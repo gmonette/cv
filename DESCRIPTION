@@ -3,15 +3,13 @@ Type: Package
 Title: Methods for faster cross-validation
 Version: 0.1.0
 Date: 2023-07-28
-Authors@R: c(person("John", "Fox", role = c("aut", "cre"), email = "jfox@mcmaster.ca"),
-	person("Georges", "Monette", role = "aut", email = "georges@yorku.ca"))
-Author: John Fox [aut, cre],
-  Georges Monette [aut]
-Maintainer: Georges Monette <georges@yorku.ca>
+Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
+  comment = c(ORCID = "0000-0002-1196-8012")),
+	person("Georges", "Monette", role = c("aut", "cre"), email = "georges@yorku.ca"))
 Description: Cross-validation methods that exploit features of various
     modeling function to improve speed.
-Depends: lme4, doParallel
-Imports: insight, parallelly, foreach
+Depends: doParallel 
+Imports: insight, parallelly, foreach, lme4
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true

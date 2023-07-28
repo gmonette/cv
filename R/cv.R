@@ -54,21 +54,21 @@ BayesRule <- function(y, yhat){
 #'
 #' Generic function to cross-validate fitted models using fast algorithms
 #'
-#' @param model: a model object that responds to model.frame(), update(), and predict()
+#' @param model a model object that responds to model.frame(), update(), and predict()
 #'         and for which the response is stored in model$y or accessible via model.response()
-#' @param data: data frame to which the model was fit (not usually necessary)
-#' @param criterion: cross-validation criterion function of form f(y.obs, y.fitted)
+#' @param data data frame to which the model was fit (not usually necessary)
+#' @param criterion cross-validation criterion function of form f(y.obs, y.fitted)
 #'              (default is mse)
-#' @param   k: perform k-fold cross-validation (default is n-fold)
-#' @param    seed: for R's random number generator
-#' @param    parallel: do computations in parallel? (default is FALSE)
-#' @param    ncores: number of cores to use for parallel computations
+#' @param k perform k-fold cross-validation (default is n-fold)
+#' @param seed for R's random number generator
+#' @param parallel do computations in parallel? (default is FALSE)
+#' @param ncores number of cores to use for parallel computations
 #'           (default is number of physical cores detected)
-#' @param    ...: to match generic
+#' @param ... to match generic
 #' @returns a "cv" object with the cv criterion averaged across the folds,
-#'          the bias-adjsuted averaged cv criterion,
-#'          the criterion applied to the model fit to the full data set,
-#'         and the initial value of R's RNG seed
+#' the bias-adjusted averaged cv criterion,
+#' the criterion applied to the model fit to the full data set,
+#' and the initial value of R's RNG seed
 #' @export
 cv <- function(model, data, criterion, k, seed, ...){
   # Cross Validation
@@ -87,6 +87,7 @@ cv <- function(model, data, criterion, k, seed, ...){
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
+#' @importFrom lme4 lmer
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=nrow(data),
@@ -157,6 +158,7 @@ cv.default <- function(model, data=insight::get_data(model),
 }
 
 #' @describeIn cv print method
+#' @param x a `cv` object to be printed
 #' @export
 print.cv <- function(x, ...){
   cat(x[["k"]], "-Fold Cross Validation", sep="")
@@ -251,6 +253,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(da
 }
 
 #' @describeIn cv glm method
+#' @param approximate perform approximate leave-k-out computation for a GLM
 #' @export
 cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(data),
                    seed, parallel=FALSE,
@@ -339,6 +342,8 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(d
 }
 
 #' @describeIn cv merMod method
+#' @param clusterVariables a character vector of names of the variables
+#' defining clusters for a mixed model with nested random effects
 #' @export
 cv.merMod <- function(model,
                       data=insight::get_data(model),
@@ -404,7 +409,6 @@ cv.merMod <- function(model,
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
-      require("lme4", quietly=TRUE) # why is this necessary?
       f(i)
     }
     stopCluster(cl)

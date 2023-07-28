@@ -60,30 +60,37 @@ cv(model, data, criterion, k, seed, ...)
 )
 }
 \arguments{
-\item{model:}{a model object that responds to model.frame(), update(), and predict()
+\item{model}{a model object that responds to model.frame(), update(), and predict()
 and for which the response is stored in model$y or accessible via model.response()}
 
-\item{data:}{data frame to which the model was fit (not usually necessary)}
+\item{data}{data frame to which the model was fit (not usually necessary)}
 
-\item{criterion:}{cross-validation criterion function of form f(y.obs, y.fitted)
+\item{criterion}{cross-validation criterion function of form f(y.obs, y.fitted)
 (default is mse)}
 
-\item{k:}{perform k-fold cross-validation (default is n-fold)}
+\item{k}{perform k-fold cross-validation (default is n-fold)}
 
-\item{seed:}{for R's random number generator}
+\item{seed}{for R's random number generator}
 
-\item{parallel:}{do computations in parallel? (default is FALSE)}
+\item{...}{to match generic}
 
-\item{ncores:}{number of cores to use for parallel computations
+\item{parallel}{do computations in parallel? (default is FALSE)}
+
+\item{ncores}{number of cores to use for parallel computations
 (default is number of physical cores detected)}
 
-\item{...:}{to match generic}
+\item{x}{a `cv` object to be printed}
+
+\item{approximate}{perform approximate leave-k-out computation for a GLM}
+
+\item{clusterVariables}{a character vector of names of the variables
+defining clusters for a mixed model with nested random effects}
 }
 \value{
 a "cv" object with the cv criterion averaged across the folds,
-         the bias-adjsuted averaged cv criterion,
-         the criterion applied to the model fit to the full data set,
-        and the initial value of R's RNG seed
+the bias-adjusted averaged cv criterion,
+the criterion applied to the model fit to the full data set,
+and the initial value of R's RNG seed
 }
 \description{
 Generic function to cross-validate fitted models using fast algorithms
