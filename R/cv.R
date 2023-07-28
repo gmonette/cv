@@ -1,27 +1,3 @@
-# getModelData <- function(model) {
-#   # returns a data frame with the data to which the model was fit
-#   # model: a statistical model object that responds to model.frame() and formula()
-#   data1 <- data <- model.frame(model)
-#   vars <- all.vars(formula(model))
-#   if ("pi" %in% vars) {
-#     vars <- setdiff(vars, "pi")
-#     message("the symbol 'pi' is treated as a numeric constant in the model formula")
-#   }
-#   cols <- colnames(data)
-#   check <- vars %in% cols
-#   if (!(all(check))) {
-#     missing.cols <- !check
-#     data1 <- expand.model.frame(model, vars[missing.cols])
-#   }
-#   missing.cols <- !cols %in% colnames(data1)
-#   if (any(missing.cols)) {
-#     data1 <- cbind(data1, data[missing.cols])
-#   }
-#   cols <- colnames(data1)
-#   valid <- make.names(cols) == cols | grepl("^\\(.*\\)$", cols)
-#   data1[valid]
-# }
-
 #' Extract response variable(s)
 #'
 #' Generic function to extract the response variable(s) from a fitted model
@@ -38,6 +14,7 @@
 getResponse <- function(model, ...){
   UseMethod("getResponse")
 }
+
 #' @describeIn getResponse default method
 #' @export
 getResponse.default <- function(model, ...){
@@ -46,6 +23,7 @@ getResponse.default <- function(model, ...){
   if (!is.numeric(y)) stop("non-numeric response")
   y
 }
+
 #' Cost functions for fitted models
 #'
 #' @param y response
@@ -55,12 +33,14 @@ getResponse.default <- function(model, ...){
 mse <- function(y, yhat){
   mean((y - yhat)^2)
 }
+
 #' @describeIn mse Bayes Rule 2
 #' @export
 BayesRule2 <- function(y, yhat){
   yhat <- round(yhat)
   mean(y != yhat) # proportion in error
 }
+
 #' @describeIn mse Bayes Rule 2
 #' @export
 BayesRule <- function(y, yhat){
@@ -69,11 +49,12 @@ BayesRule <- function(y, yhat){
   yhat <- round(yhat)
   mean(y != yhat) # proportion in error
 }
+
 #' Cross-validate fitted model
 #'
 #' Generic function to cross-validate fitted models using fast algorithms
 #'
-#'  @param model: a model object that responds to model.frame(), update(), and predict()
+#' @param model: a model object that responds to model.frame(), update(), and predict()
 #'         and for which the response is stored in model$y or accessible via model.response()
 #' @param data: data frame to which the model was fit (not usually necessary)
 #' @param criterion: cross-validation criterion function of form f(y.obs, y.fitted)
@@ -101,6 +82,11 @@ cv <- function(model, data, criterion, k, seed, ...){
 }
 
 #' @describeIn cv default method
+#' @importFrom stats coef family fitted lm.wfit model.frame
+#' model.matrix model.response predict update weighted.mean weights
+#' @importFrom parallel makeCluster stopCluster
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach %dopar%
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=nrow(data),
@@ -147,9 +133,8 @@ cv.default <- function(model, data=insight::get_data(model),
   folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
-  indices <- sample(n, n) # permute cases
+  indices <- if (n > k) sample(n, n)  else 1:n # permute cases
   if (parallel && ncores > 1){
-    if (!require("doParallel")) stop("doParallel package is missing")
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
@@ -171,19 +156,26 @@ cv.default <- function(model, data=insight::get_data(model),
   result
 }
 
+#' @describeIn cv print method
 #' @export
 print.cv <- function(x, ...){
   cat(x[["k"]], "-Fold Cross Validation", sep="")
+  if (!is.null(x[["clusters"]])){
+    cat(" based on", x[["n clusters"]],
+        paste0("{", paste(x[["clusters"]], collapse=" ,"), "}"),
+        "clusters")
+  }
   cat("\ncross-validation criterion =", x[["CV crit"]])
   cat("\nbias-adjusted cross-validation criterion =", x[["adj CV crit"]])
   cat("\nfull-sample criterion =", x[["full crit"]], "\n")
   invisible(x)
 }
 
+#' @describeIn cv lm method
 #' @export
 cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(data),
-                       seed, parallel=FALSE,
-                       ncores=parallelly::availableCores(logical=FALSE), ...){
+                  seed, parallel=FALSE,
+                  ncores=parallelly::availableCores(logical=FALSE), ...){
   UpdateLM <- function(omit){
     # compute coefficients with omit cases deleted
     #  uses the Woodbury matrix identity
@@ -235,9 +227,8 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(da
   folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
-  indices <- sample(n, n) # permute cases
+  indices <- if (n > k) sample(n, n)  else 1:n # permute cases
   if (parallel && ncores > 1L){
-    if (!require("doParallel")) stop("doParallel package is missing")
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
@@ -259,6 +250,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(da
   result
 }
 
+#' @describeIn cv glm method
 #' @export
 cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(data),
                    seed, parallel=FALSE,
@@ -291,8 +283,8 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(d
     seed <- NULL
   }
   if (!approximate){
-  cv.default(model=model, data=data, criterion=criterion, k=k, seed=seed,
-             parallel=parallel, ncores=ncores, ...)
+    cv.default(model=model, data=data, criterion=criterion, k=k, seed=seed,
+               parallel=parallel, ncores=ncores, ...)
   } else {
     b <- coef(model)
     p <- length(b)
@@ -322,9 +314,8 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(d
     folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
     ends <- cumsum(folds) # end of each fold
     starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
-    indices <- sample(n, n) # permute cases
+    indices <- if (n > k) sample(n, n)  else 1:n # permute cases
     if (parallel && ncores > 1L){
-      if (!require("doParallel")) stop("doParallel package is missing")
       cl <- makeCluster(ncores)
       registerDoParallel(cl)
       result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
@@ -345,4 +336,90 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(d
     class(result) <- "cv"
     result
   }
+}
+
+#' @describeIn cv merMod method
+#' @export
+cv.merMod <- function(model,
+                      data=insight::get_data(model),
+                      criterion=mse, k=nrow(clusters),
+                      seed, parallel=FALSE,
+                      ncores=parallelly::availableCores(logical=FALSE),
+                      clusterVariables,
+                      ...){
+
+  defineClusters <- function(variables){
+    all.variables <- names(data)
+    if (any(bad <- !variables %in% all.variables)){
+      stop("The following cluster variable", if (sum(bad) > 1) "s are" else " is",
+           " not in the data: ", paste(variables[bad], collapse=", "))
+    }
+    unique(data[, variables, drop=FALSE])
+  }
+
+  selectCluster <- function(cluster){
+    result <- apply(data[, names(cluster), drop=FALSE], 1,
+                    function(x) all(x == cluster))
+    if (!any(result)) stop("there is no such cluster: ",
+                           paste(paste0(names(cluster), "=", cluster), collapse=", "))
+    result
+  }
+
+  selectClusters <- function(clusters) {
+    result <- apply(clusters, 1, selectCluster)
+    apply(result, 1, any)
+  }
+
+  f <- function(i){
+    indices.i <- indices[starts[i]:ends[i]]
+    index <- selectClusters(clusters[- indices.i, , drop=FALSE])
+    model.i <- update(model, data=data[index, ])
+    fit.o.i <- predict(model.i, newdata=data, re.form=NA) # allow.new.levels=TRUE)
+    fit.i <- fit.o.i[!index]
+    c(criterion(y[!index], fit.i), criterion(y, fit.o.i))
+  }
+
+  clusters <- defineClusters(clusterVariables)
+
+  y <- insight::get_response(model)
+  n <- nrow(clusters)
+  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+    stop("k must be an integer between 2 and number of clussters")
+  }
+  if (k != n){
+    if (missing(seed)) seed <- sample(1e6, 1L)
+    set.seed(seed)
+    message("R RNG seed set to ", seed)
+  } else {
+    seed <- NULL
+  }
+  nk <-  n %/% k # number of clusters in each fold
+  rem <- n %% k  # remainder
+  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
+  ends <- cumsum(folds) # end of each fold
+  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+  indices <- if (n > k) sample(n, n)  else 1:n # permute clusters
+
+  if (parallel && ncores > 1L){
+    cl <- makeCluster(ncores)
+    registerDoParallel(cl)
+    result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
+      require("lme4", quietly=TRUE) # why is this necessary?
+      f(i)
+    }
+    stopCluster(cl)
+  } else {
+    result <- matrix(0, k, 2L)
+    for (i in 1L:k){
+      result[i, ] <- f(i)
+    }
+  }
+  cv <- weighted.mean(result[, 1L], folds)
+  cv.full <- criterion(y, predict(model, re.form=NA))
+  adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
+  result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
+                 "k" = if (k == n) "n" else k, "seed" = seed,
+                 clusters = clusterVariables, "n clusters" = n)
+  class(result) <- "cv"
+  result
 }

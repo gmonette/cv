@@ -3,6 +3,10 @@
 \name{cv}
 \alias{cv}
 \alias{cv.default}
+\alias{print.cv}
+\alias{cv.lm}
+\alias{cv.glm}
+\alias{cv.merMod}
 \title{Cross-validate fitted model}
 \usage{
 cv(model, data, criterion, k, seed, ...)
@@ -17,8 +21,48 @@ cv(model, data, criterion, k, seed, ...)
   ncores = parallelly::availableCores(logical = FALSE),
   ...
 )
+
+\method{print}{cv}(x, ...)
+
+\method{cv}{lm}(
+  model,
+  data = insight::get_data(model),
+  criterion = mse,
+  k = nrow(data),
+  seed,
+  parallel = FALSE,
+  ncores = parallelly::availableCores(logical = FALSE),
+  ...
+)
+
+\method{cv}{glm}(
+  model,
+  data = insight::get_data(model),
+  criterion = mse,
+  k = nrow(data),
+  seed,
+  parallel = FALSE,
+  ncores = parallelly::availableCores(logical = FALSE),
+  approximate = FALSE,
+  ...
+)
+
+\method{cv}{merMod}(
+  model,
+  data = insight::get_data(model),
+  criterion = mse,
+  k = nrow(clusters),
+  seed,
+  parallel = FALSE,
+  ncores = parallelly::availableCores(logical = FALSE),
+  clusterVariables,
+  ...
+)
 }
 \arguments{
+\item{model:}{a model object that responds to model.frame(), update(), and predict()
+and for which the response is stored in model$y or accessible via model.response()}
+
 \item{data:}{data frame to which the model was fit (not usually necessary)}
 
 \item{criterion:}{cross-validation criterion function of form f(y.obs, y.fitted)
@@ -44,12 +88,19 @@ a "cv" object with the cv criterion averaged across the folds,
 \description{
 Generic function to cross-validate fitted models using fast algorithms
 }
-\details{
-@param model: a model object that responds to model.frame(), update(), and predict()
-        and for which the response is stored in model$y or accessible via model.response()
-}
 \section{Methods (by class)}{
 \itemize{
 \item \code{cv(default)}: default method
+
+\item \code{cv(lm)}: lm method
+
+\item \code{cv(glm)}: glm method
+
+\item \code{cv(merMod)}: merMod method
+
+}}
+\section{Methods (by generic)}{
+\itemize{
+\item \code{print(cv)}: print method
 
 }}
