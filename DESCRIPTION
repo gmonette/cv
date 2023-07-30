@@ -2,14 +2,14 @@ Package: cv
 Type: Package
 Title: Methods for faster cross-validation
 Version: 0.1.0
-Date: 2023-07-28
+Date: 2023-07-30
 Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
   comment = c(ORCID = "0000-0002-1196-8012")),
 	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"))
 Description: Cross-validation methods that exploit features of various
     modeling function to improve speed.
 Depends: doParallel 
-Imports: insight, parallelly, foreach, lme4
+Imports: insight, parallelly, foreach, lme4, MASS
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
