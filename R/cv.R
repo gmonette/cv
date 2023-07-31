@@ -59,9 +59,11 @@ BayesRule <- function(y, yhat){
 #' @param data data frame to which the model was fit (not usually necessary)
 #' @param criterion cross-validation criterion function of form f(y.obs, y.fitted)
 #'              (default is mse)
-#' @param k perform k-fold cross-validation (default is n-fold)
+#' @param k perform k-fold cross-validation (default is 10); \code{k}
+#' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
+#' cross-validation.
 #' @param seed for R's random number generator
-#' @param parallel do computations in parallel? (default is FALSE)
+#' @param parallel do computations in parallel? (default is \code{FALSE})
 #' @param ncores number of cores to use for parallel computations
 #'           (default is number of physical cores detected)
 #' @param ... to match generic
@@ -72,8 +74,8 @@ BayesRule <- function(y, yhat){
 #' @examples
 #' data("Auto", package="ISLR")
 #' m.auto <- lm(mpg ~ horsepower, data=Auto)
-#' cv(m.auto)
-#' cv(m.auto, k=10, seed=1234)
+#' cv(m.auto,  k="loo")
+#' cv(m.auto, seed=1234)
 #'
 #' data("Caravan", package="ISLR")
 #' m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)
@@ -92,7 +94,7 @@ cv <- function(model, data, criterion, k, seed, ...){
 #' @importFrom lme4 lmer
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
-                       criterion=mse, k=nrow(data),
+                       criterion=mse, k=10,
                        seed, parallel=FALSE,
                        ncores=parallelly::availableCores(logical=FALSE), ...){
   f <- function(i){
@@ -105,8 +107,13 @@ cv.default <- function(model, data=insight::get_data(model),
   }
   y <- getResponse(model)
   n <- nrow(data)
+  if (is.character(k)){
+    if (k == "n" || k == "loo") {
+      k <- n
+    }
+  }
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
-    stop("k must be an integer between 2 and n")
+    stop('k must be an integer between 2 and n or "n" or "loo"')
   }
   if (k != n){
     if (missing(seed)) seed <- sample(1e6, 1L)
@@ -144,7 +151,7 @@ cv.default <- function(model, data=insight::get_data(model),
 }
 
 #' @describeIn cv print method
-#' @param x a `cv` object to be printed
+#' @param x a \code{cv} object to be printed
 #' @export
 print.cv <- function(x, ...){
   cat(x[["k"]], "-Fold Cross Validation", sep="")
@@ -161,7 +168,7 @@ print.cv <- function(x, ...){
 
 #' @describeIn cv lm method
 #' @export
-cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(data),
+cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
                   seed, parallel=FALSE,
                   ncores=parallelly::availableCores(logical=FALSE), ...){
   UpdateLM <- function(omit){
@@ -187,6 +194,14 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(da
   w <- weights(model)
   if (is.null(w)) w <- rep(1, length(y))
   n <- nrow(data)
+  if (is.character(k)){
+    if (k == "n" || k == "loo") {
+      k <- n
+    }
+  }
+  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+    stop('k must be an integer between 2 and n or "n" or "loo"')
+  }
   b <- coef(model)
   p <- length(b)
   if (p > model$rank) {
@@ -241,7 +256,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(da
 #' @describeIn cv glm method
 #' @param approximate perform approximate leave-k-out computation for a GLM
 #' @export
-cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(data),
+cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
                    seed, parallel=FALSE,
                    ncores=parallelly::availableCores(logical=FALSE),
                    approximate=FALSE, ...){
@@ -264,6 +279,14 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=nrow(d
     c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
   }
   n <- nrow(data)
+  if (is.character(k)){
+    if (k == "n" || k == "loo") {
+      k <- n
+    }
+  }
+  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+    stop('k must be an integer between 2 and n or "n" or "loo"')
+  }
   if (k != n){
     if (missing(seed)) seed <- sample(1e6, 1L)
     set.seed(seed)

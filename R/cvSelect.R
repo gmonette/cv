@@ -1,37 +1,45 @@
 #' Generic Function to Cross-Validate a Model-Selection Procedure
 #'
 #' @param procedure a model-selection procedure function that accepts the following arguments:
-#' `data`, set to the data argument to `cvSelect()`;
-#' `indices`, the indices of the rows of data defining the current fold; if missing,
+#' \code{data}, set to the data argument to \code{cvSelect()};
+#' \code{indices}, the indices of the rows of data defining the current fold; if missing,
 #' the model-selection procedure is applied to the full data; other arguments, to be
-#' passed via `...`. `procedure()` should return a two-element vector with the result
+#' passed via \code{...}. \code{procedure()} should return a two-element vector with the result
 #' of applying a cross-validation criterion to the cases in
 #' the current fold for the model deleting that fold, and to
 #' all of the cases again for the model deleting the current fold.
-#' When the indices argument is missing, procedure() returns the cross-validation criterion for all of the cases based on
+#' When the indices argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
 #' the model fit to all of the cases.
 #' @param data full data frame for model selection
-#' @param k perform k-fold cross-validation (default is n-fold)
+#' @param k perform k-fold cross-validation (default is 10); \code{k}
+#' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
+#' cross-validation.
 #' @param seed for R's random number generator
-#' @param parallel do computations in parallel? (default is FALSE)
+#' @param parallel do computations in parallel? (default is \code{FALSE})
 #' @param ncores number of cores to use for parallel computations
 #'           (default is number of physical cores detected)
-#' @param ... arguments to be passed to `procedure()`.
-#' @returns a "cv" object with the cv criterion averaged across the folds,
-#' the bias-adjusted averaged cv criterion,
+#' @param ... arguments to be passed to \code{procedure()}.
+#' @returns \code{cvSelect()} return a \code{"cv"} object with the CV criterion averaged across the folds,
+#' the bias-adjusted averaged CV criterion,
 #' the criterion applied to the model fit to the full data set,
 #' and the initial value of R's RNG seed
 #' @importFrom MASS stepAIC
+#' @describeIn cvSelect apply cross-validation to a model-selection procedure.
 #' @export
 cvSelect <- function(procedure,
                      data,
-                     k=nrow(data),
+                     k=10,
                      seed, parallel=FALSE,
                      ncores=parallelly::availableCores(logical=FALSE),
                      ...){
   n <- nrow(data)
+  if (is.character(k)){
+    if (k == "n" || k == "loo") {
+      k <- n
+    }
+  }
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
-    stop("k must be an integer between 2 and n")
+    stop('k must be an integer between 2 and n or "n" or "loo"')
   }
   if (k != n){
     if (missing(seed)) seed <- sample(1e6, 1L)
@@ -69,13 +77,19 @@ cvSelect <- function(procedure,
   result
 }
 
-#' @describeIn cvSelect select a model using the `stepAIC()` function in the
-#' *MASS* package.
+#' @describeIn cvSelect select a model using the \code{\link[MASS]{stepAIC}()} function in the
+#' \pkg{MASS} package.
 #' @param data full data frame
 #' @param indices indices of cases in data defining the current fold
 #' @param model a regression model object fit to data
 #' @param criterion a CV criterion function
-#' @param k. the `k` argument to `stepAIC()` (note the period in `k.`).
+#' @param k. the \code{k} argument to \code{\link[MASS]{stepAIC}()} (note the period in \code{k.}).
+#' @examples
+#' data("Auto", package="ISLR")
+#' m.auto <- lm(mpg ~ . - name - origin, data=Auto)
+#' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
+#' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
+#'          k.=log(nrow(Auto))) # via BIC
 #' @export
 selectStepAIC <- function(data, indices,
                           model, criterion=mse, k.=2, ...){

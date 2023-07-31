@@ -8,7 +8,7 @@
 cvSelect(
   procedure,
   data,
-  k = nrow(data),
+  k = 10,
   seed,
   parallel = FALSE,
   ncores = parallelly::availableCores(logical = FALSE),
@@ -19,28 +19,30 @@ selectStepAIC(data, indices, model, criterion = mse, k. = 2, ...)
 }
 \arguments{
 \item{procedure}{a model-selection procedure function that accepts the following arguments:
-`data`, set to the data argument to `cvSelect()`;
-`indices`, the indices of the rows of data defining the current fold; if missing,
+\code{data}, set to the data argument to \code{cvSelect()};
+\code{indices}, the indices of the rows of data defining the current fold; if missing,
 the model-selection procedure is applied to the full data; other arguments, to be
-passed via `...`. `procedure()` should return a two-element vector with the result
+passed via \code{...}. \code{procedure()} should return a two-element vector with the result
 of applying a cross-validation criterion to the cases in
 the current fold for the model deleting that fold, and to
 all of the cases again for the model deleting the current fold.
-When the indices argument is missing, procedure() returns the cross-validation criterion for all of the cases based on
+When the indices argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
 the model fit to all of the cases.}
 
 \item{data}{full data frame}
 
-\item{k}{perform k-fold cross-validation (default is n-fold)}
+\item{k}{perform k-fold cross-validation (default is 10); \code{k}
+may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
+cross-validation.}
 
 \item{seed}{for R's random number generator}
 
-\item{parallel}{do computations in parallel? (default is FALSE)}
+\item{parallel}{do computations in parallel? (default is \code{FALSE})}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is number of physical cores detected)}
 
-\item{...}{arguments to be passed to `procedure()`.}
+\item{...}{arguments to be passed to \code{procedure()}.}
 
 \item{indices}{indices of cases in data defining the current fold}
 
@@ -48,11 +50,11 @@ the model fit to all of the cases.}
 
 \item{criterion}{a CV criterion function}
 
-\item{k.}{the `k` argument to `stepAIC()` (note the period in `k.`).}
+\item{k.}{the \code{k} argument to \code{\link[MASS]{stepAIC}()} (note the period in \code{k.}).}
 }
 \value{
-a "cv" object with the cv criterion averaged across the folds,
-the bias-adjusted averaged cv criterion,
+\code{cvSelect()} return a \code{"cv"} object with the CV criterion averaged across the folds,
+the bias-adjusted averaged CV criterion,
 the criterion applied to the model fit to the full data set,
 and the initial value of R's RNG seed
 }
@@ -61,7 +63,16 @@ Generic Function to Cross-Validate a Model-Selection Procedure
 }
 \section{Functions}{
 \itemize{
-\item \code{selectStepAIC()}: select a model using the `stepAIC()` function in the
-*MASS* package.
+\item \code{cvSelect()}: apply cross-validation to a model-selection procedure.
+
+\item \code{selectStepAIC()}: select a model using the \code{\link[MASS]{stepAIC}()} function in the
+\pkg{MASS} package.
 
 }}
+\examples{
+data("Auto", package="ISLR")
+m.auto <- lm(mpg ~ . - name - origin, data=Auto)
+cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
+cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
+         k.=log(nrow(Auto))) # via BIC
+}

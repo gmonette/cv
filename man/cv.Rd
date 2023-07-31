@@ -27,7 +27,7 @@ cv(model, data, criterion, k, seed, ...)
   model,
   data = insight::get_data(model),
   criterion = mse,
-  k = nrow(data),
+  k = 10,
   seed,
   parallel = FALSE,
   ncores = parallelly::availableCores(logical = FALSE),
@@ -40,7 +40,7 @@ cv(model, data, criterion, k, seed, ...)
   model,
   data = insight::get_data(model),
   criterion = mse,
-  k = nrow(data),
+  k = 10,
   seed,
   parallel = FALSE,
   ncores = parallelly::availableCores(logical = FALSE),
@@ -51,7 +51,7 @@ cv(model, data, criterion, k, seed, ...)
   model,
   data = insight::get_data(model),
   criterion = mse,
-  k = nrow(data),
+  k = 10,
   seed,
   parallel = FALSE,
   ncores = parallelly::availableCores(logical = FALSE),
@@ -68,11 +68,13 @@ and for which the response is stored in model$y or accessible via model.response
 \item{criterion}{cross-validation criterion function of form f(y.obs, y.fitted)
 (default is mse)}
 
-\item{k}{perform k-fold cross-validation (default is n-fold)}
+\item{k}{perform k-fold cross-validation (default is 10); \code{k}
+may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
+cross-validation.}
 
 \item{seed}{for R's random number generator}
 
-\item{parallel}{do computations in parallel? (default is FALSE)}
+\item{parallel}{do computations in parallel? (default is \code{FALSE})}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is number of physical cores detected)}
@@ -82,7 +84,7 @@ defining clusters for a mixed model with nested random effects}
 
 \item{...}{to match generic}
 
-\item{x}{a `cv` object to be printed}
+\item{x}{a \code{cv} object to be printed}
 
 \item{approximate}{perform approximate leave-k-out computation for a GLM}
 }
@@ -114,8 +116,8 @@ Generic function to cross-validate fitted models using fast algorithms
 \examples{
 data("Auto", package="ISLR")
 m.auto <- lm(mpg ~ horsepower, data=Auto)
-cv(m.auto)
-cv(m.auto, k=10, seed=1234)
+cv(m.auto,  k="loo")
+cv(m.auto, seed=1234)
 
 data("Caravan", package="ISLR")
 m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)
