@@ -111,3 +111,13 @@ Generic function to cross-validate fitted models using fast algorithms
 \item \code{print(cv)}: print method
 
 }}
+\examples{
+data("Auto", package="ISLR")
+m.auto <- lm(mpg ~ horsepower, data=Auto)
+cv(m.auto)
+cv(m.auto, k=10, seed=1234)
+
+data("Caravan", package="ISLR")
+m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)
+cv(m.caravan, k=5, criterion=BayesRule, seed=123)
+}

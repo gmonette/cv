@@ -69,15 +69,17 @@ BayesRule <- function(y, yhat){
 #' the bias-adjusted averaged cv criterion,
 #' the criterion applied to the model fit to the full data set,
 #' and the initial value of R's RNG seed
+#' @examples
+#' data("Auto", package="ISLR")
+#' m.auto <- lm(mpg ~ horsepower, data=Auto)
+#' cv(m.auto)
+#' cv(m.auto, k=10, seed=1234)
+#'
+#' data("Caravan", package="ISLR")
+#' m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)
+#' cv(m.caravan, k=5, criterion=BayesRule, seed=123)
 #' @export
 cv <- function(model, data, criterion, k, seed, ...){
-  # Cross Validation
-  # Args:
-  #   model: model object
-  #   data: data frame to which the model was fit
-  #   criterion: cross-validation criterion function
-  #   k: perform k-fold cross-validation
-  #   seed: for R's random number generator
   UseMethod("cv")
 }
 
@@ -93,22 +95,6 @@ cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=nrow(data),
                        seed, parallel=FALSE,
                        ncores=parallelly::availableCores(logical=FALSE), ...){
-  # Args:
-  #   model: a model object that responds to model.frame(), update(), and predict()
-  #.         and for which the response is stored in model$y or accessible via model.response()
-  #   data: data frame to which the model was fit (not usually necessary)
-  #   criterion: cross-validation criterion function of form f(y.obs, y.fitted)
-  #              (default is mse)
-  #   k: perform k-fold cross-validation (default is n-fold)
-  #   seed: for R's random number generator
-  #   parallel: do computations in parallel? (default is FALSE)
-  #   ncores: number of cores to use for parallel computations
-  #           (default is number of physical cores detected)
-  #   ...: to match generic
-  # Returns: a "cv" object with the cv criterion averaged across the folds,
-  #          the bias-adjsuted averaged cv criterion,
-  #          the criterion applied to the model fit to the full data set,
-  #.         and the initial value of R's RNG seed
   f <- function(i){
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
