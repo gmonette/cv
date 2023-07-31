@@ -66,6 +66,15 @@ BayesRule <- function(y, yhat){
 #' @param parallel do computations in parallel? (default is \code{FALSE})
 #' @param ncores number of cores to use for parallel computations
 #'           (default is number of physical cores detected)
+#' @param method computational method to apply to a linear (i.e. \code{"lm"}) model fit by least-squares,
+#' one of \code{"auto"}, \code{"hatvalues"}, \code{"Woodbury"}, or \code{"naive"}.
+#' \code{method="hatvalues"} is applicable only to n-fold (leave-one-ou, loot) cross-validation
+#' and uses the hatvalues for the model to compute the loo fitted value for each case.
+#' \code{method="Woodbury"} uses an efficient method applicable regardless of the
+#' number of folds to compute fitted values for each fold, but the method may be
+#' numerically unstable; \code{method="naive"} invokes the default \code{cv()} method
+#' literally refitting the model \code{k} times. \code{method="auto"} is equivalent
+#' to \code{method="hatvalues"} when \code{k} = n and to \code{method="Wooodbury"} otherwise.
 #' @param ... to match generic
 #' @returns a "cv" object with the cv criterion averaged across the folds,
 #' the bias-adjusted averaged cv criterion,
@@ -88,6 +97,7 @@ cv <- function(model, data, criterion, k, seed, ...){
 #' @describeIn cv default method
 #' @importFrom stats coef family fitted lm.wfit model.frame
 #' model.matrix model.response predict update weighted.mean weights
+#' residuals hatvalues
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
@@ -161,15 +171,18 @@ print.cv <- function(x, ...){
         "clusters")
   }
   cat("\ncross-validation criterion =", x[["CV crit"]])
-  cat("\nbias-adjusted cross-validation criterion =", x[["adj CV crit"]])
-  cat("\nfull-sample criterion =", x[["full crit"]], "\n")
+  if (!is.null(x[["adj CV crit"]]))
+    cat("\nbias-adjusted cross-validation criterion =", x[["adj CV crit"]])
+  if (!is.null(x[["full crit"]]))
+    cat("\nfull-sample criterion =", x[["full crit"]], "\n")
   invisible(x)
 }
 
 #' @describeIn cv lm method
 #' @export
 cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
-                  seed, parallel=FALSE,
+                  seed, method=c("auto", "hatvalues", "Woodbury", "naive"),
+                  parallel=FALSE,
                   ncores=parallelly::availableCores(logical=FALSE), ...){
   UpdateLM <- function(omit){
     # compute coefficients with omit cases deleted
@@ -212,6 +225,19 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     X <- X[, !is.na(b)]
     p <- ncol(X)
     model <- lm.wfit(X, y, w)
+  }
+  method <- match.arg(method)
+  if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
+  if (method == "auto"){
+    method <- if (k == n) "hatvalues" else "Woodbury"
+  }
+  if (method == "naive") return(NextMethod())
+  if (method == "hatvalues"){
+    yhat <- y - residuals(model)/(1 - hatvalues(model))
+    cv <- criterion(y, yhat)
+    result <- list(k="n", "CV crit" = cv)
+    class(result) <- "cv"
+    return(result)
   }
   XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
   Xy <- t(X) %*% (w * y)
