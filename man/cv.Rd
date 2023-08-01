@@ -54,9 +54,9 @@ cv(model, data, criterion, k, seed, ...)
   criterion = mse,
   k = 10,
   seed,
+  method = c("exact", "hatvalues", "Woodbury"),
   parallel = FALSE,
   ncores = parallelly::availableCores(logical = FALSE),
-  approximate = FALSE,
   ...
 )
 }
@@ -87,17 +87,9 @@ defining clusters for a mixed model with nested random effects}
 
 \item{x}{a \code{cv} object to be printed}
 
-\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model fit by least-squares,
-one of \code{"auto"}, \code{"hatvalues"}, \code{"Woodbury"}, or \code{"naive"}.
-\code{method="hatvalues"} is applicable only to n-fold (leave-one-ou, loot) cross-validation
-and uses the hatvalues for the model to compute the loo fitted value for each case.
-\code{method="Woodbury"} uses an efficient method applicable regardless of the
-number of folds to compute fitted values for each fold, but the method may be
-numerically unstable; \code{method="naive"} invokes the default \code{cv()} method
-literally refitting the model \code{k} times. \code{method="auto"} is equivalent
-to \code{method="hatvalues"} when \code{k} = n and to \code{method="Wooodbury"} otherwise.}
-
-\item{approximate}{perform approximate leave-k-out computation for a GLM}
+\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
+or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
+of the available options.}
 }
 \value{
 a "cv" object with the cv criterion averaged across the folds,

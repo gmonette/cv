@@ -66,15 +66,9 @@ BayesRule <- function(y, yhat){
 #' @param parallel do computations in parallel? (default is \code{FALSE})
 #' @param ncores number of cores to use for parallel computations
 #'           (default is number of physical cores detected)
-#' @param method computational method to apply to a linear (i.e. \code{"lm"}) model fit by least-squares,
-#' one of \code{"auto"}, \code{"hatvalues"}, \code{"Woodbury"}, or \code{"naive"}.
-#' \code{method="hatvalues"} is applicable only to n-fold (leave-one-ou, loot) cross-validation
-#' and uses the hatvalues for the model to compute the loo fitted value for each case.
-#' \code{method="Woodbury"} uses an efficient method applicable regardless of the
-#' number of folds to compute fitted values for each fold, but the method may be
-#' numerically unstable; \code{method="naive"} invokes the default \code{cv()} method
-#' literally refitting the model \code{k} times. \code{method="auto"} is equivalent
-#' to \code{method="hatvalues"} when \code{k} = n and to \code{method="Wooodbury"} otherwise.
+#' @param method computational method to apply to a linear (i.e. \code{"lm"}) model
+#' or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
+#' of the available options.
 #' @param ... to match generic
 #' @returns a "cv" object with the cv criterion averaged across the folds,
 #' the bias-adjusted averaged cv criterion,
@@ -280,12 +274,13 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
 }
 
 #' @describeIn cv glm method
-#' @param approximate perform approximate leave-k-out computation for a GLM
 #' @export
 cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
-                   seed, parallel=FALSE,
+                   seed,
+                   method=c("exact", "hatvalues", "Woodbury"),
+                   parallel=FALSE,
                    ncores=parallelly::availableCores(logical=FALSE),
-                   approximate=FALSE, ...){
+                   ...){
   UpdateIWLS <- function(omit){
     # compute coefficients with omit cases deleted
     #  uses the Woodbury matrix identity
@@ -313,16 +308,25 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
+  method <- match.arg(method)
   if (k != n){
     if (missing(seed)) seed <- sample(1e6, 1L)
     set.seed(seed)
-    if (approximate) message("R RNG seed set to ", seed)
+    if (method != "exact") message("R RNG seed set to ", seed)
   } else {
     seed <- NULL
   }
-  if (!approximate){
+  if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
+  if (method == "exact"){
     cv.default(model=model, data=data, criterion=criterion, k=k, seed=seed,
                parallel=parallel, ncores=ncores, ...)
+  } else if (method == "hatvalues") {
+    y <- getResponse(model)
+    yhat <- y - residuals(model, type="response")/(1 - hatvalues(model))
+    cv <- criterion(y, yhat)
+    result <- list(k="n", "CV crit" = cv)
+    class(result) <- "cv"
+    return(result)
   } else {
     b <- coef(model)
     p <- length(b)
@@ -375,4 +379,3 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     result
   }
 }
-
