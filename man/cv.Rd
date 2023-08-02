@@ -31,6 +31,7 @@ cv(model, data, criterion, k, seed, ...)
   seed,
   parallel = FALSE,
   ncores = parallelly::availableCores(logical = FALSE),
+  method = NULL,
   ...
 )
 
@@ -61,19 +62,17 @@ cv(model, data, criterion, k, seed, ...)
 )
 }
 \arguments{
-\item{model}{a model object that responds to model.frame(), update(), and predict()
-and for which the response is stored in model$y or accessible via model.response()}
+\item{model}{a regression model object (see Details).}
 
 \item{data}{data frame to which the model was fit (not usually necessary)}
 
-\item{criterion}{cross-validation criterion function of form f(y.obs, y.fitted)
-(default is mse)}
-
-\item{k}{perform k-fold cross-validation (default is 10); \code{k}
+\item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
 
-\item{seed}{for R's random number generator}
+\item{seed}{for R's random number generator; optional, if not
+supplied a random seed will be selected and saved; not needed
+for n-fold cross-validation}
 
 \item{parallel}{do computations in parallel? (default is \code{FALSE})}
 
@@ -85,17 +84,18 @@ defining clusters for a mixed model with nested random effects}
 
 \item{...}{to match generic}
 
-\item{x}{a \code{cv} object to be printed}
-
 \item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 of the available options.}
+
+\item{x}{a \code{cv} object to be printed}
 }
 \value{
-a "cv" object with the cv criterion averaged across the folds,
-the bias-adjusted averaged cv criterion,
+a \code{"cv"} object with the cross-validation criterion averaged across the folds,
+the bias-adjusted averaged CV criterion,
 the criterion applied to the model fit to the full data set,
-and the initial value of R's RNG seed
+and the initial value of R's RNG seed. Some methods return a
+subset of these components and may add additional information.
 }
 \description{
 A parallelized generic k-fold (including n-fold, i.e., leave-one-out)
@@ -103,20 +103,48 @@ cross-validation function, with a default method, and
 specific methods for linear and generalized-linear models that can be much
 more computationally efficient.
 }
+\details{
+The default method uses \code{\link{update}()} to refit the model
+to each fold, and should work if there are appropriate \code{update()}
+and \code{\link{predict}()} methods and if the default method for \code{\link{getResponse}()}
+works or if a \code{getResponse()} method is supplied.
+
+The \code{"lm"} and \code{"glm"} methods can use much faster computational
+algorithms, as selected by the \code{method} argument. The linear-model
+method accommodates weighted linear models.
+
+For both classes of models, for the leave-one-out (n-fold) case, fitted values
+for the folds can be computed from the hat-values via
+\code{method="hatvalues"} without refitting the model;
+for GLMs, this method is approximate, for LMs it is exact.
+
+Again for both classes of models, when more than one case is omitted
+in each fold, fitted values may be obtained without refitting the
+model by exploiting the Woodbury matrix identity via \code{method="Woodbury"}.
+As for hatvalues, this method is exact for LMs and approximate for
+GLMs.
+
+The default for linear models is \code{method="auto"},
+which is equivalent to \code{method="hatvalues"} for n-fold cross-validation
+and \code{method="Woodbury"} otherwise; \code{method="naive"} refits
+the model via \code{update()} and is generally much slower. The
+default for generalized linear models is \code{method="exact"},
+which employs \code{update()}.
+}
 \section{Methods (by class)}{
 \itemize{
 \item \code{cv(merMod)}: merMod method
 
-\item \code{cv(default)}: default method
+\item \code{cv(default)}: \code{default} method
 
-\item \code{cv(lm)}: lm method
+\item \code{cv(lm)}: \code{"lm"} method
 
-\item \code{cv(glm)}: glm method
+\item \code{cv(glm)}: \code{"glm"} method
 
 }}
 \section{Methods (by generic)}{
 \itemize{
-\item \code{print(cv)}: print method
+\item \code{print(cv)}: \code{print()} method
 
 }}
 \examples{

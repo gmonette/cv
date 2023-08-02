@@ -5,15 +5,18 @@
 #' specific methods for linear and generalized-linear models that can be much
 #' more computationally efficient.
 #'
-#' @param model a model object that responds to model.frame(), update(), and predict()
-#'         and for which the response is stored in model$y or accessible via model.response()
+#' @param model a regression model object (see Details).
 #' @param data data frame to which the model was fit (not usually necessary)
-#' @param criterion cross-validation criterion function of form f(y.obs, y.fitted)
-#'              (default is mse)
-#' @param k perform k-fold cross-validation (default is 10); \code{k}
+#' @param criterion cross-validation criterion function of form \code{f(y, yhat)}
+#'        where \code{y} is the observed values of the response and
+#'        \code{yhat} the predicted values; the default is \code{\link{mse}
+#'        (the mean-squared error)
+#' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
-#' @param seed for R's random number generator
+#' @param seed for R's random number generator; optional, if not
+#' supplied a random seed will be selected and saved; not needed
+#' for n-fold cross-validation
 #' @param parallel do computations in parallel? (default is \code{FALSE})
 #' @param ncores number of cores to use for parallel computations
 #'           (default is number of physical cores detected)
@@ -21,10 +24,40 @@
 #' or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 #' of the available options.
 #' @param ... to match generic
-#' @returns a "cv" object with the cv criterion averaged across the folds,
-#' the bias-adjusted averaged cv criterion,
+#' @returns a \code{"cv"} object with the cross-validation criterion averaged across the folds,
+#' the bias-adjusted averaged CV criterion,
 #' the criterion applied to the model fit to the full data set,
-#' and the initial value of R's RNG seed
+#' and the initial value of R's RNG seed. Some methods return a
+#' subset of these components and may add additional information.
+#'
+#' @details
+#' The default method uses \code{\link{update}()} to refit the model
+#' to each fold, and should work if there are appropriate \code{update()}
+#' and \code{\link{predict}()} methods and if the default method for \code{\link{getResponse}()}
+#' works or if a \code{getResponse()} method is supplied.
+#'
+#' The \code{"lm"} and \code{"glm"} methods can use much faster computational
+#' algorithms, as selected by the \code{method} argument. The linear-model
+#' method accommodates weighted linear models.
+#'
+#' For both classes of models, for the leave-one-out (n-fold) case, fitted values
+#' for the folds can be computed from the hat-values via
+#' \code{method="hatvalues"} without refitting the model;
+#' for GLMs, this method is approximate, for LMs it is exact.
+#'
+#' Again for both classes of models, when more than one case is omitted
+#' in each fold, fitted values may be obtained without refitting the
+#' model by exploiting the Woodbury matrix identity via \code{method="Woodbury"}.
+#' As for hatvalues, this method is exact for LMs and approximate for
+#' GLMs.
+#'
+#' The default for linear models is \code{method="auto"},
+#' which is equivalent to \code{method="hatvalues"} for n-fold cross-validation
+#' and \code{method="Woodbury"} otherwise; \code{method="naive"} refits
+#' the model via \code{update()} and is generally much slower. The
+#' default for generalized linear models is \code{method="exact"},
+#' which employs \code{update()}.
+#'
 #' @examples
 #' data("Auto", package="ISLR")
 #' m.auto <- lm(mpg ~ horsepower, data=Auto)
@@ -39,7 +72,7 @@ cv <- function(model, data, criterion, k, seed, ...){
   UseMethod("cv")
 }
 
-#' @describeIn cv default method
+#' @describeIn cv \code{default} method
 #' @importFrom stats coef family fitted lm.wfit model.frame
 #' model.matrix model.response predict update weighted.mean weights
 #' residuals hatvalues
@@ -51,7 +84,8 @@ cv <- function(model, data, criterion, k, seed, ...){
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10,
                        seed, parallel=FALSE,
-                       ncores=parallelly::availableCores(logical=FALSE), ...){
+                       ncores=parallelly::availableCores(logical=FALSE),
+                       method=NULL, ...){
   f <- function(i){
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
@@ -100,12 +134,13 @@ cv.default <- function(model, data=insight::get_data(model),
   cv.full <- criterion(y, fitted(model))
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
-                 "k" = if (k == n) "n" else k, "seed" = seed)
+                 "k" = if (k == n) "n" else k, "seed" = seed,
+                 "method"=method)
   class(result) <- "cv"
   result
 }
 
-#' @describeIn cv print method
+#' @describeIn cv \code{print()} method
 #' @param x a \code{cv} object to be printed
 #' @export
 print.cv <- function(x, ...){
@@ -115,6 +150,7 @@ print.cv <- function(x, ...){
         paste0("{", paste(x[["clusters"]], collapse=" ,"), "}"),
         "clusters")
   }
+  if (!is.null(x[["method"]])) cat("\nmethod:", x[["method"]])
   cat("\ncross-validation criterion =", x[["CV crit"]])
   if (!is.null(x[["adj CV crit"]]))
     cat("\nbias-adjusted cross-validation criterion =", x[["adj CV crit"]])
@@ -123,7 +159,7 @@ print.cv <- function(x, ...){
   invisible(x)
 }
 
-#' @describeIn cv lm method
+#' @describeIn cv \code{"lm"} method
 #' @export
 cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
                   seed, method=c("auto", "hatvalues", "Woodbury", "naive"),
@@ -180,7 +216,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   if (method == "hatvalues"){
     yhat <- y - residuals(model)/(1 - hatvalues(model))
     cv <- criterion(y, yhat)
-    result <- list(k="n", "CV crit" = cv)
+    result <- list(k="n", "CV crit" = cv, "method"=method)
     class(result) <- "cv"
     return(result)
   }
@@ -219,12 +255,13 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   cv.full <- criterion(y, fitted(model))
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
-                 "k" = if (k == n) "n" else k, "seed" = seed)
+                 "k" = if (k == n) "n" else k, "seed" = seed,
+                 "method"=method)
   class(result) <- "cv"
   result
 }
 
-#' @describeIn cv glm method
+#' @describeIn cv \code{"glm"} method
 #' @export
 cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
                    seed,
@@ -270,12 +307,12 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
     cv.default(model=model, data=data, criterion=criterion, k=k, seed=seed,
-               parallel=parallel, ncores=ncores, ...)
+               parallel=parallel, ncores=ncores, method=method, ...)
   } else if (method == "hatvalues") {
     y <- getResponse(model)
     yhat <- y - residuals(model, type="response")/(1 - hatvalues(model))
     cv <- criterion(y, yhat)
-    result <- list(k="n", "CV crit" = cv)
+    result <- list(k="n", "CV crit" = cv, method="method")
     class(result) <- "cv"
     return(result)
   } else {
@@ -325,7 +362,8 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     cv.full <- criterion(y, fitted(model))
     adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
     result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
-                   "k" = if (k == n) "n" else k, "seed" = seed)
+                   "k" = if (k == n) "n" else k, "seed" = seed,
+                   "method"=method)
     class(result) <- "cv"
     result
   }

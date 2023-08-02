@@ -22,12 +22,25 @@ BayesRule2(y, yhat)
 Compute cost functions (cross-validation criteria) for fitted
 regression models.
 }
+\details{
+Two cost functions (cross-validation criteria) are provided: (1)
+\code{mse()} returns the mean-squared error of prediction for
+a numeric response variable \code{y} and predictions \code{yhat}.
+(2) \code{BayesRule()} and \code{BayesRule2()} report the proportion
+of correct predictions for a dichotomous response variable \code{y}, assumed
+coded \code{0} and \code{1}. The \code{yhat} values are
+predicted probabilities and are rounded to 0 or 1. The distinction
+between \code{BayesRule()} and \code{BayesRule2()} is that the former
+checks that the \code{y} values are all either \code{0} or \code{1}
+and that the \code{yhat} values are all between 0 and 1, while
+the latter doesn't and is therefore faster.
+}
 \section{Functions}{
 \itemize{
-\item \code{mse()}: Mean-Square Error
+\item \code{mse()}: Mean-square error
 
-\item \code{BayesRule()}: Bayes for a binary response
+\item \code{BayesRule()}: Bayes Rule for a binary response
 
-\item \code{BayesRule2()}: Bayes for a binary response (without bounds checking)
+\item \code{BayesRule2()}: Bayes rule for a binary response (without bounds checking)
 
 }}
