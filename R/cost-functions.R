@@ -3,6 +3,8 @@
 #' Compute cost functions (cross-validation criteria) for fitted
 #' regression models.
 #'
+#' @aliases costFunctions
+#'
 #' @param y response
 #' @param yhat fitted value
 #'

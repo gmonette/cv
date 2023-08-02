@@ -1,6 +1,9 @@
-#' Cross-validate fitted model
+#' Cross-Validate Regression Models
 #'
-#' Generic function to cross-validate fitted models using fast algorithms
+#' A parallelized generic k-fold (including n-fold, i.e., leave-one-out)
+#' cross-validation function, with a default method, and
+#' specific methods for linear and generalized-linear models that can be much
+#' more computationally efficient.
 #'
 #' @param model a model object that responds to model.frame(), update(), and predict()
 #'         and for which the response is stored in model$y or accessible via model.response()

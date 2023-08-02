@@ -2,6 +2,7 @@
 % Please edit documentation in R/cost-functions.R
 \name{mse}
 \alias{mse}
+\alias{costFunctions}
 \alias{BayesRule}
 \alias{BayesRule2}
 \title{Cost Functions for Fitted Regression Models}

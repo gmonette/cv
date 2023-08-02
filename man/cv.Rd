@@ -7,7 +7,7 @@
 \alias{print.cv}
 \alias{cv.lm}
 \alias{cv.glm}
-\title{Cross-validate fitted model}
+\title{Cross-Validate Regression Models}
 \usage{
 \method{cv}{merMod}(
   model,
@@ -98,7 +98,10 @@ the criterion applied to the model fit to the full data set,
 and the initial value of R's RNG seed
 }
 \description{
-Generic function to cross-validate fitted models using fast algorithms
+A parallelized generic k-fold (including n-fold, i.e., leave-one-out)
+cross-validation function, with a default method, and
+specific methods for linear and generalized-linear models that can be much
+more computationally efficient.
 }
 \section{Methods (by class)}{
 \itemize{
