@@ -9,7 +9,7 @@
 #' @param data data frame to which the model was fit (not usually necessary)
 #' @param criterion cross-validation criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
-#'        \code{yhat} the predicted values; the default is \code{\link{mse}
+#'        \code{yhat} the predicted values; the default is \code{\link{mse}}
 #'        (the mean-squared error)
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)

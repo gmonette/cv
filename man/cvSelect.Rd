@@ -3,7 +3,7 @@
 \name{cvSelect}
 \alias{cvSelect}
 \alias{selectStepAIC}
-\title{Generic Function to Cross-Validate a Model-Selection Procedure}
+\title{Cross-Validate a Model-Selection Procedure}
 \usage{
 cvSelect(
   procedure,
@@ -18,37 +18,28 @@ cvSelect(
 selectStepAIC(data, indices, model, criterion = mse, k. = 2, ...)
 }
 \arguments{
-\item{procedure}{a model-selection procedure function that accepts the following arguments:
-\code{data}, set to the data argument to \code{cvSelect()};
-\code{indices}, the indices of the rows of data defining the current fold; if missing,
-the model-selection procedure is applied to the full data; other arguments, to be
-passed via \code{...}. \code{procedure()} should return a two-element vector with the result
-of applying a cross-validation criterion to the cases in
-the current fold for the model deleting that fold, and to
-all of the cases again for the model deleting the current fold.
-When the indices argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
-the model fit to all of the cases.}
+\item{procedure}{a model-selection procedure function (see Details).}
 
-\item{data}{full data frame}
+\item{data}{full data frame for model selection.}
 
 \item{k}{perform k-fold cross-validation (default is 10); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
 
-\item{seed}{for R's random number generator}
+\item{seed}{for R's random number generator; not used for n-fold cross-validation.}
 
-\item{parallel}{do computations in parallel? (default is \code{FALSE})}
+\item{parallel}{do computations in parallel? (default is \code{FALSE}),}
 
 \item{ncores}{number of cores to use for parallel computations
-(default is number of physical cores detected)}
+(default is number of physical cores detected).}
 
 \item{...}{arguments to be passed to \code{procedure()}.}
 
-\item{indices}{indices of cases in data defining the current fold}
+\item{indices}{indices of cases in data defining the current fold.}
 
-\item{model}{a regression model object fit to data}
+\item{model}{a regression model object fit to data.}
 
-\item{criterion}{a CV criterion function}
+\item{criterion}{a CV criterion function.}
 
 \item{k.}{the \code{k} argument to \code{\link[MASS]{stepAIC}()} (note the period in \code{k.}).}
 }
@@ -56,10 +47,33 @@ cross-validation.}
 \code{cvSelect()} return a \code{"cv"} object with the CV criterion averaged across the folds,
 the bias-adjusted averaged CV criterion,
 the criterion applied to the model fit to the full data set,
-and the initial value of R's RNG seed
+and the initial value of R's RNG seed.
 }
 \description{
-Generic Function to Cross-Validate a Model-Selection Procedure
+A generic function to cross-validate a model-selection procedure,
+along with a procedure that applies the \code{\link[MASS]{stepAIC}()}
+model-selection function in the \pkg{MASS} package.
+}
+\details{
+The model-selection function supplied as the \code{procedure} argument
+to \code{cvSelect()} should accept the following arguments:
+\describe{
+ \item{\code{data}}{set to the \code{data} argument to \code{cvSelect()}.}
+ \item{\code{indices}}{the indices of the rows of \code{data} defining the current fold; if missing,
+ the model-selection procedure is applied to the full \code{data}.}
+  \item{other arguments}{to be passed via the \code{...}
+  to \code{cvSelect()}.}
+}
+\code{procedure()} should return a two-element vector with the result
+of applying a cross-validation criterion to the cases in
+the current fold for the model deleting that fold, and to
+all of the cases again for the model deleting the current fold.
+
+When the \code{indices} argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
+the model fit to all of the cases.
+
+For an example of a model-selection function for the \code{procedure}
+argument, see the code for \code{selectStepAIC()}.
 }
 \section{Functions}{
 \itemize{
@@ -75,4 +89,7 @@ m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
          k.=log(nrow(Auto))) # via BIC
+}
+\seealso{
+\code{\link[MASS]{stepAIC}()}
 }
