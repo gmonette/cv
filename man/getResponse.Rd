@@ -20,9 +20,15 @@ a vector or matrix containing the values of response variable(s)
 \description{
 Generic function to extract the response variable(s) from a fitted model.
 }
+\details{
+The supplied \code{default} method returns the \code{model$y} component
+of the model object if it exists and otherwise the result of
+\code{model.response(model.frame(model))}, checking in either case whether
+the result is numeric.
+}
 \section{Methods (by class)}{
 \itemize{
-\item \code{getResponse(default)}: default method
+\item \code{getResponse(default)}: \code{default} method
 
 }}
 \examples{
