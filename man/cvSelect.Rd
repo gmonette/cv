@@ -58,11 +58,11 @@ model-selection function in the \pkg{MASS} package.
 The model-selection function supplied as the \code{procedure} argument
 to \code{cvSelect()} should accept the following arguments:
 \describe{
- \item{\code{data}}{set to the \code{data} argument to \code{cvSelect()}.}
- \item{\code{indices}}{the indices of the rows of \code{data} defining the current fold; if missing,
- the model-selection procedure is applied to the full \code{data}.}
-  \item{other arguments}{to be passed via the \code{...}
-  to \code{cvSelect()}.}
+\item{\code{data}}{set to the \code{data} argument to \code{cvSelect()}.}
+\item{\code{indices}}{the indices of the rows of \code{data} defining the current fold; if missing,
+the model-selection procedure is applied to the full \code{data}.}
+\item{other arguments}{to be passed via the \code{...}
+to \code{cvSelect()}.}
 }
 \code{procedure()} should return a two-element vector with the result
 of applying a cross-validation criterion to the cases in

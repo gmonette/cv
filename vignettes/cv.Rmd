@@ -1,0 +1,66 @@
+---
+title: "Cross-validation of regression models"
+author: "John Fox and Georges Monette"
+date: "`r Sys.Date()`"
+package: cv
+output: 
+  rmarkdown::html_vignette:
+  fig_caption: yes
+bibliography: ["cv.bib"]
+csl: apa.csl
+vignette: >
+  %\VignetteIndexEntry{Cross-validation of regression models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center",
+  fig.height = 6,
+  fig.width = 7,
+  fig.path = "fig/",
+  dev = "png",
+  comment = "#>"
+)
+
+# save some typing
+knitr::set_alias(w = "fig.width",
+                 h = "fig.height",
+                 cap = "fig.cap")
+
+# colorize text: use inline as `r colorize(text, color)`
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color,
+      x)
+  } else x
+}
+
+
+.opts <- options(digits = 4)
+```
+
+Load the packages we'll use here:
+```{r setup}
+library(cv)    # 
+```
+
+## Cross-validation
+
+
+```{r, include = FALSE}
+options(.opts)
+```
+
+## References
+
+
+
+
+
