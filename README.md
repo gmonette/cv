@@ -2,11 +2,11 @@
 
 Some of the functions supplied by the package:
 
-* `cv()` is a generic function with a default method and `"lm"` and `"glm"`
-methods. 
+* `cv()` is a generic function with a default method and 
+computationally efficient `"lm"` and `"glm"` methods. 
 
 * `mse()` (mean-squared error) and `BayesRule()` are cross-validation
-criteria ("cost functions").
+criteria ("cost functions"), suitable for use with `cv()`.
 
 * `cvSelect()` cross-validates a selection procedure for a regression
 model. 
