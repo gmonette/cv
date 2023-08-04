@@ -58,14 +58,14 @@ test_that("cvSelect Woodbury vs hatvalues loo glm", {
 # test that parallel computations work correctly using selectStepAIC()
 #  for a glm
 
-# data("Caravan", package="ISLR")
-# Caravan <- Caravan[1:500, c(1:10, 86)]
-# m.caravan <- glm(Purchase ~ ., data=Caravan, family=binomial)
-#
-# test_that("cvSelect parallel glm", {
-#   expect_equal(cvSelect(selectStepAIC, Caravan, k=5, seed=123,
-#          model=m.caravan),
-#          cvSelect(selectStepAIC, Caravan, k=5, seed=123,
-#          model=m.caravan, parallel=TRUE, ncores=2)
-#   )
-# })
+data("Caravan", package="ISLR")
+assign("Cara", Caravan[1:500, c(1:10, 86)], envir=.GlobalEnv)
+m.caravan <- glm(Purchase ~ ., data=Cara, family=binomial)
+
+test_that("cvSelect parallel glm", {
+  expect_equal(cvSelect(selectStepAIC, Cara, k=5, seed=123,
+         model=m.caravan, criterion=BayesRule),
+         cvSelect(selectStepAIC, Cara, k=5, seed=123,
+         model=m.caravan, parallel=TRUE, ncores=2, criterion=BayesRule)
+  )
+})
