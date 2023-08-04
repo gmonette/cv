@@ -31,6 +31,23 @@ test_that("lm Woodbury vs naive k=10", {
                cv(lm.fit, k=10, method="naive", seed=123)[1:3])
 })
 
+# test different algorithms for a Gaussian generalized linear model
+
+test_that("glm hatvalues vs exact loo", {
+  expect_equal(cv(glm.fit, k="loo", method="hatvalues")$"CV crit",
+               cv(glm.fit, k="loo", method="exact")$"CV crit")
+})
+
+test_that("glm Woodbury vs exact loo", {
+  expect_equal(cv(glm.fit, k="loo", method="Woodbury")[1:3],
+               cv(glm.fit, k="loo", method="exact")[1:3])
+})
+
+test_that("glm Woodbury vs exact k=10", {
+  expect_equal(cv(glm.fit, k=10, method="Woodbury", seed=123)[1:3],
+               cv(glm.fit, k=10, method="exact", seed=123)[1:3])
+})
+
 # test that parallel computations work for a linear model
 
 test_that("parallel computations lm loo", {
