@@ -77,3 +77,23 @@ expect_equal(cv(m.caravan, k=10, criterion=BayesRule, seed=123),
              cv(m.caravan, k=10, criterion=BayesRule, seed=123,
                 parallel=TRUE, ncores=2))
 })
+
+# test vs boot:cv.glm()
+
+if (require(boot)){
+
+  test_that("glm method for linear model matches boot::cv.glm()", {
+    expect_equal(boot::cv.glm(Auto, glm.fit)$delta,
+                 as.vector(unlist(cv(glm.fit, k="loo")[1:2])))
+  })
+
+  test_that("lm method matches boot::cv.glm()", {
+    expect_equal(boot::cv.glm(Auto, glm.fit)$delta,
+                 as.vector(unlist(cv(lm.fit, k="loo", method="Woodbury")[1:2])))
+  })
+
+  test_that("glm method for GLM matches boot::cv.glm()", {
+    expect_equal(boot::cv.glm(Caravan, m.caravan)$delta,
+                 as.vector(unlist(cv(m.caravan, k="loo")[1:2])))
+  })
+}
