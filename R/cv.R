@@ -80,6 +80,7 @@ cv <- function(model, data, criterion, k, seed, ...){
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
 #' @importFrom lme4 lmer
+#' @importFrom parallelly availableCores
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10,

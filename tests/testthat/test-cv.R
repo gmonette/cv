@@ -63,8 +63,8 @@ test_that("parallel computations lm k=10", {
 # test that parallel computations work for a generalized linear model
 
 data("Caravan", package="ISLR")
-Caravan <- Caravan[1:500, c(1:10, 86)]
-m.caravan <- glm(Purchase ~ ., data=Caravan, family=binomial)
+assign("Cara", Caravan[1:500, c(1:10, 86)], envir=.GlobalEnv)
+m.caravan <- glm(Purchase ~ ., data=Cara, family=binomial)
 
 test_that("parallel computations glm loo", {
   expect_equal(cv(m.caravan, k="loo", criterion=BayesRule, seed=123),
@@ -93,7 +93,7 @@ if (require(boot)){
   })
 
   test_that("glm method for GLM matches boot::cv.glm()", {
-    expect_equal(boot::cv.glm(Caravan, m.caravan)$delta,
+    expect_equal(boot::cv.glm(Cara, m.caravan)$delta,
                  as.vector(unlist(cv(m.caravan, k="loo")[1:2])))
   })
 }
