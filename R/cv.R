@@ -19,7 +19,7 @@
 #' for n-fold cross-validation
 #' @param parallel do computations in parallel? (default is \code{FALSE})
 #' @param ncores number of cores to use for parallel computations
-#'           (default is number of physical cores detected)
+#'        (default is number of physical cores detected)
 #' @param method computational method to apply to a linear (i.e. \code{"lm"}) model
 #' or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 #' of the available options.
