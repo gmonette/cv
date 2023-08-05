@@ -53,6 +53,8 @@ library(cv)    #
 
 ## Cross-validation
 
+@JamesEtAl:2013 
+
 
 ```{r, include = FALSE}
 options(.opts)
