@@ -215,7 +215,10 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   }
   if (method == "naive") return(NextMethod())
   if (method == "hatvalues"){
-    yhat <- y - residuals(model)/(1 - hatvalues(model))
+    h <- hatvalues(model)
+    if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
+      stop("there are hatvalues numerically equal to 1")
+    yhat <- y - residuals(model)/(1 -h)
     cv <- criterion(y, yhat)
     result <- list(k="n", "CV crit" = cv, "method"=method)
     class(result) <- "cv"
@@ -311,7 +314,10 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
                parallel=parallel, ncores=ncores, method=method, ...)
   } else if (method == "hatvalues") {
     y <- getResponse(model)
-    yhat <- y - residuals(model, type="response")/(1 - hatvalues(model))
+    h <- hatvalues(model)
+    if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
+      stop("there are hatvalues numerically equal to 1")
+    yhat <- y - residuals(model, type="response")/(1 - h)
     cv <- criterion(y, yhat)
     result <- list(k="n", "CV crit" = cv, method="method")
     class(result) <- "cv"
