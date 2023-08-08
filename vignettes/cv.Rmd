@@ -14,7 +14,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   message = FALSE,
@@ -47,16 +47,21 @@ colorize <- function(x, color) {
 ```
 
 Load the packages we'll use here:
-```{r setup}
+```{r loadpackages}
 library(cv)    # 
 ```
 
 ## Cross-validation
 
-@JamesEtAl:2013 
+Cross-validation (CV) is an essentially simple and intuitively reasonable approach to estimating the predictive accuracy of regression models. CV is developed in many standard sources on regression modeling and "machine learning"---we particularly recommend @JamesEtAl:2013 [Secs. 5.1, 5.3]---and so we will describe the method only briefly here before taking up computational issues and some examples.
 
+Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit a statistical model; and then the second part is used to assess the adequacy of the model fit to the first part of the data. For a discussion of data-division, see XXX. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, particularly in smaller samples, the results can vary substantially based on the random division of the data: See @Harrell:2015 [Sec. 5.3] for this and other remarks about data-division and cross-validation.
 
-```{r, include = FALSE}
+Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the omitted fold, computing some CV criterion or "cost" measure, such as the mean-squared error of prediction. The CV criterion is then averaged over the $k$ folds. In the extreme $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
+
+Because the $k$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of prediction error. The $n$ regression models are highly statistical dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has relatively large variance. In contrast, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) are somewhat biased but have smaller variance. It is also possible to correct $k$-fold CV for bias (see below).
+
+```{r restore, include = FALSE}
 options(.opts)
 ```
 

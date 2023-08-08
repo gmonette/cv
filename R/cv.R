@@ -59,12 +59,12 @@
 #' which employs \code{update()}.
 #'
 #' @examples
-#' data("Auto", package="ISLR")
+#' data("Auto", package="ISLR2")
 #' m.auto <- lm(mpg ~ horsepower, data=Auto)
 #' cv(m.auto,  k="loo")
 #' cv(m.auto, seed=1234)
 #'
-#' data("Caravan", package="ISLR")
+#' data("Caravan", package="ISLR2")
 #' m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)
 #' cv(m.caravan, k=5, criterion=BayesRule, seed=123)
 #' @export

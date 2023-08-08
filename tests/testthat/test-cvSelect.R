@@ -1,7 +1,7 @@
 # test that different algorithms produce the same results
 #  using selectStepAIC() for a lm
 
-data(Auto, package="ISLR")
+data(Auto, package="ISLR2")
 m <- lm(mpg ~ . - name - origin, data=Auto)
 
 test_that("cvSelect naive vs Woodbury lm", {
@@ -58,7 +58,7 @@ test_that("cvSelect Woodbury vs hatvalues loo glm", {
 # test that parallel computations work correctly using selectStepAIC()
 #  for a glm
 
-data("Caravan", package="ISLR")
+data("Caravan", package="ISLR2")
 assign("Cara", Caravan[1:500, c(1:10, 86)], envir=.GlobalEnv)
 m.caravan <- glm(Purchase ~ ., data=Cara, family=binomial)
 

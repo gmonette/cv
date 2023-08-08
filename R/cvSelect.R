@@ -104,7 +104,7 @@ cvSelect <- function(procedure,
 #' @param criterion a CV criterion function.
 #' @param k. the \code{k} argument to \code{\link[MASS]{stepAIC}()} (note the period in \code{k.}).
 #' @examples
-#' data("Auto", package="ISLR")
+#' data("Auto", package="ISLR2")
 #' m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 #' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
 #' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,

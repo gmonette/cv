@@ -84,7 +84,7 @@ argument, see the code for \code{selectStepAIC()}.
 
 }}
 \examples{
-data("Auto", package="ISLR")
+data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
