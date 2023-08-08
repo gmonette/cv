@@ -77,10 +77,8 @@ cvSelect <- function(procedure,
   if (parallel && ncores > 1){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
-    #  require(cv) # !!! temporary
+    result <- foreach(i = 1L:k, .combine=rbind) %dopar%
       procedure(data, indices[starts[i]:ends[i]], ...)
-    }
     stopCluster(cl)
   } else {
     result <- matrix(0, k, 2L)
