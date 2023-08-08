@@ -61,9 +61,19 @@ Cross-validation speaks to both of these issues. In CV, the data are randomly di
 
 Because the $k$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of prediction error. The $n$ regression models are highly statistical dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has relatively large variance. In contrast, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) are somewhat biased but have smaller variance. It is also possible to correct $k$-fold CV for bias (see below).
 
+## Examples
+
+The data for the examples in this section are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2013 
+
+### Polynomial regression for the `Auto` data
+
+
 ```{r restore, include = FALSE}
 options(.opts)
 ```
+
+### Logistic regression for the `Caravan` data
+
 
 ## References
 
