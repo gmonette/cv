@@ -136,7 +136,8 @@ cv.default <- function(model, data=insight::get_data(model),
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 "method"=method)
+                 "method"=method,
+                 "criterion" = deparse(substitute(criterion)))
   class(result) <- "cv"
   result
 }
@@ -152,6 +153,7 @@ print.cv <- function(x, ...){
         "clusters")
   }
   if (!is.null(x[["method"]])) cat("\nmethod:", x[["method"]])
+  if (!is.null(x[["criterion"]])) cat("\ncriterion:", x[["criterion"]])
   cat("\ncross-validation criterion =", x[["CV crit"]])
   if (!is.null(x[["adj CV crit"]]))
     cat("\nbias-adjusted cross-validation criterion =", x[["adj CV crit"]])
@@ -220,7 +222,8 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model)/(1 -h)
     cv <- criterion(y, yhat)
-    result <- list(k="n", "CV crit" = cv, "method"=method)
+    result <- list(k="n", "CV crit" = cv, "method"=method,
+                   "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
     return(result)
   }
@@ -260,7 +263,8 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 "method"=method)
+                 "method"=method,
+                 "criterion" = deparse(substitute(criterion)))
   class(result) <- "cv"
   result
 }
@@ -310,8 +314,10 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   }
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
-    cv.default(model=model, data=data, criterion=criterion, k=k, seed=seed,
+    result <- cv.default(model=model, data=data, criterion=criterion, k=k, seed=seed,
                parallel=parallel, ncores=ncores, method=method, ...)
+    result$"criterion" <- deparse(substitute(criterion))
+    return(result)
   } else if (method == "hatvalues") {
     y <- getResponse(model)
     h <- hatvalues(model)
@@ -319,7 +325,8 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model, type="response")/(1 - h)
     cv <- criterion(y, yhat)
-    result <- list(k="n", "CV crit" = cv, method="method")
+    result <- list(k="n", "CV crit" = cv, method="method",
+                   "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
     return(result)
   } else {
@@ -370,7 +377,8 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
     result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                    "k" = if (k == n) "n" else k, "seed" = seed,
-                   "method"=method)
+                   "method"=method,
+                   "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
     result
   }
