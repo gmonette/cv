@@ -15,6 +15,7 @@ Imports: insight,
          lme4, 
          MASS
 Suggests: boot,
+          carData,
           ISLR2,
           knitr,
           nnet,

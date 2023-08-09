@@ -63,17 +63,60 @@ Because the $k$ models are each fit to $n - 1$ cases, LOO CV produces a nearly u
 
 ## Examples
 
-The data for the examples in this section are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2013 
 
 ### Polynomial regression for the `Auto` data
+
+The data for this example are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2013, and the presentation here is close to that in the original source [@JamesEtAl:2013 Secs. 5.1, 5.3], but demonstrating the use of the `cv()` function in the **cv** package.[^1] 
+
+[^1]: @JamesEtAl:2013 use the `cv.glm()` function in the **boot** package [@CantyRipley2022; @DavisonHinkley1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function.
+
+The `Auto` dataset contains information about 392 cars:
+
+```{r Auto}
+data("Auto", package="ISLR2")
+head(Auto)
+dim(Auto)
+```
+With the exception of `origin` (which we'll address later), these variables are largely self-explanatory, with the possible exception of units of measurement: for details see `help("Auto", package="ISLR2")`.
+
+We'll focus here on the relationship of `mpg` (miles per gallon) to `horsepower`, as displayed in the following scatterplot:
+
+```{r mpg-horsepower-scatterplot}
+#| out.width = "100%",
+#| fig.height = 6,
+#| fig.cap = "`mpg` vs `horsepower` for the `Auto` data"
+plot(mpg ~ horsepower, data=Auto)
+```
+The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2013, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^2] Polynomial fits  for $p = 1$ to $5$ are shown in the following figure:
+
+[^2]: Although it serves to illustrate the use of CV, a polynomial is probably not the best choice here. Consider, for example the scatterplot for log-transformed `mpg` and `horsepower`, produced by `plot(mpg ~ horsepower, data=Auto, log="xy")` (and left to the reader).
+
+```{r mpg-horsepower-scatterplot-polynomials}
+#| out.width = "100%",
+#| fig.height = 5,
+#| fig.cap = "`mpg` vs `horsepower` for the `Auto` data"
+plot(mpg ~ horsepower, data=Auto)
+horsepower <- with(Auto, 
+                   seq(min(horsepower), max(horsepower), 
+                       length=1000))
+for (p in 1:5){
+  m <- lm(mpg ~ poly(horsepower,p), data=Auto)
+  mpg <- predict(m, newdata=data.frame(horsepower=horsepower))
+  lines(horsepower, mpg, col=p + 1, lty=p, lwd=2)
+}
+legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
+       title="Power", inset=0.02)
+```
+The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ probably overfits the data by chasing one or two relatively high `mpg` values at the right.
+
+
+### Logistic regression for the `Mroz` data
+
 
 
 ```{r restore, include = FALSE}
 options(.opts)
 ```
-
-### Logistic regression for the `Caravan` data
-
 
 ## References
 
