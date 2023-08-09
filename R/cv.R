@@ -325,7 +325,7 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model, type="response")/(1 - h)
     cv <- criterion(y, yhat)
-    result <- list(k="n", "CV crit" = cv, method="method",
+    result <- list(k="n", "CV crit" = cv, method=method,
                    "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
     return(result)
