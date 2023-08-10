@@ -133,7 +133,7 @@ legend("topright", inset=0.02,
 ```
 The code for this graph uses the `mse()` function from the **cv** package to compute the MSE for each fit.
 
-### Using `cv()`
+#### Using `cv()`
 
 The generic `cv()` function has an `"lm"` method, which by default performs $k = 10$-fold CV:
 ```{r cv-lm-1}
@@ -142,7 +142,7 @@ summary(m.auto)
 
 cv(m.auto)
 ```
-The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the orginal, full-sample regression.
+The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the orginal, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
 
 To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases in the data, here `k=392`, or, more conveniently, to `k="loo"` or `k="n"`:
 
@@ -150,7 +150,7 @@ To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases 
 cv(m.auto, k="loo")
 ```
 For LOO CV of a linear model, `cv()` by default uses the hatvalues from the model fit to the full data for the LOO updates, and reports only the CV estimate of MSE. Alternative methods are to use the Woodbury matrix identity or the "naive" approach of literally refitting the model with each case omitted. All three methods produce exact results for a linear model (within the precision of floating-point computations):
-```{r cv.lm 3}
+```{r cv.lm-3}
 cv(m.auto, k="loo", method="naive")
 
 cv(m.auto, k="loo", method="Woodbury")
@@ -158,7 +158,7 @@ cv(m.auto, k="loo", method="Woodbury")
 The `"naive"` and `"Woodbury"` methods also return the bias-adjusted estimate of MSE and the full-sample MSE, but bias isn't an issue for LOO CV.
 
 This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In this comparison, we include the `cv.glm()` function from the **boot** package, which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the `microbenchmark()` function from the package of the same name for the timings [@Mersmann:2023]:
-```{r cv.lm timings}
+```{r cv.lm-timings, cache=TRUE}
 m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data=Auto)
 boot::cv.glm(Auto, m.auto.glm)$delta
 
@@ -170,15 +170,76 @@ microbenchmark::microbenchmark(
   times=10
 )
 ```
-On our computer, using the hatvalues is about an order of magnitude faster than employing Woodbury matrix updates, and more than two orders of magnitude faster than refitting the model.
+On our computer, using the hatvalues is about an order of magnitude faster than employing Woodbury matrix updates, and more than two orders of magnitude faster than refitting the model.[^3]
+
+[^3]: Out of impatience, we asked `microbenchmark()` to execute each command only 10 times rather than the default 100. With the exception of the last columns, the output is self-explanatory. The last column shows which methods have average timings that are statistically distinguishable. Because of the small number of repetitions (i.e., 10), the `"hatvalues"` and `"Woodbury"` methods aren't distinguishable, but the difference between these methods persists when we perform more repetitions---we invite the reader to redo this computation with the default `times=100` repetitions.
 
 ### Logistic regression for the `Mroz` data
 
+The `Mroz` data set from the **carData** package [associated with @FoxWeisberg:2019] have been used by several authors to illustrate binary logistic regression; see, in particular @FoxWeisberg:2019. The data were originally drawn from the U.S. Panel Study of Income Dynamics and pertain to married women. Here are a few cases in the data set:
+```{r Mroz-data}
+data("Mroz", package="carData")
+head(Mroz, 3)
+tail(Mroz, 3)
+```
+The response variable in the logistic regression is `lfp`, labor-force participation, a factor coded `"yes"` or `"no"`. The remaining variables are predictors:
 
+* `k5`, number of children 5 years old of younger in the woman's household;
+* `k618`, number of children between 6 and 18 years old;
+* `age`, in years;
+* `wc`, wife's college attendance, `"yes"` or `"no"`;
+* `hc`, husband's college attendance;
+* `lwg`, the woman's log wage rate if she is employed, or her *imputed* wage rate, if she is not [a variable that @FoxWeisberg:2019 show is problematicly defined]; and
+* `inc`, family income, in $1000s, exclusive of wife's income.
+
+We use the `glm()` function to fit a binary logistic regression to the `Mroz` data:
+```{r Mroz-logistic-regresion}
+m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
+summary(m.mroz)
+
+BayesRule(ifelse(Mroz$lfp == "yes", 1, 0), 
+          fitted(m.mroz, type="response"))
+```
+In addition to the usually summary output for a GLM, we show the result of applying the `BayesRule()` function from the **cv** package to predictions derived from the fitted model. Bayes rule, which predicts a "success" in a binary regression model when the fitted probability of success [i.e., $\phi = \Pr(y = 1)$] is $\widehat{\phi} \ge .5$ and a "failure" if $\widehat{\phi} \lt .5$.[^4] The first argument to `BayesRule()` is the binary {0, 1} response, and the second argument is the predicted probability of success. `BayesRule()` returns the proportion of predictions that are *in error*, as appropriate for a "cost" function.
+
+[^4]: `BayesRule()` does some error checking; `BayesRule2()` is similar, but omits the error checking, and so can be faster for large problems.
 
 ```{r restore, include = FALSE}
 options(.opts)
 ```
+In this example, the fitted logistic regression incorrectly predicts 31% of the responses; we expect this estimate to be optimistic given that the model is used to "predict" the data to which it is fit.
+
+The `"glm"` method for `cv()` is largely similar to the `"lm"` method, although the default algorithm, selected explicitly by `method="exact"`, refits the model with each fold removed (and is thus equivalent to `method="naive"` for `"lm"` models). For generalized linear models, `method="Woodbury"` or (for LOO CV) `method="hatvalues"` provide approximate results (see the last section of the vignette for details):
+
+```{r cv-Mroz-10-fold}
+cv(m.mroz, criterion=BayesRule, seed=248)
+
+cv(m.mroz, criterion=BayesRule, seed=248, method="Woodbury")
+```
+To ensure that the two methods use the same 10 folds, we specify the seed for R's random-number generator explicitly; here, and as is common in our experience, the `"exact"` and `"Woodbury"` algorithms produce nearly identical results. The CV estimates of prediction error are slightly higher than the estimate based on all of the cases.
+
+Here are results of applying LOO CV to the Mroz model, using both the exact and the approximate methods:
+```{r cv-Mroz-LOO}
+cv(m.mroz, k="loo", criterion=BayesRule)
+
+cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury")
+
+cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues")
+```
+To the number of decimal digits shown, the three methods produce identical results for this example.
+
+As for linear models, we report some timings for the various `cv()` methods of computation in LOO CV as well as for the `cv.glm()` function from the **boot** package (which, recall, refits the model with each case removed, and thus is comparable to `cv()` with `method="exact"`):
+```{r glm-timings, cache=TRUE}
+microbenchmark::microbenchmark(
+  hatvalues=cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues"),
+  Woodbury=cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury"),
+  exact=cv(m.mroz, k="loo", criterion=BayesRule),
+  cv.glm=boot::cv.glm(Mroz, m.mroz,
+               cost=BayesRule),
+  times=10)
+```
+There is a substantial time penalty associated with exact computations.
+
 
 ## References
 
