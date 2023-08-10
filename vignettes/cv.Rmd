@@ -66,7 +66,7 @@ Because the $k$ models are each fit to $n - 1$ cases, LOO CV produces a nearly u
 
 ### Polynomial regression for the `Auto` data
 
-The data for this example are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2013, and the presentation here is close to that in the original source [@JamesEtAl:2013 Secs. 5.1, 5.3], but demonstrating the use of the `cv()` function in the **cv** package.[^1] 
+The data for this example are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2013, and the presentation here is close (though not identical) to that in the original source [@JamesEtAl:2013 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function in the **cv** package.[^1] 
 
 [^1]: @JamesEtAl:2013 use the `cv.glm()` function in the **boot** package [@CantyRipley2022; @DavisonHinkley1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function.
 
@@ -89,7 +89,7 @@ plot(mpg ~ horsepower, data=Auto)
 ```
 The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2013, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^2] Polynomial fits  for $p = 1$ to $5$ are shown in the following figure:
 
-[^2]: Although it serves to illustrate the use of CV, a polynomial is probably not the best choice here. Consider, for example the scatterplot for log-transformed `mpg` and `horsepower`, produced by `plot(mpg ~ horsepower, data=Auto, log="xy")` (and left to the reader).
+[^2]: Although it serves to illustrate the use of CV, a polynomial is probably not the best choice here. Consider, for example the scatterplot for log-transformed `mpg` and `horsepower`, produced by `plot(mpg ~ horsepower, data=Auto, log="xy")` (execution of which is left to the reader).
 
 ```{r mpg-horsepower-scatterplot-polynomials}
 #| out.width = "100%",
@@ -105,10 +105,72 @@ for (p in 1:5){
   lines(horsepower, mpg, col=p + 1, lty=p, lwd=2)
 }
 legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
-       title="Power", inset=0.02)
+       title="Degree", inset=0.02)
 ```
 The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ probably overfits the data by chasing one or two relatively high `mpg` values at the right.
 
+The following graph shows two measures of estimated squared error as a function of polynomial-regression degree: The mean-squared error (MSE), defined as $\mathsf{MSE} = \sum (y_i - \widehat{y}_i)^2/n$, and the usual unbiased estimated error variance, defined as $\widehat(\sigma)^2 = \sum (y_i - \widehat{y}_i)^2/(n - p - 1)$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
+
+```{r mpg-horsepower-MSE-se2}
+#| out.width = "100%",
+#| fig.height = 5,
+#| fig.cap = "Estimated squared error as a function of polynomial degree, $p$"
+se <- mse <- numeric(10)
+for (p in 1:10){
+  m <- lm(mpg ~ poly(horsepower, p), data=Auto)
+  mse[p] <- mse(Auto$mpg, fitted(m))
+  se[p] <- summary(m)$sigma
+}
+
+plot(c(1, 10), range(mse, se^2), type="n",
+     xlab="Degree of polynomial, p",
+     ylab="Estimated Squared Error")
+lines(1:10, mse, lwd=2, lty=1, col=2, pch=16, type="b")
+lines(1:10, se^2, lwd=2, lty=2, col=3, pch=17, type="b")
+legend("topright", inset=0.02,
+       legend=c(expression(hat(sigma)^2), "MSE"),
+       lwd=2, lty=2:1, col=3:2, pch=17:16)
+```
+The code for this graph uses the `mse()` function from the **cv** package to compute the MSE for each fit.
+
+### Using `cv()`
+
+The generic `cv()` function has an `"lm"` method, which by default performs $k = 10$-fold CV:
+```{r cv-lm-1}
+m.auto <- lm(mpg ~ poly(horsepower, 2), data=Auto)
+summary(m.auto)
+
+cv(m.auto)
+```
+The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the orginal, full-sample regression.
+
+To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases in the data, here `k=392`, or, more conveniently, to `k="loo"` or `k="n"`:
+
+```{r cv.lm-2`}
+cv(m.auto, k="loo")
+```
+For LOO CV of a linear model, `cv()` by default uses the hatvalues from the model fit to the full data for the LOO updates, and reports only the CV estimate of MSE. Alternative methods are to use the Woodbury matrix identity or the "naive" approach of literally refitting the model with each case omitted. All three methods produce exact results for a linear model (within the precision of floating-point computations):
+```{r cv.lm 3}
+cv(m.auto, k="loo", method="naive")
+
+cv(m.auto, k="loo", method="Woodbury")
+```
+The `"naive"` and `"Woodbury"` methods also return the bias-adjusted estimate of MSE and the full-sample MSE, but bias isn't an issue for LOO CV.
+
+This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In this comparison, we include the `cv.glm()` function from the **boot** package, which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the `microbenchmark()` function from the package of the same name for the timings [@Mersmann:2023]:
+```{r cv.lm timings}
+m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data=Auto)
+boot::cv.glm(Auto, m.auto.glm)$delta
+
+microbenchmark::microbenchmark(
+  hatvalues = cv(m.auto, k="loo"),
+  Woodbury = cv(m.auto, k="loo", method="Woodbury"),
+  naive = cv(m.auto, k="loo", method="naive"),
+  cv.glm = boot::cv.glm(Auto, m.auto.glm),
+  times=10
+)
+```
+On our computer, using the hatvalues is about an order of magnitude faster than employing Woodbury matrix updates, and more than two orders of magnitude faster than refitting the model.
 
 ### Logistic regression for the `Mroz` data
 
