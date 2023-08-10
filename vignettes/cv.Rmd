@@ -107,7 +107,7 @@ for (p in 1:5){
 legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
        title="Degree", inset=0.02)
 ```
-The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ probably overfits the data by chasing one or two relatively high `mpg` values at the right.
+The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ probably over-fits the data by chasing one or two relatively high `mpg` values at the right.
 
 The following graph shows two measures of estimated squared error as a function of polynomial-regression degree: The mean-squared error (MSE), defined as $\mathsf{MSE} = \sum (y_i - \widehat{y}_i)^2/n$, and the usual unbiased estimated error variance, defined as $\widehat(\sigma)^2 = \sum (y_i - \widehat{y}_i)^2/(n - p - 1)$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
 
@@ -142,7 +142,7 @@ summary(m.auto)
 
 cv(m.auto)
 ```
-The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the orginal, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
+The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the original, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
 
 To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases in the data, here `k=392`, or, more conveniently, to `k="loo"` or `k="n"`:
 
@@ -158,7 +158,7 @@ cv(m.auto, k="loo", method="Woodbury")
 The `"naive"` and `"Woodbury"` methods also return the bias-adjusted estimate of MSE and the full-sample MSE, but bias isn't an issue for LOO CV.
 
 This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In this comparison, we include the `cv.glm()` function from the **boot** package, which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the `microbenchmark()` function from the package of the same name for the timings [@Mersmann:2023]:
-```{r cv.lm-timings, cache=TRUE}
+```{r cv.lm.timings, cache=TRUE}
 m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data=Auto)
 boot::cv.glm(Auto, m.auto.glm)$delta
 
@@ -189,7 +189,7 @@ The response variable in the logistic regression is `lfp`, labor-force participa
 * `age`, in years;
 * `wc`, wife's college attendance, `"yes"` or `"no"`;
 * `hc`, husband's college attendance;
-* `lwg`, the woman's log wage rate if she is employed, or her *imputed* wage rate, if she is not [a variable that @FoxWeisberg:2019 show is problematicly defined]; and
+* `lwg`, the woman's log wage rate if she is employed, or her *imputed* wage rate, if she is not [a variable that @FoxWeisberg:2019 show is problematically defined]; and
 * `inc`, family income, in $1000s, exclusive of wife's income.
 
 We use the `glm()` function to fit a binary logistic regression to the `Mroz` data:
@@ -229,7 +229,7 @@ cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues")
 To the number of decimal digits shown, the three methods produce identical results for this example.
 
 As for linear models, we report some timings for the various `cv()` methods of computation in LOO CV as well as for the `cv.glm()` function from the **boot** package (which, recall, refits the model with each case removed, and thus is comparable to `cv()` with `method="exact"`):
-```{r glm-timings, cache=TRUE}
+```{r glm.timings, cache=TRUE}
 microbenchmark::microbenchmark(
   hatvalues=cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues"),
   Woodbury=cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury"),
@@ -239,6 +239,8 @@ microbenchmark::microbenchmark(
   times=10)
 ```
 There is a substantial time penalty associated with exact computations.
+
+## Cross-validating model selection
 
 
 ## References

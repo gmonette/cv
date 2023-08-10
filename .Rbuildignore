@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 __notes_*
 ^\.github$
+vignettes/cv_cache/*
