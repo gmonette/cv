@@ -29,5 +29,3 @@ if (!require(remotes)) install.packages("remotes")
 remotes::install_github("gmonette/cv", build_vignettes = TRUE)
 ```
 
-(There are, at present, no vignettes, but we plan to write one or more.)
-
