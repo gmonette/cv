@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-08-10" />
+<meta name="date" content="2023-08-11" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-08-10</h4>
+<h4 class="date">2023-08-11</h4>
 
 
 
@@ -381,12 +381,11 @@ a common scientific norm. Emulating this process in a single study by
 data-division is less common: The data are randomly divided into two,
 possibly equal-size, parts; the first part is used to develop and fit a
 statistical model; and then the second part is used to assess the
-adequacy of the model fit to the first part of the data. For a
-discussion of data-division, see XXX. Data-division, however, suffers
-from two problems: (1) Dividing the data decreases the sample size and
-thus increases sampling error; and (2), even more disconcertingly,
-particularly in smaller samples, the results can vary substantially
-based on the random division of the data: See <span class="citation">Harrell (2015, sec. 5.3)</span> for this and other
+adequacy of the model fit to the first part of the data. Data-division,
+however, suffers from two problems: (1) Dividing the data decreases the
+sample size and thus increases sampling error; and (2), even more
+disconcertingly, particularly in smaller samples, the results can vary
+substantially based on the random division of the data: See <span class="citation">Harrell (2015, sec. 5.3)</span> for this and other
 remarks about data-division and cross-validation.</p>
 <p>Cross-validation speaks to both of these issues. In CV, the data are
 randomly divided as equally as possible into several, say <span class="math inline">\(k\)</span>, parts, called “folds.” The statistical
@@ -546,8 +545,8 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.27</span></span>
-<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.25</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.17</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.16</span></span>
 <span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.98</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -792,6 +791,36 @@ computations.</p>
 </div>
 <div id="cross-validating-model-selection" class="section level2">
 <h2>Cross-validating model selection</h2>
+<p>As <span class="citation">Hastie, Tibshirani, &amp; Friedman (2009,
+sec. 7.10.2: “The Wrong and Right Way to Do Cross-validation”)</span>,
+if the whole data are used to select or fine-tune a statistical model,
+subsequent cross-validation of the model is intrinsically misleading,
+because the model is selected to fit the whole data, including the part
+of the data that remains when each fold is removed.</p>
+<p>The following example is similar in spirit to one employed by <span class="citation">Hastie et al. (2009)</span>. Suppose that we randomly
+generate <span class="math inline">\(n = 1000\)</span> independent
+observations for a response variable variable <span class="math inline">\(y \sim N(\mu = 10, \sigma^2 = 0)\)</span>, and
+independently sample <span class="math inline">\(1000\)</span>
+observations for each of <span class="math inline">\(p = 100\)</span>
+“predictors,” <span class="math inline">\(x_1, \ldots, x_{100}\)</span>,
+each from <span class="math inline">\(x_j \sim N(0, 1)\)</span>. The
+response has nothing to do with the predictors and so the population
+linear-regression model <span class="math inline">\(y_i = \alpha +
+\beta_1 x_{i1} + \cdots + \beta_{100} x_{i,100} + \varepsilon_i\)</span>
+has <span class="math inline">\(\alpha = 10\)</span> and all <span class="math inline">\(\beta_j = 0\)</span>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># for reproducibility</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="at">mean=</span><span class="dv">10</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">1000</span><span class="sc">*</span><span class="dv">100</span>), <span class="dv">1000</span>, <span class="dv">100</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="fu">colnames</span>(X) <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="fu">head</span>(y)</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt; [1]  9.439524  9.769823 11.558708 10.070508 10.129288 11.715065</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>X[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt;                1          2          3          4          5</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt; [1,] -0.99579872 -0.5116037 -0.1503075  0.1965498 -0.4941739</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt; [2,] -1.03995504  0.2369379 -0.3277571  0.6501132  1.1275935</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt; [3,] -0.01798024 -0.5415892 -1.4481653  0.6710042 -1.1469495</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt; [4,] -0.13217513  1.2192276 -0.6972846 -1.2841578  1.4810186</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; [5,] -2.54934277  0.1741359  2.5984902 -2.0261096  0.9161912</span></span></code></pre></div>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
@@ -812,6 +841,11 @@ Sage.
 <div id="ref-Harrell:2015" class="csl-entry">
 Harrell, F., Jr. (2015). <em>Regression modeling strategies</em> (Second
 edition). New York: Springer.
+</div>
+<div id="ref-HastieTibshiraniFriedman:2009" class="csl-entry">
+Hastie, T., Tibshirani, R., &amp; Friedman, J. (2009). <em>The elements
+of statistical learning: Data mining, inference, and prediction</em>
+(Second edition). New York: Springer. Retrieved from <a href="https://hastie.su.domains/ElemStatLearn/printings/ESLII_print12_toc.pdf">https://hastie.su.domains/ElemStatLearn/printings/ESLII_print12_toc.pdf</a>
 </div>
 <div id="ref-JamesEtAl:2013" class="csl-entry">
 James, G., Witten, D., Hastie, T., &amp; Tibshirani, R. (2021). <em>An

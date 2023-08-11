@@ -145,7 +145,11 @@ cv.default <- function(model, data=insight::get_data(model),
 #' @describeIn cv \code{print()} method
 #' @param x a \code{cv} object to be printed
 #' @export
-print.cv <- function(x, ...){
+print.cv <- function(x, digits=getOption("digits"), ...){
+  rnd <- function(x){
+    if (round(log10(x)) >= digits) round(x)
+    else signif(x, digits)
+  }
   cat(x[["k"]], "-Fold Cross Validation", sep="")
   if (!is.null(x[["clusters"]])){
     cat(" based on", x[["n clusters"]],
@@ -154,11 +158,11 @@ print.cv <- function(x, ...){
   }
   if (!is.null(x[["method"]])) cat("\nmethod:", x[["method"]])
   if (!is.null(x[["criterion"]])) cat("\ncriterion:", x[["criterion"]])
-  cat("\ncross-validation criterion =", x[["CV crit"]])
+  cat("\ncross-validation criterion =", rnd(x[["CV crit"]]))
   if (!is.null(x[["adj CV crit"]]))
-    cat("\nbias-adjusted cross-validation criterion =", x[["adj CV crit"]])
+    cat("\nbias-adjusted cross-validation criterion =", rnd(x[["adj CV crit"]]))
   if (!is.null(x[["full crit"]]))
-    cat("\nfull-sample criterion =", x[["full crit"]], "\n")
+    cat("\nfull-sample criterion =", rnd(x[["full crit"]]), "\n")
   invisible(x)
 }
 

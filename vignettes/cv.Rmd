@@ -43,7 +43,7 @@ colorize <- function(x, color) {
 }
 
 
-.opts <- options(digits = 4)
+.opts <- options(digits = 5)
 ```
 
 Load the packages we'll use here:
@@ -55,7 +55,7 @@ library(cv)    #
 
 Cross-validation (CV) is an essentially simple and intuitively reasonable approach to estimating the predictive accuracy of regression models. CV is developed in many standard sources on regression modeling and "machine learning"---we particularly recommend @JamesEtAl:2013 [Secs. 5.1, 5.3]---and so we will describe the method only briefly here before taking up computational issues and some examples.
 
-Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit a statistical model; and then the second part is used to assess the adequacy of the model fit to the first part of the data. For a discussion of data-division, see XXX. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, particularly in smaller samples, the results can vary substantially based on the random division of the data: See @Harrell:2015 [Sec. 5.3] for this and other remarks about data-division and cross-validation.
+Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit a statistical model; and then the second part is used to assess the adequacy of the model fit to the first part of the data. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, particularly in smaller samples, the results can vary substantially based on the random division of the data: See @Harrell:2015 [Sec. 5.3] for this and other remarks about data-division and cross-validation.
 
 Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the omitted fold, computing some CV criterion or "cost" measure, such as the mean-squared error of prediction. The CV criterion is then averaged over the $k$ folds. In the extreme $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
 
@@ -204,9 +204,6 @@ In addition to the usually summary output for a GLM, we show the result of apply
 
 [^4]: `BayesRule()` does some error checking; `BayesRule2()` is similar, but omits the error checking, and so can be faster for large problems.
 
-```{r restore, include = FALSE}
-options(.opts)
-```
 In this example, the fitted logistic regression incorrectly predicts 31% of the responses; we expect this estimate to be optimistic given that the model is used to "predict" the data to which it is fit.
 
 The `"glm"` method for `cv()` is largely similar to the `"lm"` method, although the default algorithm, selected explicitly by `method="exact"`, refits the model with each fold removed (and is thus equivalent to `method="naive"` for `"lm"` models). For generalized linear models, `method="Woodbury"` or (for LOO CV) `method="hatvalues"` provide approximate results (see the last section of the vignette for details):
@@ -242,6 +239,22 @@ There is a substantial time penalty associated with exact computations.
 
 ## Cross-validating model selection
 
+As @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"], if the whole data are used to select or fine-tune a statistical model, subsequent cross-validation of the model is intrinsically misleading, because the model is selected to fit the whole data, including the part of the data that remains when each fold is removed.
+
+The following example is similar in spirit to one employed by @HastieTibshiraniFriedman:2009. Suppose that we randomly generate $n = 1000$ independent observations for a response variable variable $y \sim N(\mu = 10, \sigma^2 = 0)$, and independently sample $1000$ observations for each of $p = 100$ "predictors," $x_1, \ldots, x_{100}$, each from $x_j \sim N(0, 1)$. The response has nothing to do with the predictors and so the population linear-regression model $y_i = \alpha + \beta_1 x_{i1} + \cdots + \beta_{100} x_{i,100} + \varepsilon_i$ has $\alpha = 10$ and all $\beta_j = 0$. 
+
+```{r generate-selection-data}
+set.seed(123) # for reproducibility
+y <- rnorm(1000, mean=10)
+X <- matrix(rnorm(1000*100), 1000, 100)
+colnames(X) <- 1:100
+head(y)
+X[1:5, 1:5]
+```
+
+```{r restore, include = FALSE}
+options(.opts)
+```
 
 ## References
 

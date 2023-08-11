@@ -111,3 +111,11 @@ cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury")
 
 cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues")
 
+## ----generate-selection-data--------------------------------------------------
+set.seed(123) # for reproducibility
+y <- rnorm(1000, mean=10)
+X <- matrix(rnorm(1000*100), 1000, 100)
+colnames(X) <- 1:100
+head(y)
+X[1:5, 1:5]
+

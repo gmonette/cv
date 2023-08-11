@@ -35,7 +35,7 @@ cv(model, data, criterion, k, seed, ...)
   ...
 )
 
-\method{print}{cv}(x, ...)
+\method{print}{cv}(x, digits = getOption("digits"), ...)
 
 \method{cv}{lm}(
   model,
