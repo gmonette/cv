@@ -3,3 +3,6 @@
 __notes_*
 ^\.github$
 vignettes/cv_cache/*
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
