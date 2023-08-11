@@ -27,7 +27,7 @@ colorize <- function(x, color) {
 }
 
 
-.opts <- options(digits = 4)
+.opts <- options(digits = 5)
 
 ## ----loadpackages-------------------------------------------------------------
 library(cv)    # 
@@ -96,9 +96,6 @@ summary(m.mroz)
 BayesRule(ifelse(Mroz$lfp == "yes", 1, 0), 
           fitted(m.mroz, type="response"))
 
-## ----restore, include = FALSE-------------------------------------------------
-options(.opts)
-
 ## ----cv-Mroz-10-fold----------------------------------------------------------
 cv(m.mroz, criterion=BayesRule, seed=248)
 
@@ -118,4 +115,7 @@ X <- matrix(rnorm(1000*100), 1000, 100)
 colnames(X) <- 1:100
 head(y)
 X[1:5, 1:5]
+
+## ----restore, include = FALSE-------------------------------------------------
+options(.opts)
 

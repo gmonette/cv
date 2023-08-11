@@ -94,6 +94,9 @@ or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explan
 of the available options.}
 
 \item{x}{a \code{cv} object to be printed}
+
+\item{digits}{significant digits for printing,
+default taken from the \code{"digits"} option}
 }
 \value{
 a \code{"cv"} object with the cross-validation criterion averaged across the folds,

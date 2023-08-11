@@ -144,6 +144,8 @@ cv.default <- function(model, data=insight::get_data(model),
 
 #' @describeIn cv \code{print()} method
 #' @param x a \code{cv} object to be printed
+#' @param digits significant digits for printing,
+#' default taken from the \code{"digits"} option
 #' @export
 print.cv <- function(x, digits=getOption("digits"), ...){
   rnd <- function(x){

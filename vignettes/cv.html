@@ -545,9 +545,9 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.17</span></span>
-<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.16</span></span>
-<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.98</span></span></code></pre></div>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.352</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.333</span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
 regression with each fold deleted without having literally to refit the
@@ -568,7 +568,7 @@ argument to <code>cv()</code>.</p>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.25</span></span></code></pre></div>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span></code></pre></div>
 <p>For LOO CV of a linear model, <code>cv()</code> by default uses the
 hatvalues from the model fit to the full data for the LOO updates, and
 reports only the CV estimate of MSE. Alternative methods are to use the
@@ -580,17 +580,17 @@ computations):</p>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; method: naive</span></span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.25</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.25</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.98</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a></span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="fu">cv</span>(m.auto, <span class="at">k=</span><span class="st">&quot;loo&quot;</span>, <span class="at">method=</span><span class="st">&quot;Woodbury&quot;</span>)</span>
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.25</span></span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.25</span></span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.98</span></span></code></pre></div>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;naive&quot;</code> and <code>&quot;Woodbury&quot;</code> methods also
 return the bias-adjusted estimate of MSE and the full-sample MSE, but
 bias isn’t an issue for LOO CV.</p>
@@ -604,7 +604,7 @@ model as an equivalent Gaussian GLM. We use the
 for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>m.auto.glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(mpg <span class="sc">~</span> <span class="fu">poly</span>(horsepower, <span class="dv">2</span>), <span class="at">data=</span>Auto)</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>boot<span class="sc">::</span><span class="fu">cv.glm</span>(Auto, m.auto.glm)<span class="sc">$</span>delta</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; [1] 19.25 19.25</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; [1] 19.248 19.248</span></span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
 <span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="at">hatvalues =</span> <span class="fu">cv</span>(m.auto, <span class="at">k=</span><span class="st">&quot;loo&quot;</span>),</span>
@@ -614,11 +614,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span></span>
 <span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>)</span>
 <span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt;       expr      min       lq   mean median     uq    max neval cld</span></span>
-<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt;  hatvalues    983.8    996.5   1170   1182   1303   1320    10 a  </span></span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10468.0  10748.3  11334  10998  11145  14670    10 a  </span></span>
-<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt;      naive 214862.2 216135.4 223798 217417 220407 278845    10  b </span></span>
-<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt;     cv.glm 375969.2 381982.4 397617 386410 395410 447805    10   c</span></span></code></pre></div>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt;       expr       min     lq     mean   median       uq      max neval cld</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt;  hatvalues    954.19   1167   1161.2   1188.9   1218.6   1297.5    10 a  </span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10349.34  10534  11062.0  10683.3  11297.6  13368.8    10 a  </span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt;      naive 214636.64 216485 217288.3 217069.5 218253.4 219587.1    10  b </span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt;     cv.glm 380696.28 380719 395681.7 382773.2 385014.4 511022.3    10   c</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
@@ -640,10 +640,10 @@ few cases in the data set:</p>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; 2 yes  0    2  30 no no 0.3285 19.50</span></span>
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; 3 yes  1    3  35 no no 1.5141 12.04</span></span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="fu">tail</span>(Mroz, <span class="dv">3</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt;     lfp k5 k618 age wc hc    lwg    inc</span></span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; 751  no  0    0  43 no no 0.8881  9.952</span></span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 752  no  0    0  60 no no 1.2250 24.984</span></span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 753  no  0    3  39 no no 0.8532 28.363</span></span></code></pre></div>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt;     lfp k5 k618 age wc hc     lwg    inc</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; 751  no  0    0  43 no no 0.88814  9.952</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 752  no  0    0  60 no no 1.22497 24.984</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 753  no  0    3  39 no no 0.85321 28.363</span></span></code></pre></div>
 <p>The response variable in the logistic regression is <code>lfp</code>,
 labor-force participation, a factor coded <code>&quot;yes&quot;</code> or
 <code>&quot;no&quot;</code>. The remaining variables are predictors:</p>
@@ -694,7 +694,7 @@ regression to the <code>Mroz</code> data:</p>
 <span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a></span>
 <span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a><span class="fu">BayesRule</span>(<span class="fu">ifelse</span>(Mroz<span class="sc">$</span>lfp <span class="sc">==</span> <span class="st">&quot;yes&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>), </span>
 <span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a>          <span class="fu">fitted</span>(m.mroz, <span class="at">type=</span><span class="st">&quot;response&quot;</span>))</span>
-<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a><span class="co">#&gt; [1] 0.3068</span></span></code></pre></div>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a><span class="co">#&gt; [1] 0.30677</span></span></code></pre></div>
 <p>In addition to the usually summary output for a GLM, we show the
 result of applying the <code>BayesRule()</code> function from the
 <strong>cv</strong> package to predictions derived from the fitted
@@ -720,17 +720,17 @@ last section of the vignette for details):</p>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; method: exact</span></span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.3240372</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3195223</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.3067729</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31952</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
 <span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a></span>
 <span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="at">criterion=</span>BayesRule, <span class="at">seed=</span><span class="dv">248</span>, <span class="at">method=</span><span class="st">&quot;Woodbury&quot;</span>)</span>
 <span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.3240372</span></span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3192577</span></span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.3067729</span></span></code></pre></div>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31926</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
 <p>To ensure that the two methods use the same 10 folds, we specify the
 seed for R’s random-number generator explicitly; here, and as is common
 in our experience, the <code>&quot;exact&quot;</code> and <code>&quot;Woodbury&quot;</code>
@@ -743,23 +743,23 @@ exact and the approximate methods:</p>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; method: exact</span></span>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.3200531</span></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183001</span></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.3067729</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
 <span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a></span>
 <span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="at">k=</span><span class="st">&quot;loo&quot;</span>, <span class="at">criterion=</span>BayesRule, <span class="at">method=</span><span class="st">&quot;Woodbury&quot;</span>)</span>
 <span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.3200531</span></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183001</span></span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.3067729</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
 <span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a></span>
 <span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="at">k=</span><span class="st">&quot;loo&quot;</span>, <span class="at">criterion=</span>BayesRule, <span class="at">method=</span><span class="st">&quot;hatvalues&quot;</span>)</span>
 <span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
 <span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.3200531</span></span></code></pre></div>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span></code></pre></div>
 <p>To the number of decimal digits shown, the three methods produce
 identical results for this example.</p>
 <p>As for linear models, we report some timings for the various
@@ -775,16 +775,11 @@ comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
 <span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>               <span class="at">cost=</span>BayesRule),</span>
 <span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span>)</span>
 <span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt;       expr         min         lq        mean      median          uq</span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.310401    1.33373    1.375341    1.375345    1.388342</span></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   39.945726   40.45958   41.293556   41.370886   41.599338</span></span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt;      exact 1750.979661 1777.68140 1835.624682 1824.532698 1843.590830</span></span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2019.926295 2066.25420 2122.571451 2135.245662 2157.432874</span></span>
-<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co">#&gt;          max neval cld</span></span>
-<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co">#&gt;     1.505684    10 a  </span></span>
-<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="co">#&gt;    43.428717    10 a  </span></span>
-<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a><span class="co">#&gt;  2008.740511    10  b </span></span>
-<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a><span class="co">#&gt;  2212.281690    10   c</span></span></code></pre></div>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean   median       uq       max neval  cld</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2929    1.3305    1.3773    1.358    1.443    1.4692    10 a   </span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   39.9350   40.4381   41.1376   40.997   41.975   42.9574    10  b  </span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt;      exact 1743.1439 1750.7409 1776.2863 1758.004 1801.049 1845.1572    10   c </span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2052.4803 2067.4920 2088.5954 2094.641 2100.892 2129.5143    10    d</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -813,21 +808,21 @@ has <span class="math inline">\(\alpha = 10\)</span> and all <span class="math i
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">1000</span><span class="sc">*</span><span class="dv">100</span>), <span class="dv">1000</span>, <span class="dv">100</span>)</span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="fu">colnames</span>(X) <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span></span>
 <span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="fu">head</span>(y)</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt; [1]  9.439524  9.769823 11.558708 10.070508 10.129288 11.715065</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt; [1]  9.4395  9.7698 11.5587 10.0705 10.1293 11.7151</span></span>
 <span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>X[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt;                1          2          3          4          5</span></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt; [1,] -0.99579872 -0.5116037 -0.1503075  0.1965498 -0.4941739</span></span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt; [2,] -1.03995504  0.2369379 -0.3277571  0.6501132  1.1275935</span></span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt; [3,] -0.01798024 -0.5415892 -1.4481653  0.6710042 -1.1469495</span></span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt; [4,] -0.13217513  1.2192276 -0.6972846 -1.2841578  1.4810186</span></span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; [5,] -2.54934277  0.1741359  2.5984902 -2.0261096  0.9161912</span></span></code></pre></div>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt;             1        2        3        4        5</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt; [1,] -0.99580 -0.51160 -0.15031  0.19655 -0.49417</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt; [2,] -1.03996  0.23694 -0.32776  0.65011  1.12759</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt; [3,] -0.01798 -0.54159 -1.44817  0.67100 -1.14695</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt; [4,] -0.13218  1.21923 -0.69728 -1.28416  1.48102</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; [5,] -2.54934  0.17414  2.59849 -2.02611  0.91619</span></span></code></pre></div>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
 <div id="ref-CantyRipley2022" class="csl-entry">
-Canty, A., &amp; Ripley, B. D. (2022). <em>Boot: Bootstrap r (s-plus)
-functions</em>.
+Canty, A., &amp; Ripley, B. D. (2022). <em>Boot: Bootstrap
+<span>R</span> (<span>S</span>-plus) functions</em>.
 </div>
 <div id="ref-DavisonHinkley1997" class="csl-entry">
 Davison, A. C., &amp; Hinkley, D. V. (1997). <em>Bootstrap methods and
