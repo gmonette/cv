@@ -109,13 +109,26 @@ cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury")
 cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues")
 
 ## ----generate-selection-data--------------------------------------------------
-set.seed(123) # for reproducibility
-y <- rnorm(1000, mean=10)
-X <- matrix(rnorm(1000*100), 1000, 100)
-colnames(X) <- 1:100
-head(y)
-X[1:5, 1:5]
+set.seed(24361) # for reproducibility
+D <- data.frame(
+  y = rnorm(1000, mean=10),
+  X = matrix(rnorm(1000*100), 1000, 100)
+)
+head(D[, 1:6])
 
-## ----restore, include = FALSE-------------------------------------------------
-options(.opts)
+## ----ominbus-F----------------------------------------------------------------
+m.full <- lm(y ~ ., data=D)
+m.null <- lm(y ~ 1, data=D)
+anova(m.null, m.full)
+
+summary(m.null)
+
+## ----forward-selection--------------------------------------------------------
+m.select <- MASS::stepAIC(m.null, direction="forward", trace=FALSE,
+                     scope=list(lower=~1, upper=formula(m.full)))
+summary(m.select)
+mse(D$y, fitted(m.select))
+
+## ----cv-selectedModel---------------------------------------------------------
+cv(m.select, seed=2529)
 

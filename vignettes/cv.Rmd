@@ -239,22 +239,61 @@ There is a substantial time penalty associated with exact computations.
 
 ## Cross-validating model selection
 
-As @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"], if the whole data are used to select or fine-tune a statistical model, subsequent cross-validation of the model is intrinsically misleading, because the model is selected to fit the whole data, including the part of the data that remains when each fold is removed.
+### A preliminary example
 
-The following example is similar in spirit to one employed by @HastieTibshiraniFriedman:2009. Suppose that we randomly generate $n = 1000$ independent observations for a response variable variable $y \sim N(\mu = 10, \sigma^2 = 0)$, and independently sample $1000$ observations for each of $p = 100$ "predictors," $x_1, \ldots, x_{100}$, each from $x_j \sim N(0, 1)$. The response has nothing to do with the predictors and so the population linear-regression model $y_i = \alpha + \beta_1 x_{i1} + \cdots + \beta_{100} x_{i,100} + \varepsilon_i$ has $\alpha = 10$ and all $\beta_j = 0$. 
+As @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"] explain, if the whole data are used to select or fine-tune a statistical model, subsequent cross-validation of the model is intrinsically misleading, because the model is selected to fit the whole data, including the part of the data that remains when each fold is removed.
+
+The following example is similar in spirit to one employed by @HastieTibshiraniFriedman:2009. Suppose that we randomly generate $n = 1000$ independent observations for a response variable variable $y \sim N(\mu = 10, \sigma^2 = 0)$, and independently sample $1000$ observations for $p = 100$ "predictors," $x_1, \ldots, x_{100}$, each from $x_j \sim N(0, 1)$. The response has nothing to do with the predictors and so the population linear-regression model $y_i = \alpha + \beta_1 x_{i1} + \cdots + \beta_{100} x_{i,100} + \varepsilon_i$ has $\alpha = 10$ and all $\beta_j = 0$. 
 
 ```{r generate-selection-data}
-set.seed(123) # for reproducibility
-y <- rnorm(1000, mean=10)
-X <- matrix(rnorm(1000*100), 1000, 100)
-colnames(X) <- 1:100
-head(y)
-X[1:5, 1:5]
+set.seed(24361) # for reproducibility
+D <- data.frame(
+  y = rnorm(1000, mean=10),
+  X = matrix(rnorm(1000*100), 1000, 100)
+)
+head(D[, 1:6])
+```
+Least-squares provides accurate estimates of the regression constant $\alpha = 10$ and the error variance $\sigma^2 = 1$ for the "null model" including only the regression constant; moreover, the omnibus $F$-test of the correct null hypothesis that all of the $\beta$s are 0 for the "full model" with all 100 $x$s is associated with a large $p$-value:
+```{r omnibus-F}
+m.full <- lm(y ~ ., data=D)
+m.null <- lm(y ~ 1, data=D)
+anova(m.null, m.full)
+
+summary(m.null)
+```
+Next, using the `stepAIC()` function in the **MASS** package [@VenablesRipley:2002], let us perform a forward stepwise regression to select a "best" model, starting with the null model, and using AIC as the model-selection criterion (see the help page for `stepAIC()` for details):[^5]
+
+[^5]: It's generally advantageous to start with the largest model, here the one with 100 predictors, and proceed by backward elimination. In this demonstration, however, where all of the $\beta$s are really 0, the selected model will be small, and so we proceed by forward selection from the null model to save computing time.
+
+```{r forward-selection}
+m.select <- MASS::stepAIC(m.null, direction="forward", trace=FALSE,
+                     scope=list(lower=~1, upper=formula(m.full)))
+summary(m.select)
+mse(D$y, fitted(m.select))
+```
+The resulting model has 15 predictors, a very modest $R^2 = .044$, but a small $p$-value for its omnibus $F$-test (which, of course, is entirely spurious because the same data were used to select and test the model). The MSE for the selected model is smaller than the true error variance $\sigma^2 = 1$, as is the estimated error variance for the selected model, $\widehat{\sigma}^2 = 0.973^2 = 0.947$.
+
+If we cross-validate the selected model, we also obtain an optimistic estimate of its predictive power:
+```{r cv-selectedModel}
+cv(m.select, seed=2529)
 ```
 
-```{r restore, include = FALSE}
-options(.opts)
+The `cvSelect()` function in the **cv** package allows us to cross-validate the whole model-selection procedure. The first argument to `cvSelect()` is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The `selectStepAIC()` function, also in **cv** and based on `stepAIC()`, is suitable for use with `cvSelect()`:
+```{r cvSelect-artificial-data, cache=TRUE}
+cvSelect(selectStepAIC, data=D, seed=3791,
+         model=m.null,
+         direction="forward",
+         scope=list(lower=~1, upper=formula(m.full)))
 ```
+
+The other arguments to `cvSelect()` are:
+
+* `data`, the data set to which the model is fit;
+* `seed`, an optional seed for R's pseudo-random-number generator; as for `cv()`, if the seed isn't supplied by the user, a seed is randomly selected and saved;
+* additional arguments required by the model-selection function, here the starting `model` argument, the `direction` of model selection, and the `scope` of models considered (from the model with only a regression constant to the model with all 100 predictors).
+
+
+By default, `cvSelect()` performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
 
 ## References
 
