@@ -112,7 +112,7 @@ selectStepAIC <- function(data, indices,
                           model, criterion=mse, k.=2, ...){
   y <- getResponse(model)
   if (missing(indices)) {
-    model.i <- MASS::stepAIC(model, trace=FALSE, ...)
+    model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
     fit.o.i <- predict(model.i, newdata=data, type="response")
     return(criterion(y, fit.o.i))
   }
