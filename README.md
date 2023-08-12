@@ -1,4 +1,3 @@
-# cv package for R: Various Functions for Cross-Validation of Regression Models 
 
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml)
@@ -6,7 +5,7 @@
   [![Last Commit](https://img.shields.io/github/last-commit/gmonette/cv)](https://github.com/gmonette/cv)
   <!-- badges: end -->
   
-<img src="man/figures/cv-hex.png" style="float:right; height:200px;" />
+# cv package for R: Various Functions for Cross-Validation of Regression Models <img src="man/figures/cv-hex.png" style="float:right; height:200px;" />
 
 Some of the functions supplied by the package:
 
