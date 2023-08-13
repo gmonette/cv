@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-08-12" />
+<meta name="date" content="2023-08-13" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-08-12</h4>
+<h4 class="date">2023-08-13</h4>
 
 
 
@@ -542,11 +542,11 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a></span>
 <span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 134866</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 164750</span></span>
 <span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.392</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.391</span></span>
 <span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.37</span></span>
 <span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
@@ -939,15 +939,16 @@ function capable of refitting the model with a fold omitted and
 returning a CV criterion. The <code>selectStepAIC()</code> function,
 also in <strong>cv</strong> and based on <code>stepAIC()</code>, is
 suitable for use with <code>cvSelect()</code>:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">cvSelect</span>(selectStepAIC, <span class="at">data=</span>D, <span class="at">seed=</span><span class="dv">3791</span>,</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>         <span class="at">model=</span>m.null,</span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>         <span class="at">direction=</span><span class="st">&quot;forward&quot;</span>,</span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>         <span class="at">scope=</span><span class="fu">list</span>(<span class="at">lower=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">upper=</span><span class="fu">formula</span>(m.full)))</span>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>cv.select <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, <span class="at">data=</span>D, <span class="at">seed=</span><span class="dv">3791</span>,</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>                      <span class="at">model=</span>m.null,<span class="at">direction=</span><span class="st">&quot;forward&quot;</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>                      <span class="at">scope=</span><span class="fu">list</span>(<span class="at">lower=</span><span class="sc">~</span><span class="dv">1</span>, </span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>                                 <span class="at">upper=</span><span class="fu">formula</span>(m.full)))</span>
 <span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3791</span></span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 1.0687</span></span>
-<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.0612</span></span>
-<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>cv.select</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 1.0687</span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.0612</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
 <p>The other arguments to <code>cvSelect()</code> are:</p>
 <ul>
 <li><code>data</code>, the data set to which the model is fit;</li>
@@ -963,6 +964,42 @@ predictors).</li>
 <p>By default, <code>cvSelect()</code> performs 10-fold CV, and produces
 an estimate of MSE for the model-selection procedure even
 <em>larger</em> than the true error variance, <span class="math inline">\(\sigma^2 = 1\)</span>.</p>
+<p>Also by default, when the number of folds is 10 or fewer,
+<code>cvSelect()</code> saves the selected models. In this example, the
+variables retained by the model-selection process in the several folds
+are quite different (printing out the column numbers of the predictors
+selected in each fold):</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">lapply</span>(cv.select<span class="sc">$</span>models, <span class="cf">function</span>(m) </span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="fu">as.numeric</span>(<span class="fu">sub</span>(<span class="st">&quot;X.&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="fu">names</span>(<span class="fu">coef</span>(m))[<span class="sc">-</span><span class="dv">1</span>]))))</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">#&gt;  [1]  2  6 15 26 28 29 46 54 61 65 70 87 90 91 97 99</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; [[2]]</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt;  [1]  8 25 26 31 54 56 64 73 81 87 89 90 92 99</span></span>
+<span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a><span class="co">#&gt; [[3]]</span></span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a><span class="co">#&gt;  [1] 28 33 40 56 61 65 81 87 90 91 92 99</span></span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a><span class="co">#&gt; [[4]]</span></span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a><span class="co">#&gt;  [1]  8 15 17 29 35 40 45 53 60 64 65 79 87 90 91 92 99</span></span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a><span class="co">#&gt; [[5]]</span></span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a><span class="co">#&gt;  [1]  8 25 31 35 46 53 54 56 60 68 72 87 88 89 90 91 99</span></span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a><span class="co">#&gt; [[6]]</span></span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a><span class="co">#&gt;  [1]  8 11 29 31 40 45 53 54 68 70 77 87 90 91 99</span></span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a><span class="co">#&gt; [[7]]</span></span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a><span class="co">#&gt;  [1]  4 17 45 53 68 87 89 90 91 99</span></span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a><span class="co">#&gt; [[8]]</span></span>
+<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a><span class="co">#&gt;  [1] 15 26 45 46 53 54 56 60 61 65 68 70 87 90 92 99</span></span>
+<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a><span class="co">#&gt; [[9]]</span></span>
+<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a><span class="co">#&gt;  [1] 15 26 28 40 45 47 54 56 60 65 68 87 90 91 97 99</span></span>
+<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a><span class="co">#&gt; [[10]]</span></span>
+<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a><span class="co">#&gt;  [1]  4 35 40 46 53 54 56 61 87 90 91 92 99</span></span></code></pre></div>
 </div>
 </div>
 <div id="references" class="section level2 unnumbered">

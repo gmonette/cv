@@ -132,3 +132,7 @@ mse(D$y, fitted(m.select))
 ## ----cv-selectedModel---------------------------------------------------------
 cv(m.select, seed=2529)
 
+## ----compare-selected-models--------------------------------------------------
+lapply(cv.select$models, function(m) 
+  sort(as.numeric(sub("X.", "", names(coef(m))[-1]))))
+

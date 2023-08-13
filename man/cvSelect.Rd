@@ -27,7 +27,7 @@ may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
 
 \item{save.models}{save the selected models? (default is \code{TRUE} if
-\code{k} is 10 or smaller, \code{FALSE} otherewise)}
+\code{k} is 10 or smaller, \code{FALSE} otherwise)}
 
 \item{seed}{for R's random number generator; not used for n-fold cross-validation.}
 

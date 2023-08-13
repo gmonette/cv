@@ -280,10 +280,11 @@ cv(m.select, seed=2529)
 
 The `cvSelect()` function in the **cv** package allows us to cross-validate the whole model-selection procedure. The first argument to `cvSelect()` is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The `selectStepAIC()` function, also in **cv** and based on `stepAIC()`, is suitable for use with `cvSelect()`:
 ```{r cvSelect-artificial-data, cache=TRUE}
-cvSelect(selectStepAIC, data=D, seed=3791,
-         model=m.null,
-         direction="forward",
-         scope=list(lower=~1, upper=formula(m.full)))
+cv.select <- cvSelect(selectStepAIC, data=D, seed=3791,
+                      model=m.null,direction="forward",
+                      scope=list(lower=~1, 
+                                 upper=formula(m.full)))
+cv.select
 ```
 
 The other arguments to `cvSelect()` are:
@@ -294,6 +295,13 @@ The other arguments to `cvSelect()` are:
 
 
 By default, `cvSelect()` performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
+
+Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves the selected models. In this example, the variables retained by the model-selection process in the several folds are quite different (printing out the column numbers of the predictors selected in each fold):
+```{r compare-selected-models}
+lapply(cv.select$models, function(m) 
+  sort(as.numeric(sub("X.", "", names(coef(m))[-1]))))
+```
+
 
 ## References
 
