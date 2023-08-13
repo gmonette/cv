@@ -17,8 +17,8 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  message = FALSE,
-  warning = FALSE,
+  message = TRUE,
+  warning = TRUE,
   fig.align = "center",
   fig.height = 6,
   fig.width = 7,

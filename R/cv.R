@@ -17,9 +17,8 @@
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
 #' for n-fold cross-validation
-#' @param parallel do computations in parallel? (default is \code{FALSE})
 #' @param ncores number of cores to use for parallel computations
-#'        (default is number of physical cores detected)
+#'        (default is \code{1}, i.e., computations aren't done in parallel)
 #' @param method computational method to apply to a linear (i.e. \code{"lm"}) model
 #' or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 #' of the available options.
@@ -80,12 +79,9 @@ cv <- function(model, data, criterion, k, seed, ...){
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
 #' @importFrom lme4 lmer
-#' @importFrom parallelly availableCores
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
-                       criterion=mse, k=10,
-                       seed, parallel=FALSE,
-                       ncores=parallelly::availableCores(logical=FALSE),
+                       criterion=mse, k=10, seed, ncores=1,
                        method=NULL, ...){
   f <- function(i){
     # helper function to compute cv criterion for each fold
@@ -118,7 +114,7 @@ cv.default <- function(model, data=insight::get_data(model),
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
-  if (parallel && ncores > 1){
+  if (ncores > 1){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
@@ -172,8 +168,7 @@ print.cv <- function(x, digits=getOption("digits"), ...){
 #' @export
 cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
                   seed, method=c("auto", "hatvalues", "Woodbury", "naive"),
-                  parallel=FALSE,
-                  ncores=parallelly::availableCores(logical=FALSE), ...){
+                  ncores=1, ...){
   UpdateLM <- function(omit){
     # compute coefficients with omit cases deleted
     #  uses the Woodbury matrix identity
@@ -251,7 +246,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
-  if (parallel && ncores > 1L){
+  if (ncores > 1L){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
@@ -278,10 +273,8 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
 #' @describeIn cv \code{"glm"} method
 #' @export
 cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
-                   seed,
-                   method=c("exact", "hatvalues", "Woodbury"),
-                   parallel=FALSE,
-                   ncores=parallelly::availableCores(logical=FALSE),
+                   seed, method=c("exact", "hatvalues", "Woodbury"),
+                   ncores=1,
                    ...){
   UpdateIWLS <- function(omit){
     # compute coefficients with omit cases deleted
@@ -321,7 +314,7 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
     result <- cv.default(model=model, data=data, criterion=criterion, k=k, seed=seed,
-               parallel=parallel, ncores=ncores, method=method, ...)
+               ncores=ncores, method=method, ...)
     result$"criterion" <- deparse(substitute(criterion))
     return(result)
   } else if (method == "hatvalues") {
@@ -365,7 +358,7 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     ends <- cumsum(folds) # end of each fold
     starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
     indices <- if (n > k) sample(n, n)  else 1:n # permute cases
-    if (parallel && ncores > 1L){
+    if (ncores > 1L){
       cl <- makeCluster(ncores)
       registerDoParallel(cl)
       result <- foreach(i = 1L:k, .combine=rbind) %dopar% {

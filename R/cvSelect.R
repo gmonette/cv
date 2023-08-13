@@ -11,9 +11,8 @@
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
-#' @param parallel do computations in parallel? (default is \code{FALSE}),
 #' @param ncores number of cores to use for parallel computations
-#'           (default is number of physical cores detected).
+#'        (default is \code{1}, i.e., computations aren't done in parallel)
 #' @param ... arguments to be passed to \code{procedure()}.
 #' @returns \code{cvSelect()} return a \code{"cv"} object with the CV criterion averaged across the folds,
 #' the bias-adjusted averaged CV criterion,
@@ -46,12 +45,7 @@
 #' @seealso \code{\link[MASS]{stepAIC}()}
 #'
 #' @export
-cvSelect <- function(procedure,
-                     data,
-                     k=10,
-                     seed, parallel=FALSE,
-                     ncores=parallelly::availableCores(logical=FALSE),
-                     ...){
+cvSelect <- function(procedure, data, k=10, seed, ncores=1, ...){
   n <- nrow(data)
   if (is.character(k)){
     if (k == "n" || k == "loo") {
@@ -74,11 +68,17 @@ cvSelect <- function(procedure,
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
-  if (parallel && ncores > 1){
+  if (ncores > 1){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    result <- foreach(i = 1L:k, .combine=rbind) %dopar%
-      procedure(data, indices[starts[i]:ends[i]], ...)
+    arglist <- c(list(data=data, indices=1), list(...))
+    result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
+      # the following deals with a scoping issue that can
+      # occur with args passed via ...
+      arglist$indices <- indices[starts[i]:ends[i]]
+      do.call(procedure, arglist)
+    }
+      # procedure(data, indices[starts[i]:ends[i]], ...)
     stopCluster(cl)
   } else {
     result <- matrix(0, k, 2L)

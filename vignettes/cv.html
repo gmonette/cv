@@ -542,12 +542,13 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a></span>
 <span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
-<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.167</span></span>
-<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.157</span></span>
-<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 134866</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.392</span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.37</span></span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
 regression with each fold deleted without having literally to refit the
@@ -613,12 +614,14 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="at">cv.glm =</span> boot<span class="sc">::</span><span class="fu">cv.glm</span>(Auto, m.auto.glm),</span>
 <span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span></span>
 <span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>)</span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt;       expr       min       lq     mean   median       uq      max neval cld</span></span>
-<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt;  hatvalues    976.33   1145.3   1161.7   1189.9   1223.8   1282.4    10 a  </span></span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10337.00  10456.7  10711.9  10710.6  10912.3  11151.3    10 a  </span></span>
-<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt;      naive 215056.85 217499.0 242583.7 219207.8 272248.0 342018.4    10  b </span></span>
-<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt;     cv.glm 381645.06 384163.4 396841.1 388818.5 401419.0 440296.5    10   c</span></span></code></pre></div>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = &quot;loo&quot;), :</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq     mean   median       uq      max neval cld</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues    972.03    978.88   1141.2   1173.6   1195.5   1303.2    10 a  </span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10659.96  10732.98  11342.7  11009.5  11560.6  13653.7    10 a  </span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co">#&gt;      naive 209975.84 214227.58 215784.3 216035.4 217571.5 220701.9    10  b </span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 370645.29 383632.86 407092.4 387547.1 438686.7 504999.3    10   c</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
@@ -717,20 +720,22 @@ generalized linear models, <code>method=&quot;Woodbury&quot;</code> or (for LOO
 CV) <code>method=&quot;hatvalues&quot;</code> provide approximate results (see the
 last section of the vignette for details):</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="at">criterion=</span>BayesRule, <span class="at">seed=</span><span class="dv">248</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; method: exact</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31952</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="at">criterion=</span>BayesRule, <span class="at">seed=</span><span class="dv">248</span>, <span class="at">method=</span><span class="st">&quot;Woodbury&quot;</span>)</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31926</span></span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 248</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; method: exact</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31952</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="at">criterion=</span>BayesRule, <span class="at">seed=</span><span class="dv">248</span>, <span class="at">method=</span><span class="st">&quot;Woodbury&quot;</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 248</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31926</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
 <p>To ensure that the two methods use the same 10 folds, we specify the
 seed for R’s random-number generator explicitly; here, and as is common
 in our experience, the <code>&quot;exact&quot;</code> and <code>&quot;Woodbury&quot;</code>
@@ -776,10 +781,10 @@ comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
 <span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span>)</span>
 <span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2954    1.2972    1.3448    1.3303    1.3724    1.4844    10</span></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   39.3937   41.0977   47.8510   41.8745   42.8077  102.0662    10</span></span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt;      exact 1759.5185 1768.7963 1793.7131 1801.2676 1815.2035 1825.4887    10</span></span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2044.4905 2061.0253 2091.2573 2089.7572 2110.4585 2155.1559    10</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2964    1.2989    1.3377    1.3175    1.3257    1.4533    10</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   39.2384   40.0730   41.4385   41.1883   42.7950   44.6502    10</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt;      exact 1738.0466 1750.2729 1785.0868 1772.6956 1821.0899 1875.6404    10</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2040.4965 2058.2190 2084.3368 2081.3898 2097.2088 2140.7951    10</span></span>
 <span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co">#&gt;   cld</span></span>
 <span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co">#&gt;  a   </span></span>
 <span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="co">#&gt;   b  </span></span>
@@ -912,7 +917,7 @@ the model-selection criterion (see the help page for
 <span id="cb17-36"><a href="#cb17-36" tabindex="-1"></a><span class="co">#&gt; F-statistic: 3.03 on 15 and 984 DF,  p-value: 8.34e-05</span></span>
 <span id="cb17-37"><a href="#cb17-37" tabindex="-1"></a><span class="fu">mse</span>(D<span class="sc">$</span>y, <span class="fu">fitted</span>(m.select))</span>
 <span id="cb17-38"><a href="#cb17-38" tabindex="-1"></a><span class="co">#&gt; [1] 0.93063</span></span></code></pre></div>
-<p>The resulting model has 15 predictors, a very modest <span class="math inline">\(R^2 = .044\)</span>, but a small <span class="math inline">\(p\)</span>-value for its ominbus <span class="math inline">\(F\)</span>-test (which, of course, is entirely
+<p>The resulting model has 15 predictors, a very modest <span class="math inline">\(R^2 = .044\)</span>, but a small <span class="math inline">\(p\)</span>-value for its omnibus <span class="math inline">\(F\)</span>-test (which, of course, is entirely
 spurious because the same data were used to select and test the model).
 The MSE for the selected model is smaller than the true error variance
 <span class="math inline">\(\sigma^2 = 1\)</span>, as is the estimated
@@ -920,12 +925,13 @@ error variance for the selected model, <span class="math inline">\(\widehat{\sig
 <p>If we cross-validate the selected model, we also obtain an optimistic
 estimate of its predictive power:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">cv</span>(m.select, <span class="at">seed=</span><span class="dv">2529</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.95937</span></span>
-<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.95785</span></span>
-<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 2529</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.95937</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.95785</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
 <p>The <code>cvSelect()</code> function in the <strong>cv</strong>
 package allows us to cross-validate the whole model-selection procedure.
 The first argument to <code>cvSelect()</code> is a model-selection
@@ -937,10 +943,11 @@ suitable for use with <code>cvSelect()</code>:</p>
 <span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>         <span class="at">model=</span>m.null,</span>
 <span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>         <span class="at">direction=</span><span class="st">&quot;forward&quot;</span>,</span>
 <span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>         <span class="at">scope=</span><span class="fu">list</span>(<span class="at">lower=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">upper=</span><span class="fu">formula</span>(m.full)))</span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 1.0687</span></span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.0612</span></span>
-<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3791</span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 1.0687</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.0612</span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
 <p>The other arguments to <code>cvSelect()</code> are:</p>
 <ul>
 <li><code>data</code>, the data set to which the model is fit;</li>

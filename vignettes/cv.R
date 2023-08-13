@@ -1,8 +1,8 @@
 ## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
-  message = FALSE,
-  warning = FALSE,
+  message = TRUE,
+  warning = TRUE,
   fig.align = "center",
   fig.height = 6,
   fig.width = 7,
@@ -116,7 +116,7 @@ D <- data.frame(
 )
 head(D[, 1:6])
 
-## ----ominbus-F----------------------------------------------------------------
+## ----omnibus-F----------------------------------------------------------------
 m.full <- lm(y ~ ., data=D)
 m.null <- lm(y ~ 1, data=D)
 anova(m.null, m.full)

@@ -5,15 +5,7 @@
 \alias{selectStepAIC}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
-cvSelect(
-  procedure,
-  data,
-  k = 10,
-  seed,
-  parallel = FALSE,
-  ncores = parallelly::availableCores(logical = FALSE),
-  ...
-)
+cvSelect(procedure, data, k = 10, seed, ncores = 1, ...)
 
 selectStepAIC(data, indices, model, criterion = mse, k. = 2, ...)
 }
@@ -28,10 +20,8 @@ cross-validation.}
 
 \item{seed}{for R's random number generator; not used for n-fold cross-validation.}
 
-\item{parallel}{do computations in parallel? (default is \code{FALSE}),}
-
 \item{ncores}{number of cores to use for parallel computations
-(default is number of physical cores detected).}
+(default is \code{1}, i.e., computations aren't done in parallel)}
 
 \item{...}{arguments to be passed to \code{procedure()}.}
 

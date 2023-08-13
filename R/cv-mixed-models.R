@@ -5,8 +5,8 @@
 cv.merMod <- function(model,
                       data=insight::get_data(model),
                       criterion=mse, k=nrow(clusters),
-                      seed, parallel=FALSE,
-                      ncores=parallelly::availableCores(logical=FALSE),
+                      seed,
+                      ncores=1,
                       clusterVariables,
                       ...){
 
@@ -62,7 +62,7 @@ cv.merMod <- function(model,
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute clusters
 
-  if (parallel && ncores > 1L){
+  if (ncores > 1L){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k, .combine=rbind) %dopar% {

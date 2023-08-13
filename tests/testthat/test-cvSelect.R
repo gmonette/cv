@@ -19,7 +19,7 @@ test_that("cvSelect parallel lm", {
   expect_equal(cvSelect(selectStepAIC, Auto, k=5, seed=123,
                         model=m),
                cvSelect(selectStepAIC, Auto, k=5, seed=123,
-                        model=m, parallel=TRUE, ncores=2)
+                        model=m, ncores=2)
                )
 })
 
@@ -66,6 +66,6 @@ test_that("cvSelect parallel glm", {
   expect_equal(cvSelect(selectStepAIC, Cara, k=5, seed=123,
          model=m.caravan, criterion=BayesRule),
          cvSelect(selectStepAIC, Cara, k=5, seed=123,
-         model=m.caravan, parallel=TRUE, ncores=2, criterion=BayesRule)
+         model=m.caravan, ncores=2, criterion=BayesRule)
   )
 })

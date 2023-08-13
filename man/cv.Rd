@@ -15,8 +15,7 @@
   criterion = mse,
   k = nrow(clusters),
   seed,
-  parallel = FALSE,
-  ncores = parallelly::availableCores(logical = FALSE),
+  ncores = 1,
   clusterVariables,
   ...
 )
@@ -29,8 +28,7 @@ cv(model, data, criterion, k, seed, ...)
   criterion = mse,
   k = 10,
   seed,
-  parallel = FALSE,
-  ncores = parallelly::availableCores(logical = FALSE),
+  ncores = 1,
   method = NULL,
   ...
 )
@@ -44,8 +42,7 @@ cv(model, data, criterion, k, seed, ...)
   k = 10,
   seed,
   method = c("auto", "hatvalues", "Woodbury", "naive"),
-  parallel = FALSE,
-  ncores = parallelly::availableCores(logical = FALSE),
+  ncores = 1,
   ...
 )
 
@@ -56,8 +53,7 @@ cv(model, data, criterion, k, seed, ...)
   k = 10,
   seed,
   method = c("exact", "hatvalues", "Woodbury"),
-  parallel = FALSE,
-  ncores = parallelly::availableCores(logical = FALSE),
+  ncores = 1,
   ...
 )
 }
@@ -79,10 +75,8 @@ cross-validation.}
 supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation}
 
-\item{parallel}{do computations in parallel? (default is \code{FALSE})}
-
 \item{ncores}{number of cores to use for parallel computations
-(default is number of physical cores detected)}
+(default is \code{1}, i.e., computations aren't done in parallel)}
 
 \item{clusterVariables}{a character vector of names of the variables
 defining clusters for a mixed model with nested random effects}
