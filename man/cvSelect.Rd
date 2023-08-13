@@ -5,9 +5,17 @@
 \alias{selectStepAIC}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
-cvSelect(procedure, data, k = 10, seed, ncores = 1, ...)
+cvSelect(procedure, data, k = 10, save.models = k <= 10, seed, ncores = 1, ...)
 
-selectStepAIC(data, indices, model, criterion = mse, k. = 2, ...)
+selectStepAIC(
+  data,
+  indices,
+  model,
+  criterion = mse,
+  k. = 2,
+  save.models = TRUE,
+  ...
+)
 }
 \arguments{
 \item{procedure}{a model-selection procedure function (see Details).}
@@ -17,6 +25,9 @@ selectStepAIC(data, indices, model, criterion = mse, k. = 2, ...)
 \item{k}{perform k-fold cross-validation (default is 10); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
+
+\item{save.models}{save the selected models? (default is \code{TRUE} if
+\code{k} is 10 or smaller, \code{FALSE} otherewise)}
 
 \item{seed}{for R's random number generator; not used for n-fold cross-validation.}
 
@@ -34,10 +45,12 @@ cross-validation.}
 \item{k.}{the \code{k} argument to \code{\link[MASS]{stepAIC}()} (note the period in \code{k.}).}
 }
 \value{
-\code{cvSelect()} return a \code{"cv"} object with the CV criterion averaged across the folds,
-the bias-adjusted averaged CV criterion,
-the criterion applied to the model fit to the full data set,
-and the initial value of R's RNG seed.
+An object of class \code{"cv"}, with the averaged CV criterion
+(\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
+the criterion for the model applied to the full data (\code{"full crit"}),
+the number of folds (\code{"k"}), the seed for R's random-number
+generator (\code{"seed"}), and (optionally) a list of selected models
+for each fold (\code{"models"}).
 }
 \description{
 A generic function to cross-validate a model-selection procedure,

@@ -10,17 +10,20 @@
 #' @param k perform k-fold cross-validation (default is 10); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
+#' @param save.models save the selected models? (default is \code{TRUE} if
+#' \code{k} is 10 or smaller, \code{FALSE} otherwise)
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel)
 #' @param ... arguments to be passed to \code{procedure()}.
-#' @returns \code{cvSelect()} return a \code{"cv"} object with the CV criterion averaged across the folds,
-#' the bias-adjusted averaged CV criterion,
-#' the criterion applied to the model fit to the full data set,
-#' and the initial value of R's RNG seed.
 #' @importFrom MASS stepAIC
 #' @describeIn cvSelect apply cross-validation to a model-selection procedure.
-#'
+#' @returns An object of class \code{"cv"}, with the averaged CV criterion
+#' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
+#' the criterion for the model applied to the full data (\code{"full crit"}),
+#' the number of folds (\code{"k"}), the seed for R's random-number
+#' generator (\code{"seed"}), and (optionally) a list of selected models
+#' for each fold (\code{"models"}).
 #' @details
 #' The model-selection function supplied as the \code{procedure} argument
 #' to \code{cvSelect()} should accept the following arguments:
@@ -45,7 +48,9 @@
 #' @seealso \code{\link[MASS]{stepAIC}()}
 #'
 #' @export
-cvSelect <- function(procedure, data, k=10, seed, ncores=1, ...){
+cvSelect <- function(procedure, data, k=10,
+                     save.models = k <= 10,
+                     seed, ncores=1, ...){
   n <- nrow(data)
   if (is.character(k)){
     if (k == "n" || k == "loo") {
@@ -71,26 +76,41 @@ cvSelect <- function(procedure, data, k=10, seed, ncores=1, ...){
   if (ncores > 1){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    arglist <- c(list(data=data, indices=1), list(...))
-    result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
+    arglist <- c(list(data=data, indices=1, save.models=save.models),
+                 list(...))
+    selection <- foreach(i = 1L:k, .combine=c) %dopar% {
       # the following deals with a scoping issue that can
-      # occur with args passed via ...
+      #   occur with args passed via ...
       arglist$indices <- indices[starts[i]:ends[i]]
-      do.call(procedure, arglist)
+      selection <- do.call(procedure, arglist)
     }
-      # procedure(data, indices[starts[i]:ends[i]], ...)
+    if (save.models){
+      is <- seq(1L:(2*k))
+      # CV criteria saved in odd-numbered elements
+      #   models in even-numbered elements
+      result <- do.call(rbind, selection[is %% 2 == 1])
+      models <- do.call(list, selection[is %% 2 == 0])
+    } else {
+      result <- do.call(rbind, selection)
+      models <- NULL
+    }
     stopCluster(cl)
   } else {
     result <- matrix(0, k, 2L)
+    models <- vector(k, mode="list")
     for (i in 1L:k){
-      result[i, ] <- procedure(data, indices[starts[i]:ends[i]], ...)
+      selection <- procedure(data, indices[starts[i]:ends[i]],
+                             save.models=save.models, ...)
+      result[i, ] <- selection[[1]]
+      if (save.models) models[[i]] <- selection[[2]]
     }
   }
   cv <- weighted.mean(result[, 1L], folds)
   cv.full <- procedure(data, ...)
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
-                 "k" = if (k == n) "n" else k, "seed" = seed)
+                 "k" = if (k == n) "n" else k, "seed" = seed,
+                 models = if (save.models) models else NULL)
   class(result) <- "cv"
   result
 }
@@ -109,7 +129,8 @@ cvSelect <- function(procedure, data, k=10, seed, ncores=1, ...){
 #'          k.=log(nrow(Auto))) # via BIC
 #' @export
 selectStepAIC <- function(data, indices,
-                          model, criterion=mse, k.=2, ...){
+                          model, criterion=mse, k.=2,
+                          save.models=TRUE, ...){
   y <- getResponse(model)
   if (missing(indices)) {
     model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
@@ -120,7 +141,9 @@ selectStepAIC <- function(data, indices,
   model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
   fit.o.i <- predict(model.i, newdata=data, type="response")
   fit.i <- fit.o.i[indices]
-  c(criterion(y[indices], fit.i), criterion(y, fit.o.i))
+  list(criterion=c(criterion(y[indices], fit.i),
+         criterion(y, fit.o.i)),
+       if (save.models) model=model.i else NULL)
 }
 
 # selectAllSubsets <- function(data, indices, formula, ...){

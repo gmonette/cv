@@ -93,10 +93,11 @@ of the available options.}
 default taken from the \code{"digits"} option}
 }
 \value{
-a \code{"cv"} object with the cross-validation criterion averaged across the folds,
-the bias-adjusted averaged CV criterion,
-the criterion applied to the model fit to the full data set,
-and the initial value of R's RNG seed. Some methods return a
+An object of class \code{"cv"}, with the averaged CV criterion
+(\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
+the criterion for the model applied to the full data (\code{"full crit"}),
+the number of folds (\code{"k"}), and the seed for R's random-number
+generator (\code{"seed"}). Some methods may return a
 subset of these components and may add additional information.
 }
 \description{
