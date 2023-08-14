@@ -29,9 +29,6 @@ colorize <- function(x, color) {
 
 .opts <- options(digits = 5)
 
-## ----loadpackages-------------------------------------------------------------
-library(cv)    # 
-
 ## ----Auto---------------------------------------------------------------------
 data("Auto", package="ISLR2")
 head(Auto)
@@ -54,6 +51,8 @@ legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
        title="Degree", inset=0.02)
 
 ## ----mpg-horsepower-MSE-se2---------------------------------------------------
+library("cv") # for mse() and other functions
+
 se <- mse <- numeric(10)
 for (p in 1:10){
   m <- lm(mpg ~ poly(horsepower, p), data=Auto)
@@ -135,4 +134,28 @@ cv(m.select, seed=2529)
 ## ----compare-selected-models--------------------------------------------------
 lapply(cv.select$models, function(m) 
   sort(as.numeric(sub("X.", "", names(coef(m))[-1]))))
+
+## ----recall-Mroz-regression---------------------------------------------------
+summary(m.mroz)
+
+## ----mroz-selection-----------------------------------------------------------
+m.mroz.sel <- MASS::stepAIC(m.mroz, k=log(nrow(Mroz)),
+                            trace=FALSE)
+summary(m.mroz.sel)
+BayesRule(Mroz$lfp == "yes",
+          predict(m.mroz.sel, type="response"))
+
+## ----cv-mroz-regression-------------------------------------------------------
+cv(m.mroz.sel, criterion=BayesRule, seed=345266)
+
+## ----cv-mroz-selection--------------------------------------------------------
+m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz, 
+                          seed=6681,
+                          criterion=BayesRule,
+                          model=m.mroz,
+                          k.=log(nrow(Mroz)))
+m.mroz.sel.cv
+
+## ----compare-selected-models-mroz---------------------------------------------
+do.call(car::compareCoefs, m.mroz.sel.cv$models)
 

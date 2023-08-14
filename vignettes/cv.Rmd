@@ -46,11 +46,6 @@ colorize <- function(x, color) {
 .opts <- options(digits = 5)
 ```
 
-Load the packages we'll use here:
-```{r loadpackages}
-library(cv)    # 
-```
-
 ## Cross-validation
 
 Cross-validation (CV) is an essentially simple and intuitively reasonable approach to estimating the predictive accuracy of regression models. CV is developed in many standard sources on regression modeling and "machine learning"---we particularly recommend @JamesEtAl:2013 [Secs. 5.1, 5.3]---and so we will describe the method only briefly here before taking up computational issues and some examples.
@@ -115,6 +110,8 @@ The following graph shows two measures of estimated squared error as a function 
 #| out.width = "100%",
 #| fig.height = 5,
 #| fig.cap = "Estimated squared error as a function of polynomial degree, $p$"
+library("cv") # for mse() and other functions
+
 se <- mse <- numeric(10)
 for (p in 1:10){
   m <- lm(mpg ~ poly(horsepower, p), data=Auto)
@@ -301,7 +298,43 @@ Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves the
 lapply(cv.select$models, function(m) 
   sort(as.numeric(sub("X.", "", names(coef(m))[-1]))))
 ```
+### Mroz's logistic regression revisited
 
+For a contrasting example we apply model selection to Mroz's logistic regression for married women's labor-force participation. First, recall the logistic regression model that we fit to the `Mroz` data:
+```{r recall-Mroz-regression}
+summary(m.mroz)
+```
+
+Applying stepwise model selection Mroz's logistic regression, using BIC as the model-selection criterion (via the argument `k=log(nrow(Mroz))` to `stepAIC()`) selects 5 of the 7 original predictors:
+```{r mroz-selection}
+m.mroz.sel <- MASS::stepAIC(m.mroz, k=log(nrow(Mroz)),
+                            trace=FALSE)
+summary(m.mroz.sel)
+BayesRule(Mroz$lfp == "yes",
+          predict(m.mroz.sel, type="response"))
+```
+The Bayes rule applied to the selected model misclassifies 32% of the cases in the `Mroz` data. 
+
+Cross-validating the selected model produces a similar, slightly larger, estimate of misclassification, about 33%:
+```{r cv-mroz-regression}
+cv(m.mroz.sel, criterion=BayesRule, seed=345266)
+```
+Is this estimate of predictive performance optimistic?
+
+We proceed to apply the model-selection procedure by cross-validation, producing more or less the same result:
+```{r cv-mroz-selection}
+m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz, 
+                          seed=6681,
+                          criterion=BayesRule,
+                          model=m.mroz,
+                          k.=log(nrow(Mroz)))
+m.mroz.sel.cv
+```
+As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using the `compareCoefs()` function in the **car** package [@FoxWeisberg:2019]:
+```{r compare-selected-models-mroz}
+do.call(car::compareCoefs, m.mroz.sel.cv$models)
+```
+In this example, therefore, we appear to obtain a realistic estimate of model performance directly from the selected model, because there is little added uncertainty induced by model selection.
 
 ## References
 
