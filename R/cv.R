@@ -75,7 +75,7 @@ cv <- function(model, data, criterion, k, seed, ...){
 #' @describeIn cv \code{default} method
 #' @importFrom stats coef family fitted lm.wfit model.frame
 #' model.matrix model.response predict update weighted.mean weights
-#' residuals hatvalues
+#' residuals hatvalues printCoefmat
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%

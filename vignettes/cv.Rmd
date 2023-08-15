@@ -293,10 +293,9 @@ The other arguments to `cvSelect()` are:
 
 By default, `cvSelect()` performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
 
-Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves the selected models. In this example, the variables retained by the model-selection process in the several folds are quite different (printing out the column numbers of the predictors selected in each fold):
+Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves the coefficients of the selected models. In this example, the `compareFolds()` function reveals that the variables retained by the model-selection process in the several folds are quite different:
 ```{r compare-selected-models}
-lapply(cv.select$models, function(m) 
-  sort(as.numeric(sub("X.", "", names(coef(m))[-1]))))
+compareFolds(cv.select)
 ```
 ### Mroz's logistic regression revisited
 
@@ -330,9 +329,9 @@ m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
                           k.=log(nrow(Mroz)))
 m.mroz.sel.cv
 ```
-As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using the `compareCoefs()` function in the **car** package [@FoxWeisberg:2019]:
+As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using the `compareFolds()`:
 ```{r compare-selected-models-mroz}
-do.call(car::compareCoefs, m.mroz.sel.cv$models)
+compareFolds(m.mroz.sel.cv)
 ```
 In this example, therefore, we appear to obtain a realistic estimate of model performance directly from the selected model, because there is little added uncertainty induced by model selection.
 

@@ -3,9 +3,10 @@
 \name{cvSelect}
 \alias{cvSelect}
 \alias{selectStepAIC}
+\alias{compareFolds}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
-cvSelect(procedure, data, k = 10, save.models = k <= 10, seed, ncores = 1, ...)
+cvSelect(procedure, data, k = 10, save.coef = k <= 10, seed, ncores = 1, ...)
 
 selectStepAIC(
   data,
@@ -13,9 +14,11 @@ selectStepAIC(
   model,
   criterion = mse,
   k. = 2,
-  save.models = TRUE,
+  save.coef = TRUE,
   ...
 )
+
+compareFolds(object, digits = 3, ...)
 }
 \arguments{
 \item{procedure}{a model-selection procedure function (see Details).}
@@ -26,7 +29,7 @@ selectStepAIC(
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
 
-\item{save.models}{save the selected models? (default is \code{TRUE} if
+\item{save.coef}{save the coefficients from the selected models? (default is \code{TRUE} if
 \code{k} is 10 or smaller, \code{FALSE} otherwise)}
 
 \item{seed}{for R's random number generator; not used for n-fold cross-validation.}
@@ -43,14 +46,19 @@ cross-validation.}
 \item{criterion}{a CV criterion function.}
 
 \item{k.}{the \code{k} argument to \code{\link[MASS]{stepAIC}()} (note the period in \code{k.}).}
+
+\item{object}{an object of class \code{"cvSelect"}.}
+
+\item{digits}{significant digits for printing coefficients,
+(default \code{3}).}
 }
 \value{
-An object of class \code{"cv"}, with the averaged CV criterion
+An object of class , inheriting from class \code{"cv"}, with the averaged CV criterion
 (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 the criterion for the model applied to the full data (\code{"full crit"}),
 the number of folds (\code{"k"}), the seed for R's random-number
-generator (\code{"seed"}), and (optionally) a list of selected models
-for each fold (\code{"models"}).
+generator (\code{"seed"}), and (optionally) a list of coefficients for the selected models
+for each fold (\code{"coefs"}).
 }
 \description{
 A generic function to cross-validate a model-selection procedure,
@@ -84,6 +92,9 @@ argument, see the code for \code{selectStepAIC()}.
 
 \item \code{selectStepAIC()}: select a model using the \code{\link[MASS]{stepAIC}()} function in the
 \pkg{MASS} package.
+
+\item \code{compareFolds()}: print the coefficients from the selected models
+for the several folds.
 
 }}
 \examples{

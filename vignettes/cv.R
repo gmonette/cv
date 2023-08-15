@@ -132,8 +132,7 @@ mse(D$y, fitted(m.select))
 cv(m.select, seed=2529)
 
 ## ----compare-selected-models--------------------------------------------------
-lapply(cv.select$models, function(m) 
-  sort(as.numeric(sub("X.", "", names(coef(m))[-1]))))
+compareFolds(cv.select)
 
 ## ----recall-Mroz-regression---------------------------------------------------
 summary(m.mroz)
@@ -157,5 +156,5 @@ m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
 m.mroz.sel.cv
 
 ## ----compare-selected-models-mroz---------------------------------------------
-do.call(car::compareCoefs, m.mroz.sel.cv$models)
+compareFolds(m.mroz.sel.cv)
 

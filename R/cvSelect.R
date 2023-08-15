@@ -10,7 +10,7 @@
 #' @param k perform k-fold cross-validation (default is 10); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
-#' @param save.models save the selected models? (default is \code{TRUE} if
+#' @param save.coef save the coefficients from the selected models? (default is \code{TRUE} if
 #' \code{k} is 10 or smaller, \code{FALSE} otherwise)
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
 #' @param ncores number of cores to use for parallel computations
@@ -18,12 +18,12 @@
 #' @param ... arguments to be passed to \code{procedure()}.
 #' @importFrom MASS stepAIC
 #' @describeIn cvSelect apply cross-validation to a model-selection procedure.
-#' @returns An object of class \code{"cv"}, with the averaged CV criterion
+#' @returns An object of class , inheriting from class \code{"cv"}, with the averaged CV criterion
 #' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
 #' the number of folds (\code{"k"}), the seed for R's random-number
-#' generator (\code{"seed"}), and (optionally) a list of selected models
-#' for each fold (\code{"models"}).
+#' generator (\code{"seed"}), and (optionally) a list of coefficients for the selected models
+#' for each fold (\code{"coefs"}).
 #' @details
 #' The model-selection function supplied as the \code{procedure} argument
 #' to \code{cvSelect()} should accept the following arguments:
@@ -49,7 +49,7 @@
 #'
 #' @export
 cvSelect <- function(procedure, data, k=10,
-                     save.models = k <= 10,
+                     save.coef = k <= 10,
                      seed, ncores=1, ...){
   n <- nrow(data)
   if (is.character(k)){
@@ -76,7 +76,7 @@ cvSelect <- function(procedure, data, k=10,
   if (ncores > 1){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    arglist <- c(list(data=data, indices=1, save.models=save.models),
+    arglist <- c(list(data=data, indices=1, save.coef=save.coef),
                  list(...))
     selection <- foreach(i = 1L:k, .combine=c) %dopar% {
       # the following deals with a scoping issue that can
@@ -84,25 +84,25 @@ cvSelect <- function(procedure, data, k=10,
       arglist$indices <- indices[starts[i]:ends[i]]
       selection <- do.call(procedure, arglist)
     }
-    if (save.models){
+    if (save.coef){
       is <- seq(1L:(2*k))
       # CV criteria saved in odd-numbered elements
-      #   models in even-numbered elements
+      #   coefficients in even-numbered elements
       result <- do.call(rbind, selection[is %% 2 == 1])
-      models <- do.call(list, selection[is %% 2 == 0])
+      coefs <- do.call(list, selection[is %% 2 == 0])
     } else {
       result <- do.call(rbind, selection)
-      models <- NULL
+      coefs <- NULL
     }
     stopCluster(cl)
   } else {
     result <- matrix(0, k, 2L)
-    models <- vector(k, mode="list")
+    coefs <- vector(k, mode="list")
     for (i in 1L:k){
       selection <- procedure(data, indices[starts[i]:ends[i]],
-                             save.models=save.models, ...)
+                             save.coef=save.coef, ...)
       result[i, ] <- selection[[1]]
-      if (save.models) models[[i]] <- selection[[2]]
+      if (save.coef) coefs[[i]] <- selection[[2]]
     }
   }
   cv <- weighted.mean(result[, 1L], folds)
@@ -110,8 +110,8 @@ cvSelect <- function(procedure, data, k=10,
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 models = if (save.models) models else NULL)
-  class(result) <- "cv"
+                 coefs = if (save.coef) coefs else NULL)
+  class(result) <- c("cvSelect", "cv")
   result
 }
 
@@ -130,7 +130,7 @@ cvSelect <- function(procedure, data, k=10,
 #' @export
 selectStepAIC <- function(data, indices,
                           model, criterion=mse, k.=2,
-                          save.models=TRUE, ...){
+                          save.coef=TRUE, ...){
   y <- getResponse(model)
   if (missing(indices)) {
     model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
@@ -143,8 +143,36 @@ selectStepAIC <- function(data, indices,
   fit.i <- fit.o.i[indices]
   list(criterion=c(criterion(y[indices], fit.i),
          criterion(y, fit.o.i)),
-       if (save.models) model=model.i else NULL)
+       if (save.coef) coefs=coef(model.i) else NULL)
 }
+
+#' @describeIn cvSelect print the coefficients from the selected models
+#' for the several folds.
+#' @param object an object of class \code{"cvSelect"}.
+#' @param digits significant digits for printing coefficients,
+#' (default \code{3}).
+#' @export
+compareFolds <- function(object, digits=3, ...){
+  UseMethod("compareFolds")
+}
+
+#' @export
+compareFolds.cvSelect <- function(object, digits=3, ...){
+  coefficients <- object$coefs
+  if (is.null(coefficients))
+    stop("coefficients for folds not available")
+  names <- unlist(lapply(coefficients, names))
+  counts <- table(names)
+  counts <- sort(counts, decreasing=TRUE)
+  table <- matrix(NA, length(coefficients), length(counts))
+  colnames(table) <- names(counts)
+  rownames(table) <- paste("Fold", seq(along=coefficients))
+  for (i in seq(along=coefficients)){
+    table[i, names(coefficients[[i]])] <- coefficients[[i]]
+  }
+  printCoefmat(table, na.print="", digits=digits)
+}
+
 
 # selectAllSubsets <- function(data, indices, formula, ...){
 #   if (missing(indices)){
