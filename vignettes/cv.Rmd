@@ -104,7 +104,7 @@ legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
 ```
 The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ probably over-fits the data by chasing one or two relatively high `mpg` values at the right.
 
-The following graph shows two measures of estimated squared error as a function of polynomial-regression degree: The mean-squared error (MSE), defined as $\mathsf{MSE} = \sum (y_i - \widehat{y}_i)^2/n$, and the usual unbiased estimated error variance, defined as $\widehat(\sigma)^2 = \sum (y_i - \widehat{y}_i)^2/(n - p - 1)$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
+The following graph shows two measures of estimated squared error as a function of polynomial-regression degree: The mean-squared error (MSE), defined as $\mathsf{MSE} = \sum (y_i - \widehat{y}_i)^2/n$, and the usual unbiased estimated error variance, defined as $\widehat{\sigma}^2 = \sum (y_i - \widehat{y}_i)^2/(n - p - 1)$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
 
 ```{r mpg-horsepower-MSE-se2}
 #| out.width = "100%",
