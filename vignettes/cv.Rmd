@@ -335,6 +335,41 @@ compareFolds(m.mroz.sel.cv)
 ```
 In this example, therefore, we appear to obtain a realistic estimate of model performance directly from the selected model, because there is little added uncertainty induced by model selection.
 
+## Computational notes
+
+The most straightforward way to implement cross-validation in R for statistical modeling functions that are written in the canonical manner is to use `update()` to refit the model with each fold removed. This is the approach taken in the default method for `cv()`, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds in modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.
+
+The `"lm"` and `"glm"` methods for `cv()` take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the error matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
+
+The weighted-least-squares (WLS) estimator of $\boldsymbol{\beta}$ is[^6]
+$$
+\mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} 
+  \mathbf{X}^T \mathbf{W} \mathbf{y}
+$$ 
+
+[^6]: This is a definitional formula, which assumes that the model matrix $\mathbf{X}$ is of full column rank, and which can be subject to numerical instability when $\mathbf{X}$ is ill-conditioned. `lm()` uses the singular-value decomposition of the model matrix to obtain computationally more stable results.
+
+Fitted values are then $\widehat{\mathbf{y}} = \mathbf{X}\mathbf{b}_{\mathrm{WLS}}$.
+
+The LOO fitted value for the $i$th case can be efficiently computed by $\widehat{y}_{-i} = y_i - e_i/(1 - h_i)$ where $h_i = \mathbf{x}^T_i \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i$. Here, $\mathbf{x}^T_i$ is the $i$th row of $\mathbf{X}$, and $\mathbf{x}_i$ is the $i$th row written as a column vector. This approach can break down when one or more hatvalues are equal to 1, in which case the formula requires division by 0.
+
+To compute cross-validated fitted values when the folds contain more than one case, we make use of the Woodbury matrix identify [@Wikipedia:2023],
+$$
+\left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k} 
+\mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} = \mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} + 
+\mathbf{VA}^{-1}\mathbf{U} \right)^{-1} \mathbf{VA}^{-1}
+$$
+where $\mathbf{A}$ is a nonsingular order-$n$ matrix. We apply this result by letting
+\begin{align*}
+	\mathbf{A} &= \mathbf{X}^T \mathbf{W} \mathbf{X} \\
+	\mathbf{U} &= \mathbf{X}_j^T \\
+	\mathbf{V} &= - \mathbf{X}_j \\
+	\mathbf{C} &= \mathbf{W}_j \\
+\end{align*}
+where the subscript $\mathbf{j} = (i_{j1}, \ldots, i_{jm})$ represents the vector of indices for the cases in the $j$th fold, $j = 1, \ldots, k$. The negative sign in $\mathbf{V} = - \mathbf{X}_j$ reflects the *removal*, rather than addition, of the cases in $\mathbf{j}$. 
+
+Applying the Woodbury identity isn't quite as fast as using the hatvalues, but it is generally much faster than refitting the model. A disadvantage of the Woodbury identify, however, is that it entails explicit matrix inversion and thus may be numerically unstable. It also requires that the model matrix be of full rank. We impose that restriction in our code by removing redundant regressors from the model matrix for all of the cases, but that doesn't preclude rank deficiency from surfacing when a fold is removed.
+
 ## References
 
 
