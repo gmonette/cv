@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 184458</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 272695</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.119</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.112</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.346</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.327</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -1164,7 +1164,7 @@ weights. For the linear model with constant error variance, the error
 matrix is taken to be <span class="math inline">\(\mathbf{W} =
 \mathbf{I}_n\)</span>, the order-<span class="math inline">\(n\)</span>
 identity matrix.</p>
-<p>The weighted-least-squares (WLS) estimator of <span class="math inline">\(\boldsymbol{\beta}\)</span> is<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> <span class="math display">\[
+<p>The weighted-least-squares (WLS) estimator of <span class="math inline">\(\boldsymbol{\beta}\)</span> is <span class="citation">(see, e.g., Fox, 2016, sec. 12.2.2)</span> <a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> <span class="math display">\[
 \mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X}
 \right)^{-1}
   \mathbf{X}^T \mathbf{W} \mathbf{y}
@@ -1174,10 +1174,11 @@ identity matrix.</p>
 <p>The LOO fitted value for the <span class="math inline">\(i\)</span>th
 case can be efficiently computed by <span class="math inline">\(\widehat{y}_{-i} = y_i - e_i/(1 - h_i)\)</span>
 where <span class="math inline">\(h_i = \mathbf{x}^T_i \left(
-\mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i\)</span>.
-Here, <span class="math inline">\(\mathbf{x}^T_i\)</span> is the <span class="math inline">\(i\)</span>th row of <span class="math inline">\(\mathbf{X}\)</span>, and <span class="math inline">\(\mathbf{x}_i\)</span> is the <span class="math inline">\(i\)</span>th row written as a column vector. This
+\mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i\)</span>
+(the so-called “hatvalue”). Here, <span class="math inline">\(\mathbf{x}^T_i\)</span> is the <span class="math inline">\(i\)</span>th row of <span class="math inline">\(\mathbf{X}\)</span>, and <span class="math inline">\(\mathbf{x}_i\)</span> is the <span class="math inline">\(i\)</span>th row written as a column vector. This
 approach can break down when one or more hatvalues are equal to 1, in
-which case the formula requires division by 0.</p>
+which case the formula for <span class="math inline">\(\widehat{y}_{-i}\)</span> requires division by
+0.</p>
 <p>To compute cross-validated fitted values when the folds contain more
 than one case, we make use of the Woodbury matrix identify <span class="citation">(&quot;Woodbury matrix identity&quot;, 2023)</span>, <span class="math display">\[
 \left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k}
@@ -1188,21 +1189,48 @@ than one case, we make use of the Woodbury matrix identify <span class="citation
 nonsingular order-<span class="math inline">\(n\)</span> matrix. We
 apply this result by letting <span class="math display">\[\begin{align*}
     \mathbf{A} &amp;= \mathbf{X}^T \mathbf{W} \mathbf{X} \\
-    \mathbf{U} &amp;= \mathbf{X}_j^T \\
-    \mathbf{V} &amp;= - \mathbf{X}_j \\
-    \mathbf{C} &amp;= \mathbf{W}_j \\
-\end{align*}\]</span> where the subscript <span class="math inline">\(\mathbf{j} = (i_{j1}, \ldots, i_{jm})\)</span>
+    \mathbf{U} &amp;= \mathbf{X}_\mathbf{j}^T \\
+    \mathbf{V} &amp;= - \mathbf{X}_\mathbf{j} \\
+    \mathbf{C} &amp;= \mathbf{W}_\mathbf{j} \\
+\end{align*}\]</span> where the subscript <span class="math inline">\(\mathbf{j} = (i_{j1}, \ldots, i_{jm})^T\)</span>
 represents the vector of indices for the cases in the <span class="math inline">\(j\)</span>th fold, <span class="math inline">\(j =
-1, \ldots, k\)</span>. The negative sign in <span class="math inline">\(\mathbf{V} = - \mathbf{X}_j\)</span> reflects the
-<em>removal</em>, rather than addition, of the cases in <span class="math inline">\(\mathbf{j}\)</span>.</p>
+1, \ldots, k\)</span>. The negative sign in <span class="math inline">\(\mathbf{V} = - \mathbf{X}_\mathbf{j}\)</span>
+reflects the <em>removal</em>, rather than addition, of the cases in
+<span class="math inline">\(\mathbf{j}\)</span>.</p>
 <p>Applying the Woodbury identity isn’t quite as fast as using the
 hatvalues, but it is generally much faster than refitting the model. A
-disadvantage of the Woodbury identify, however, is that it entails
-explicit matrix inversion and thus may be numerically unstable. It also
-requires that the model matrix be of full rank. We impose that
-restriction in our code by removing redundant regressors from the model
-matrix for all of the cases, but that doesn’t preclude rank deficiency
-from surfacing when a fold is removed.</p>
+disadvantage of the Woodbury identity, however, is that it entails
+explicit matrix inversion and thus may be numerically unstable. The
+inverse of <span class="math inline">\(\mathbf{A} = \mathbf{X}^T
+\mathbf{W} \mathbf{X}\)</span> is available directly in the
+<code>&quot;lm&quot;</code> object, but the second term on the right-hand side of
+the Woodbury identity requires a matrix inversion with each fold
+deleted. (In contrast, the inverse of each <span class="math inline">\(\mathbf{C} = \mathbf{W}_\mathbf{j}\)</span> is
+straightforward because <span class="math inline">\(\mathbf{W}\)</span>
+is diagonal.)</p>
+<p>The Woodbury identity also requires that the model matrix be of full
+rank. We impose that restriction in our code by removing redundant
+regressors from the model matrix for all of the cases, but that doesn’t
+preclude rank deficiency from surfacing when a fold is removed. Rank
+deficiency of <span class="math inline">\(\mathbf{X}\)</span> doesn’t
+disqualify cross-validation because all we need are fitted values under
+the estimated model.</p>
+<p><code>glm()</code> computes the maximum-likelihood estimates for a
+generalized linear model by iterated weighted least squares <span class="citation">(see, e.g., Fox &amp; Weisberg, 2019, sec.
+6.12)</span>. The last iteration is therefore just a WLS fit of the
+“working response” on the model matrix using “working weights.” Both the
+working weights and the working response at convergence are available
+from the information in the object returned by <code>glm()</code>.</p>
+<p>We then treat re-estimation of the model with a case or cases deleted
+as a WLS problem, using the hatvalues or the Woodbury matrix identity.
+The resulting fitted values for the deleted fold aren’t exact—that is,
+except for the Gaussian family, the result isn’t identical to what we
+would obtain by literally refitting the model—but in our (limited)
+experience, the approximation is very good, especially for LOO CV, which
+is when we would be most tempted to use it. Nevertheless, because these
+results are approximate, the default for the <code>&quot;glm&quot;</code>
+<code>cv()</code> method is to perform the exact computation, which
+entails refitting the model with each fold omitted.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
@@ -1214,6 +1242,10 @@ Canty, A., &amp; Ripley, B. D. (2022). <em>Boot: Bootstrap
 <div id="ref-DavisonHinkley1997" class="csl-entry">
 Davison, A. C., &amp; Hinkley, D. V. (1997). <em>Bootstrap methods and
 their applications</em>. Cambridge: Cambridge University Press.
+</div>
+<div id="ref-Fox:2016" class="csl-entry">
+Fox, J. (2016). <em>Applied regression analysis and generalized linear
+models</em> (Second edition). Thousand Oaks <span>CA</span>: Sage.
 </div>
 <div id="ref-FoxWeisberg:2019" class="csl-entry">
 Fox, J., &amp; Weisberg, S. (2019). <em>An <span>R</span> companion to
