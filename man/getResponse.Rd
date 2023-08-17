@@ -3,11 +3,14 @@
 \name{getResponse}
 \alias{getResponse}
 \alias{getResponse.default}
+\alias{getResponse.merMod}
 \title{Extract Response Variable(s)}
 \usage{
 getResponse(model, ...)
 
 \method{getResponse}{default}(model, ...)
+
+\method{getResponse}{merMod}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model}
@@ -15,23 +18,31 @@ getResponse(model, ...)
 \item{...}{additional parameters for specific methods}
 }
 \value{
-a vector or matrix containing the values of response variable(s)
+a numeric vector containing the values of the response variable
 }
 \description{
 Generic function to extract the response variable(s) from a fitted model.
 }
 \details{
 The supplied \code{default} method returns the \code{model$y} component
-of the model object if it exists and otherwise the result of
-\code{model.response(model.frame(model))}, checking in either case whether
-the result is numeric.
+of the model object, or, if \code{model} is an S4 object, the result
+returned by the \code{\link[insight]{get_response}()} function in
+the \pkg{insight} package. If this result is \code{NULL}, the result of
+\code{model.response(model.frame(model))} is returned, checking in any case whether
+the result is a numeric vector.
+
+There is also a \code{"merMod"} method that converts factor
+responses to numeric 0/1 responses, as would be appropriate
+for a generalized linear mixed models with a binary response.
 }
 \section{Methods (by class)}{
 \itemize{
 \item \code{getResponse(default)}: \code{default} method
 
+\item \code{getResponse(merMod)}: \code{merMod} method
+
 }}
 \examples{
-    fit <- lm(cbind(hp, mpg) ~ gear, mtcars)
+    fit <- lm(mpg ~ gear, mtcars)
     getResponse(fit)
 }

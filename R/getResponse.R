@@ -5,16 +5,22 @@
 #' @param model a fitted model
 #' @param ... additional parameters for specific methods
 #'
-#' @returns a vector or matrix containing the values of response variable(s)
+#' @returns a numeric vector containing the values of the response variable
 #'
 #' @details
 #' The supplied \code{default} method returns the \code{model$y} component
-#' of the model object if it exists and otherwise the result of
-#' \code{model.response(model.frame(model))}, checking in either case whether
-#' the result is numeric.
+#' of the model object, or, if \code{model} is an S4 object, the result
+#' returned by the \code{\link[insight]{get_response}()} function in
+#' the \pkg{insight} package. If this result is \code{NULL}, the result of
+#' \code{model.response(model.frame(model))} is returned, checking in any case whether
+#' the result is a numeric vector.
+#'
+#' There is also a \code{"merMod"} method that converts factor
+#' responses to numeric 0/1 responses, as would be appropriate
+#' for a generalized linear mixed models with a binary response.
 #'
 #' @examples
-#'     fit <- lm(cbind(hp, mpg) ~ gear, mtcars)
+#'     fit <- lm(mpg ~ gear, mtcars)
 #'     getResponse(fit)
 #' @export
 getResponse <- function(model, ...){
@@ -24,9 +30,21 @@ getResponse <- function(model, ...){
 #' @describeIn getResponse \code{default} method
 #' @export
 getResponse.default <- function(model, ...){
-  y <- model$y
+  y <- if (!isS4(model)) model$y else insight::get_response(model)
   if (is.null(y)) y <- model.response(model.frame(model))
+  if (!is.vector(y)) stop("non-vector response")
   if (!is.numeric(y)) stop("non-numeric response")
   y
 }
 
+#' @describeIn getResponse \code{merMod} method
+#' @export
+getResponse.merMod <- function(model, ...){
+  y <- insight::get_response(model)
+  if (is.factor(y)) {
+    y <- as.numeric(y != levels(y)[1])
+  }
+  if (!is.vector(y)) stop("non-vector response")
+  if (!is.numeric(y)) stop("non-numeric response")
+  y
+}
