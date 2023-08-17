@@ -42,7 +42,15 @@ getResponse.default <- function(model, ...){
 getResponse.merMod <- function(model, ...){
   y <- insight::get_response(model)
   if (is.factor(y)) {
-    y <- as.numeric(y != levels(y)[1])
+    levels <- levels(y)
+    failure <- levels[1]
+    if (length(levels) > 2){
+      message("Note: the response has more than 2 levels.\n",
+              " The first level ('", failure,
+              "') denotes failure (0),\n",
+              " the others success (1)")
+    }
+    y <- as.numeric(y != failure)
   }
   if (!is.vector(y)) stop("non-vector response")
   if (!is.numeric(y)) stop("non-numeric response")
