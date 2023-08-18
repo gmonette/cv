@@ -24,6 +24,10 @@
 #' defining clusters for a mixed model with nested random effects;
 #' if missing, cross-validation is performed for individual cases rather than
 #' for clusters
+#' @param includeRandom include the random effects in predicting cases
+#' in the clusters used to fit the model with each fold deleted (default
+#' is \code{TRUE})? Predictions for cases in the omitted clusters for
+#' each fold are always based only on the fixed effects.
 #' @param ... to match generic
 #'
 #' @details
@@ -48,6 +52,7 @@ cv.merMod <- function(model,
                       seed,
                       ncores=1,
                       clusterVariables,
+                      includeRandom=TRUE,
                       ...){
 
   defineClusters <- function(variables){
@@ -77,7 +82,8 @@ cv.merMod <- function(model,
     index <- selectClusters(clusters[- indices.i, , drop=FALSE])
     model.i <- update(model, data=data[index, ])
     fit.o.i <- predict(model.i, newdata=data, type="response",
-                       re.form=NA) # allow.new.levels=TRUE)
+                       re.form=if (includeRandom) NULL else NA,
+                       allow.new.levels=TRUE)
     fit.i <- fit.o.i[!index]
     c(criterion(y[!index], fit.i), criterion(y, fit.o.i))
   }

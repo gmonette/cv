@@ -2,7 +2,7 @@ Package: cv
 Type: Package
 Title: Cross-Validation of Regression Models
 Version: 0.1.0
-Date: 2023-08-17
+Date: 2023-08-18
 Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
   comment = c(ORCID = "0000-0002-1196-8012")),
 	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"))
@@ -14,7 +14,6 @@ Imports: insight,
          lme4, 
          MASS
 Suggests: boot,
-          car,
           carData,
           ISLR2,
           knitr,
@@ -28,5 +27,6 @@ VignetteBuilder:
     rmarkdown
 License: GPL (>= 2)
 Encoding: UTF-8
+Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
