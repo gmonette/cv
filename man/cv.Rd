@@ -4,17 +4,19 @@
 \alias{cv}
 \alias{cv.default}
 \alias{print.cv}
+\alias{print.cvList}
 \alias{cv.lm}
 \alias{cv.glm}
 \title{Cross-Validate Regression Models}
 \usage{
-cv(model, data, criterion, k, seed, ...)
+cv(model, data, criterion, k, reps = 1, seed, ...)
 
 \method{cv}{default}(
   model,
   data = insight::get_data(model),
   criterion = mse,
   k = 10,
+  reps = 1,
   seed,
   ncores = 1,
   method = NULL,
@@ -23,11 +25,14 @@ cv(model, data, criterion, k, seed, ...)
 
 \method{print}{cv}(x, digits = getOption("digits"), ...)
 
+\method{print}{cvList}(x, ...)
+
 \method{cv}{lm}(
   model,
   data = insight::get_data(model),
   criterion = mse,
   k = 10,
+  reps = 1,
   seed,
   method = c("auto", "hatvalues", "Woodbury", "naive"),
   ncores = 1,
@@ -39,6 +44,7 @@ cv(model, data, criterion, k, seed, ...)
   data = insight::get_data(model),
   criterion = mse,
   k = 10,
+  reps = 1,
   seed,
   method = c("exact", "hatvalues", "Woodbury"),
   ncores = 1,
@@ -58,6 +64,8 @@ where \code{y} is the observed values of the response and
 \item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
+
+\item{reps}{number of times to replicate k-fold CV (default is \code{1})}
 
 \item{seed}{for R's random number generator; optional, if not
 supplied a random seed will be selected and saved; not needed
@@ -84,6 +92,8 @@ the criterion for the model applied to the full data (\code{"full crit"}),
 the number of folds (\code{"k"}), and the seed for R's random-number
 generator (\code{"seed"}). Some methods may return a
 subset of these components and may add additional information.
+If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
+which is literally a list of \code{"cv"} objects.
 }
 \description{
 A parallelized generic k-fold (including n-fold, i.e., leave-one-out)
@@ -133,11 +143,17 @@ which employs \code{update()}.
 \item \code{print(cv)}: \code{print()} method
 
 }}
+\section{Functions}{
+\itemize{
+\item \code{print(cvList)}: \code{print()} method
+
+}}
 \examples{
 data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ horsepower, data=Auto)
 cv(m.auto,  k="loo")
 cv(m.auto, seed=1234)
+cv(m.auto, seed=1234, reps=3)
 
 data("Caravan", package="ISLR2")
 m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)

@@ -15,6 +15,8 @@
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation; the default is \code{10} if cross-validating individual
 #' cases and \code{"loo"} if cross-validating clusters.
+#' @param reps number of times to replicate k-fold CV (default is \code{1})
+#' FIXME! not yet implemented
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
 #' for n-fold cross-validation
@@ -48,7 +50,7 @@
 #' @export
 cv.merMod <- function(model,
                       data=insight::get_data(model),
-                      criterion=mse, k,
+                      criterion=mse, k, reps=1,
                       seed,
                       ncores=1,
                       clusterVariables,

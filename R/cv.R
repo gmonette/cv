@@ -14,6 +14,7 @@
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
+#' @param reps number of times to replicate k-fold CV (default is \code{1})
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
 #' for n-fold cross-validation
@@ -29,6 +30,8 @@
 #' the number of folds (\code{"k"}), and the seed for R's random-number
 #' generator (\code{"seed"}). Some methods may return a
 #' subset of these components and may add additional information.
+#' If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
+#' which is literally a list of \code{"cv"} objects.
 #'
 #' @details
 #' The default method uses \code{\link{update}()} to refit the model
@@ -63,26 +66,27 @@
 #' m.auto <- lm(mpg ~ horsepower, data=Auto)
 #' cv(m.auto,  k="loo")
 #' cv(m.auto, seed=1234)
+#' cv(m.auto, seed=1234, reps=3)
 #'
 #' data("Caravan", package="ISLR2")
 #' m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)
 #' cv(m.caravan, k=5, criterion=BayesRule, seed=123)
 #' @export
-cv <- function(model, data, criterion, k, seed, ...){
+cv <- function(model, data, criterion, k, reps=1, seed, ...){
   UseMethod("cv")
 }
 
 #' @describeIn cv \code{default} method
 #' @importFrom stats coef family fitted lm.wfit model.frame
 #' model.matrix model.response predict update weighted.mean weights
-#' residuals hatvalues printCoefmat
+#' residuals hatvalues printCoefmat sd
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
 #' @importFrom lme4 lmer
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
-                       criterion=mse, k=10, seed, ncores=1,
+                       criterion=mse, k=10, reps=1, seed, ncores=1,
                        method=NULL, ...){
   f <- function(i){
     # helper function to compute cv criterion for each fold
@@ -107,6 +111,7 @@ cv.default <- function(model, data=insight::get_data(model),
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
+    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
     seed <- NULL
   }
   nk <-  n %/% k # number of cases in each fold
@@ -136,7 +141,22 @@ cv.default <- function(model, data=insight::get_data(model),
                  "method"=method,
                  "criterion" = deparse(substitute(criterion)))
   class(result) <- "cv"
-  result
+  if (reps == 1) {
+    return(result)
+  } else {
+    res <- cv(model=model, data=data, criterion=criterion,
+              k=10, ncores=ncores, method=method, reps=reps - 1, ...)
+    if (reps  > 2){
+      res[[length(res) + 1]] <- result
+    } else {
+      res <- list(res, result)
+    }
+    for (i in 1:(length(res) - 1)){
+      res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
+    }
+    class(res) <- "cvList"
+    return(res)
+  }
 }
 
 #' @describeIn cv \code{print()} method
@@ -156,19 +176,52 @@ print.cv <- function(x, digits=getOption("digits"), ...){
         "clusters")
   }
   if (!is.null(x[["method"]])) cat("\nmethod:", x[["method"]])
-  if (!is.null(x[["criterion"]])) cat("\ncriterion:", x[["criterion"]])
-  cat("\ncross-validation criterion =", rnd(x[["CV crit"]]))
-  if (!is.null(x[["adj CV crit"]]))
+  if (!is.null(x[["criterion"]]) && x[["criterion"]] != "criterion")
+    cat("\ncriterion:", x[["criterion"]])
+  if (is.null(x[["SD CV crit"]])){
+    cat("\ncross-validation criterion =", rnd(x[["CV crit"]]))
+  } else {
+    cat("\ncross-validation criterion = ",
+        rnd(x[["CV crit"]]), " (", rnd(x[["SD CV crit"]]), ")", sep="")
+  }
+  if (!is.null(x[["adj CV crit"]])){
+    if (is.null(x[["SD adj CV crit"]])){
     cat("\nbias-adjusted cross-validation criterion =", rnd(x[["adj CV crit"]]))
+    } else {
+      cat("\nbias-adjusted cross-validation criterion = ",
+          rnd(x[["adj CV crit"]]), " (", rnd(x[["SD adj CV crit"]]), ")", sep="")
+    }
+  }
   if (!is.null(x[["full crit"]]))
     cat("\nfull-sample criterion =", rnd(x[["full crit"]]), "\n")
   invisible(x)
 }
 
+#' @describeIn cv \code{print()} method
+#' @export
+print.cvList <- function(x, ...){
+  reps <- length(x)
+  names(x) <- paste("Replicate ", 1:reps)
+  CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
+  CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
+  adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
+  adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
+  x$Average <- x[[1]]
+  x$Average[["CV crit"]] <- CVcrit
+  x$Average[["adj CV crit"]] <- adjCVcrit
+  x$Average[["SD CV crit"]] <- CVcritSD
+  x$Average[["SD adj CV crit"]] <- adjCVcritSD
+  for (rep in seq_along(x)){
+    cat("\n", names(x)[rep], ":\n", sep="")
+    print(x[[rep]])
+  }
+  return(invisible(x))
+}
+
 #' @describeIn cv \code{"lm"} method
 #' @export
 cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
-                  seed, method=c("auto", "hatvalues", "Woodbury", "naive"),
+                  reps=1, seed, method=c("auto", "hatvalues", "Woodbury", "naive"),
                   ncores=1, ...){
   UpdateLM <- function(omit){
     # compute coefficients with omit cases deleted
@@ -201,6 +254,8 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
+  if (k == n && reps > 1) stop("reps should not be > 1 for n-fold CV")
+
   b <- coef(model)
   p <- length(b)
   if (p > model$rank) {
@@ -268,13 +323,28 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
                  "method"=method,
                  "criterion" = deparse(substitute(criterion)))
   class(result) <- "cv"
-  result
+  if (reps == 1) {
+    return(result)
+  } else {
+    res <- cv(model=model, data=data, criterion=criterion,
+              k=10, ncores=ncores, method=method, reps=reps - 1, ...)
+    if (reps  > 2){
+      res[[length(res) + 1]] <- result
+    } else {
+      res <- list(res, result)
+    }
+    for (i in 1:(length(res) - 1)){
+      res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
+    }
+    class(res) <- "cvList"
+    return(res)
+  }
 }
 
 #' @describeIn cv \code{"glm"} method
 #' @export
 cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
-                   seed, method=c("exact", "hatvalues", "Woodbury"),
+                   reps=1, seed, method=c("exact", "hatvalues", "Woodbury"),
                    ncores=1,
                    ...){
   UpdateIWLS <- function(omit){
@@ -304,6 +374,8 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
+  if (k == n && reps > 1) stop("reps should not be > 1 for n-fold CV")
+
   method <- match.arg(method)
   if (k != n){
     if (missing(seed)) seed <- sample(1e6, 1L)
@@ -314,9 +386,9 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   }
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
-    result <- cv.default(model=model, data=data, criterion=criterion, k=k, seed=seed,
+    result <- cv.default(model=model, data=data, criterion=criterion, k=k, reps=reps, seed=seed,
                ncores=ncores, method=method, ...)
-    result$"criterion" <- deparse(substitute(criterion))
+    if (inherits(result, "cv")) result$"criterion" <- deparse(substitute(criterion))
     return(result)
   } else if (method == "hatvalues") {
     y <- getResponse(model)
@@ -380,6 +452,21 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
                    "method"=method,
                    "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
-    result
+    if (reps == 1) {
+      return(result)
+    } else {
+      res <- cv(model=model, data=data, criterion=criterion,
+                k=10, ncores=ncores, method=method, reps=reps - 1, ...)
+      if (reps  > 2){
+        res[[length(res) + 1]] <- result
+      } else {
+        res <- list(res, result)
+      }
+      for (i in 1:(length(res) - 1)){
+        res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
+      }
+      class(res) <- "cvList"
+      return(res)
+    }
   }
 }
