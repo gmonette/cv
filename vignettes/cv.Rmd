@@ -353,6 +353,29 @@ compareFolds(m.mroz.sel.cv)
 ```
 In this example, therefore, we appear to obtain a realistic estimate of model performance directly from the selected model, because there is little added uncertainty induced by model selection.
 
+## Parallel computations
+
+The CV functions in the **cv** package are all capable of performing parallel computations by setting the `ncores` argument (specifying the number of computer cores to be used) to a number > `1` (which is the default). Parallel computation can be advantageous for large problems, reducing the execution time of the program.
+
+To illustrate, let's time model selection in Mroz's logistic regression, repeating the computation as performed previously and then doing it in parallel using 2 cores:
+```{r parallel-computation}
+system.time(m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
+                          seed=6681,
+                          criterion=BayesRule,
+                          model=m.mroz,
+                          k.=log(nrow(Mroz))))
+
+system.time(m.mroz.sel.cv.p <- cvSelect(selectStepAIC, Mroz,
+                          seed=6681,
+                          criterion=BayesRule,
+                          model=m.mroz,
+                          k.=log(nrow(Mroz)),
+                          ncores=2))
+all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
+```
+
+In this small problem, the parallel computation is actually *slower*, because there is an overhead cost to parallelization, but we can see that it produces the same result as before.
+
 ## Computational notes
 
 The most straightforward way to implement cross-validation in R for statistical modeling functions that are written in the canonical manner is to use `update()` to refit the model with each fold removed. This is the approach taken in the default method for `cv()`, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds in modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.

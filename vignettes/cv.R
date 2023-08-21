@@ -162,3 +162,18 @@ m.mroz.sel.cv
 ## ----compare-selected-models-mroz---------------------------------------------
 compareFolds(m.mroz.sel.cv)
 
+## ----parallel-computation-----------------------------------------------------
+system.time(m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
+                          seed=6681,
+                          criterion=BayesRule,
+                          model=m.mroz,
+                          k.=log(nrow(Mroz))))
+
+system.time(m.mroz.sel.cv.p <- cvSelect(selectStepAIC, Mroz,
+                          seed=6681,
+                          criterion=BayesRule,
+                          model=m.mroz,
+                          k.=log(nrow(Mroz)),
+                          ncores=2))
+all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
+

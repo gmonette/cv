@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 323716</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 413791</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.28</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.265</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.202</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.19</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -1226,6 +1226,41 @@ very similar, as we show using the <code>compareFolds()</code>:</p>
 of model performance directly from the selected model, because there is
 little added uncertainty induced by model selection.</p>
 </div>
+</div>
+<div id="parallel-computations" class="section level2">
+<h2>Parallel computations</h2>
+<p>The CV functions in the <strong>cv</strong> package are all capable
+of performing parallel computations by setting the <code>ncores</code>
+argument (specifying the number of computer cores to be used) to a
+number &gt; <code>1</code> (which is the default). Parallel computation
+can be advantageous for large problems, reducing the execution time of
+the program.</p>
+<p>To illustrate, let’s time model selection in Mroz’s logistic
+regression, repeating the computation as performed previously and then
+doing it in parallel using 2 cores:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>                          <span class="at">criterion=</span>BayesRule,</span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>                          <span class="at">model=</span>m.mroz,</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>                          <span class="at">k.=</span><span class="fu">log</span>(<span class="fu">nrow</span>(Mroz))))</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a><span class="co">#&gt;   0.332   0.011   0.343</span></span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
+<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
+<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a>                          <span class="at">criterion=</span>BayesRule,</span>
+<span id="cb26-13"><a href="#cb26-13" tabindex="-1"></a>                          <span class="at">model=</span>m.mroz,</span>
+<span id="cb26-14"><a href="#cb26-14" tabindex="-1"></a>                          <span class="at">k.=</span><span class="fu">log</span>(<span class="fu">nrow</span>(Mroz)),</span>
+<span id="cb26-15"><a href="#cb26-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
+<span id="cb26-16"><a href="#cb26-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
+<span id="cb26-17"><a href="#cb26-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
+<span id="cb26-18"><a href="#cb26-18" tabindex="-1"></a><span class="co">#&gt;   0.035   0.008   1.497</span></span>
+<span id="cb26-19"><a href="#cb26-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
+<span id="cb26-20"><a href="#cb26-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>In this small problem, the parallel computation is actually
+<em>slower</em>, because there is an overhead cost to parallelization,
+but we can see that it produces the same result as before.</p>
 </div>
 <div id="computational-notes" class="section level2">
 <h2>Computational notes</h2>
