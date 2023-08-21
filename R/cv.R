@@ -145,7 +145,7 @@ cv.default <- function(model, data=insight::get_data(model),
     return(result)
   } else {
     res <- cv(model=model, data=data, criterion=criterion,
-              k=10, ncores=ncores, method=method, reps=reps - 1, ...)
+              k=k, ncores=ncores, method=method, reps=reps - 1, ...)
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {
@@ -327,7 +327,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     return(result)
   } else {
     res <- cv(model=model, data=data, criterion=criterion,
-              k=10, ncores=ncores, method=method, reps=reps - 1, ...)
+              k=k, ncores=ncores, method=method, reps=reps - 1, ...)
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {
@@ -456,7 +456,7 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
       return(result)
     } else {
       res <- cv(model=model, data=data, criterion=criterion,
-                k=10, ncores=ncores, method=method, reps=reps - 1, ...)
+                k=k, ncores=ncores, method=method, reps=reps - 1, ...)
       if (reps  > 2){
         res[[length(res) + 1]] <- result
       } else {
