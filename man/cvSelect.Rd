@@ -6,7 +6,16 @@
 \alias{compareFolds}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
-cvSelect(procedure, data, k = 10, save.coef = k <= 10, seed, ncores = 1, ...)
+cvSelect(
+  procedure,
+  data,
+  k = 10,
+  reps = 1,
+  save.coef = k <= 10,
+  seed,
+  ncores = 1,
+  ...
+)
 
 selectStepAIC(
   data,
@@ -28,6 +37,8 @@ compareFolds(object, digits = 3, ...)
 \item{k}{perform k-fold cross-validation (default is 10); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
+
+\item{reps}{number of times to replicate k-fold CV (default is \code{1})}
 
 \item{save.coef}{save the coefficients from the selected models? (default is \code{TRUE} if
 \code{k} is 10 or smaller, \code{FALSE} otherwise)}
@@ -59,6 +70,8 @@ the criterion for the model applied to the full data (\code{"full crit"}),
 the number of folds (\code{"k"}), the seed for R's random-number
 generator (\code{"seed"}), and (optionally) a list of coefficients for the selected models
 for each fold (\code{"coefs"}).
+#' If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
+which is literally a list of \code{c("cvSelect", "cv")} objects.
 }
 \description{
 A generic function to cross-validate a model-selection procedure,
@@ -102,7 +115,7 @@ data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
-         k.=log(nrow(Auto))) # via BIC
+         k.=log(nrow(Auto)), k=5, reps=3) # via BIC
 }
 \seealso{
 \code{\link[MASS]{stepAIC}()}

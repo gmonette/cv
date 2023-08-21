@@ -12,6 +12,7 @@
 #' cross-validation.
 #' @param save.coef save the coefficients from the selected models? (default is \code{TRUE} if
 #' \code{k} is 10 or smaller, \code{FALSE} otherwise)
+#' @param reps number of times to replicate k-fold CV (default is \code{1})
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel)
@@ -24,6 +25,8 @@
 #' the number of folds (\code{"k"}), the seed for R's random-number
 #' generator (\code{"seed"}), and (optionally) a list of coefficients for the selected models
 #' for each fold (\code{"coefs"}).
+#' #' If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
+#' which is literally a list of \code{c("cvSelect", "cv")} objects.
 #' @details
 #' The model-selection function supplied as the \code{procedure} argument
 #' to \code{cvSelect()} should accept the following arguments:
@@ -48,7 +51,7 @@
 #' @seealso \code{\link[MASS]{stepAIC}()}
 #'
 #' @export
-cvSelect <- function(procedure, data, k=10,
+cvSelect <- function(procedure, data, k=10, reps=1,
                      save.coef = k <= 10,
                      seed, ncores=1, ...){
   n <- nrow(data)
@@ -65,6 +68,7 @@ cvSelect <- function(procedure, data, k=10,
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
+    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
     seed <- NULL
   }
   nk <-  n %/% k # number of cases in each fold
@@ -112,7 +116,20 @@ cvSelect <- function(procedure, data, k=10,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  coefs = if (save.coef) coefs else NULL)
   class(result) <- c("cvSelect", "cv")
-  result
+  if (reps == 1) {
+    return(result)
+  } else {
+    res <- cvSelect(procedure=procedure, data=data, k=k,
+                    reps = reps - 1, save.coef = save.coef,
+                    ncores=ncores, ...)
+    if (reps  > 2){
+      res[[length(res) + 1]] <- result
+    } else {
+      res <- list(res, result)
+    }
+    class(res) <- c("cvSelectList", "cvList")
+    return(res)
+  }
 }
 
 #' @describeIn cvSelect select a model using the \code{\link[MASS]{stepAIC}()} function in the
@@ -126,7 +143,7 @@ cvSelect <- function(procedure, data, k=10,
 #' m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 #' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
 #' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
-#'          k.=log(nrow(Auto))) # via BIC
+#'          k.=log(nrow(Auto)), k=5, reps=3) # via BIC
 #' @export
 selectStepAIC <- function(data, indices,
                           model, criterion=mse, k.=2,
