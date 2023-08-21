@@ -107,6 +107,10 @@ cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury")
 
 cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues")
 
+## ----mroz-reps----------------------------------------------------------------
+cv(m.mroz, criterion=BayesRule, seed=248, reps=5, 
+   method="Woodbury")
+
 ## ----generate-selection-data--------------------------------------------------
 set.seed(24361) # for reproducibility
 D <- data.frame(
