@@ -16,7 +16,6 @@
 #' cross-validation; the default is \code{10} if cross-validating individual
 #' cases and \code{"loo"} if cross-validating clusters.
 #' @param reps number of times to replicate k-fold CV (default is \code{1})
-#' FIXME! not yet implemented
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
 #' for n-fold cross-validation
@@ -101,7 +100,8 @@ cv.merMod <- function(model,
 
   y <- getResponse(model)
 
-  if (missing(clusterVariables)){
+  if (missing(clusterVariables)) clusterVariables <- NULL
+  if (is.null(clusterVariables)){
     n <- nrow(data)
     if (missing(k)) k <- 10
     if (is.character(k)){
@@ -155,9 +155,26 @@ cv.merMod <- function(model,
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 clusters = if (!missing(clusterVariables)) clusterVariables else NULL,
-                 "n clusters" = if (!missing(clusterVariables)) n else NULL
+                 clusters = clusterVariables,
+                 "n clusters" = if (!is.null(clusterVariables)) n else NULL
                  )
   class(result) <- "cv"
-  result
+  if (reps == 1) {
+    return(result)
+  } else {
+    res <- cv(model=model, data=data, criterion=criterion,
+              k=10, ncores=ncores, reps=reps - 1,
+              clusterVariables=clusterVariables,
+              includeRandom=includeRandom, ...)
+    if (reps  > 2){
+      res[[length(res) + 1]] <- result
+    } else {
+      res <- list(res, result)
+    }
+    for (i in 1:(length(res) - 1)){
+      res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
+    }
+    class(res) <- "cvList"
+    return(res)
+  }
 }

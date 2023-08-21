@@ -68,9 +68,9 @@
 #' cv(m.auto, seed=1234)
 #' cv(m.auto, seed=1234, reps=3)
 #'
-#' data("Caravan", package="ISLR2")
-#' m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)
-#' cv(m.caravan, k=5, criterion=BayesRule, seed=123)
+#' data("Mroz", package="carData")
+#' m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
+#' cv(m.mroz, criterion=BayesRule, seed=123)
 #' @export
 cv <- function(model, data, criterion, k, reps=1, seed, ...){
   UseMethod("cv")
@@ -201,7 +201,7 @@ print.cv <- function(x, digits=getOption("digits"), ...){
 #' @export
 print.cvList <- function(x, ...){
   reps <- length(x)
-  names(x) <- paste("Replicate ", 1:reps)
+  names(x) <- paste("Replicate", 1:reps)
   CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
   CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
   adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))

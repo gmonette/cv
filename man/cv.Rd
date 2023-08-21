@@ -155,7 +155,7 @@ cv(m.auto,  k="loo")
 cv(m.auto, seed=1234)
 cv(m.auto, seed=1234, reps=3)
 
-data("Caravan", package="ISLR2")
-m.caravan <- glm(Purchase ~ ., data=Caravan[1:2500, ], family=binomial)
-cv(m.caravan, k=5, criterion=BayesRule, seed=123)
+data("Mroz", package="carData")
+m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
+cv(m.mroz, criterion=BayesRule, seed=123)
 }
