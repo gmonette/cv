@@ -12,7 +12,8 @@ Depends: doParallel
 Imports: insight, 
          foreach, 
          lme4, 
-         MASS
+         MASS,
+         nlme
 Suggests: boot,
           carData,
           ISLR2,

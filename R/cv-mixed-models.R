@@ -1,8 +1,10 @@
 #' Cross-Validate Mixed-Effects Model
 #'
-#' A \code{\link{cv}()} method for models of class \code{"merMod"}, fit
+#' \code{\link{cv}()} methods for models of class \code{"merMod"}, fit
 #' by the \code{\link[lme4]{lmer}()} and \code{\link[lme4]{glmer}()} functions
-#' in the \pkg{lme4} package. The implementation here should be regarded
+#' in the \pkg{lme4} package, and for models of class \code{"lme"}
+#' fit by the \code{\link[nlme]{lme}()} function in the \pkg{nlme}
+#' package. The implementations here should be regarded
 #' as experimental.
 #'
 #' @param model a regression model object of class \code{"merMod"}.
@@ -34,9 +36,10 @@
 #' effects; if the latter, predictions include the random effects. Only mixed
 #' models with fully nested random effects are supported.
 #'
-#' @seealso \code{\link{cv}}, \code{\link[lme4]{lmer}}, \code{\link[lme4]{glmer}}
+#' @seealso \code{\link{cv}}, \code{\link[lme4]{lmer}}, \code{\link[lme4]{glmer}},
+#' \code{\link[nlme]{lme}}
 #' @examples
-#' library(lme4)
+#' library("lme4")
 #' # from ?lmer:
 #' (fm1 <- lmer(Reaction ~ Days + (Days | Subject), sleepstudy))
 #' cv(fm1, clusterVariables="Subject") # LOO CV of clusters
@@ -44,6 +47,14 @@
 #' cv(fm1, clusterVariables="Subject", k=5,
 #'    seed=834, reps=3) # 5-fold CV of clusters, repeated 3 times
 #'
+#' library(nlme)
+#' # from ?lme
+#' (fm2 <- lme(distance ~ age + Sex, data = Orthodont,
+#'             random = ~ 1))
+#' cv(fm2) # LOO CV of cases
+#' cv(fm2, clusterVariables="Subject", k=5, seed=321) # 5-fold CV of clusters
+#'
+#' @describeIn cv.merMod \code{cv()} method
 #' @export
 cv.merMod <- function(model,
                       data=insight::get_data(model),
@@ -53,31 +64,9 @@ cv.merMod <- function(model,
                       clusterVariables,
                       ...){
 
-  defineClusters <- function(variables){
-    all.variables <- names(data)
-    if (any(bad <- !variables %in% all.variables)){
-      stop("The following cluster variable", if (sum(bad) > 1) "s are" else " is",
-           " not in the data: ", paste(variables[bad], collapse=", "))
-    }
-    unique(data[, variables, drop=FALSE])
-  }
-
-  selectCluster <- function(cluster){
-    result <- apply(data[, names(cluster), drop=FALSE], 1,
-                    function(x) all(x == cluster))
-    if (!any(result)) stop("there is no such cluster: ",
-                           paste(paste0(names(cluster), "=", cluster), collapse=", "))
-    result
-  }
-
-  selectClusters <- function(clusters) {
-    result <- apply(clusters, 1, selectCluster)
-    apply(result, 1, any)
-  }
-
   f.clusters <- function(i){
     indices.i <- indices[starts[i]:ends[i]]
-    index <- selectClusters(clusters[- indices.i, , drop=FALSE])
+    index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
     model.i <- update(model, data=data[index, ])
     fit.o.i <- predict(model.i, newdata=data, type="response",
                        re.form=NA,
@@ -108,7 +97,7 @@ cv.merMod <- function(model,
     }
     f <- f.cases
   } else {
-    clusters <- defineClusters(clusterVariables)
+    clusters <- defineClusters(clusterVariables, data)
     n <- nrow(clusters)
     if (missing(k)) k <- nrow(clusters)
     f <- f.clusters
@@ -116,7 +105,7 @@ cv.merMod <- function(model,
 
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
     stop("k must be an integer between 2 and number of",
-         if (missing(clusterVariables)) "cases" else "clusters")
+         if (is.null(clusterVariables)) "cases" else "clusters")
   }
 
   if (k != n){
@@ -148,7 +137,7 @@ cv.merMod <- function(model,
   }
   cv <- weighted.mean(result[, 1L], folds)
   cv.full <- criterion(y, predict(model, type="response",
-                                  re.form=if (missing(clusterVariables)) NULL else NA))
+                                  re.form=if (is.null(clusterVariables)) NULL else NA))
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
@@ -175,3 +164,135 @@ cv.merMod <- function(model,
     return(res)
   }
 }
+
+#' @describeIn cv.merMod \code{cv()} method
+#' @export
+cv.lme <- function(model,
+                   data=insight::get_data(model),
+                   criterion=mse, k, reps=1,
+                   seed,
+                   ncores=1,
+                   clusterVariables,
+                    ...){
+
+  f.clusters <- function(i){
+    indices.i <- indices[starts[i]:ends[i]]
+    index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
+    model.i <- update(model, data=data[index, ])
+    fit.o.i <- predict(model.i, newdata=data,
+                       level=0)
+    fit.i <- fit.o.i[!index]
+    c(criterion(y[!index], fit.i), criterion(y, fit.o.i))
+  }
+
+  f.cases <- function(i){
+    indices.i <- indices[starts[i]:ends[i]]
+    model.i <- update(model, data=data[ - indices.i, ])
+    fit.o.i <- predict(model.i, newdata=data, level=1)
+    fit.i <- fit.o.i[indices.i]
+    c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
+  }
+
+  y <- getResponse(model)
+
+  if (missing(clusterVariables)) clusterVariables <- NULL
+  if (is.null(clusterVariables)){
+    n <- nrow(data)
+    if (missing(k)) k <- 10
+    if (is.character(k)){
+      if (k == "n" || k == "loo") {
+        k <- n
+      }
+    }
+    f <- f.cases
+  } else {
+    clusters <- defineClusters(clusterVariables, data)
+    n <- nrow(clusters)
+    if (missing(k)) k <- nrow(clusters)
+    f <- f.clusters
+  }
+
+  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+    stop("k must be an integer between 2 and number of",
+         if (is.null(clusterVariables)) "cases" else "clusters")
+  }
+
+  if (k != n){
+    if (missing(seed)) seed <- sample(1e6, 1L)
+    set.seed(seed)
+    message("R RNG seed set to ", seed)
+  } else {
+    seed <- NULL
+  }
+  nk <-  n %/% k # number in each fold
+  rem <- n %% k  # remainder
+  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
+  ends <- cumsum(folds) # end of each fold
+  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+  indices <- if (n > k) sample(n, n)  else 1:n # permute clusters/cases
+
+  if (ncores > 1L){
+    cl <- makeCluster(ncores)
+    registerDoParallel(cl)
+    result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
+      f(i)
+    }
+    stopCluster(cl)
+  } else {
+    result <- matrix(0, k, 2L)
+    for (i in 1L:k){
+      result[i, ] <- f(i)
+    }
+  }
+  cv <- weighted.mean(result[, 1L], folds)
+  cv.full <- criterion(y, predict(model, type="response",
+                                  level=if (is.null(clusterVariables)) 1 else 0))
+  adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
+  result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
+                 "k" = if (k == n) "n" else k, "seed" = seed,
+                 clusters = clusterVariables,
+                 "n clusters" = if (!is.null(clusterVariables)) n else NULL
+  )
+  class(result) <- "cv"
+  if (reps == 1) {
+    return(result)
+  } else {
+    res <- cv(model=model, data=data, criterion=criterion,
+              k=k, ncores=ncores, reps=reps - 1,
+              clusterVariables=clusterVariables,
+              ...)
+    if (reps  > 2){
+      res[[length(res) + 1]] <- result
+    } else {
+      res <- list(res, result)
+    }
+    for (i in 1:(length(res) - 1)){
+      res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
+    }
+    class(res) <- "cvList"
+    return(res)
+  }
+}
+
+defineClusters <- function(variables, data){
+  all.variables <- names(data)
+  if (any(bad <- !variables %in% all.variables)){
+    stop("The following cluster variable", if (sum(bad) > 1) "s are" else " is",
+         " not in the data: ", paste(variables[bad], collapse=", "))
+  }
+  unique(data[, variables, drop=FALSE])
+}
+
+selectCluster <- function(cluster, data){
+  result <- apply(data[, names(cluster), drop=FALSE], 1,
+                  function(x) all(x == cluster))
+  if (!any(result)) stop("there is no such cluster: ",
+                         paste(paste0(names(cluster), "=", cluster), collapse=", "))
+  result
+}
+
+selectClusters <- function(clusters, data) {
+  result <- apply(clusters, 1, selectCluster, data=data)
+  apply(result, 1, any)
+}
+

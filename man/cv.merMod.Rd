@@ -2,9 +2,22 @@
 % Please edit documentation in R/cv-mixed-models.R
 \name{cv.merMod}
 \alias{cv.merMod}
+\alias{cv.lme}
 \title{Cross-Validate Mixed-Effects Model}
 \usage{
 \method{cv}{merMod}(
+  model,
+  data = insight::get_data(model),
+  criterion = mse,
+  k,
+  reps = 1,
+  seed,
+  ncores = 1,
+  clusterVariables,
+  ...
+)
+
+\method{cv}{lme}(
   model,
   data = insight::get_data(model),
   criterion = mse,
@@ -48,9 +61,11 @@ for clusters}
 \item{...}{to match generic}
 }
 \description{
-A \code{\link{cv}()} method for models of class \code{"merMod"}, fit
+\code{\link{cv}()} methods for models of class \code{"merMod"}, fit
 by the \code{\link[lme4]{lmer}()} and \code{\link[lme4]{glmer}()} functions
-in the \pkg{lme4} package. The implementation here should be regarded
+in the \pkg{lme4} package, and for models of class \code{"lme"}
+fit by the \code{\link[nlme]{lme}()} function in the \pkg{nlme}
+package. The implementations here should be regarded
 as experimental.
 }
 \details{
@@ -60,8 +75,15 @@ individual observations. If the former, predictions are based only on fixed
 effects; if the latter, predictions include the random effects. Only mixed
 models with fully nested random effects are supported.
 }
+\section{Functions}{
+\itemize{
+\item \code{cv(merMod)}: \code{cv()} method
+
+\item \code{cv(lme)}: \code{cv()} method
+
+}}
 \examples{
-library(lme4)
+library("lme4")
 # from ?lmer:
 (fm1 <- lmer(Reaction ~ Days + (Days | Subject), sleepstudy))
 cv(fm1, clusterVariables="Subject") # LOO CV of clusters
@@ -69,7 +91,15 @@ cv(fm1, seed=447) # 10-fold CV of cases
 cv(fm1, clusterVariables="Subject", k=5,
    seed=834, reps=3) # 5-fold CV of clusters, repeated 3 times
 
+library(nlme)
+# from ?lme
+(fm2 <- lme(distance ~ age + Sex, data = Orthodont,
+            random = ~ 1))
+cv(fm2) # LOO CV of cases
+cv(fm2, clusterVariables="Subject", k=5, seed=321) # 5-fold CV of clusters
+
 }
 \seealso{
-\code{\link{cv}}, \code{\link[lme4]{lmer}}, \code{\link[lme4]{glmer}}
+\code{\link{cv}}, \code{\link[lme4]{lmer}}, \code{\link[lme4]{glmer}},
+\code{\link[nlme]{lme}}
 }

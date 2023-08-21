@@ -4,6 +4,7 @@
 \alias{getResponse}
 \alias{getResponse.default}
 \alias{getResponse.merMod}
+\alias{getResponse.lme}
 \title{Extract Response Variable(s)}
 \usage{
 getResponse(model, ...)
@@ -11,6 +12,8 @@ getResponse(model, ...)
 \method{getResponse}{default}(model, ...)
 
 \method{getResponse}{merMod}(model, ...)
+
+\method{getResponse}{lme}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model}
@@ -40,6 +43,8 @@ for a generalized linear mixed models with a binary response.
 \item \code{getResponse(default)}: \code{default} method
 
 \item \code{getResponse(merMod)}: \code{merMod} method
+
+\item \code{getResponse(lme)}: \code{merMod} method
 
 }}
 \examples{

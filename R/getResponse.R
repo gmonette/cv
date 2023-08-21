@@ -56,3 +56,7 @@ getResponse.merMod <- function(model, ...){
   if (!is.numeric(y)) stop("non-numeric response")
   y
 }
+
+#' @describeIn getResponse \code{merMod} method
+#' @export
+getResponse.lme <- function(model, ...) insight::get_response(model)
