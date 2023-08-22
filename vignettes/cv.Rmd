@@ -233,6 +233,74 @@ microbenchmark::microbenchmark(
 ```
 There is a substantial time penalty associated with exact computations.
 
+### Cross-validating mixed-effects models
+
+The fundamental analogy for cross-validation is to the collection of new data. That is, predicting the response in each fold from the model fit to data in the other folds is like using the model fit to all of the data to predict the response for new cases from the values of the predictors for those new cases. As we explained, the application of this idea to independently sampled cases is straightforward---simply partition the data into random folds of equal size and leave each fold out in turn, or, in the case of LOO CV, simply omit each case in turn.
+
+In contrast, mixed-effects models are fit to *dependent* data, in which cases as clustered, such as hierarchical data, where the clusters comprise higher-level units (e.g., students clustered in schools), or longitudinal data, where the clusters are individuals and the cases repeated observations on the individuals over time.[^5] 
+
+[^5]: There are, however, more complex situations that give rise to so-called *crossed* (rather than *nested*) random effects. For example, consider students within classes within schools. In primary schools, students typically are in a single class, and so classes are nested within schools. In secondary schools, however, students typically take several classes and students who are together in a particular class may not be together in other classes; consequently, random effects based on classes within schools are crossed. Although the `lmer()` function in the **lme4** package is capable of modeling both nested and crossed random effects, the `cv()` methods for mixed models in the **cv** package pertain only to nested random effects. It may be possible to cross-validate mixed models with crossed random effects, but we don't know how to do it.
+
+We can think of two approaches to applying cross-validation to clustered data:
+
+1. Treat CV as analogous to predicting the response for one or more cases in a *newly observed cluster*. In this instance, the folds comprise one or more whole clusters; we refit the model with all of the cases in clusters in the current fold removed; and then we predict the response for the cases in clusters in the current fold. These predictions are based only on fixed effects because the random effects for the omitted clusters are presumably unknown, as they would be for data on cases in newly observed clusters.
+
+2. Treat CV as analogous to predicting the response for a newly observed case in an *existing cluster*. In this instance, the folds comprise one or more individual cases, and the predictions can use both the fixed and random effects.
+
+### Example: The High-School and Beyond data
+
+Following their use by @RaudenbushBryk:2002, data from the 1982 *High School and Beyond* (HSB) survey have become a staple of the literature on mixed-effects models. The HSB data are used by @FoxWeisberg:2019 [Sec. 7.2.2] to illustrate the application of linear mixed models to hierarchical data, and we'll closely follow their example here.
+
+The HSB data are included in the `MathAchieve` and `MathAchSchool` data sets in the **nlme** package  [@PinheiroBates:2000]. `MathAchieve` includes individual-level data on 7185  students in 160 high schools, and `MathAchSchool` includes school-level data:
+```{r HSB-data}
+data("MathAchieve", package="nlme")
+dim(MathAchieve)
+head(MathAchieve, 3)
+tail(MathAchieve, 3)
+
+data("MathAchSchool", package="nlme")
+dim(MathAchSchool)
+head(MathAchSchool, 2)
+tail(MathAchSchool, 2)
+```
+The first few students are in school number 1224 and the last few in school 9586. 
+
+We'll use only the `School`, `SES` (students' socioeconomic status), and `MathAch` (their score on a standardized math-achievement test) variables in the `MathAchieve` data set, and `Sector` (`"Catholic"` or `"Public"`) in the `MathAchSchool` data set.
+
+Some data-management is required before fitting a mixed-effects model to the HSB data, for which we use the **dplyr** package [@WickhamEtAl:2023]:
+```{r HSB-data-management, cache=TRUE}
+library("dplyr")
+MathAchieve %>% group_by(School) %>%
+  summarize(mean.ses = mean(SES)) -> Temp
+Temp <- merge(MathAchSchool, Temp, by="School")
+HSB <- merge(Temp[, c("School", "Sector", "mean.ses")],
+             MathAchieve[, c("School", "SES", "MathAch")], by="School")
+names(HSB) <- tolower(names(HSB))
+
+HSB$cses <- with(HSB, ses - mean.ses)
+```
+In the process, we created two new school-level variables: `meanses`, which is the average SES for students in each school; and `cses`, which is school-average SES centered at its mean. For details, see @FoxWeisberg:2019 [Sec. 7.2.2].
+
+Still following Fox and Weisberg, we proceed to use the `lmer()` function in the **lme4** package [@BatesEtAl:2015] to fit a mixed model for math achievement to the HSB data:
+```{r HSB-lmer, cache=TRUE}
+library("lme4")
+hsb.lmer <- lmer(mathach ~ mean.ses*cses + sector*cses
+                   + (cses | school), data=HSB)
+summary(hsb.lmer, correlation=FALSE)
+```
+
+We can then cross-validate at the cluster (i.e., school) level,
+```{r HSB-lmer-CV-cluster, cache=TRUE}
+cv(hsb.lmer, k=10, clusterVariables="school", seed=5240)
+```
+or at the case (i.e., student) level,
+```{r HSB-lmer-CV-case, cache=TRUE}
+cv(hsb.lmer, seed=1575)
+```
+For cluster-level CV, the `clusterVariables` argument tells `cv()` how the clusters are defined. Were there more than one clustering variable, say classes within schools, these would be provided as a character vector of variable names: `clusterVariables = c("school", "class")`. For cluster-level CV, the default is `k = "loo"`, that is, leave one cluster out at a time; we instead specify `k = 10` folds of clusters, each fold therefore comprising $160/10 = 16$ schools. 
+
+If the `clusterVariables` argument is omitted, then case-level CV is employed, with `k = 10` folds as the default, here each with $7185/10 \approx 719$ students. Notice that one of the 10 models refit with a fold removed failed to converge. Convergence problems are common in mixed-effects modeling. The apparent issue here is that an estimated variance component is close to or equal to 0, which is at a boundary of the parameter space. That shouldn't disqualify the fitted model for the kind of prediction required for cross-validation.
+
 ## Replicating cross-validation
 
 Assuming that the number of cases $n$ is a multiple of the number of folds $k$---a slightly simplifying assumption---the number of possible partitions of cases into folds is $\frac{n!}{[(n/k)!]^k}$, a number that grows very large very quickly. For example, for $n = 10$ and $k = 5$, so that the folds are each of size $n/k = 2$, there are $113,400$ possible partitions; for $n=100$ and $k=5$, where $n/k = 20$, still a small problem, the number of possible partitions is truly astronomical, $1.09\times 10^{66}$.
@@ -247,9 +315,9 @@ cv(m.mroz, criterion=BayesRule, seed=248, reps=5,
 ```
 When `reps` > `1`, the result returned by `cv()` is an object of class `"cvList"`---literally a list of `"cv"` objects. The results are reported for each repetition and then averaged across repetitions, with the standard deviations of the CV criterion and the biased-adjusted CV criterion given in parentheses. In this example, there is therefore little variation across repetitions, increasing our confidence in the reliability of the results. 
 
-Notice that the seed that's set in the `cv()` command pertains to the first repetition and the seeds for the remaining repetitions are then selected pseudo-randomly.[^5] Setting the first seed, however, makes the entire process easily replicable, and the seed for each repetition is stored in the corresponding element of the `"cvList"` object (which isn't, however, saved in the example).
+Notice that the seed that's set in the `cv()` command pertains to the first repetition and the seeds for the remaining repetitions are then selected pseudo-randomly.[^6] Setting the first seed, however, makes the entire process easily replicable, and the seed for each repetition is stored in the corresponding element of the `"cvList"` object (which isn't, however, saved in the example).
 
-[^5]: Because of the manner in which the computation is performed, the order of the replicates in the `"cvList"` object returned by `cv()` isn't the same as the order in which the replicates are computed. Each element of the result, however, is a `"cv"` object with the correct random-number seed saved, and so this technical detail can be safely ignored. The individual `"cv"` objects are printed in the order in which they are stored rather than the order in which they are computed.
+[^6]: Because of the manner in which the computation is performed, the order of the replicates in the `"cvList"` object returned by `cv()` isn't the same as the order in which the replicates are computed. Each element of the result, however, is a `"cv"` object with the correct random-number seed saved, and so this technical detail can be safely ignored. The individual `"cv"` objects are printed in the order in which they are stored rather than the order in which they are computed.
 
 
 ## Cross-validating model selection
@@ -276,9 +344,9 @@ anova(m.null, m.full)
 
 summary(m.null)
 ```
-Next, using the `stepAIC()` function in the **MASS** package [@VenablesRipley:2002], let us perform a forward stepwise regression to select a "best" model, starting with the null model, and using AIC as the model-selection criterion (see the help page for `stepAIC()` for details):[^6]
+Next, using the `stepAIC()` function in the **MASS** package [@VenablesRipley:2002], let us perform a forward stepwise regression to select a "best" model, starting with the null model, and using AIC as the model-selection criterion (see the help page for `stepAIC()` for details):[^7]
 
-[^6]: It's generally advantageous to start with the largest model, here the one with 100 predictors, and proceed by backward elimination. In this demonstration, however, where all of the $\beta$s are really 0, the selected model will be small, and so we proceed by forward selection from the null model to save computing time.
+[^7]: It's generally advantageous to start with the largest model, here the one with 100 predictors, and proceed by backward elimination. In this demonstration, however, where all of the $\beta$s are really 0, the selected model will be small, and so we proceed by forward selection from the null model to save computing time.
 
 ```{r forward-selection}
 m.select <- MASS::stepAIC(m.null, direction="forward", trace=FALSE,
@@ -382,13 +450,13 @@ The most straightforward way to implement cross-validation in R for statistical 
 
 The `"lm"` and `"glm"` methods for `cv()` take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the error matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
 
-The weighted-least-squares (WLS) estimator of $\boldsymbol{\beta}$ is [see, e.g., @Fox:2016, Sec. 12.2.2] [^7]
+The weighted-least-squares (WLS) estimator of $\boldsymbol{\beta}$ is [see, e.g., @Fox:2016, Sec. 12.2.2] [^8]
 $$
 \mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} 
   \mathbf{X}^T \mathbf{W} \mathbf{y}
 $$ 
 
-[^7]: This is a definitional formula, which assumes that the model matrix $\mathbf{X}$ is of full column rank, and which can be subject to numerical instability when $\mathbf{X}$ is ill-conditioned. `lm()` uses the singular-value decomposition of the model matrix to obtain computationally more stable results.
+[^8]: This is a definitional formula, which assumes that the model matrix $\mathbf{X}$ is of full column rank, and which can be subject to numerical instability when $\mathbf{X}$ is ill-conditioned. `lm()` uses the singular-value decomposition of the model matrix to obtain computationally more stable results.
 
 Fitted values are then $\widehat{\mathbf{y}} = \mathbf{X}\mathbf{b}_{\mathrm{WLS}}$.
 

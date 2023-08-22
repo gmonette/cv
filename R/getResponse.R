@@ -1,6 +1,6 @@
-#' Extract Response Variable(s)
+#' Extract Response Variable
 #'
-#' Generic function to extract the response variable(s) from a fitted model.
+#' Generic function to extract the response variable from a fitted model.
 #'
 #' @param model a fitted model
 #' @param ... additional parameters for specific methods
@@ -15,7 +15,8 @@
 #' \code{model.response(model.frame(model))} is returned, checking in any case whether
 #' the result is a numeric vector.
 #'
-#' There is also a \code{"merMod"} method that converts factor
+#' There is also an \code{"lme"} method, and a \code{"merMod"}
+#' method that converts factor
 #' responses to numeric 0/1 responses, as would be appropriate
 #' for a generalized linear mixed models with a binary response.
 #'

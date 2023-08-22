@@ -10,7 +10,7 @@
 Some of the functions supplied by the package:
 
 * `cv()` is a generic function with a default method and 
-computationally efficient `"lm"` and `"glm"` methods. 
+computationally efficient `"lm"` and `"glm"` methods. There are also experimental `"merMod"` and `"lme"` methods for mixed-effects models.
 
 * `mse()` (mean-squared error) and `BayesRule()` are cross-validation
 criteria ("cost functions"), suitable for use with `cv()`.

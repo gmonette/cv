@@ -107,6 +107,17 @@ cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury")
 
 cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues")
 
+## ----HSB-data-----------------------------------------------------------------
+data("MathAchieve", package="nlme")
+dim(MathAchieve)
+head(MathAchieve, 3)
+tail(MathAchieve, 3)
+
+data("MathAchSchool", package="nlme")
+dim(MathAchSchool)
+head(MathAchSchool, 2)
+tail(MathAchSchool, 2)
+
 ## ----mroz-reps----------------------------------------------------------------
 cv(m.mroz, criterion=BayesRule, seed=248, reps=5, 
    method="Woodbury")
