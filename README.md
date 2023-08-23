@@ -29,6 +29,7 @@ To install the package:
 
 ```
 if (!require(remotes)) install.packages("remotes")
-remotes::install_github("gmonette/cv", build_vignettes = TRUE)
+remotes::install_github("gmonette/cv", build_vignettes = TRUE,
+  dependencies=TRUE)
 ```
 

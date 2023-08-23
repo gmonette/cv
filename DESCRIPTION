@@ -16,6 +16,7 @@ Imports: insight,
          nlme
 Suggests: boot,
           carData,
+          dplyr,
           ISLR2,
           knitr,
           microbenchmark,
