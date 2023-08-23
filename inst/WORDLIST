@@ -38,3 +38,5 @@ SES
 Weisberg
 dplyr
 lme
+BayesRule
+microbenchmark
