@@ -167,7 +167,7 @@ m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
                           model=m.mroz,
-                          k.=log(nrow(Mroz)))
+                          AIC=FALSE)
 m.mroz.sel.cv
 
 ## ----compare-selected-models-mroz---------------------------------------------
@@ -178,13 +178,13 @@ system.time(m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
                           model=m.mroz,
-                          k.=log(nrow(Mroz))))
+                          AIC=FALSE))
 
 system.time(m.mroz.sel.cv.p <- cvSelect(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
                           model=m.mroz,
-                          k.=log(nrow(Mroz)),
+                          AIC=FALSE,
                           ncores=2))
 all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
 

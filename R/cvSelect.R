@@ -137,23 +137,29 @@ cvSelect <- function(procedure, data, k=10, reps=1,
 #' @param indices indices of cases in data defining the current fold.
 #' @param model a regression model object fit to data.
 #' @param criterion a CV criterion function.
-#' @param k. the \code{k} argument to \code{\link[MASS]{stepAIC}()} (note the period in \code{k.}).
+#' @param AIC if \code{TRUE} (the default) use the AIC as the
+#' model-selection criterion; if {FALSE}, use the BIC.
+#' The \code{k} argument to \code{\link[MASS]{stepAIC}()}
+#' is set accordingly (note that this is distinct from the number of
+#' folds \code{k}).
 #' @examples
 #' data("Auto", package="ISLR2")
 #' m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 #' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
 #' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
-#'          k.=log(nrow(Auto)), k=5, reps=3) # via BIC
+#'          AIC=FALSE, k=5, reps=3) # via BIC
 #' @export
 selectStepAIC <- function(data, indices,
-                          model, criterion=mse, k.=2,
+                          model, criterion=mse, AIC=TRUE,
                           save.coef=TRUE, ...){
   y <- getResponse(model)
   if (missing(indices)) {
+    k. = if (AIC) 2 else log(nrow(data))
     model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
     fit.o.i <- predict(model.i, newdata=data, type="response")
     return(criterion(y, fit.o.i))
   }
+  k. <- if (AIC) 2 else log(nrow(data) - length(indices))
   model <- update(model, data=data[-indices, ])
   model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
   fit.o.i <- predict(model.i, newdata=data, type="response")

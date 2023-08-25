@@ -428,10 +428,10 @@ m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
                           model=m.mroz,
-                          k.=log(nrow(Mroz)))
+                          AIC=FALSE)
 m.mroz.sel.cv
 ```
-As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using the `compareFolds()`:
+Setting `AIC=FALSE` in the call to `cvSelect()` uses the BIC rather than the AIC as the model-selection criterion. As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using `compareFolds()`:
 ```{r compare-selected-models-mroz}
 compareFolds(m.mroz.sel.cv)
 ```
@@ -447,13 +447,13 @@ system.time(m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
                           model=m.mroz,
-                          k.=log(nrow(Mroz))))
+                          AIC=FALSE))
 
 system.time(m.mroz.sel.cv.p <- cvSelect(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
                           model=m.mroz,
-                          k.=log(nrow(Mroz)),
+                          AIC=FALSE,
                           ncores=2))
 all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
 ```

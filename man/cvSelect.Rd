@@ -22,7 +22,7 @@ selectStepAIC(
   indices,
   model,
   criterion = mse,
-  k. = 2,
+  AIC = TRUE,
   save.coef = TRUE,
   ...
 )
@@ -56,7 +56,11 @@ cross-validation.}
 
 \item{criterion}{a CV criterion function.}
 
-\item{k.}{the \code{k} argument to \code{\link[MASS]{stepAIC}()} (note the period in \code{k.}).}
+\item{AIC}{if \code{TRUE} (the default) use the AIC as the
+model-selection criterion; if {FALSE}, use the BIC.
+The \code{k} argument to \code{\link[MASS]{stepAIC}()}
+is set accordingly (note that this is distinct from the number of
+folds \code{k}).}
 
 \item{object}{an object of class \code{"cvSelect"}.}
 
@@ -115,7 +119,7 @@ data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
-         k.=log(nrow(Auto)), k=5, reps=3) # via BIC
+         AIC=FALSE, k=5, reps=3) # via BIC
 }
 \seealso{
 \code{\link[MASS]{stepAIC}()}
