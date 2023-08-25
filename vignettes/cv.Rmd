@@ -172,7 +172,7 @@ On our computer, using the hatvalues is about an order of magnitude faster than 
 
 ### Logistic regression for the `Mroz` data
 
-The `Mroz` data set from the **carData** package [associated with @FoxWeisberg:2019] have been used by several authors to illustrate binary logistic regression; see, in particular @FoxWeisberg:2019. The data were originally drawn from the U.S. Panel Study of Income Dynamics and pertain to married women. Here are a few cases in the data set:
+The `Mroz` data set from the **carData** package [associated with @FoxWeisberg:2019] has been used by several authors to illustrate binary logistic regression; see, in particular @FoxWeisberg:2019. The data were originally drawn from the U.S. Panel Study of Income Dynamics and pertain to married women. Here are a few cases in the data set:
 ```{r Mroz-data}
 data("Mroz", package="carData")
 head(Mroz, 3)
