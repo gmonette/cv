@@ -20,6 +20,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   seed,
   ncores = 1,
   method = NULL,
+  type = "response",
   ...
 )
 
@@ -79,6 +80,10 @@ for n-fold cross-validation}
 \item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 of the available options.}
+
+\item{type}{to be passed to the \code{type} argument of \code{predict()};
+the default is \code{type="response"}, which is appropriate, e.g., for a \code{"glm"} model
+and may be recognized or ignored by \code{predict()} methods for other model classes.}
 
 \item{x}{a \code{cv} object to be printed}
 

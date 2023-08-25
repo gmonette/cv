@@ -23,6 +23,9 @@
 #' @param method computational method to apply to a linear (i.e. \code{"lm"}) model
 #' or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 #' of the available options.
+#' @param type to be passed to the \code{type} argument of \code{predict()};
+#' the default is `type="response"`, which is appropriate, e.g., for a `"glm"` model
+#' and may be recognized or ignored by \code{predict()} methods for other model classes.
 #' @param ... to match generic
 #' @returns An object of class \code{"cv"}, with the averaged CV criterion
 #' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
@@ -88,12 +91,12 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10, reps=1, seed, ncores=1,
-                       method=NULL, ...){
+                       method=NULL, type="response", ...){
   f <- function(i){
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
     model.i <- update(model, data=data[ - indices.i, ])
-    fit.o.i <- predict(model.i, newdata=data, type="response")
+    fit.o.i <- predict(model.i, newdata=data, type=type)
     fit.i <- fit.o.i[indices.i]
     c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
   }
@@ -135,7 +138,7 @@ cv.default <- function(model, data=insight::get_data(model),
     }
   }
   cv <- weighted.mean(result[, 1L], folds)
-  cv.full <- criterion(y, fitted(model))
+  cv.full <- criterion(y, predict(model, type=type))
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
