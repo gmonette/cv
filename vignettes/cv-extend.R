@@ -43,3 +43,58 @@ AUCcomp(with(Mroz, as.numeric(lfp == "yes")), fitted(m.mroz))
 library("cv")
 cv(m.mroz, criterion=AUCcomp, seed=3639)
 
+## ----BEPS-data----------------------------------------------------------------
+data("BEPS", package="carData")
+head(BEPS)
+
+## ----BEPS-model---------------------------------------------------------------
+library("nnet")
+m.beps <- multinom(vote ~ age + gender + economic.cond.national +
+                       economic.cond.household + Blair + Hague + Kennedy +
+                       Europe*political.knowledge, data=BEPS)
+
+car::Anova(m.beps)
+
+## ----BEPS-plot, fig.width=9, fig.height=5-------------------------------------
+plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
+            xlevels=list(Europe=1:11, political.knowledge=0:3),
+            fixed.predictors=list(given.values=c(gendermale=0.5))),
+     lines=list(col=c("blue", "red", "orange")),
+     axes=list(x=list(rug=FALSE), y=list(style="stacked")))
+
+## ----BayesRuleMulti-----------------------------------------------------------
+head(BEPS$vote)
+yhat <- predict(m.beps, type="class")
+head(yhat)
+
+BayesRuleMulti <- function(y, yhat){
+  mean(y != yhat)
+}
+
+BayesRuleMulti(BEPS$vote, yhat)
+
+## ----BEPS-response-distribution-----------------------------------------------
+xtabs(~ vote, data=BEPS)/nrow(BEPS)
+
+## ----BEPS-test-default, error=TRUE--------------------------------------------
+cv(m.beps, seed=3465, criterion=BayesRuleMulti)
+
+## ----getRespons.multinom------------------------------------------------------
+getResponse.multinom <- function(model, ...) {
+  insight::get_response(model)
+}
+
+head(getResponse(m.beps))
+
+## ----BEPS-test-default-2, error=TRUE------------------------------------------
+cv(m.beps, seed=3465, criterion=BayesRuleMulti)
+
+## ----cv.nultinom--------------------------------------------------------------
+cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
+                         seed, trace=FALSE, ...){
+  NextMethod(type="class", trace=trace, criterion=criterion)
+}
+
+## ----BEPS-cv------------------------------------------------------------------
+cv(m.beps, seed=3465)
+

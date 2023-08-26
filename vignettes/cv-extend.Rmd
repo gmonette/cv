@@ -76,6 +76,87 @@ As expected, the cross-validated complement to the AUC is somewhat less optimist
 
 ## Adding a model class not covered by the default `cv()` method
 
+Suppose that we want to cross-validate a multinomial logistic regression model fit by the `multinom()` function in the **nnet** package [@VenablesRipley:2002]. We borrow an example from @Fox:2016 [Sec. 14.2.1], with data from the British Election Panel Study on vote choice in the 2001 British election. Data for the example are in the `BEPS` data frame in the **carData** package:
+```{r BEPS-data}
+data("BEPS", package="carData")
+head(BEPS)
+```
+The polytomous (multi-category) response variable is `vote`, a factor with levels `"Conservative"`, `"Labour"`, and `"Liberal Democrat"`. The predictors of `vote` are:
+
+* `age`, in years;
+* `econ.cond.national` and `econ.cond.household`, the respondent's ratings of the state of the economy, on 1 to 5 scales.
+* `Blair`, `Hague`, and `Kennedy`, ratings of the leaders of the Labour, Conservative, and Liberal Democratic parties, on 1 to 5 scales.
+* `Europe`, an 11-point scale on attitude towards European integration, with high scores representing "Euro-skepticism."
+* `political.knowledge`, knowledge of the parties' positions on European integration, with scores from 0 to 3.
+* `gender`, `"female"` or `"male"`.
+
+The model fit to the data includes an interaction between `Europe` and `political.knowledge`; the other predictors enter the model additively:
+```{r BEPS-model}
+library("nnet")
+m.beps <- multinom(vote ~ age + gender + economic.cond.national +
+                       economic.cond.household + Blair + Hague + Kennedy +
+                       Europe*political.knowledge, data=BEPS)
+
+car::Anova(m.beps)
+```
+Most of the predictors, including the `Europe` $\times$ `political.knowledge` interaction, are associated with very small $p$-values.
+
+Here's an "effect plot", using the the **effects** package [@FoxWeisberg:2019] to visualize the `Europe` $\times$ `political.knowledge` interaction in a "stacked-area" graph:
+```{r BEPS-plot, fig.width=9, fig.height=5}
+plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
+            xlevels=list(Europe=1:11, political.knowledge=0:3),
+            fixed.predictors=list(given.values=c(gendermale=0.5))),
+     lines=list(col=c("blue", "red", "orange")),
+     axes=list(x=list(rug=FALSE), y=list(style="stacked")))
+```
+
+To cross-validate this multinomial-logit model we need an appropriate cost criterion. Neither of the criteria supplied by the **cv** package---`mse()`, which is appropriate for a numeric response, nor `BayesRule()`, which is appropriate for a binary response---will do. One possibility is to adapt Bayes rule to a polytomous response:
+```{r BayesRuleMulti}
+head(BEPS$vote)
+yhat <- predict(m.beps, type="class")
+head(yhat)
+
+BayesRuleMulti <- function(y, yhat){
+  mean(y != yhat)
+}
+
+BayesRuleMulti(BEPS$vote, yhat)
+```
+The `predict()` method for `"multinom"` models called with argument `type="class"` reports the Bayes-rule prediction for each case---that is, the response category with the highest predicted probability. Our `BayesRuleMulti()` function just reports the proportion of misclassified cases. The marginal proportions for the response categories are
+```{r BEPS-response-distribution}
+xtabs(~ vote, data=BEPS)/nrow(BEPS)
+```
+and so the marginal Bayes-rule prediction, that everyone will vote Labour, produces an error rate of $1 - 0.47213 = 0.52787$. The multinomial-logit model appears to do substantially better than that, but does its performance hold up to cross-validation?
+
+We check first whether the default `cv()` method works "out-of-the-box" for the `"multinom"` model:
+```{r BEPS-test-default, error=TRUE}
+cv(m.beps, seed=3465, criterion=BayesRuleMulti)
+```
+The default method of `getResponse()` (a function supplied by the **cv** package---see `?getResponse`) fails for a `"multinom"` object. A straightforward solution is to supply a `getResponse.multinom()` method that returns the factor response [using the `get_response()` function from the **insight** package, @LudeckeWaggonerMakowski:2019],
+```{r getRespons.multinom}
+getResponse.multinom <- function(model, ...) {
+  insight::get_response(model)
+}
+
+head(getResponse(m.beps))
+```
+and to try again:
+```{r BEPS-test-default-2, error=TRUE}
+cv(m.beps, seed=3465, criterion=BayesRuleMulti)
+```
+A `traceback()` (not shown) reveals that the problem is that the default method of `cv()` calls the `"multinom"` method for `predict()` with the argument `type="response"`, when the correct argument should be `type="class"`.  We therefore must write a "`multinom`" method for `cv()`, but that proves to be very simple:
+```{r cv.nultinom}
+cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
+                         seed, trace=FALSE, ...){
+  NextMethod(type="class", trace=trace, criterion=criterion)
+}
+```
+That is, we simply call the default `cv()` method with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`, and by default sets `trace=FALSE` to suppress the iteration history reported by `multinom()`---it would be tedious to see the iteration history for each fold. Then:
+```{r BEPS-cv}
+cv(m.beps, seed=3465)
+```
+The cross-validated polytomous Bayes-rule criterion confirms that the fitted model does substantially better than the marginal Bayes-rule prediction that everyone votes for Labour.
+
 
 ## Adding a model-selection procedure
 
