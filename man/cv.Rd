@@ -72,7 +72,8 @@ cross-validation.}
 supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation}
 
-\item{...}{to match generic}
+\item{...}{to match generic and, for the default method,
+arguments to be passed to \code{update()}.}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}
@@ -81,7 +82,8 @@ for n-fold cross-validation}
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 of the available options.}
 
-\item{type}{to be passed to the \code{type} argument of \code{predict()};
+\item{type}{for the default method, value to be passed to the
+\code{type} argument of \code{predict()};
 the default is \code{type="response"}, which is appropriate, e.g., for a \code{"glm"} model
 and may be recognized or ignored by \code{predict()} methods for other model classes.}
 

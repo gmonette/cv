@@ -23,10 +23,12 @@
 #' @param method computational method to apply to a linear (i.e. \code{"lm"}) model
 #' or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 #' of the available options.
-#' @param type to be passed to the \code{type} argument of \code{predict()};
+#' @param type for the default method, value to be passed to the
+#' \code{type} argument of \code{predict()};
 #' the default is `type="response"`, which is appropriate, e.g., for a `"glm"` model
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
-#' @param ... to match generic
+#' @param ... to match generic and, for the default method,
+#' arguments to be passed to \code{update()}.
 #' @returns An object of class \code{"cv"}, with the averaged CV criterion
 #' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
@@ -95,7 +97,7 @@ cv.default <- function(model, data=insight::get_data(model),
   f <- function(i){
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
-    model.i <- update(model, data=data[ - indices.i, ])
+    model.i <- update(model, data=data[ - indices.i, ], ...)
     fit.o.i <- predict(model.i, newdata=data, type=type)
     fit.i <- fit.o.i[indices.i]
     c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
