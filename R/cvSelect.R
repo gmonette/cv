@@ -156,16 +156,16 @@ selectStepAIC <- function(data, indices,
   if (missing(indices)) {
     k. = if (AIC) 2 else log(nrow(data))
     model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
-    fit.o.i <- predict(model.i, newdata=data, type="response")
-    return(criterion(y, fit.o.i))
+    fit.all.i <- predict(model.i, newdata=data, type="response")
+    return(criterion(y, fit.all.i))
   }
   k. <- if (AIC) 2 else log(nrow(data) - length(indices))
   model <- update(model, data=data[-indices, ])
   model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
-  fit.o.i <- predict(model.i, newdata=data, type="response")
-  fit.i <- fit.o.i[indices]
+  fit.all.i <- predict(model.i, newdata=data, type="response")
+  fit.i <- fit.all.i[indices]
   list(criterion=c(criterion(y[indices], fit.i),
-         criterion(y, fit.o.i)),
+         criterion(y, fit.all.i)),
        if (save.coef) coefs=coef(model.i) else NULL)
 }
 
@@ -195,10 +195,3 @@ compareFolds.cvSelect <- function(object, digits=3, ...){
   }
   printCoefmat(table, na.print="", digits=digits)
 }
-
-
-# selectAllSubsets <- function(data, indices, formula, ...){
-#   if (missing(indices)){
-#     regsubsets(formula, data=data, nbest=1)
-#   }
-# }

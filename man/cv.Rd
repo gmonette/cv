@@ -72,8 +72,7 @@ cross-validation.}
 supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation}
 
-\item{...}{to match generic and, for the default method,
-arguments to be passed to \code{update()}.}
+\item{...}{to match generic.}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}

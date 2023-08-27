@@ -27,8 +27,7 @@
 #' \code{type} argument of \code{predict()};
 #' the default is `type="response"`, which is appropriate, e.g., for a `"glm"` model
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
-#' @param ... to match generic and, for the default method,
-#' arguments to be passed to \code{update()}.
+#' @param ... to match generic.
 #' @returns An object of class \code{"cv"}, with the averaged CV criterion
 #' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
@@ -97,10 +96,10 @@ cv.default <- function(model, data=insight::get_data(model),
   f <- function(i){
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
-    model.i <- update(model, data=data[ - indices.i, ], ...)
-    fit.o.i <- predict(model.i, newdata=data, type=type)
-    fit.i <- fit.o.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
+    model.i <- update(model, data=data[ - indices.i, ])
+    fit.all.i <- predict(model.i, newdata=data, type=type)
+    fit.i <- fit.all.i[indices.i]
+    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
   y <- getResponse(model)
   n <- nrow(data)
@@ -243,9 +242,9 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
     b.i <- UpdateLM(indices.i)
-    fit.o.i <- X %*% b.i
-    fit.i <- fit.o.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
+    fit.all.i <- X %*% b.i
+    fit.i <- fit.all.i[indices.i]
+    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
   X <- model.matrix(model)
   y <- getResponse(model)
@@ -367,9 +366,9 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
     b.i <- UpdateIWLS(indices.i)
-    fit.o.i <- linkinv(X %*% b.i)
-    fit.i <- fit.o.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
+    fit.all.i <- linkinv(X %*% b.i)
+    fit.i <- fit.all.i[indices.i]
+    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
   n <- nrow(data)
   if (is.character(k)){

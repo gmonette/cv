@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-08-26" />
+<meta name="date" content="2023-08-27" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-08-26</h4>
+<h4 class="date">2023-08-27</h4>
 
 
 
@@ -612,26 +612,29 @@ be <code>type=&quot;class&quot;</code>. We therefore must write a
 “<code>multinom</code>” method for <code>cv()</code>, but that proves to
 be very simple:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>cv.multinom <span class="ot">&lt;-</span> <span class="cf">function</span> (model, data, <span class="at">criterion=</span>BayesRuleMulti, k, reps,</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>                         seed, <span class="at">trace=</span><span class="cn">FALSE</span>, ...){</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">NextMethod</span>(<span class="at">type=</span><span class="st">&quot;class&quot;</span>, <span class="at">trace=</span>trace, <span class="at">criterion=</span>criterion)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>                         seed, ...){</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">NextMethod</span>(<span class="at">type=</span><span class="st">&quot;class&quot;</span>, <span class="at">criterion=</span>criterion)</span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>}</span></code></pre></div>
 <p>That is, we simply call the default <code>cv()</code> method with the
 <code>type</code> argument properly set. In addition to supplying the
 correct <code>type</code> argument, our method sets the default
 <code>criterion</code> for the <code>cv.multinom()</code> method to
-<code>BayesRuleMulti</code>, and by default sets
-<code>trace=FALSE</code> to suppress the iteration history reported by
-<code>multinom()</code>—it would be tedious to see the iteration history
-for each fold. Then:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">cv</span>(m.beps, <span class="at">seed=</span><span class="dv">3465</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3465</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
-<p>The cross-validated polytomous Bayes-rule criterion confirms that the
-fitted model does substantially better than the marginal Bayes-rule
-prediction that everyone votes for Labour.</p>
+<code>BayesRuleMulti</code>.</p>
+<p>Then:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>m.beps <span class="ot">&lt;-</span> <span class="fu">update</span>(m.beps, <span class="at">trace=</span><span class="cn">FALSE</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">cv</span>(m.beps, <span class="at">seed=</span><span class="dv">3465</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3465</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
+<p>Prior to invoking <code>cv</code>, we called <code>update()</code>
+with <code>trace=FALSE</code> to suppress the iteration history reported
+by default by <code>multinom()</code>—it would be tedious to see the
+iteration history for each fold. The cross-validated polytomous
+Bayes-rule criterion confirms that the fitted model does substantially
+better than the marginal Bayes-rule prediction that everyone votes for
+Labour.</p>
 </div>
 <div id="adding-a-model-selection-procedure" class="section level2">
 <h2>Adding a model-selection procedure</h2>

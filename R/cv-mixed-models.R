@@ -68,20 +68,20 @@ cv.merMod <- function(model,
     indices.i <- indices[starts[i]:ends[i]]
     index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
     model.i <- update(model, data=data[index, ])
-    fit.o.i <- predict(model.i, newdata=data, type="response",
+    fit.all.i <- predict(model.i, newdata=data, type="response",
                        re.form=NA,
                        allow.new.levels=TRUE)
-    fit.i <- fit.o.i[!index]
-    c(criterion(y[!index], fit.i), criterion(y, fit.o.i))
+    fit.i <- fit.all.i[!index]
+    c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
   }
 
   f.cases <- function(i){
     indices.i <- indices[starts[i]:ends[i]]
     model.i <- update(model, data=data[ - indices.i, ])
-    fit.o.i <- predict(model.i, newdata=data, type="response",
+    fit.all.i <- predict(model.i, newdata=data, type="response",
                        allow.new.levels=TRUE)
-    fit.i <- fit.o.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
+    fit.i <- fit.all.i[indices.i]
+    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
 
   y <- getResponse(model)
@@ -179,18 +179,18 @@ cv.lme <- function(model,
     indices.i <- indices[starts[i]:ends[i]]
     index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
     model.i <- update(model, data=data[index, ])
-    fit.o.i <- predict(model.i, newdata=data,
+    fit.all.i <- predict(model.i, newdata=data,
                        level=0)
-    fit.i <- fit.o.i[!index]
-    c(criterion(y[!index], fit.i), criterion(y, fit.o.i))
+    fit.i <- fit.all.i[!index]
+    c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
   }
 
   f.cases <- function(i){
     indices.i <- indices[starts[i]:ends[i]]
     model.i <- update(model, data=data[ - indices.i, ])
-    fit.o.i <- predict(model.i, newdata=data, level=1)
-    fit.i <- fit.o.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.o.i))
+    fit.all.i <- predict(model.i, newdata=data, level=1)
+    fit.i <- fit.all.i[indices.i]
+    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
 
   y <- getResponse(model)
