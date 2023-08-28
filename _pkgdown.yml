@@ -1,4 +1,5 @@
 url: https://gmonette.github.io/cv/
 template:
   bootstrap: 5
-
+development:
+  mode: auto
