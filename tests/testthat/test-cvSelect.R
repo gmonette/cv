@@ -36,7 +36,11 @@ test_that("cvSelect exact vs Woodbury glm", {
   )
 })
 
+
+# longer tests
+
 test_that("cvSelect exact vs hatvalues loo glm", {
+  skip_on_cran()
   expect_equal(cvSelect(selectStepAIC, Auto, k="loo",
                         model=m.glm, method="exact"),
                cvSelect(selectStepAIC, Auto, k="loo",
@@ -45,6 +49,7 @@ test_that("cvSelect exact vs hatvalues loo glm", {
 })
 
 test_that("cvSelect Woodbury vs hatvalues loo glm", {
+  skip_on_cran()
   expect_equal(cvSelect(selectStepAIC, Auto, k="loo",
                         model=m.glm, method="Woodbury"),
                cvSelect(selectStepAIC, Auto, k="loo",
@@ -60,9 +65,11 @@ assign("Cara", Caravan[1:500, c(1:10, 86)], envir=.GlobalEnv)
 m.caravan <- glm(Purchase ~ ., data=Cara, family=binomial)
 
 test_that("cvSelect parallel glm", {
+  skip_on_cran()
   expect_equal(cvSelect(selectStepAIC, Cara, k=5, seed=123,
-         model=m.caravan, criterion=BayesRule),
-         cvSelect(selectStepAIC, Cara, k=5, seed=123,
-         model=m.caravan, ncores=2, criterion=BayesRule)
+                        model=m.caravan, criterion=BayesRule),
+               cvSelect(selectStepAIC, Cara, k=5, seed=123,
+                        model=m.caravan, ncores=2, criterion=BayesRule)
   )
 })
+

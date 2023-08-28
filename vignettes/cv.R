@@ -8,7 +8,8 @@ knitr::opts_chunk$set(
   fig.width = 7,
   fig.path = "fig/",
   dev = "png",
-  comment = "#>"
+  comment = "#>" #,
+  # eval = nzchar(Sys.getenv("REBUILD_VIGNETTES"))
 )
 
 # save some typing
@@ -172,6 +173,64 @@ m.mroz.sel.cv
 
 ## ----compare-selected-models-mroz---------------------------------------------
 compareFolds(m.mroz.sel.cv)
+
+## ----Prestige-data------------------------------------------------------------
+data("Prestige", package="carData")
+head(Prestige)
+summary(Prestige)
+
+## ----scatterplot-matrix-------------------------------------------------------
+library("car")
+scatterplotMatrix(~ prestige + income + education + women,
+                  data=Prestige, smooth=list(spread=FALSE))
+
+## ----power-transform-Prestige-------------------------------------------------
+trans <- powerTransform( cbind(income, education, women) ~ 1,
+                         data=Prestige, family="yjPower")
+summary(trans)
+
+## ----transformed-predictors---------------------------------------------------
+P <- Prestige[, c("prestige", "income", "education", "women")]
+(lambdas <- trans$roundlam)
+names(lambdas) <- c("income", "education", "women")
+for (var in c("income", "education", "women")){
+  P[, var] <- yjPower(P[, var], lambda=lambdas[var])
+}
+summary(P)
+
+scatterplotMatrix(~ prestige + income + education + women,
+                  data=P, smooth=list(spread=FALSE))
+
+## ----prestige-regressions-----------------------------------------------------
+m.pres <- lm(prestige ~ income + education + women, data=Prestige)
+m.pres.trans <- lm(prestige ~ income + education + women, data=P)
+mse(Prestige$prestige, fitted(m.pres))
+mse(P$prestige, fitted(m.pres.trans))
+
+## ----CR-plots-untransformed---------------------------------------------------
+crPlots(m.pres)
+
+## ----CR-plots-transformed-----------------------------------------------------
+crPlots(m.pres.trans)
+
+## ----transform-response-------------------------------------------------------
+summary(powerTransform(m.pres.trans))
+
+## ----selectTrans--------------------------------------------------------------
+selectTrans(data=Prestige, model=m.pres,
+            predictors=c("income", "education", "women"),
+            response="prestige", family="yjPower")
+
+## ----cv-select-transformations------------------------------------------------
+cvs <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=1463,
+                predictors=c("income", "education", "women"),
+                response="prestige",
+                family="yjPower")
+cvs
+
+cv(m.pres, seed=1463) # untransformed model with same folds
+
+compareFolds(cvs)
 
 ## ----parallel-computation-----------------------------------------------------
 system.time(m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,

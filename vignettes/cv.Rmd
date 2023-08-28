@@ -24,7 +24,8 @@ knitr::opts_chunk$set(
   fig.width = 7,
   fig.path = "fig/",
   dev = "png",
-  comment = "#>"
+  comment = "#>" #,
+  # eval = nzchar(Sys.getenv("REBUILD_VIGNETTES"))
 )
 
 # save some typing
@@ -436,6 +437,104 @@ Setting `AIC=FALSE` in the call to `cvSelect()` uses the BIC rather than the AIC
 compareFolds(m.mroz.sel.cv)
 ```
 In this example, therefore, we appear to obtain a realistic estimate of model performance directly from the selected model, because there is little added uncertainty induced by model selection.
+
+### Cross-validating choice of transformations in regression
+
+The **cv** package also provides a `cvSelect()` procedure, `selectTrans()`, for choosing transformations of the predictors and the response in regression. 
+
+Some background: As @Weisberg:2014 [Sec. 8.2] explains, there are technical advantages to having (numeric) predictors in linear regression analysis that are themselves linearly related. If the predictors *aren't* linearly related, then the relationships between them can often be straightened by power transformations. Transformations can be selected after graphical examination of the data, or by analytic methods. Once the relationships between the predictors are linearized, it can be advantageous similarly to transform the response variable towards normality.
+
+Selecting transformations analytically raises the possibility of automating the process, as would be required for cross-validation. One could, in principle, apply graphical methods to select transformations for each fold, but because a data analyst couldn't forget the choices made for previous folds, the process wouldn't really be applied independently to the folds.
+
+To illustrate, we adapt an example appearing in several places in @FoxWeisberg:2019 (for example in Chapter 3 on transforming data), using data on the prestige and other characteristics of 102 Canadian occupations circa 1970. The data are in the `Prestige` data frame in the **carData** package:
+```{r Prestige-data}
+data("Prestige", package="carData")
+head(Prestige)
+summary(Prestige)
+```
+The variables in the `Prestige` data set are:
+
+* `education`: average years of education for incumbents in the occupation, from the 1971 Canadian Census.
+* `income`: average dollars of annual income for the occupation, from the Census.
+* `women`: percentage of occupational incumbents who were women, also from the Census.
+* `prestige`: the average prestige rating of the occupation on a 0--100 "thermometer" scale, in a Canadian social survey conducted around the same time.
+* `type`, type of occupation, and `census`, the Census occupational code, which are not used in our example.
+
+The object of a regression analysis for the `Prestige` data (and their original purpose) is to predict occupational prestige from the other variables in the data set.
+
+A scatterplot matrix (using the `scatterplotMatrix()` function in the **car** package) of the numeric variables in the data reveals that the distributions of `income` and `women` are positively skewed, and that some of the relationships among the three predictors, and between the predictors and the response (i.e., `prestige`), are nonlinear:
+```{r scatterplot-matrix}
+#| out.width = "100%",
+#| fig.height = 6,
+#| fig.cap = "Scatterplot matrix for the `Prestige` data."
+library("car")
+scatterplotMatrix(~ prestige + income + education + women,
+                  data=Prestige, smooth=list(spread=FALSE))
+```
+The `powerTransform()` function in the **car** package transforms variables towards multivariate normality by a generalization of Box and Cox's maximum-likelihood-like approach [@BoxCox:1964]. Several "families" of power transformations can be used, including the original Box-Cox family, simple powers (and roots), and two adaptations of the Box-Cox family to data that may include negative values and zeros: the Box-Cox-with-negatives family and the Yeo-Johnson family; see @Weisberg:2014 [Chap. 8], and @FoxWeisberg:2019 [Chap. 3] for details. Because `women` has some zero values, we use the Yeo-Johnson family:
+```{r power-transform-Prestige}
+trans <- powerTransform( cbind(income, education, women) ~ 1,
+                         data=Prestige, family="yjPower")
+summary(trans)
+```
+We thus have evidence of the desirability of transforming `income` (by the $1/3$ power) and `women` (by the $0.16$ power---which is close to the "0" power, i.e., the log transformation), but not `education`. Applying the "rounded" power transformations makes the predictors better-behaved:
+```{r transformed-predictors}
+#| out.width = "100%",
+#| fig.height = 6,
+#| fig.cap = "Scatterplot matrix for the `Prestige` data with the predictors transformed."
+P <- Prestige[, c("prestige", "income", "education", "women")]
+(lambdas <- trans$roundlam)
+names(lambdas) <- c("income", "education", "women")
+for (var in c("income", "education", "women")){
+  P[, var] <- yjPower(P[, var], lambda=lambdas[var])
+}
+summary(P)
+
+scatterplotMatrix(~ prestige + income + education + women,
+                  data=P, smooth=list(spread=FALSE))
+```
+Comparing the MSE for the regressions with the original and transformed predictors shows a advantage to the latter:
+```{r prestige-regressions}
+m.pres <- lm(prestige ~ income + education + women, data=Prestige)
+m.pres.trans <- lm(prestige ~ income + education + women, data=P)
+mse(Prestige$prestige, fitted(m.pres))
+mse(P$prestige, fitted(m.pres.trans))
+```
+Similarly, component+residual plots for the two regressions, produced by the `crPlots()` function in the **car** package, suggest that the partial relationship of `prestige` to `income` is more nearly linear in the transformed data, but the transformation of `women` fails to capture what appears to be a slight quadratic partial relationship; the partial relationship of `prestige` to `education` is close to linear in both regressions:
+```{r CR-plots-untransformed}
+#| fig.cap = "Component+residual plots for the `Prestige` regression with the original predicctors."
+crPlots(m.pres)
+```
+```{r CR-plots-transformed}
+#| fig.cap = "Component+residual plots for the `Prestige` regression with transformed predicctors."
+crPlots(m.pres.trans)
+```
+
+Having transformed the predictors towards multinormality, we now consider whether there's evidence for transforming the response (using `powerTransform()` for Box and Cox's original method), and we discover that there's not:
+```{r transform-response}
+summary(powerTransform(m.pres.trans))
+```
+
+The `selectTrans()` function in the **cv** package automates the process of selecting predictor and response transformations. The function takes a `data` set and "working" `model` as arguments, along with the candidate `predictors` and `response` for transformation, and the transformation `family` to employ. If the `predictors` argument is missing then only the response is transformed, and if the `response` argument is missing, only the supplied predictors are transformed. The default `family` for transforming the predictors is `"bcPower"`---the original Box-Cox family---as is the default `family.y` for transforming the response; here we specify `family="yjPower` because of the zeros in `women`. `selectTrans()` returns the result of applying a lack-of-fit criterion to the model after the selected transformation is applied, with the default `criterion=mse`:
+```{r selectTrans}
+selectTrans(data=Prestige, model=m.pres,
+            predictors=c("income", "education", "women"),
+            response="prestige", family="yjPower")
+```
+`selectTrans()` also takes an optional `indices` argument, making it suitable for doing computations on a subset of the data (i.e., a CV fold), and hence for use with `cvSelect()` (see `?selectTrans` for details):
+
+```{r cv-select-transformations}
+cvs <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=1463,
+                predictors=c("income", "education", "women"),
+                response="prestige",
+                family="yjPower")
+cvs
+
+cv(m.pres, seed=1463) # untransformed model with same folds
+
+compareFolds(cvs)
+```
+The results suggest that the predictive power of the transformed regression is reliably greater than that of the untransformed regression (though in both case, the cross-validated MSE is considerably higher than the MSE computed for the whole data). Examining the selected transformations for each fold reveals that the predictor `education` and the response `prestige` are never transformed; that the $1/3$ power is selected for `income` in all of the folds; and that the transformation selected for `women` varies narrowly across the folds between the $0$th power (i.e., log) and the $1/3$ power.
 
 ## Parallel computations
 

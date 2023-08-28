@@ -24,7 +24,8 @@ knitr::opts_chunk$set(
   fig.width = 7,
   fig.path = "fig/",
   dev = "png",
-  comment = "#>"
+  comment = "#>" #,
+  # eval = nzchar(Sys.getenv("REBUILD_VIGNETTES"))
 )
 
 # save some typing
