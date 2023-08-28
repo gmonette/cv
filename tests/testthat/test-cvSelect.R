@@ -52,9 +52,6 @@ test_that("cvSelect Woodbury vs hatvalues loo glm", {
   )
 })
 
-## FIXME!!! The following works when run directly but fails
-## when run in test suite ???
-
 # test that parallel computations work correctly using selectStepAIC()
 #  for a glm
 

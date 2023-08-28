@@ -3,6 +3,7 @@
 \name{cvSelect}
 \alias{cvSelect}
 \alias{selectStepAIC}
+\alias{selectTrans}
 \alias{compareFolds}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
@@ -24,6 +25,20 @@ selectStepAIC(
   criterion = mse,
   AIC = TRUE,
   save.coef = TRUE,
+  ...
+)
+
+selectTrans(
+  data,
+  indices,
+  save.coef = TRUE,
+  model,
+  criterion = mse,
+  predictors,
+  response,
+  family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
+  family.y = c("bcPower", "bcnPower", "yjPower", "basicPower"),
+  rounded = TRUE,
   ...
 )
 
@@ -62,19 +77,38 @@ The \code{k} argument to \code{\link[MASS]{stepAIC}()}
 is set accordingly (note that this is distinct from the number of
 folds \code{k}).}
 
+\item{predictors}{character vector of names of the predictors in the model
+to transform; if missing, no predictors will be transformed.}
+
+\item{response}{name of the response variable; if missing, the response
+won't be transformed.}
+
+\item{family}{transformation family for the predictors, one of
+\code{"bcPower", "bcnPower", "yjPower", "basicPower"},
+with \code{"bcPower"} as the default. These are the names of transformation
+functions in the \pkg{car} package; see \code{\link[car]{bcPower}}}
+
+\item{family.y}{transformation family for the response,
+with \code{"bcPower"} as the default.}
+
+\item{rounded}{if \code{TRUE} (the default) use nicely rounded versions
+of the estimated transformation parameters (see \code{\link[car]{bcPower}}).}
+
 \item{object}{an object of class \code{"cvSelect"}.}
 
 \item{digits}{significant digits for printing coefficients,
 (default \code{3}).}
 }
 \value{
-An object of class , inheriting from class \code{"cv"}, with the averaged CV criterion
+An object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
 (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 the criterion for the model applied to the full data (\code{"full crit"}),
 the number of folds (\code{"k"}), the seed for R's random-number
-generator (\code{"seed"}), and (optionally) a list of coefficients for the selected models
+generator (\code{"seed"}), and (optionally) a list of coefficients
+(or, in the case of \code{selectTrans()}, estimated transformation
+parameters) for the selected models
 for each fold (\code{"coefs"}).
-#' If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
+If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
 which is literally a list of \code{c("cvSelect", "cv")} objects.
 }
 \description{
@@ -89,8 +123,8 @@ to \code{cvSelect()} should accept the following arguments:
 \item{\code{data}}{set to the \code{data} argument to \code{cvSelect()}.}
 \item{\code{indices}}{the indices of the rows of \code{data} defining the current fold; if missing,
 the model-selection procedure is applied to the full \code{data}.}
-\item{other arguments}{to be passed via the \code{...}
-to \code{cvSelect()}.}
+\item{other arguments}{to be passed via \code{...}
+from \code{cvSelect()}.}
 }
 \code{procedure()} should return a two-element vector with the result
 of applying a cross-validation criterion to the cases in
@@ -100,8 +134,9 @@ all of the cases again for the model deleting the current fold.
 When the \code{indices} argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
 the model fit to all of the cases.
 
-For an example of a model-selection function for the \code{procedure}
-argument, see the code for \code{selectStepAIC()}.
+For examples of model-selection functions for the \code{procedure}
+argument, see the code for \code{selectStepAIC()} and for
+\code{selectTrans()}.
 }
 \section{Functions}{
 \itemize{
@@ -109,6 +144,8 @@ argument, see the code for \code{selectStepAIC()}.
 
 \item \code{selectStepAIC()}: select a model using the \code{\link[MASS]{stepAIC}()} function in the
 \pkg{MASS} package.
+
+\item \code{selectTrans()}: select transformations of the predictors and response.
 
 \item \code{compareFolds()}: print the coefficients from the selected models
 for the several folds.
@@ -120,7 +157,17 @@ m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
 cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
          AIC=FALSE, k=5, reps=3) # via BIC
+
+data("Prestige", package="carData")
+m.pres <- lm(prestige ~ income + education + women,
+             data=Prestige)
+cvt <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=123,
+                predictors=c("income", "education", "women"),
+                response="prestige", family="yjPower")
+cvt
+compareFolds(cvt)
+cv(m.pres, seed=123)
 }
 \seealso{
-\code{\link[MASS]{stepAIC}()}
+\code{\link[MASS]{stepAIC}()}, \code{\link[car]{bcPower}}
 }

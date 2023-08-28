@@ -9,13 +9,13 @@ Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
 Description: Cross-validation methods of regression models that exploit features of various
     modeling functions to improve speed.
 Depends: doParallel 
-Imports: insight, 
+Imports: car,
          foreach, 
+         insight, 
          lme4, 
          MASS,
          nlme
 Suggests: boot,
-          car,
           carData,
           dplyr,
           effects,

@@ -19,13 +19,15 @@
 #' @param ... arguments to be passed to \code{procedure()}.
 #' @importFrom MASS stepAIC
 #' @describeIn cvSelect apply cross-validation to a model-selection procedure.
-#' @returns An object of class , inheriting from class \code{"cv"}, with the averaged CV criterion
+#' @returns An object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
 #' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
 #' the number of folds (\code{"k"}), the seed for R's random-number
-#' generator (\code{"seed"}), and (optionally) a list of coefficients for the selected models
+#' generator (\code{"seed"}), and (optionally) a list of coefficients
+#' (or, in the case of \code{selectTrans()}, estimated transformation
+#' parameters) for the selected models
 #' for each fold (\code{"coefs"}).
-#' #' If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
+#' If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
 #' which is literally a list of \code{c("cvSelect", "cv")} objects.
 #' @details
 #' The model-selection function supplied as the \code{procedure} argument
@@ -34,8 +36,8 @@
 #'  \item{\code{data}}{set to the \code{data} argument to \code{cvSelect()}.}
 #'  \item{\code{indices}}{the indices of the rows of \code{data} defining the current fold; if missing,
 #'  the model-selection procedure is applied to the full \code{data}.}
-#'   \item{other arguments}{to be passed via the \code{...}
-#'   to \code{cvSelect()}.}
+#'   \item{other arguments}{to be passed via \code{...}
+#'   from \code{cvSelect()}.}
 #' }
 #' \code{procedure()} should return a two-element vector with the result
 #' of applying a cross-validation criterion to the cases in
@@ -45,10 +47,11 @@
 #' When the \code{indices} argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
 #' the model fit to all of the cases.
 #'
-#' For an example of a model-selection function for the \code{procedure}
-#' argument, see the code for \code{selectStepAIC()}.
+#' For examples of model-selection functions for the \code{procedure}
+#' argument, see the code for \code{selectStepAIC()} and for
+#' \code{selectTrans()}.
 #'
-#' @seealso \code{\link[MASS]{stepAIC}()}
+#' @seealso \code{\link[MASS]{stepAIC}()}, \code{\link[car]{bcPower}}
 #'
 #' @export
 cvSelect <- function(procedure, data, k=10, reps=1,
@@ -168,6 +171,192 @@ selectStepAIC <- function(data, indices,
          criterion(y, fit.all.i)),
        if (save.coef) coefs=coef(model.i) else NULL)
 }
+
+
+transX <- function(model, predictors, family="bcPower",
+                   rounded=TRUE, data=insight::get_data(model)){
+  # Find transformations of predictors towards normality
+  # Returns: a list of the selected transformations, with $lamdas and
+  #          $gammas components (the latter may be NULL)
+  # Args:
+  #   model: e.g., an "lm" model object
+  #   predictors: names of predictors to transform
+  #   rounded: use "rounded" transformations, see ?car::powerTransform
+  #   family: transformation family recognized by car::powerTransform()
+  #   data: data to which the model was fit
+  trans <- car::powerTransform(data[, predictors], family=family)
+  lambdas <- if(rounded) trans$roundlam else trans$lambda
+  names(lambdas) <- paste0("lam.", predictors)
+  gammas <- trans$gamma
+  if (!is.null(gammas)){
+    names(gammas) <- paste0("gam.", predictors)
+  }
+  list(lambdas=lambdas, gammas=gammas) # gammas may be NULL
+}
+
+transy <-  function(model, family="bcPower", rounded=TRUE){
+  trans <- car::powerTransform(model, family=family)
+  lambda <- if(rounded) trans$roundlam else trans$lambda
+  gamma <- trans$gamma
+  c(lambda=as.vector(lambda), gamma=as.vector(gamma))
+}
+
+bcPowerInverse <- function (y, lambda){
+  if (abs(lambda) < sqrt(.Machine$double.eps)) {
+    exp(y)
+  } else {
+    (y*lambda + 1)^(1/lambda)
+  }
+}
+
+basicPowerInverse <- function (y, lambda){
+  if (abs(lambda) < sqrt(.Machine$double.eps)) {
+    exp(y)
+  } else {
+    y^(1/lambda)
+  }
+}
+
+yjPowerInverse <- function(y, lambda) {
+  neg <- y < 0
+  y[!neg] <- if(abs(lambda) < sqrt(.Machine$double.eps)) {
+    exp(y[!neg]) - 1
+  } else {
+    (y[!neg]*lambda + 1)^(1/lambda) - 1
+  }
+  y[neg] <- if(abs(lambda - 2) < sqrt(.Machine$double.eps)) {
+    -expm1(-y[neg])
+  } else {
+    1 - (-(2 - lambda)*y[neg] + 1)^(1/(2 - lambda))
+  }
+  y
+}
+
+#' @describeIn cvSelect select transformations of the predictors and response.
+#' @param predictors character vector of names of the predictors in the model
+#' to transform; if missing, no predictors will be transformed.
+#' @param response name of the response variable; if missing, the response
+#' won't be transformed.
+#' @param family transformation family for the predictors, one of
+#' \code{"bcPower", "bcnPower", "yjPower", "basicPower"},
+#' with \code{"bcPower"} as the default. These are the names of transformation
+#' functions in the \pkg{car} package; see \code{\link[car]{bcPower}}
+#' @param family.y transformation family for the response,
+#' with \code{"bcPower"} as the default.
+#' @param rounded if \code{TRUE} (the default) use nicely rounded versions
+#' of the estimated transformation parameters (see \code{\link[car]{bcPower}}).
+#' @examples
+#'
+#' data("Prestige", package="carData")
+#' m.pres <- lm(prestige ~ income + education + women,
+#'              data=Prestige)
+#' cvt <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=123,
+#'                 predictors=c("income", "education", "women"),
+#'                 response="prestige", family="yjPower")
+#' cvt
+#' compareFolds(cvt)
+#' cv(m.pres, seed=123)
+#' @export
+selectTrans <- function(data, indices, save.coef=TRUE, model,
+                        criterion=mse, predictors, response,
+                        family=c("bcPower", "bcnPower", "yjPower", "basicPower"),
+                        family.y=c("bcPower", "bcnPower", "yjPower", "basicPower"),
+                        rounded=TRUE,
+                        ...){
+  y <- getResponse(model)
+  family <- match.arg(family)
+  family.y <- match.arg(family.y)
+  powertrans <- switch(family,
+                       bcPower = car::bcPower,
+                       bcnPower = car::bcnPower,
+                       yjPower = car:: yjPower,
+                       basicPower = car::basicPower
+  )
+
+  powertrans.y <- switch(family.y,
+                         bcPower = car::bcPower,
+                         bcnPower = car::bcnPower,
+                         yjPower = car:: yjPower,
+                         basicPower = car::basicPower
+  )
+
+  inverse.pt.y <- switch(family.y,
+                         bcPower = bcPowerInverse,
+                         bcnPower = car::bcnPowerInverse,
+                         yjPower = yjPowerInverse,
+                         basicPower = basicPowerInverse
+  )
+
+  if (missing(indices)) {
+    indices <- nrow(data) + 1 # will use full sample
+    full.sample <- TRUE
+  } else {
+    # refit model omitting current fold
+    model <- update(model, data = data[-indices, ])
+    full.sample <- FALSE
+  }
+
+  # find predictor transformations:
+  if (!missing(predictors)){
+    trans <- transX(model, predictors, family, rounded)
+    lambdas <- trans$lambdas
+    gammas <- trans$gammas # nb: there may be no gammas
+    # transform predictors:
+    for (pred in predictors){
+      data[, pred] <- if (is.null(gammas)){
+        powertrans(data[, pred], lambdas[paste0("lam.", pred)])
+      } else {
+        powertrans(data[, pred],
+                   lambda=lambdas[paste0("lam.", pred)],
+                   gamma=gammas[paste0("gam.", pred)])
+      }
+    }
+    model <- update(model, data=data[-indices, ])
+  }
+
+  # transform response:
+  if (!missing(response)){
+    transy <- transy(model, family.y)
+    data[, response] <- if (is.na(transy["gamma"])){
+      powertrans.y(data[, response], lambda=transy["lambda"])
+    } else {
+      powertrans.y(data[, response],
+                   lambda=transy["lambda"],
+                   gamma=transy["gamma"])
+    }
+    # refit model with transformed predictors and response,
+    #   omitting current fold
+    model <- update(model, data=data[-indices, ])
+  }
+
+  # get predicted values for *all* cases:
+
+  fit.o.i <- if (!missing(response)){
+    if (is.na(transy["gamma"])){
+      inverse.pt.y(predict(model, newdata = data),
+                   lambda=transy["lambda"])
+    } else {
+      inverse.pt.y(predict(model, newdata = data),
+                   lambda=transy["lambda"],
+                   gamma=transy["gamma"])
+    }
+  } else {
+    predict(model, newdata = data)
+  }
+
+  if (full.sample) return(criterion(y, fit.o.i))
+  # ... and for current fold only:
+  fit.i <- fit.o.i[indices]
+  # compute and return CV criteria and transformation parameters:
+  list(criterion = c(criterion(y[indices], fit.i),
+                     criterion(y, fit.o.i)),
+       coefs = if (save.coef) c(lambdas, gammas,
+                                lamda.y=as.vector(transy["lambda"]),
+                                if (!is.na(transy["gamma"]))
+                                  gamma.y=as.vector(transy["gamma"]))
+       else NULL)
+}
+
 
 #' @describeIn cvSelect print the coefficients from the selected models
 #' for the several folds.
