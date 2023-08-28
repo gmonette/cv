@@ -28,6 +28,12 @@ model-selection function in the MASS package."><!-- mathjax --><script src="http
 <li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/cv-extend.html">Extending the cv package</a>
+  </div>
+</li>
 <li class="nav-item">
   <a class="nav-link" href="../news/index.html">Changelog</a>
 </li>
@@ -58,13 +64,38 @@ model-selection function in the <span class="pkg">MASS</span> package.</p>
 <span>  <span class="va">procedure</span>,</span>
 <span>  <span class="va">data</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  reps <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  save.coef <span class="op">=</span> <span class="va">k</span> <span class="op">&lt;=</span> <span class="fl">10</span>,</span>
 <span>  <span class="va">seed</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  ncores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span>logical <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">selectStepAIC</span><span class="op">(</span><span class="va">data</span>, <span class="va">indices</span>, <span class="va">model</span>, criterion <span class="op">=</span> <span class="va">mse</span>, k. <span class="op">=</span> <span class="fl">2</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">selectStepAIC</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">indices</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  criterion <span class="op">=</span> <span class="va">mse</span>,</span>
+<span>  AIC <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  save.coef <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">selectTrans</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">indices</span>,</span>
+<span>  save.coef <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  criterion <span class="op">=</span> <span class="va">mse</span>,</span>
+<span>  <span class="va">predictors</span>,</span>
+<span>  <span class="va">response</span>,</span>
+<span>  family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bcPower"</span>, <span class="st">"bcnPower"</span>, <span class="st">"yjPower"</span>, <span class="st">"basicPower"</span><span class="op">)</span>,</span>
+<span>  family.y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bcPower"</span>, <span class="st">"bcnPower"</span>, <span class="st">"yjPower"</span>, <span class="st">"basicPower"</span><span class="op">)</span>,</span>
+<span>  rounded <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">compareFolds</span><span class="op">(</span><span class="va">object</span>, digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -83,17 +114,22 @@ may be a number or <code>"loo"</code> or <code>"n"</code> for n-fold (leave-one-
 cross-validation.</p></dd>
 
 
+<dt>reps</dt>
+<dd><p>number of times to replicate k-fold CV (default is <code>1</code>)</p></dd>
+
+
+<dt>save.coef</dt>
+<dd><p>save the coefficients from the selected models? (default is <code>TRUE</code> if
+<code>k</code> is 10 or smaller, <code>FALSE</code> otherwise)</p></dd>
+
+
 <dt>seed</dt>
 <dd><p>for R's random number generator; not used for n-fold cross-validation.</p></dd>
 
 
-<dt>parallel</dt>
-<dd><p>do computations in parallel? (default is <code>FALSE</code>),</p></dd>
-
-
 <dt>ncores</dt>
 <dd><p>number of cores to use for parallel computations
-(default is number of physical cores detected).</p></dd>
+(default is <code>1</code>, i.e., computations aren't done in parallel)</p></dd>
 
 
 <dt>...</dt>
@@ -112,18 +148,64 @@ cross-validation.</p></dd>
 <dd><p>a CV criterion function.</p></dd>
 
 
-<dt>k.</dt>
-<dd><p>the <code>k</code> argument to <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a>()</code> (note the period in <code>k.</code>).</p></dd>
+<dt>AIC</dt>
+<dd><p>if <code>TRUE</code> (the default) use the AIC as the
+model-selection criterion; if FALSE, use the BIC.
+The <code>k</code> argument to <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a>()</code>
+is set accordingly (note that this is distinct from the number of
+folds <code>k</code>).</p></dd>
+
+
+<dt>predictors</dt>
+<dd><p>character vector of names of the predictors in the model
+to transform; if missing, no predictors will be transformed.</p></dd>
+
+
+<dt>response</dt>
+<dd><p>name of the response variable; if missing, the response
+won't be transformed.</p></dd>
+
+
+<dt>family</dt>
+<dd><p>transformation family for the predictors, one of
+<code>"bcPower", "bcnPower", "yjPower", "basicPower"</code>,
+with <code>"bcPower"</code> as the default. These are the names of transformation
+functions in the <span class="pkg">car</span> package; see <code><a href="https://rdrr.io/pkg/car/man/bcPower.html" class="external-link">bcPower</a></code></p></dd>
+
+
+<dt>family.y</dt>
+<dd><p>transformation family for the response,
+with <code>"bcPower"</code> as the default.</p></dd>
+
+
+<dt>rounded</dt>
+<dd><p>if <code>TRUE</code> (the default) use nicely rounded versions
+of the estimated transformation parameters (see <code><a href="https://rdrr.io/pkg/car/man/bcPower.html" class="external-link">bcPower</a></code>).</p></dd>
+
+
+<dt>object</dt>
+<dd><p>an object of class <code>"cvSelect"</code>.</p></dd>
+
+
+<dt>digits</dt>
+<dd><p>significant digits for printing coefficients,
+(default <code>3</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p><code>cvSelect()</code> return a <code>"cv"</code> object with the CV criterion averaged across the folds,
-the bias-adjusted averaged CV criterion,
-the criterion applied to the model fit to the full data set,
-and the initial value of R's RNG seed.</p>
+<p>An object of class <code>"cvSelect"</code>, inheriting from class <code>"cv"</code>, with the averaged CV criterion
+(<code>"CV crit"</code>), the adjusted average CV criterion (<code>"adj CV crit"</code>),
+the criterion for the model applied to the full data (<code>"full crit"</code>),
+the number of folds (<code>"k"</code>), the seed for R's random-number
+generator (<code>"seed"</code>), and (optionally) a list of coefficients
+(or, in the case of <code>selectTrans()</code>, estimated transformation
+parameters) for the selected models
+for each fold (<code>"coefs"</code>).
+If <code>reps</code> &gt; <code>1</code>, then an object of class <code>c("cvSelectList", "cvList")</code> is returned,
+which is literally a list of <code>c("cvSelect", "cv")</code> objects.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -136,8 +218,8 @@ to <code>cvSelect()</code> should accept the following arguments:</p><dl><dt><co
 the model-selection procedure is applied to the full <code>data</code>.</p></dd>
 
 <dt>other arguments</dt>
-<dd><p>to be passed via the <code>...</code>
-to <code>cvSelect()</code>.</p></dd>
+<dd><p>to be passed via <code>...</code>
+from <code>cvSelect()</code>.</p></dd>
 
 
 </dl><p><code>procedure()</code> should return a two-element vector with the result
@@ -146,8 +228,9 @@ the current fold for the model deleting that fold, and to
 all of the cases again for the model deleting the current fold.</p>
 <p>When the <code>indices</code> argument is missing, <code>procedure()</code> returns the cross-validation criterion for all of the cases based on
 the model fit to all of the cases.</p>
-<p>For an example of a model-selection function for the <code>procedure</code>
-argument, see the code for <code>selectStepAIC()</code>.</p>
+<p>For examples of model-selection functions for the <code>procedure</code>
+argument, see the code for <code>selectStepAIC()</code> and for
+<code>selectTrans()</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
@@ -155,10 +238,13 @@ argument, see the code for <code>selectStepAIC()</code>.</p>
 <ul><li><p><code>cvSelect()</code>: apply cross-validation to a model-selection procedure.</p></li>
 <li><p><code>selectStepAIC()</code>: select a model using the <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a>()</code> function in the
 <span class="pkg">MASS</span> package.</p></li>
+<li><p><code>selectTrans()</code>: select transformations of the predictors and response.</p></li>
+<li><p><code>compareFolds()</code>: print the coefficients from the selected models
+for the several folds.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a>()</code></p></div>
+    <div class="dont-index"><p><code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a>()</code>, <code><a href="https://rdrr.io/pkg/car/man/bcPower.html" class="external-link">bcPower</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -172,12 +258,67 @@ argument, see the code for <code>selectStepAIC()</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.8753</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549 </span>
 <span class="r-in"><span><span class="fu">cvSelect</span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Auto</span>, seed<span class="op">=</span><span class="fl">123</span>, model<span class="op">=</span><span class="va">m.auto</span>,</span></span>
-<span class="r-in"><span>         k.<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co"># via BIC</span></span></span>
+<span class="r-in"><span>         AIC<span class="op">=</span><span class="cn">FALSE</span>, k<span class="op">=</span><span class="fl">5</span>, reps<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="co"># via BIC</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 319729</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 889422</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 1:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.91891</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.8895</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 2:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.80601</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.78946</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 3:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.81343</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.79576</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Average:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.84612 (0.06315283)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.82491 (0.05603219)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Prestige"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m.pres</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>,</span></span>
+<span class="r-in"><span>             data<span class="op">=</span><span class="va">Prestige</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cvt</span> <span class="op">&lt;-</span> <span class="fu">cvSelect</span><span class="op">(</span><span class="va">selectTrans</span>, data<span class="op">=</span><span class="va">Prestige</span>, model<span class="op">=</span><span class="va">m.pres</span>, seed<span class="op">=</span><span class="fl">123</span>,</span></span>
+<span class="r-in"><span>                predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                response<span class="op">=</span><span class="st">"prestige"</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
+<span class="r-in"><span><span class="va">cvt</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 58.68193</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 58.26258</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 50.60016 </span>
+<span class="r-in"><span><span class="fu">compareFolds</span><span class="op">(</span><span class="va">cvt</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         lam.education lam.income lam.women lamda.y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 1          1.000      0.330     0.330       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 2          1.000      0.330     0.330       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 3          1.000      0.330     0.000       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 4          1.000      0.330     0.330       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 5          1.000      0.330     0.000       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 6          1.000      0.330     0.000       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 7          1.000      0.000     0.000       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 8          1.000      0.330     0.000       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 9          1.000      0.500     0.330       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 10         1.000      0.330     0.159       1</span>
+<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">m.pres</span>, seed<span class="op">=</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.7953</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.78791</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 66.91929</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 66.45514</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 59.15265 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
