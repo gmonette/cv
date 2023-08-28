@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 835719</span></span>
+<span><span class="co">#&gt; R RNG seed set to 720677</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.343</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.324</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.102</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.096</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -351,10 +351,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.8841    3.1551    3.1845    3.2354    3.2634    3.3367    10</span></span>
-<span><span class="co">#&gt;   Woodbury   26.9529   27.1387   27.3920   27.1985   27.5694   28.7711    10</span></span>
-<span><span class="co">#&gt;      naive  681.4480  688.3695  731.8295  692.4158  828.2334  833.8056    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1156.1025 1162.2086 1208.8659 1165.9550 1182.8293 1447.0275    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    2.6487    2.9327    3.0005    2.9741    3.0444    3.4344    10</span></span>
+<span><span class="co">#&gt;   Woodbury   26.0065   26.2656   27.3154   26.5847   27.4574   32.9551    10</span></span>
+<span><span class="co">#&gt;      naive  593.3578  595.8105  651.6024  600.1672  732.6586  735.6833    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1035.1794 1038.8782 1065.7988 1039.7220 1045.0778 1172.6568    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -537,11 +537,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.3016    3.3333    3.3838    3.3533    3.4152    3.5399    10</span></span>
-<span><span class="co">#&gt;   Woodbury   91.0196   91.8771   95.0713   93.1397  100.1533  100.9953    10</span></span>
-<span><span class="co">#&gt;      exact 3985.5700 3998.2789 4071.5149 4017.6318 4066.0958 4404.8688    10</span></span>
-<span><span class="co">#&gt;     cv.glm 4920.5457 4959.1005 5022.5470 4990.9309 5072.1259 5166.5072    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    3.018    3.0553    3.1665    3.0893    3.2505    3.5245    10</span></span>
+<span><span class="co">#&gt;   Woodbury   86.261   86.8110   88.4729   87.2924   91.1452   93.1803    10</span></span>
+<span><span class="co">#&gt;      exact 3784.259 3828.7278 3877.9027 3861.3929 3908.1691 4038.2164    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4625.273 4734.7366 4770.8588 4758.8777 4818.3269 4955.2536    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -717,7 +717,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, seed<span class="op">=</span><span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
 <span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587038 (tol = 0.002, component 1)</span></span>
+<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587141 (tol = 0.002, component 1)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 37.445</span></span>
@@ -1295,6 +1295,278 @@ similar, as we show using <code><a href="../reference/cvSelect.html">compareFold
 of model performance directly from the selected model, because there is
 little added uncertainty induced by model selection.</p>
 </div>
+<div class="section level3">
+<h3 id="cross-validating-choice-of-transformations-in-regression">Cross-validating choice of transformations in regression<a class="anchor" aria-label="anchor" href="#cross-validating-choice-of-transformations-in-regression"></a>
+</h3>
+<p>The <strong>cv</strong> package also provides a
+<code><a href="../reference/cvSelect.html">cvSelect()</a></code> procedure, <code><a href="../reference/cvSelect.html">selectTrans()</a></code>, for
+choosing transformations of the predictors and the response in
+regression.</p>
+<p>Some background: As <span class="citation">Weisberg (2014, sec.
+8.2)</span> explains, there are technical advantages to having (numeric)
+predictors in linear regression analysis that are themselves linearly
+related. If the predictors <em>aren’t</em> linearly related, then the
+relationships between them can often be straightened by power
+transformations. Transformations can be selected after graphical
+examination of the data, or by analytic methods. Once the relationships
+between the predictors are linearized, it can be advantageous similarly
+to transform the response variable towards normality.</p>
+<p>Selecting transformations analytically raises the possibility of
+automating the process, as would be required for cross-validation. One
+could, in principle, apply graphical methods to select transformations
+for each fold, but because a data analyst couldn’t forget the choices
+made for previous folds, the process wouldn’t really be applied
+independently to the folds.</p>
+<p>To illustrate, we adapt an example appearing in several places in
+<span class="citation">Fox &amp; Weisberg (2019)</span> (for example in
+Chapter 3 on transforming data), using data on the prestige and other
+characteristics of 102 Canadian occupations circa 1970. The data are in
+the <code>Prestige</code> data frame in the <strong>carData</strong>
+package:</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Prestige"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                     education income women prestige census type</span></span>
+<span><span class="co">#&gt; gov.administrators      13.11  12351 11.16     68.8   1113 prof</span></span>
+<span><span class="co">#&gt; general.managers        12.26  25879  4.02     69.1   1130 prof</span></span>
+<span><span class="co">#&gt; accountants             12.77   9271 15.70     63.4   1171 prof</span></span>
+<span><span class="co">#&gt; purchasing.officers     11.42   8865  9.11     56.8   1175 prof</span></span>
+<span><span class="co">#&gt; chemists                14.62   8403 11.68     73.5   2111 prof</span></span>
+<span><span class="co">#&gt; physicists              15.64  11030  5.13     77.6   2113 prof</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    education         income          women          prestige        census    </span></span>
+<span><span class="co">#&gt;  Min.   : 6.38   Min.   :  611   Min.   : 0.00   Min.   :14.8   Min.   :1113  </span></span>
+<span><span class="co">#&gt;  1st Qu.: 8.45   1st Qu.: 4106   1st Qu.: 3.59   1st Qu.:35.2   1st Qu.:3120  </span></span>
+<span><span class="co">#&gt;  Median :10.54   Median : 5930   Median :13.60   Median :43.6   Median :5135  </span></span>
+<span><span class="co">#&gt;  Mean   :10.74   Mean   : 6798   Mean   :28.98   Mean   :46.8   Mean   :5402  </span></span>
+<span><span class="co">#&gt;  3rd Qu.:12.65   3rd Qu.: 8187   3rd Qu.:52.20   3rd Qu.:59.3   3rd Qu.:8312  </span></span>
+<span><span class="co">#&gt;  Max.   :15.97   Max.   :25879   Max.   :97.51   Max.   :87.2   Max.   :9517  </span></span>
+<span><span class="co">#&gt;    type   </span></span>
+<span><span class="co">#&gt;  bc  :44  </span></span>
+<span><span class="co">#&gt;  prof:31  </span></span>
+<span><span class="co">#&gt;  wc  :23  </span></span>
+<span><span class="co">#&gt;  NA's: 4  </span></span>
+<span><span class="co">#&gt;           </span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div>
+<p>The variables in the <code>Prestige</code> data set are:</p>
+<ul>
+<li>
+<code>education</code>: average years of education for incumbents in
+the occupation, from the 1971 Canadian Census.</li>
+<li>
+<code>income</code>: average dollars of annual income for the
+occupation, from the Census.</li>
+<li>
+<code>women</code>: percentage of occupational incumbents who were
+women, also from the Census.</li>
+<li>
+<code>prestige</code>: the average prestige rating of the occupation
+on a 0–100 “thermometer” scale, in a Canadian social survey conducted
+around the same time.</li>
+<li>
+<code>type</code>, type of occupation, and <code>census</code>, the
+Census occupational code, which are not used in our example.</li>
+</ul>
+<p>The object of a regression analysis for the <code>Prestige</code>
+data (and their original purpose) is to predict occupational prestige
+from the other variables in the data set.</p>
+<p>A scatterplot matrix (using the <code><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix()</a></code>
+function in the <strong>car</strong> package) of the numeric variables
+in the data reveals that the distributions of <code>income</code> and
+<code>women</code> are positively skewed, and that some of the
+relationships among the three predictors, and between the predictors and
+the response (i.e., <code>prestige</code>), are nonlinear:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-forge.r-project.org/projects/car/" class="external-link">"car"</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: carData</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'car'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     recode</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">prestige</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>,</span>
+<span>                  data<span class="op">=</span><span class="va">Prestige</span>, smooth<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spread<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/scatterplot-matrix-1.png" alt="Scatterplot matrix for the `Prestige` data." width="100%"><p class="caption">
+Scatterplot matrix for the <code>Prestige</code> data.
+</p>
+</div>
+<p>The <code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform()</a></code> function in the
+<strong>car</strong> package transforms variables towards multivariate
+normality by a generalization of Box and Cox’s maximum-likelihood-like
+approach <span class="citation">(Box &amp; Cox, 1964)</span>. Several
+“families” of power transformations can be used, including the original
+Box-Cox family, simple powers (and roots), and two adaptations of the
+Box-Cox family to data that may include negative values and zeros: the
+Box-Cox-with-negatives family and the Yeo-Johnson family; see <span class="citation">Weisberg (2014, Chapter 8)</span>, and <span class="citation">Fox &amp; Weisberg (2019, Chapter 3)</span> for
+details. Because <code>women</code> has some zero values, we use the
+Yeo-Johnson family:</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">education</span>, <span class="va">women</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>,</span>
+<span>                         data<span class="op">=</span><span class="va">Prestige</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trans</span><span class="op">)</span></span>
+<span><span class="co">#&gt; yjPower Transformations to Multinormality </span></span>
+<span><span class="co">#&gt;           Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd</span></span>
+<span><span class="co">#&gt; income       0.2678        0.33       0.1051       0.4304</span></span>
+<span><span class="co">#&gt; education    0.5162        1.00      -0.2822       1.3145</span></span>
+<span><span class="co">#&gt; women        0.1630        0.16       0.0112       0.3149</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Likelihood ratio test that all transformation parameters are equal to 0</span></span>
+<span><span class="co">#&gt;                              LRT df    pval</span></span>
+<span><span class="co">#&gt; LR test, lambda = (0 0 0) 15.739  3 0.00128</span></span></code></pre></div>
+<p>We thus have evidence of the desirability of transforming
+<code>income</code> (by the <span class="math inline">\(1/3\)</span>
+power) and <code>women</code> (by the <span class="math inline">\(0.16\)</span> power—which is close to the “0”
+power, i.e., the log transformation), but not <code>education</code>.
+Applying the “rounded” power transformations makes the predictors
+better-behaved:</p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">P</span> <span class="op">&lt;-</span> <span class="va">Prestige</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"prestige"</span>, <span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="op">(</span><span class="va">lambdas</span> <span class="op">&lt;-</span> <span class="va">trans</span><span class="op">$</span><span class="va">roundlam</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    income education     women </span></span>
+<span><span class="co">#&gt;   0.33000   1.00000   0.16302</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lambdas</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">var</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">P</span><span class="op">[</span>, <span class="va">var</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/bcPower.html" class="external-link">yjPower</a></span><span class="op">(</span><span class="va">P</span><span class="op">[</span>, <span class="va">var</span><span class="op">]</span>, lambda<span class="op">=</span><span class="va">lambdas</span><span class="op">[</span><span class="va">var</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">P</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     prestige        income       education         women     </span></span>
+<span><span class="co">#&gt;  Min.   :14.8   Min.   :22.2   Min.   : 6.38   Min.   :0.00  </span></span>
+<span><span class="co">#&gt;  1st Qu.:35.2   1st Qu.:44.2   1st Qu.: 8.45   1st Qu.:1.73  </span></span>
+<span><span class="co">#&gt;  Median :43.6   Median :50.3   Median :10.54   Median :3.36  </span></span>
+<span><span class="co">#&gt;  Mean   :46.8   Mean   :50.8   Mean   :10.74   Mean   :3.50  </span></span>
+<span><span class="co">#&gt;  3rd Qu.:59.3   3rd Qu.:56.2   3rd Qu.:12.65   3rd Qu.:5.59  </span></span>
+<span><span class="co">#&gt;  Max.   :87.2   Max.   :83.6   Max.   :15.97   Max.   :6.83</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">prestige</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>,</span>
+<span>                  data<span class="op">=</span><span class="va">P</span>, smooth<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spread<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/transformed-predictors-1.png" alt="Scatterplot matrix for the `Prestige` data with the predictors transformed." width="100%"><p class="caption">
+Scatterplot matrix for the <code>Prestige</code> data with the
+predictors transformed.
+</p>
+</div>
+<p>Comparing the MSE for the regressions with the original and
+transformed predictors shows a advantage to the latter:</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m.pres</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data<span class="op">=</span><span class="va">Prestige</span><span class="op">)</span></span>
+<span><span class="va">m.pres.trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data<span class="op">=</span><span class="va">P</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 59.153</span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">P</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 50.6</span></span></code></pre></div>
+<p>Similarly, component+residual plots for the two regressions, produced
+by the <code><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots()</a></code> function in the <strong>car</strong>
+package, suggest that the partial relationship of <code>prestige</code>
+to <code>income</code> is more nearly linear in the transformed data,
+but the transformation of <code>women</code> fails to capture what
+appears to be a slight quadratic partial relationship; the partial
+relationship of <code>prestige</code> to <code>education</code> is close
+to linear in both regressions:</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/CR-plots-untransformed-1.png" alt="Component+residual plots for the `Prestige` regression with the original predicctors." width="672"><p class="caption">
+Component+residual plots for the <code>Prestige</code> regression with
+the original predicctors.
+</p>
+</div>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/CR-plots-transformed-1.png" alt="Component+residual plots for the `Prestige` regression with transformed predicctors." width="672"><p class="caption">
+Component+residual plots for the <code>Prestige</code> regression with
+transformed predicctors.
+</p>
+</div>
+<p>Having transformed the predictors towards multinormality, we now
+consider whether there’s evidence for transforming the response (using
+<code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform()</a></code> for Box and Cox’s original method), and we
+discover that there’s not:</p>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; bcPower Transformation to Normality </span></span>
+<span><span class="co">#&gt;    Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd</span></span>
+<span><span class="co">#&gt; Y1    1.0194           1       0.6773       1.3615</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Likelihood ratio test that transformation parameter is equal to 0</span></span>
+<span><span class="co">#&gt;  (log transformation)</span></span>
+<span><span class="co">#&gt;                          LRT df     pval</span></span>
+<span><span class="co">#&gt; LR test, lambda = (0) 32.217  1 1.38e-08</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Likelihood ratio test that no transformation is needed</span></span>
+<span><span class="co">#&gt;                            LRT df  pval</span></span>
+<span><span class="co">#&gt; LR test, lambda = (1) 0.012384  1 0.911</span></span></code></pre></div>
+<p>The <code><a href="../reference/cvSelect.html">selectTrans()</a></code> function in the <strong>cv</strong>
+package automates the process of selecting predictor and response
+transformations. The function takes a <code>data</code> set and
+“working” <code>model</code> as arguments, along with the candidate
+<code>predictors</code> and <code>response</code> for transformation,
+and the transformation <code>family</code> to employ. If the
+<code>predictors</code> argument is missing then only the response is
+transformed, and if the <code>response</code> argument is missing, only
+the supplied predictors are transformed. The default <code>family</code>
+for transforming the predictors is <code>"bcPower"</code>—the original
+Box-Cox family—as is the default <code>family.y</code> for transforming
+the response; here we specify <code>family="yjPower</code> because of
+the zeros in <code>women</code>. <code><a href="../reference/cvSelect.html">selectTrans()</a></code> returns the
+result of applying a lack-of-fit criterion to the model after the
+selected transformation is applied, with the default
+<code>criterion=mse</code>:</p>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">selectTrans</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">Prestige</span>, model<span class="op">=</span><span class="va">m.pres</span>,</span>
+<span>            predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span>
+<span>            response<span class="op">=</span><span class="st">"prestige"</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 50.6</span></span></code></pre></div>
+<p><code><a href="../reference/cvSelect.html">selectTrans()</a></code> also takes an optional
+<code>indices</code> argument, making it suitable for doing computations
+on a subset of the data (i.e., a CV fold), and hence for use with
+<code><a href="../reference/cvSelect.html">cvSelect()</a></code> (see <code><a href="../reference/cvSelect.html">?selectTrans</a></code> for details):</p>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectTrans</span>, data<span class="op">=</span><span class="va">Prestige</span>, model<span class="op">=</span><span class="va">m.pres</span>, seed<span class="op">=</span><span class="fl">1463</span>,</span>
+<span>                predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span>
+<span>                response<span class="op">=</span><span class="st">"prestige"</span>,</span>
+<span>                family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R RNG seed set to 1463</span></span>
+<span><span class="va">cvs</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 54.487</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 54.308</span></span>
+<span><span class="co">#&gt; full-sample criterion = 50.6</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pres</span>, seed<span class="op">=</span><span class="fl">1463</span><span class="op">)</span> <span class="co"># untransformed model with same folds</span></span>
+<span><span class="co">#&gt; R RNG seed set to 1463</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 63.293</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.073</span></span>
+<span><span class="co">#&gt; full-sample criterion = 59.153</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cvs</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         lam.education lam.income lam.women lamda.y</span></span>
+<span><span class="co">#&gt; Fold 1          1.000      0.330     0.330       1</span></span>
+<span><span class="co">#&gt; Fold 2          1.000      0.330     0.169       1</span></span>
+<span><span class="co">#&gt; Fold 3          1.000      0.330     0.330       1</span></span>
+<span><span class="co">#&gt; Fold 4          1.000      0.330     0.330       1</span></span>
+<span><span class="co">#&gt; Fold 5          1.000      0.330     0.000       1</span></span>
+<span><span class="co">#&gt; Fold 6          1.000      0.330     0.330       1</span></span>
+<span><span class="co">#&gt; Fold 7          1.000      0.330     0.330       1</span></span>
+<span><span class="co">#&gt; Fold 8          1.000      0.330     0.000       1</span></span>
+<span><span class="co">#&gt; Fold 9          1.000      0.330     0.000       1</span></span>
+<span><span class="co">#&gt; Fold 10         1.000      0.330     0.000       1</span></span></code></pre></div>
+<p>The results suggest that the predictive power of the transformed
+regression is reliably greater than that of the untransformed regression
+(though in both case, the cross-validated MSE is considerably higher
+than the MSE computed for the whole data). Examining the selected
+transformations for each fold reveals that the predictor
+<code>education</code> and the response <code>prestige</code> are never
+transformed; that the <span class="math inline">\(1/3\)</span> power is
+selected for <code>income</code> in all of the folds; and that the
+transformation selected for <code>women</code> varies narrowly across
+the folds between the <span class="math inline">\(0\)</span>th power
+(i.e., log) and the <span class="math inline">\(1/3\)</span> power.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="parallel-computations">Parallel computations<a class="anchor" aria-label="anchor" href="#parallel-computations"></a>
@@ -1308,7 +1580,7 @@ the program.</p>
 <p>To illustrate, let’s time model selection in Mroz’s logistic
 regression, repeating the computation as performed previously and then
 doing it in parallel using 2 cores:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
 <span>                          criterion<span class="op">=</span><span class="va">BayesRule</span>,</span>
@@ -1316,7 +1588,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.665   0.000   0.665</span></span>
+<span><span class="co">#&gt;   0.461   0.000   0.461</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -1326,7 +1598,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.072   0.001   1.929</span></span>
+<span><span class="co">#&gt;   0.055   0.012   1.773</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -1444,6 +1716,11 @@ Bates, D., Mächler, M., Bolker, B., &amp; Walker, S. (2015). Fitting
 linear mixed-effects models using <span class="nocase">lme4</span>.
 <em>Journal of Statistical Software</em>, <em>67</em>(1), 1–48.
 </div>
+<div id="ref-BoxCox:1964" class="csl-entry">
+Box, G. E. P., &amp; Cox, D. R. (1964). An analysis of transformations.
+<em>Journal of the Royal Statistical Society, Series
+<span>B</span></em>, <em>26</em>, 211–252.
+</div>
 <div id="ref-CantyRipley2022" class="csl-entry">
 Canty, A., &amp; Ripley, B. D. (2022). <em>Boot: Bootstrap
 <span>R</span> (<span>S</span>-plus) functions</em>.
@@ -1493,6 +1770,10 @@ Thousand Oaks <span>CA</span>: Sage.
 Venables, W. N., &amp; Ripley, B. D. (2002). <em>Modern applied
 statistics with <span>S</span></em> (Fourth edition). New York:
 Springer.
+</div>
+<div id="ref-Weisberg:2014" class="csl-entry">
+Weisberg, S. (2014). <em>Applied linear regression</em> (Second
+edition). Hoboken <span>NJ</span>: Wiley.
 </div>
 <div id="ref-WickhamEtAl:2023" class="csl-entry">
 Wickham, H., François, R., Henry, L., Müller, K., &amp; Vaughan, D.
