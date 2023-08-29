@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-08-28</h4>
+            <h4 data-toc-skip class="date">2023-08-29</h4>
       
       
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -114,9 +114,11 @@ model selection, including an <code>auc()</code> function. We convert
 the AUC into a cost measure by taking its complement:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">AUCcomp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu">Metrics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Metrics/man/auc.html" class="external-link">auc</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span></code></pre></div>
-<p>We then apply <code>AUCcomp()</code> to the Mroz logistic regression
+<p>We then apply <code>AUCcomp()</code> to the a logistic regression
 discussed in the main <strong>cv</strong> package vignette, which we
-reproduce here:</p>
+reproduce here, using the <code>Mroz</code> data frame from the
+<strong>carData</strong> package <span class="citation">(Fox &amp;
+Weisberg, 2019)</span>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Mroz"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span>
 <span><span class="va">m.mroz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">lfp</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">Mroz</span>, family<span class="op">=</span><span class="va">binomial</span><span class="op">)</span></span>
@@ -254,7 +256,8 @@ predictors enter the model additively:</p>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 <p>Most of the predictors, including the <code>Europe</code> <span class="math inline">\(\times\)</span> <code>political.knowledge</code>
-interaction, are associated with very small <span class="math inline">\(p\)</span>-values.</p>
+interaction, are associated with very small <span class="math inline">\(p\)</span>-values; the <code>Anova()</code>
+function is from the <strong>car</strong> package <span class="citation">(Fox &amp; Weisberg, 2019)</span>.</p>
 <p>Here’s an “effect plot”, using the the <strong>effects</strong>
 package <span class="citation">(Fox &amp; Weisberg, 2019)</span> to
 visualize the <code>Europe</code> <span class="math inline">\(\times\)</span> <code>political.knowledge</code>
@@ -377,6 +380,294 @@ Labour.</p>
 <div class="section level2">
 <h2 id="adding-a-model-selection-procedure">Adding a model-selection procedure<a class="anchor" aria-label="anchor" href="#adding-a-model-selection-procedure"></a>
 </h2>
+<p>The <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> function supplied by the
+<strong>cv</strong> package, which is based on the
+<code>stepAIC()</code> function from the <strong>nnet</strong> package
+<span class="citation">(Venables &amp; Ripley, 2002)</span> for stepwise
+model selection, is suitable for the <code>procedure</code> argument of
+<code><a href="../reference/cvSelect.html">cvSelect()</a></code>. The use of <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> is
+illustrated in the principal vignette for the package. We’ll employ
+<code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> as a “template” for writing a CV
+model-selection procedure. To see the code for this function, type
+<code><a href="../reference/cvSelect.html">cv::selectStepAIC</a></code> at the R command prompt or examine the
+sources for the <strong>cv</strong> package at <a href="https://github.com/gmonette/cv" class="external-link uri">https://github.com/gmonette/cv</a>.</p>
+<p>Another approach to model selection is all-subsets regression. The
+<code><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets()</a></code> function in the <strong>leaps</strong> package
+<span class="citation">(Lumley &amp; Miller, 2020)</span> implements an
+efficient algorithm for selecting the best-fitting linear least-squares
+regressions for subsets of predictors of all sizes, from 1 through the
+maximum number of candidate predictors. To illustrate its use, we employ
+the <code>swiss</code> data frame supplied by the <strong>leaps</strong>
+package:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"leaps"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">swiss</span><span class="op">)</span></span>
+<span><span class="co">#&gt;              Fertility Agriculture Examination Education Catholic</span></span>
+<span><span class="co">#&gt; Courtelary        80.2        17.0          15        12     9.96</span></span>
+<span><span class="co">#&gt; Delemont          83.1        45.1           6         9    84.84</span></span>
+<span><span class="co">#&gt; Franches-Mnt      92.5        39.7           5         5    93.40</span></span>
+<span><span class="co">#&gt; Moutier           85.8        36.5          12         7    33.77</span></span>
+<span><span class="co">#&gt; Neuveville        76.9        43.5          17        15     5.16</span></span>
+<span><span class="co">#&gt; Porrentruy        76.1        35.3           9         7    90.57</span></span>
+<span><span class="co">#&gt;              Infant.Mortality</span></span>
+<span><span class="co">#&gt; Courtelary               22.2</span></span>
+<span><span class="co">#&gt; Delemont                 22.2</span></span>
+<span><span class="co">#&gt; Franches-Mnt             20.2</span></span>
+<span><span class="co">#&gt; Moutier                  20.3</span></span>
+<span><span class="co">#&gt; Neuveville               20.6</span></span>
+<span><span class="co">#&gt; Porrentruy               26.6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">swiss</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 47</span></span></code></pre></div>
+<p>The data set includes the following variables, for each of 47
+French-speaking Swiss provinces circa 1888:</p>
+<ul>
+<li>
+<code>Fertility</code>: A standardized fertility measure.</li>
+<li>
+<code>Agriculture</code>: The percentage of the male population
+engaged in agriculture.</li>
+<li>
+<code>Examination</code>: The percentage of draftees into the Swiss
+army receiving the highest grade on an examination.</li>
+<li>
+<code>Education</code>: The percentage of draftees with more than a
+primary-school education.</li>
+<li>
+<code>Catholic</code>: The percentage of the population who were
+Catholic.</li>
+<li>
+<code>Infant.Mortality</code>: The infant-mortality rate, expressed
+as the percentage of live births surviving less than a year.</li>
+</ul>
+<p>Following <span class="citation">Lumley &amp; Miller (2020)</span>,
+we’ll treat <code>Fertility</code> as the response and the other
+variables as predictors in a linear least-squares regression:’</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Fertility</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">swiss</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.swiss</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = Fertility ~ ., data = swiss)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -15.274  -5.262   0.503   4.120  15.321 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;                  Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)       66.9152    10.7060    6.25  1.9e-07 ***</span></span>
+<span><span class="co">#&gt; Agriculture       -0.1721     0.0703   -2.45   0.0187 *  </span></span>
+<span><span class="co">#&gt; Examination       -0.2580     0.2539   -1.02   0.3155    </span></span>
+<span><span class="co">#&gt; Education         -0.8709     0.1830   -4.76  2.4e-05 ***</span></span>
+<span><span class="co">#&gt; Catholic           0.1041     0.0353    2.95   0.0052 ** </span></span>
+<span><span class="co">#&gt; Infant.Mortality   1.0770     0.3817    2.82   0.0073 ** </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 7.17 on 41 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.707,  Adjusted R-squared:  0.671 </span></span>
+<span><span class="co">#&gt; F-statistic: 19.8 on 5 and 41 DF,  p-value: 5.59e-10</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">swiss</span><span class="op">$</span><span class="va">Fertility</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.swiss</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 44.788</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.swiss</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R RNG seed set to 8433</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 59.683</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 58.846</span></span>
+<span><span class="co">#&gt; full-sample criterion = 44.788</span></span></code></pre></div>
+<p>Thus, the MSE for the model fit to the complete data is considerably
+smaller than the CV estimate of the MSE. Can we do better by selecting a
+subset of the predictors, taking account of the additional uncertainty
+induced by model selection?</p>
+<p>First, let’s apply best-subset selection to the complete data
+set:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">swiss.sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">Fertility</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">swiss</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">swiss.sub</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Subset selection object</span></span>
+<span><span class="co">#&gt; Call: regsubsets.formula(Fertility ~ ., data = swiss)</span></span>
+<span><span class="co">#&gt; 5 Variables  (and intercept)</span></span>
+<span><span class="co">#&gt;                  Forced in Forced out</span></span>
+<span><span class="co">#&gt; Agriculture          FALSE      FALSE</span></span>
+<span><span class="co">#&gt; Examination          FALSE      FALSE</span></span>
+<span><span class="co">#&gt; Education            FALSE      FALSE</span></span>
+<span><span class="co">#&gt; Catholic             FALSE      FALSE</span></span>
+<span><span class="co">#&gt; Infant.Mortality     FALSE      FALSE</span></span>
+<span><span class="co">#&gt; 1 subsets of each size up to 5</span></span>
+<span><span class="co">#&gt; Selection Algorithm: exhaustive</span></span>
+<span><span class="co">#&gt;          Agriculture Examination Education Catholic Infant.Mortality</span></span>
+<span><span class="co">#&gt; 1  ( 1 ) " "         " "         "*"       " "      " "             </span></span>
+<span><span class="co">#&gt; 2  ( 1 ) " "         " "         "*"       "*"      " "             </span></span>
+<span><span class="co">#&gt; 3  ( 1 ) " "         " "         "*"       "*"      "*"             </span></span>
+<span><span class="co">#&gt; 4  ( 1 ) "*"         " "         "*"       "*"      "*"             </span></span>
+<span><span class="co">#&gt; 5  ( 1 ) "*"         "*"         "*"       "*"      "*"</span></span>
+<span><span class="op">(</span><span class="va">bics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">swiss.sub</span><span class="op">)</span><span class="op">$</span><span class="va">bic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] -19.603 -28.611 -35.656 -37.234 -34.553</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">bics</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 4</span></span>
+<span><span class="fu">car</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/subsets.html" class="external-link">subsets</a></span><span class="op">(</span><span class="va">swiss.sub</span>, legend<span class="op">=</span><span class="st">"topright"</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/subset-selection-1.png" alt="Selecting the best model of each size." width="672"><p class="caption">
+Selecting the best model of each size.
+</p>
+</div>
+<p>The graph, produced by the <code>subsets()</code> function in the
+<strong>car</strong> package, shows that the model with the smallest BIC
+is the best model with 4 predictors, including <code>Agriculture</code>,
+<code>Education</code>, <code>Catholic</code>, and
+<code>Infant.Mortality</code>:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m.swiss</span>, <span class="va">.</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="va">Examination</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.best</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = Fertility ~ Agriculture + Education + Catholic + </span></span>
+<span><span class="co">#&gt;     Infant.Mortality, data = swiss)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -14.676  -6.052   0.751   3.166  16.142 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;                  Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)       62.1013     9.6049    6.47  8.5e-08 ***</span></span>
+<span><span class="co">#&gt; Agriculture       -0.1546     0.0682   -2.27   0.0286 *  </span></span>
+<span><span class="co">#&gt; Education         -0.9803     0.1481   -6.62  5.1e-08 ***</span></span>
+<span><span class="co">#&gt; Catholic           0.1247     0.0289    4.31  9.5e-05 ***</span></span>
+<span><span class="co">#&gt; Infant.Mortality   1.0784     0.3819    2.82   0.0072 ** </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 7.17 on 42 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.699,  Adjusted R-squared:  0.671 </span></span>
+<span><span class="co">#&gt; F-statistic: 24.4 on 4 and 42 DF,  p-value: 1.72e-10</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">swiss</span><span class="op">$</span><span class="va">Fertility</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.best</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 45.916</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.best</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span> <span class="co"># use same folds as before</span></span>
+<span><span class="co">#&gt; R RNG seed set to 8433</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 58.467</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 57.778</span></span>
+<span><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
+<p>The MSE for the selected model is (of course) slightly higher than
+for the full model fit previously, but the cross-validated MSE is a bit
+lower—but, as we explain in the main vignette, it isn’t kosher to select
+and cross-validate a model on the same data.</p>
+<p>Here’s a function named <code>selectSubsets()</code>, meant to be
+used with <code><a href="../reference/cvSelect.html">cvSelect()</a></code>, so we can cross-validate the
+model-selection process:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">selectSubsets</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">=</span><span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">get_data</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>, </span>
+<span>                          <span class="va">model</span>,</span>
+<span>                          <span class="va">indices</span>,</span>
+<span>                          <span class="va">criterion</span><span class="op">=</span><span class="va">mse</span>,</span>
+<span>                          <span class="va">save.coef</span><span class="op">=</span><span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">model</span>, <span class="st">"lm"</span>, which<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"selectSubsets is appropriate only for 'lm' models"</span><span class="op">)</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getResponse.html">getResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span>  <span class="va">formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">indices</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># select best model from the full data by BIC</span></span>
+<span>    <span class="va">sel</span> <span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">formula</span>, data<span class="op">=</span><span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>    <span class="va">bics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sel</span><span class="op">)</span><span class="op">$</span><span class="va">bic</span></span>
+<span>    <span class="va">best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">sel</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bics</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">bics</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">x.names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">best</span><span class="op">)</span></span>
+<span>    <span class="va">m.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">X</span><span class="op">[</span>, <span class="va">x.names</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.best</span>, newdata<span class="op">=</span><span class="va">data</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="co"># select the best model omitting the i-th fold (indices)</span></span>
+<span>  <span class="va">sel.i</span> <span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">formula</span>, <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">indices</span>, <span class="op">]</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>  <span class="va">bics.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sel.i</span><span class="op">)</span><span class="op">$</span><span class="va">bic</span></span>
+<span>  <span class="va">best.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">sel.i</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bics.i</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">bics.i</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="va">x.names.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">best.i</span><span class="op">)</span></span>
+<span>  <span class="va">m.best.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="op">-</span><span class="va">indices</span><span class="op">]</span> <span class="op">~</span> <span class="va">X</span><span class="op">[</span><span class="op">-</span><span class="va">indices</span>, <span class="va">x.names.i</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>              <span class="co"># predict() doesn't work here:</span></span>
+<span>  <span class="va">fit.all.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">X</span><span class="op">[</span>, <span class="va">x.names.i</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m.best.i</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">fit.i</span> <span class="op">&lt;-</span> <span class="va">fit.all.i</span><span class="op">[</span><span class="va">indices</span><span class="op">]</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>criterion<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">criterion</span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="va">indices</span><span class="op">]</span>, <span class="va">fit.i</span><span class="op">)</span>,</span>
+<span>                   <span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all.i</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>       <span class="kw">if</span> <span class="op">(</span><span class="va">save.coef</span><span class="op">)</span><span class="op">{</span></span>
+<span>         <span class="va">coefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m.best.i</span><span class="op">)</span></span>
+<span>         <span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span></span>
+<span>         <span class="co"># fix coefficient names</span></span>
+<span>         <span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"X\\[-indices, x.names.i\\]"</span>, <span class="st">""</span>, <span class="va">nms</span><span class="op">)</span></span>
+<span>         <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">nms</span></span>
+<span>         <span class="va">coefs</span></span>
+<span>       <span class="op">}</span>  <span class="kw">else</span> <span class="op">{</span></span>
+<span>         <span class="cn">NULL</span></span>
+<span>       <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>A slightly tricky point is that because of scoping issues,
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> doesn’t work with the model fit omitting the
+<span class="math inline">\(i\)</span>th fold, and so the fitted values
+are computed directly as <span class="math inline">\(\mathbf{X}
+\mathbf{b}_{-\mathbf{i}}\)</span>, where <span class="math inline">\(\mathbf{X}\)</span> is the model-matrix for all of
+the cases, and <span class="math inline">\(\mathbf{b}_{-\mathbf{i}}\)</span> is the vector of
+least-squares coefficients for the selected model with the <span class="math inline">\(i\)</span>th fold omitted. Additionally, the
+command <code>lm(y[-indices] ~ X[-indices, x.names.i] - 1)</code>, which
+is the selected model with the <span class="math inline">\(i\)</span>th
+fold deleted, produces awkward coefficient names like
+<code>"X[-indices, Agriculture]"</code>; the command
+<code>nms &lt;- sub("X\\[-indices, x.names.i\\]", "", nms)</code> fixes
+these awkward names.</p>
+<p>Applying <code>selectSubsets()</code> to the full data produces the
+full-data cross-validated MSE (which we obtained previously):</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">selectSubsets</span><span class="op">(</span>model<span class="op">=</span><span class="va">m.swiss</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 45.916</span></span></code></pre></div>
+<p>Similarly, applying the function to an imaginary “fold” of the first
+5 cases returns the MSE for the cases in the fold, the MSE for all of
+the cases based on the model selected and fit to the cases omitting the
+fold, and the coefficients of the selected model, which contains 3
+predictors (and the intercept):</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">selectSubsets</span><span class="op">(</span>model<span class="op">=</span><span class="va">m.swiss</span>, indices<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $criterion</span></span>
+<span><span class="co">#&gt; [1] 155.657  53.411</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt;      (Intercept)        Education         Catholic Infant.Mortality </span></span>
+<span><span class="co">#&gt;        50.166253        -0.742713         0.098804         1.142324</span></span></code></pre></div>
+<p>Then, using <code>selectSubsets()</code> in cross-validation, we
+get:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">cv.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectSubsets</span>, model<span class="op">=</span><span class="va">m.swiss</span>,</span>
+<span>                      data<span class="op">=</span><span class="va">swiss</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span><span class="op">)</span> <span class="co"># use same folds</span></span>
+<span><span class="co">#&gt; R RNG seed set to 8433</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 65.835</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.644</span></span>
+<span><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
+<p>Cross-validation shows that model selection exacts a penalty in MSE.
+Examining the models selected for the 10 folds reveals that there is
+some uncertainty in identifying the predictors in the “best” model, with
+<code>Agriculture</code> sometimes appearing and sometimes not:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.swiss</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         (Intercept) Catholic Education Infant.Mortality Agriculture</span></span>
+<span><span class="co">#&gt; Fold 1      59.0852   0.1397   -1.0203           1.2985       -0.17</span></span>
+<span><span class="co">#&gt; Fold 2      67.0335   0.1367   -1.0499           0.9413       -0.20</span></span>
+<span><span class="co">#&gt; Fold 3      55.0453   0.1221   -0.8757           1.3541       -0.15</span></span>
+<span><span class="co">#&gt; Fold 4      62.5543   0.1236   -0.9719           1.0679       -0.16</span></span>
+<span><span class="co">#&gt; Fold 5      50.4643   0.1057   -0.7863           1.2144            </span></span>
+<span><span class="co">#&gt; Fold 6      68.0289   0.1195   -1.0073           0.8294       -0.17</span></span>
+<span><span class="co">#&gt; Fold 7      66.5219   0.1357   -1.0827           0.9523       -0.19</span></span>
+<span><span class="co">#&gt; Fold 8      46.3507   0.0776   -0.7637           1.4463            </span></span>
+<span><span class="co">#&gt; Fold 9      62.2632   0.1230   -1.0067           1.1000       -0.17</span></span>
+<span><span class="co">#&gt; Fold 10     52.5112   0.1005   -0.7232           1.0809</span></span></code></pre></div>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -399,6 +690,10 @@ machine learning</em>. Retrieved from <a href="https://CRAN.R-project.org/packag
 Lüdecke, D., Waggoner, P., &amp; Makowski, D. (2019). <span class="nocase">insight</span>: A unified interface to access information
 from model objects in <span>R</span>. <em>Journal of Open Source
 Software</em>, <em>4</em>(38), 1412.
+</div>
+<div id="ref-LumleyMiller:2020" class="csl-entry">
+Lumley, T., &amp; Miller, A. (2020). <em><span class="nocase">leaps</span>: Regression subset selection</em>. Retrieved
+from <a href="https://CRAN.R-project.org/package=leaps" class="external-link">https://CRAN.R-project.org/package=leaps</a>
 </div>
 <div id="ref-Wikipedia-ROC:2023" class="csl-entry">
 "Receiver operating characteristic". (2023). Receiver operating

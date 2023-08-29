@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-08-28</h4>
+            <h4 data-toc-skip class="date">2023-08-29</h4>
       
       
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 720677</span></span>
+<span><span class="co">#&gt; R RNG seed set to 623159</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.102</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.096</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.187</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.177</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -351,10 +351,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.6487    2.9327    3.0005    2.9741    3.0444    3.4344    10</span></span>
-<span><span class="co">#&gt;   Woodbury   26.0065   26.2656   27.3154   26.5847   27.4574   32.9551    10</span></span>
-<span><span class="co">#&gt;      naive  593.3578  595.8105  651.6024  600.1672  732.6586  735.6833    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1035.1794 1038.8782 1065.7988 1039.7220 1045.0778 1172.6568    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    2.6134    2.9155    2.8998    2.9521    2.9756    3.0014    10</span></span>
+<span><span class="co">#&gt;   Woodbury   26.2844   26.3730   26.5660   26.5094   26.5815   27.1781    10</span></span>
+<span><span class="co">#&gt;      naive  596.9369  600.0089  627.9366  602.2570  611.7918  739.0024    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1035.9408 1040.7625 1057.4446 1043.7049 1054.1141 1170.4849    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -537,11 +537,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.018    3.0553    3.1665    3.0893    3.2505    3.5245    10</span></span>
-<span><span class="co">#&gt;   Woodbury   86.261   86.8110   88.4729   87.2924   91.1452   93.1803    10</span></span>
-<span><span class="co">#&gt;      exact 3784.259 3828.7278 3877.9027 3861.3929 3908.1691 4038.2164    10</span></span>
-<span><span class="co">#&gt;     cv.glm 4625.273 4734.7366 4770.8588 4758.8777 4818.3269 4955.2536    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min       lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    3.0174    3.061    3.1118    3.1024    3.1362    3.2544    10</span></span>
+<span><span class="co">#&gt;   Woodbury   86.0546   86.175   87.4836   86.4945   88.1404   91.6753    10</span></span>
+<span><span class="co">#&gt;      exact 3794.6451 3815.166 3895.2063 3872.1528 4008.0886 4041.7378    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4595.3967 4644.921 4735.9214 4748.2849 4778.0860 4926.5246    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -1026,8 +1026,9 @@ elimination. In this demonstration, however, where all of the &lt;span class="ma
 will be small, and so we proceed by forward selection from the null
 model to save computing time.&lt;/p&gt;'><sup>8</sup></a></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m.select</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.null</span>, direction<span class="op">=</span><span class="st">"forward"</span>, trace<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>                     scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, upper<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">m.full</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">m.select</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.null</span>,</span>
+<span>                          direction<span class="op">=</span><span class="st">"forward"</span>, trace<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>                          scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, upper<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">m.full</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.select</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -1089,7 +1090,7 @@ also in <strong>cv</strong> and based on <code>stepAIC()</code>, is
 suitable for use with <code><a href="../reference/cvSelect.html">cvSelect()</a></code>:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.select</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, data<span class="op">=</span><span class="va">D</span>, seed<span class="op">=</span><span class="fl">3791</span>,</span>
-<span>                      model<span class="op">=</span><span class="va">m.null</span>,direction<span class="op">=</span><span class="st">"forward"</span>,</span>
+<span>                      model<span class="op">=</span><span class="va">m.null</span>, direction<span class="op">=</span><span class="st">"forward"</span>,</span>
 <span>                      scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, </span>
 <span>                                 upper<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">m.full</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 3791</span></span>
@@ -1588,7 +1589,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.461   0.000   0.461</span></span>
+<span><span class="co">#&gt;   0.451   0.000   0.451</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -1598,7 +1599,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.055   0.012   1.773</span></span>
+<span><span class="co">#&gt;   0.063   0.004   1.766</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
