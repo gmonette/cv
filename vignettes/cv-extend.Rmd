@@ -60,7 +60,7 @@ To illustrate using a different prediction cost criterion, we'll base a cost cri
 AUCcomp <- function(y, yhat) 1 - Metrics::auc(y, yhat)
 ```
 
-We then apply `AUCcomp()` to the Mroz logistic regression discussed in the main **cv** package vignette, which we reproduce here:
+We then apply `AUCcomp()` to the a logistic regression discussed in the main **cv** package vignette, which we reproduce here, using the `Mroz` data frame from the **carData** package [@FoxWeisberg:2019]:
 ```{r Mroz-regression}
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
@@ -100,7 +100,7 @@ m.beps <- multinom(vote ~ age + gender + economic.cond.national +
 
 car::Anova(m.beps)
 ```
-Most of the predictors, including the `Europe` $\times$ `political.knowledge` interaction, are associated with very small $p$-values.
+Most of the predictors, including the `Europe` $\times$ `political.knowledge` interaction, are associated with very small $p$-values; the `Anova()` function is from the **car** package [@FoxWeisberg:2019].
 
 Here's an "effect plot", using the the **effects** package [@FoxWeisberg:2019] to visualize the `Europe` $\times$ `political.knowledge` interaction in a "stacked-area" graph:
 ```{r BEPS-plot, fig.width=9, fig.height=5}
@@ -164,6 +164,122 @@ Prior to invoking `cv`, we called `update()` with `trace=FALSE` to suppress the 
 
 ## Adding a model-selection procedure
 
+The `selectStepAIC()` function supplied by the **cv** package, which is based on the `stepAIC()` function from the **nnet** package [@VenablesRipley:2002] for stepwise model selection, is suitable for the `procedure` argument of `cvSelect()`. The use of `selectStepAIC()` is illustrated in the principal vignette for the package. We'll employ `selectStepAIC()` as a "template" for writing a CV model-selection procedure. To see the code for this function, type `cv::selectStepAIC` at the R command prompt or examine the sources for the **cv** package at https://github.com/gmonette/cv.
+
+Another approach to model selection is all-subsets regression. The `regsubsets()` function in the **leaps** package [@LumleyMiller:2020] implements an efficient algorithm for selecting the best-fitting linear least-squares regressions for subsets of predictors of all sizes, from 1 through the maximum number of candidate predictors. To illustrate its use, we employ the `swiss` data frame supplied by the **leaps** package:
+```{r swiss}
+library("leaps")
+head(swiss)
+nrow(swiss)
+```
+The data set includes the following variables, for each of 47 French-speaking Swiss provinces circa 1888:
+
+* `Fertility`: A standardized fertility measure.
+* `Agriculture`: The percentage of the male population engaged in agriculture.
+* `Examination`: The percentage of draftees into the Swiss army receiving the highest grade on an examination.
+* `Education`: The percentage of draftees with more than a primary-school education.
+* `Catholic`: The percentage of the population who were Catholic.
+* `Infant.Mortality`: The infant-mortality rate, expressed as the percentage of live births surviving less than a year.
+
+Following @LumleyMiller:2020, we'll treat `Fertility` as the response and the other variables as predictors in a linear least-squares regression:'
+```{r swiss-lm}
+m.swiss <- lm(Fertility ~ ., data=swiss)
+summary(m.swiss)
+
+mse(swiss$Fertility, fitted(m.swiss))
+
+cv(m.swiss, seed=8433)
+```
+Thus, the MSE for the model fit to the complete data is considerably smaller than the CV estimate of the MSE. Can we do better by selecting a subset of the predictors, taking account of the additional uncertainty induced by model selection?
+
+First, let's apply best-subset selection to the complete data set:
+```{r subset-selection}
+#| fig.cap = "Selecting the best model of each size."
+swiss.sub <- regsubsets(Fertility ~ ., data=swiss)
+summary(swiss.sub)
+(bics <- summary(swiss.sub)$bic)
+which.min(bics)
+car::subsets(swiss.sub, legend="topright")
+```
+The graph, produced by the `subsets()` function in the **car** package, shows that the model with the smallest BIC is the best model with 4 predictors, including `Agriculture`, `Education`, `Catholic`, and `Infant.Mortality`:
+```{r best-model}
+m.best <- update(m.swiss, . ~ . - Examination)
+summary(m.best)
+
+mse(swiss$Fertility, fitted(m.best))
+
+cv(m.best, seed=8433) # use same folds as before
+```
+The MSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated MSE is a bit lower---but, as we explain in the main vignette, it isn't kosher to select and cross-validate a model on the same data.
+
+Here's a function named `selectSubsets()`, meant to be used with `cvSelect()`, so we can cross-validate the model-selection process:
+```{r selectSubsets}
+selectSubsets <- function(data=insight::get_data(model), 
+                          model,
+                          indices,
+                          criterion=mse,
+                          save.coef=TRUE, ...){
+  if (inherits(model, "lm", which=TRUE) != 1)
+    stop("selectSubsets is appropriate only for 'lm' models")
+  y <- getResponse(model)
+  formula <- formula(model)
+  X <- model.matrix(model)
+
+  if (missing(indices)) {
+    # select best model from the full data by BIC
+    sel <- leaps::regsubsets(formula, data=data, ...)
+    bics <- summary(sel)$bic
+    best <- coef(sel, 1:length(bics))[[which.min(bics)]]
+    x.names <- names(best)
+    m.best <- lm(y ~ X[, x.names])
+    fit.all <- predict(m.best, newdata=data)
+    return(criterion(y, fit.all))
+  }
+
+  # select the best model omitting the i-th fold (indices)
+  sel.i <- leaps::regsubsets(formula, data[-indices, ], ...)
+  bics.i <- summary(sel.i)$bic
+  best.i <- coef(sel.i, 1:length(bics.i))[[which.min(bics.i)]]
+  x.names.i <- names(best.i)
+  m.best.i <- lm(y[-indices] ~ X[-indices, x.names.i] - 1)
+              # predict() doesn't work here:
+  fit.all.i <- as.vector(X[, x.names.i] %*% coef(m.best.i))
+  fit.i <- fit.all.i[indices]
+  list(criterion=c(criterion(y[indices], fit.i),
+                   criterion(y, fit.all.i)),
+       if (save.coef){
+         coefs <- coef(m.best.i)
+         nms <- names(coefs)
+         # fix coefficient names
+         nms <- sub("X\\[-indices, x.names.i\\]", "", nms)
+         names(coefs) <- nms
+         coefs
+       }  else {
+         NULL
+       }
+  )
+}
+```
+A slightly tricky point is that because of scoping issues, `predict()` doesn't work with the model fit omitting the $i$th fold, and so the fitted values are computed directly as $\mathbf{X} \mathbf{b}_{-\mathbf{i}}$, where $\mathbf{X}$ is the model-matrix for all of the cases, and $\mathbf{b}_{-\mathbf{i}}$ is the vector of least-squares coefficients for the selected model with the $i$th fold omitted. Additionally, the command `lm(y[-indices] ~ X[-indices, x.names.i] - 1)`, which is the selected model with the $i$th fold deleted, produces awkward coefficient names like `"X[-indices, Agriculture]"`; the command `nms <- sub("X\\[-indices, x.names.i\\]", "", nms)` fixes these awkward names.
+
+Applying `selectSubsets()` to the full data produces the full-data cross-validated MSE (which we obtained previously):
+```{r test-selectSubsets}
+selectSubsets(model=m.swiss)
+```
+Similarly, applying the function to an imaginary "fold" of the first 5 cases returns the MSE for the cases in the fold, the MSE for all of the cases based on the model selected and fit to the cases omitting the fold, and the coefficients of the selected model, which contains 3 predictors (and the intercept):
+```{r test-selectSubsets-fold}
+selectSubsets(model=m.swiss, indices=1:5)
+```
+
+Then, using `selectSubsets()` in cross-validation, we get:
+```{r cvSelect-selectSubsets}
+(cv.swiss <- cvSelect(selectSubsets, model=m.swiss,
+                      data=swiss, seed=8433)) # use same folds
+```
+Cross-validation shows that model selection exacts a penalty in MSE. Examining the models selected for the 10 folds reveals that there is some uncertainty in identifying the predictors in the "best" model, with `Agriculture` sometimes appearing and sometimes not:
+```{r best-models-by-folds}
+compareFolds(cv.swiss)
+```
 
 ## References
 

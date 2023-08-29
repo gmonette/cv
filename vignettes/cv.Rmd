@@ -366,8 +366,9 @@ Next, using the `stepAIC()` function in the **MASS** package [@VenablesRipley:20
 [^selection-order]: It's generally advantageous to start with the largest model, here the one with 100 predictors, and proceed by backward elimination. In this demonstration, however, where all of the $\beta$s are really 0, the selected model will be small, and so we proceed by forward selection from the null model to save computing time.
 
 ```{r forward-selection}
-m.select <- MASS::stepAIC(m.null, direction="forward", trace=FALSE,
-                     scope=list(lower=~1, upper=formula(m.full)))
+m.select <- MASS::stepAIC(m.null,
+                          direction="forward", trace=FALSE,
+                          scope=list(lower=~1, upper=formula(m.full)))
 summary(m.select)
 mse(D$y, fitted(m.select))
 ```
@@ -381,7 +382,7 @@ cv(m.select, seed=2529)
 The `cvSelect()` function in the **cv** package allows us to cross-validate the whole model-selection procedure. The first argument to `cvSelect()` is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The `selectStepAIC()` function, also in **cv** and based on `stepAIC()`, is suitable for use with `cvSelect()`:
 ```{r cvSelect-artificial-data, cache=TRUE}
 cv.select <- cvSelect(selectStepAIC, data=D, seed=3791,
-                      model=m.null,direction="forward",
+                      model=m.null, direction="forward",
                       scope=list(lower=~1, 
                                  upper=formula(m.full)))
 cv.select

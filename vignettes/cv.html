@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 204843</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 412947</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.311</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.294</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.297</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.28</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -616,12 +616,12 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>)</span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = &quot;loo&quot;), :</span></span>
 <span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval cld</span></span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues    972.6   1151.9   1187.6   1206.1   1232.3   1289.7    10 a  </span></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10383.0  10422.8  10845.4  10619.9  10931.3  12339.1    10 a  </span></span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 211147.4 215348.5 217397.5 216886.2 219759.2 224278.5    10  b </span></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 378053.2 379203.2 404844.2 392487.7 444612.1 453215.2    10   c</span></span></code></pre></div>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues   1.0593   1.1687   1.2283   1.2161   1.2789   1.4316    10 a  </span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10.4781  10.6475  11.1896  10.8599  11.2048  14.0938    10 a  </span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 212.7361 215.7637 224.5327 216.5731 219.4924 280.1359    10  b </span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 379.9400 389.5255 409.4584 407.0043 424.7780 452.0622    10   c</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
@@ -781,15 +781,15 @@ comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
 <span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span>)</span>
 <span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2936    1.3189    1.3808    1.4144    1.4295    1.4539    10</span></span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   39.3102   41.0729   41.2091   41.6356   41.9265   42.1303    10</span></span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt;      exact 1787.3059 1809.8517 1848.7521 1833.9778 1886.3683 1923.2892    10</span></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2073.6152 2111.1091 2131.9651 2124.4305 2134.2539 2262.9503    10</span></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt;  cld</span></span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt;   b </span></span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt;    c</span></span></code></pre></div>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2821    1.3191    1.3769    1.3786    1.4338    1.4726    10</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   39.3971   40.8606   47.5140   41.4624   42.0265  104.2414    10</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt;      exact 1758.0320 1779.6899 1808.3914 1797.5265 1844.1840 1877.6258    10</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2050.6659 2097.4342 2123.2826 2120.9721 2157.0914 2178.3043    10</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt;   cld</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt;  a   </span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt;   b  </span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt;    c </span></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt;     d</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -880,14 +880,22 @@ to the HSB data, for which we use the <strong>dplyr</strong> package
 <span class="citation">(Wickham, François, Henry, Müller, &amp; Vaughan,
 2023)</span>:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>MathAchieve <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(School) <span class="sc">%&gt;%</span></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean.ses =</span> <span class="fu">mean</span>(SES)) <span class="ot">-&gt;</span> Temp</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>Temp <span class="ot">&lt;-</span> <span class="fu">merge</span>(MathAchSchool, Temp, <span class="at">by=</span><span class="st">&quot;School&quot;</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>HSB <span class="ot">&lt;-</span> <span class="fu">merge</span>(Temp[, <span class="fu">c</span>(<span class="st">&quot;School&quot;</span>, <span class="st">&quot;Sector&quot;</span>, <span class="st">&quot;mean.ses&quot;</span>)],</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>             MathAchieve[, <span class="fu">c</span>(<span class="st">&quot;School&quot;</span>, <span class="st">&quot;SES&quot;</span>, <span class="st">&quot;MathAch&quot;</span>)], <span class="at">by=</span><span class="st">&quot;School&quot;</span>)</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="fu">names</span>(HSB) <span class="ot">&lt;-</span> <span class="fu">tolower</span>(<span class="fu">names</span>(HSB))</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>HSB<span class="sc">$</span>cses <span class="ot">&lt;-</span> <span class="fu">with</span>(HSB, ses <span class="sc">-</span> mean.ses)</span></code></pre></div>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;dplyr&#39;</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:stats&#39;:</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt;     filter, lag</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from &#39;package:base&#39;:</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>MathAchieve <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(School) <span class="sc">%&gt;%</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean.ses =</span> <span class="fu">mean</span>(SES)) <span class="ot">-&gt;</span> Temp</span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>Temp <span class="ot">&lt;-</span> <span class="fu">merge</span>(MathAchSchool, Temp, <span class="at">by=</span><span class="st">&quot;School&quot;</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>HSB <span class="ot">&lt;-</span> <span class="fu">merge</span>(Temp[, <span class="fu">c</span>(<span class="st">&quot;School&quot;</span>, <span class="st">&quot;Sector&quot;</span>, <span class="st">&quot;mean.ses&quot;</span>)],</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>             MathAchieve[, <span class="fu">c</span>(<span class="st">&quot;School&quot;</span>, <span class="st">&quot;SES&quot;</span>, <span class="st">&quot;MathAch&quot;</span>)], <span class="at">by=</span><span class="st">&quot;School&quot;</span>)</span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="fu">names</span>(HSB) <span class="ot">&lt;-</span> <span class="fu">tolower</span>(<span class="fu">names</span>(HSB))</span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>HSB<span class="sc">$</span>cses <span class="ot">&lt;-</span> <span class="fu">with</span>(HSB, ses <span class="sc">-</span> mean.ses)</span></code></pre></div>
 <p>In the process, we created two new school-level variables:
 <code>meanses</code>, which is the average SES for students in each
 school; and <code>cses</code>, which is school-average SES centered at
@@ -897,34 +905,35 @@ its mean. For details, see <span class="citation">Fox &amp; Weisberg
 <code>lmer()</code> function in the <strong>lme4</strong> package <span class="citation">(Bates, Mächler, Bolker, &amp; Walker, 2015)</span> to
 fit a mixed model for math achievement to the HSB data:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;lme4&quot;</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>hsb.lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(mathach <span class="sc">~</span> mean.ses<span class="sc">*</span>cses <span class="sc">+</span> sector<span class="sc">*</span>cses</span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>                   <span class="sc">+</span> (cses <span class="sc">|</span> school), <span class="at">data=</span>HSB)</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="fu">summary</span>(hsb.lmer, <span class="at">correlation=</span><span class="cn">FALSE</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co">#&gt; Linear mixed model fit by REML [&#39;lmerMod&#39;]</span></span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co">#&gt; Formula: mathach ~ mean.ses * cses + sector * cses + (cses | school)</span></span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#&gt;    Data: HSB</span></span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co">#&gt; REML criterion at convergence: 46504</span></span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#&gt; Scaled residuals: </span></span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co">#&gt; -3.159 -0.723  0.017  0.754  2.958 </span></span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="co">#&gt; Random effects:</span></span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a><span class="co">#&gt;  Groups   Name        Variance Std.Dev. Corr</span></span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a><span class="co">#&gt;  school   (Intercept)  2.380   1.543        </span></span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a><span class="co">#&gt;           cses         0.101   0.318    0.39</span></span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="co">#&gt;  Residual             36.721   6.060        </span></span>
-<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a><span class="co">#&gt; Number of obs: 7185, groups:  school, 160</span></span>
-<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a><span class="co">#&gt; Fixed effects:</span></span>
-<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a><span class="co">#&gt;                     Estimate Std. Error t value</span></span>
-<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a><span class="co">#&gt; (Intercept)           12.128      0.199   60.86</span></span>
-<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a><span class="co">#&gt; mean.ses               5.333      0.369   14.45</span></span>
-<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a><span class="co">#&gt; cses                   2.945      0.156   18.93</span></span>
-<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a><span class="co">#&gt; sectorCatholic         1.227      0.306    4.00</span></span>
-<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a><span class="co">#&gt; mean.ses:cses          1.039      0.299    3.48</span></span>
-<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a><span class="co">#&gt; cses:sectorCatholic   -1.643      0.240   -6.85</span></span></code></pre></div>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="co">#&gt; Loading required package: Matrix</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>hsb.lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(mathach <span class="sc">~</span> mean.ses<span class="sc">*</span>cses <span class="sc">+</span> sector<span class="sc">*</span>cses</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>                   <span class="sc">+</span> (cses <span class="sc">|</span> school), <span class="at">data=</span>HSB)</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="fu">summary</span>(hsb.lmer, <span class="at">correlation=</span><span class="cn">FALSE</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co">#&gt; Linear mixed model fit by REML [&#39;lmerMod&#39;]</span></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#&gt; Formula: mathach ~ mean.ses * cses + sector * cses + (cses | school)</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co">#&gt;    Data: HSB</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a><span class="co">#&gt; REML criterion at convergence: 46504</span></span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; Scaled residuals: </span></span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co">#&gt; -3.159 -0.723  0.017  0.754  2.958 </span></span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a><span class="co">#&gt; Random effects:</span></span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a><span class="co">#&gt;  Groups   Name        Variance Std.Dev. Corr</span></span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a><span class="co">#&gt;  school   (Intercept)  2.380   1.543        </span></span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="co">#&gt;           cses         0.101   0.318    0.39</span></span>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a><span class="co">#&gt;  Residual             36.721   6.060        </span></span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="co">#&gt; Number of obs: 7185, groups:  school, 160</span></span>
+<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a><span class="co">#&gt; Fixed effects:</span></span>
+<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a><span class="co">#&gt;                     Estimate Std. Error t value</span></span>
+<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a><span class="co">#&gt; (Intercept)           12.128      0.199   60.86</span></span>
+<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a><span class="co">#&gt; mean.ses               5.333      0.369   14.45</span></span>
+<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a><span class="co">#&gt; cses                   2.945      0.156   18.93</span></span>
+<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a><span class="co">#&gt; sectorCatholic         1.227      0.306    4.00</span></span>
+<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a><span class="co">#&gt; mean.ses:cses          1.039      0.299    3.48</span></span>
+<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a><span class="co">#&gt; cses:sectorCatholic   -1.643      0.240   -6.85</span></span></code></pre></div>
 <p>We can then cross-validate at the cluster (i.e., school) level,</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">cv</span>(hsb.lmer, <span class="at">k=</span><span class="dv">10</span>, <span class="at">clusterVariables=</span><span class="st">&quot;school&quot;</span>, <span class="at">seed=</span><span class="dv">5240</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 5240</span></span>
@@ -966,59 +975,70 @@ and the arguments for <code>cv()</code> in this case are the same as for
 a model fit by <code>lmer()</code> or <code>glmer()</code>. We
 illustrate with the mixed model fit to the HSB data:</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;nlme&quot;</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>hsb.lme <span class="ot">&lt;-</span> <span class="fu">lme</span>(mathach <span class="sc">~</span> mean.ses<span class="sc">*</span>cses <span class="sc">+</span> sector<span class="sc">*</span>cses,</span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>                 <span class="at">random =</span> <span class="sc">~</span> cses <span class="sc">|</span> school, <span class="at">data=</span>HSB,</span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>               <span class="at">control=</span><span class="fu">list</span>(<span class="at">opt=</span><span class="st">&quot;optim&quot;</span>))</span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="fu">summary</span>(hsb.lme)</span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="co">#&gt; Linear mixed-effects model fit by REML</span></span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt;   Data: HSB </span></span>
-<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="co">#&gt;     AIC   BIC logLik</span></span>
-<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co">#&gt;   46525 46594 -23252</span></span>
-<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="co">#&gt; Random effects:</span></span>
-<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="co">#&gt;  Formula: ~cses | school</span></span>
-<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="co">#&gt;  Structure: General positive-definite, Log-Cholesky parametrization</span></span>
-<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a><span class="co">#&gt;             StdDev   Corr  </span></span>
-<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a><span class="co">#&gt; (Intercept) 1.541177 (Intr)</span></span>
-<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="co">#&gt; cses        0.018174 0.006 </span></span>
-<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a><span class="co">#&gt; Residual    6.063492       </span></span>
-<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a><span class="co">#&gt; Fixed effects:  mathach ~ mean.ses * cses + sector * cses </span></span>
-<span id="cb19-20"><a href="#cb19-20" tabindex="-1"></a><span class="co">#&gt;                       Value Std.Error   DF t-value p-value</span></span>
-<span id="cb19-21"><a href="#cb19-21" tabindex="-1"></a><span class="co">#&gt; (Intercept)         12.1282   0.19920 7022  60.886   0e+00</span></span>
-<span id="cb19-22"><a href="#cb19-22" tabindex="-1"></a><span class="co">#&gt; mean.ses             5.3367   0.36898  157  14.463   0e+00</span></span>
-<span id="cb19-23"><a href="#cb19-23" tabindex="-1"></a><span class="co">#&gt; cses                 2.9421   0.15122 7022  19.456   0e+00</span></span>
-<span id="cb19-24"><a href="#cb19-24" tabindex="-1"></a><span class="co">#&gt; sectorCatholic       1.2245   0.30611  157   4.000   1e-04</span></span>
-<span id="cb19-25"><a href="#cb19-25" tabindex="-1"></a><span class="co">#&gt; mean.ses:cses        1.0444   0.29107 7022   3.588   3e-04</span></span>
-<span id="cb19-26"><a href="#cb19-26" tabindex="-1"></a><span class="co">#&gt; cses:sectorCatholic -1.6421   0.23312 7022  -7.044   0e+00</span></span>
-<span id="cb19-27"><a href="#cb19-27" tabindex="-1"></a><span class="co">#&gt;  Correlation: </span></span>
-<span id="cb19-28"><a href="#cb19-28" tabindex="-1"></a><span class="co">#&gt;                     (Intr) men.ss cses   sctrCt mn.ss:</span></span>
-<span id="cb19-29"><a href="#cb19-29" tabindex="-1"></a><span class="co">#&gt; mean.ses             0.256                            </span></span>
-<span id="cb19-30"><a href="#cb19-30" tabindex="-1"></a><span class="co">#&gt; cses                 0.000  0.000                     </span></span>
-<span id="cb19-31"><a href="#cb19-31" tabindex="-1"></a><span class="co">#&gt; sectorCatholic      -0.699 -0.356  0.000              </span></span>
-<span id="cb19-32"><a href="#cb19-32" tabindex="-1"></a><span class="co">#&gt; mean.ses:cses        0.000  0.000  0.295  0.000       </span></span>
-<span id="cb19-33"><a href="#cb19-33" tabindex="-1"></a><span class="co">#&gt; cses:sectorCatholic  0.000  0.000 -0.696  0.000 -0.351</span></span>
-<span id="cb19-34"><a href="#cb19-34" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb19-35"><a href="#cb19-35" tabindex="-1"></a><span class="co">#&gt; Standardized Within-Group Residuals:</span></span>
-<span id="cb19-36"><a href="#cb19-36" tabindex="-1"></a><span class="co">#&gt;       Min        Q1       Med        Q3       Max </span></span>
-<span id="cb19-37"><a href="#cb19-37" tabindex="-1"></a><span class="co">#&gt; -3.170106 -0.724877  0.014892  0.754263  2.965498 </span></span>
-<span id="cb19-38"><a href="#cb19-38" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb19-39"><a href="#cb19-39" tabindex="-1"></a><span class="co">#&gt; Number of Observations: 7185</span></span>
-<span id="cb19-40"><a href="#cb19-40" tabindex="-1"></a><span class="co">#&gt; Number of Groups: 160</span></span>
-<span id="cb19-41"><a href="#cb19-41" tabindex="-1"></a></span>
-<span id="cb19-42"><a href="#cb19-42" tabindex="-1"></a><span class="fu">cv</span>(hsb.lme, <span class="at">k=</span><span class="dv">10</span>, <span class="at">clusterVariables=</span><span class="st">&quot;school&quot;</span>, <span class="at">seed=</span><span class="dv">5240</span>)</span>
-<span id="cb19-43"><a href="#cb19-43" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 5240</span></span>
-<span id="cb19-44"><a href="#cb19-44" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation based on 160 {school} clusters</span></span>
-<span id="cb19-45"><a href="#cb19-45" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 39.133</span></span>
-<span id="cb19-46"><a href="#cb19-46" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.125</span></span>
-<span id="cb19-47"><a href="#cb19-47" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 39.006</span></span>
-<span id="cb19-48"><a href="#cb19-48" tabindex="-1"></a></span>
-<span id="cb19-49"><a href="#cb19-49" tabindex="-1"></a><span class="fu">cv</span>(hsb.lme, <span class="at">seed=</span><span class="dv">1575</span>)</span>
-<span id="cb19-50"><a href="#cb19-50" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 1575</span></span>
-<span id="cb19-51"><a href="#cb19-51" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb19-52"><a href="#cb19-52" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 37.442</span></span>
-<span id="cb19-53"><a href="#cb19-53" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 37.402</span></span>
-<span id="cb19-54"><a href="#cb19-54" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 36.147</span></span></code></pre></div>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="co">#&gt; Attaching package: &#39;nlme&#39;</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:lme4&#39;:</span></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="co">#&gt;     lmList</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:dplyr&#39;:</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="co">#&gt;     collapse</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="co">#&gt; The following object is masked from &#39;package:cv&#39;:</span></span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="co">#&gt;     getResponse</span></span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>hsb.lme <span class="ot">&lt;-</span> <span class="fu">lme</span>(mathach <span class="sc">~</span> mean.ses<span class="sc">*</span>cses <span class="sc">+</span> sector<span class="sc">*</span>cses,</span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>                 <span class="at">random =</span> <span class="sc">~</span> cses <span class="sc">|</span> school, <span class="at">data=</span>HSB,</span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>               <span class="at">control=</span><span class="fu">list</span>(<span class="at">opt=</span><span class="st">&quot;optim&quot;</span>))</span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="fu">summary</span>(hsb.lme)</span>
+<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a><span class="co">#&gt; Linear mixed-effects model fit by REML</span></span>
+<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a><span class="co">#&gt;   Data: HSB </span></span>
+<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a><span class="co">#&gt;     AIC   BIC logLik</span></span>
+<span id="cb19-20"><a href="#cb19-20" tabindex="-1"></a><span class="co">#&gt;   46525 46594 -23252</span></span>
+<span id="cb19-21"><a href="#cb19-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-22"><a href="#cb19-22" tabindex="-1"></a><span class="co">#&gt; Random effects:</span></span>
+<span id="cb19-23"><a href="#cb19-23" tabindex="-1"></a><span class="co">#&gt;  Formula: ~cses | school</span></span>
+<span id="cb19-24"><a href="#cb19-24" tabindex="-1"></a><span class="co">#&gt;  Structure: General positive-definite, Log-Cholesky parametrization</span></span>
+<span id="cb19-25"><a href="#cb19-25" tabindex="-1"></a><span class="co">#&gt;             StdDev   Corr  </span></span>
+<span id="cb19-26"><a href="#cb19-26" tabindex="-1"></a><span class="co">#&gt; (Intercept) 1.541177 (Intr)</span></span>
+<span id="cb19-27"><a href="#cb19-27" tabindex="-1"></a><span class="co">#&gt; cses        0.018174 0.006 </span></span>
+<span id="cb19-28"><a href="#cb19-28" tabindex="-1"></a><span class="co">#&gt; Residual    6.063492       </span></span>
+<span id="cb19-29"><a href="#cb19-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-30"><a href="#cb19-30" tabindex="-1"></a><span class="co">#&gt; Fixed effects:  mathach ~ mean.ses * cses + sector * cses </span></span>
+<span id="cb19-31"><a href="#cb19-31" tabindex="-1"></a><span class="co">#&gt;                       Value Std.Error   DF t-value p-value</span></span>
+<span id="cb19-32"><a href="#cb19-32" tabindex="-1"></a><span class="co">#&gt; (Intercept)         12.1282   0.19920 7022  60.886   0e+00</span></span>
+<span id="cb19-33"><a href="#cb19-33" tabindex="-1"></a><span class="co">#&gt; mean.ses             5.3367   0.36898  157  14.463   0e+00</span></span>
+<span id="cb19-34"><a href="#cb19-34" tabindex="-1"></a><span class="co">#&gt; cses                 2.9421   0.15122 7022  19.456   0e+00</span></span>
+<span id="cb19-35"><a href="#cb19-35" tabindex="-1"></a><span class="co">#&gt; sectorCatholic       1.2245   0.30611  157   4.000   1e-04</span></span>
+<span id="cb19-36"><a href="#cb19-36" tabindex="-1"></a><span class="co">#&gt; mean.ses:cses        1.0444   0.29107 7022   3.588   3e-04</span></span>
+<span id="cb19-37"><a href="#cb19-37" tabindex="-1"></a><span class="co">#&gt; cses:sectorCatholic -1.6421   0.23312 7022  -7.044   0e+00</span></span>
+<span id="cb19-38"><a href="#cb19-38" tabindex="-1"></a><span class="co">#&gt;  Correlation: </span></span>
+<span id="cb19-39"><a href="#cb19-39" tabindex="-1"></a><span class="co">#&gt;                     (Intr) men.ss cses   sctrCt mn.ss:</span></span>
+<span id="cb19-40"><a href="#cb19-40" tabindex="-1"></a><span class="co">#&gt; mean.ses             0.256                            </span></span>
+<span id="cb19-41"><a href="#cb19-41" tabindex="-1"></a><span class="co">#&gt; cses                 0.000  0.000                     </span></span>
+<span id="cb19-42"><a href="#cb19-42" tabindex="-1"></a><span class="co">#&gt; sectorCatholic      -0.699 -0.356  0.000              </span></span>
+<span id="cb19-43"><a href="#cb19-43" tabindex="-1"></a><span class="co">#&gt; mean.ses:cses        0.000  0.000  0.295  0.000       </span></span>
+<span id="cb19-44"><a href="#cb19-44" tabindex="-1"></a><span class="co">#&gt; cses:sectorCatholic  0.000  0.000 -0.696  0.000 -0.351</span></span>
+<span id="cb19-45"><a href="#cb19-45" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-46"><a href="#cb19-46" tabindex="-1"></a><span class="co">#&gt; Standardized Within-Group Residuals:</span></span>
+<span id="cb19-47"><a href="#cb19-47" tabindex="-1"></a><span class="co">#&gt;       Min        Q1       Med        Q3       Max </span></span>
+<span id="cb19-48"><a href="#cb19-48" tabindex="-1"></a><span class="co">#&gt; -3.170106 -0.724877  0.014892  0.754263  2.965498 </span></span>
+<span id="cb19-49"><a href="#cb19-49" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb19-50"><a href="#cb19-50" tabindex="-1"></a><span class="co">#&gt; Number of Observations: 7185</span></span>
+<span id="cb19-51"><a href="#cb19-51" tabindex="-1"></a><span class="co">#&gt; Number of Groups: 160</span></span>
+<span id="cb19-52"><a href="#cb19-52" tabindex="-1"></a></span>
+<span id="cb19-53"><a href="#cb19-53" tabindex="-1"></a><span class="fu">cv</span>(hsb.lme, <span class="at">k=</span><span class="dv">10</span>, <span class="at">clusterVariables=</span><span class="st">&quot;school&quot;</span>, <span class="at">seed=</span><span class="dv">5240</span>)</span>
+<span id="cb19-54"><a href="#cb19-54" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 5240</span></span>
+<span id="cb19-55"><a href="#cb19-55" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation based on 160 {school} clusters</span></span>
+<span id="cb19-56"><a href="#cb19-56" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 39.133</span></span>
+<span id="cb19-57"><a href="#cb19-57" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.125</span></span>
+<span id="cb19-58"><a href="#cb19-58" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 39.006</span></span>
+<span id="cb19-59"><a href="#cb19-59" tabindex="-1"></a></span>
+<span id="cb19-60"><a href="#cb19-60" tabindex="-1"></a><span class="fu">cv</span>(hsb.lme, <span class="at">seed=</span><span class="dv">1575</span>)</span>
+<span id="cb19-61"><a href="#cb19-61" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 1575</span></span>
+<span id="cb19-62"><a href="#cb19-62" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb19-63"><a href="#cb19-63" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 37.442</span></span>
+<span id="cb19-64"><a href="#cb19-64" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 37.402</span></span>
+<span id="cb19-65"><a href="#cb19-65" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 36.147</span></span></code></pre></div>
 <p>We used the same random-number generator seeds as in the previous
 example cross-validating the model fit by <code>lmer()</code>, and so
 the same folds are employed in both cases.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> The estimated
@@ -1208,44 +1228,45 @@ Ripley, 2002)</span>, let us perform a forward stepwise regression to
 select a “best” model, starting with the null model, and using AIC as
 the model-selection criterion (see the help page for
 <code>stepAIC()</code> for details):<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>m.select <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">stepAIC</span>(m.null, <span class="at">direction=</span><span class="st">&quot;forward&quot;</span>, <span class="at">trace=</span><span class="cn">FALSE</span>,</span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>                     <span class="at">scope=</span><span class="fu">list</span>(<span class="at">lower=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">upper=</span><span class="fu">formula</span>(m.full)))</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="fu">summary</span>(m.select)</span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; lm(formula = y ~ X.99 + X.90 + X.87 + X.40 + X.65 + X.91 + X.53 + </span></span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt;     X.45 + X.31 + X.56 + X.61 + X.60 + X.46 + X.35 + X.92, data = D)</span></span>
-<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="co">#&gt; Residuals:</span></span>
-<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></span>
-<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="co">#&gt; -3.262 -0.645  0.024  0.641  3.118 </span></span>
-<span id="cb23-12"><a href="#cb23-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb23-15"><a href="#cb23-15" tabindex="-1"></a><span class="co">#&gt; (Intercept)   9.9372     0.0310  320.80   &lt;2e-16 ***</span></span>
-<span id="cb23-16"><a href="#cb23-16" tabindex="-1"></a><span class="co">#&gt; X.99         -0.0910     0.0308   -2.95   0.0032 ** </span></span>
-<span id="cb23-17"><a href="#cb23-17" tabindex="-1"></a><span class="co">#&gt; X.90         -0.0820     0.0314   -2.62   0.0090 ** </span></span>
-<span id="cb23-18"><a href="#cb23-18" tabindex="-1"></a><span class="co">#&gt; X.87         -0.0694     0.0311   -2.24   0.0256 *  </span></span>
-<span id="cb23-19"><a href="#cb23-19" tabindex="-1"></a><span class="co">#&gt; X.40         -0.0476     0.0308   -1.55   0.1221    </span></span>
-<span id="cb23-20"><a href="#cb23-20" tabindex="-1"></a><span class="co">#&gt; X.65         -0.0552     0.0315   -1.76   0.0795 .  </span></span>
-<span id="cb23-21"><a href="#cb23-21" tabindex="-1"></a><span class="co">#&gt; X.91          0.0524     0.0308    1.70   0.0894 .  </span></span>
-<span id="cb23-22"><a href="#cb23-22" tabindex="-1"></a><span class="co">#&gt; X.53         -0.0492     0.0305   -1.61   0.1067    </span></span>
-<span id="cb23-23"><a href="#cb23-23" tabindex="-1"></a><span class="co">#&gt; X.45          0.0554     0.0318    1.74   0.0818 .  </span></span>
-<span id="cb23-24"><a href="#cb23-24" tabindex="-1"></a><span class="co">#&gt; X.31          0.0452     0.0311    1.46   0.1457    </span></span>
-<span id="cb23-25"><a href="#cb23-25" tabindex="-1"></a><span class="co">#&gt; X.56          0.0543     0.0327    1.66   0.0972 .  </span></span>
-<span id="cb23-26"><a href="#cb23-26" tabindex="-1"></a><span class="co">#&gt; X.61         -0.0508     0.0317   -1.60   0.1091    </span></span>
-<span id="cb23-27"><a href="#cb23-27" tabindex="-1"></a><span class="co">#&gt; X.60         -0.0513     0.0319   -1.61   0.1083    </span></span>
-<span id="cb23-28"><a href="#cb23-28" tabindex="-1"></a><span class="co">#&gt; X.46          0.0516     0.0327    1.58   0.1153    </span></span>
-<span id="cb23-29"><a href="#cb23-29" tabindex="-1"></a><span class="co">#&gt; X.35          0.0470     0.0315    1.49   0.1358    </span></span>
-<span id="cb23-30"><a href="#cb23-30" tabindex="-1"></a><span class="co">#&gt; X.92          0.0443     0.0310    1.43   0.1533    </span></span>
-<span id="cb23-31"><a href="#cb23-31" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb23-32"><a href="#cb23-32" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb23-33"><a href="#cb23-33" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb23-34"><a href="#cb23-34" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 0.973 on 984 degrees of freedom</span></span>
-<span id="cb23-35"><a href="#cb23-35" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.0442, Adjusted R-squared:  0.0296 </span></span>
-<span id="cb23-36"><a href="#cb23-36" tabindex="-1"></a><span class="co">#&gt; F-statistic: 3.03 on 15 and 984 DF,  p-value: 8.34e-05</span></span>
-<span id="cb23-37"><a href="#cb23-37" tabindex="-1"></a><span class="fu">mse</span>(D<span class="sc">$</span>y, <span class="fu">fitted</span>(m.select))</span>
-<span id="cb23-38"><a href="#cb23-38" tabindex="-1"></a><span class="co">#&gt; [1] 0.93063</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>m.select <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">stepAIC</span>(m.null,</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>                          <span class="at">direction=</span><span class="st">&quot;forward&quot;</span>, <span class="at">trace=</span><span class="cn">FALSE</span>,</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>                          <span class="at">scope=</span><span class="fu">list</span>(<span class="at">lower=</span><span class="sc">~</span><span class="dv">1</span>, <span class="at">upper=</span><span class="fu">formula</span>(m.full)))</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="fu">summary</span>(m.select)</span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; lm(formula = y ~ X.99 + X.90 + X.87 + X.40 + X.65 + X.91 + X.53 + </span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="co">#&gt;     X.45 + X.31 + X.56 + X.61 + X.60 + X.46 + X.35 + X.92, data = D)</span></span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb23-10"><a href="#cb23-10" tabindex="-1"></a><span class="co">#&gt; Residuals:</span></span>
+<span id="cb23-11"><a href="#cb23-11" tabindex="-1"></a><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></span>
+<span id="cb23-12"><a href="#cb23-12" tabindex="-1"></a><span class="co">#&gt; -3.262 -0.645  0.024  0.641  3.118 </span></span>
+<span id="cb23-13"><a href="#cb23-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb23-14"><a href="#cb23-14" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb23-15"><a href="#cb23-15" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb23-16"><a href="#cb23-16" tabindex="-1"></a><span class="co">#&gt; (Intercept)   9.9372     0.0310  320.80   &lt;2e-16 ***</span></span>
+<span id="cb23-17"><a href="#cb23-17" tabindex="-1"></a><span class="co">#&gt; X.99         -0.0910     0.0308   -2.95   0.0032 ** </span></span>
+<span id="cb23-18"><a href="#cb23-18" tabindex="-1"></a><span class="co">#&gt; X.90         -0.0820     0.0314   -2.62   0.0090 ** </span></span>
+<span id="cb23-19"><a href="#cb23-19" tabindex="-1"></a><span class="co">#&gt; X.87         -0.0694     0.0311   -2.24   0.0256 *  </span></span>
+<span id="cb23-20"><a href="#cb23-20" tabindex="-1"></a><span class="co">#&gt; X.40         -0.0476     0.0308   -1.55   0.1221    </span></span>
+<span id="cb23-21"><a href="#cb23-21" tabindex="-1"></a><span class="co">#&gt; X.65         -0.0552     0.0315   -1.76   0.0795 .  </span></span>
+<span id="cb23-22"><a href="#cb23-22" tabindex="-1"></a><span class="co">#&gt; X.91          0.0524     0.0308    1.70   0.0894 .  </span></span>
+<span id="cb23-23"><a href="#cb23-23" tabindex="-1"></a><span class="co">#&gt; X.53         -0.0492     0.0305   -1.61   0.1067    </span></span>
+<span id="cb23-24"><a href="#cb23-24" tabindex="-1"></a><span class="co">#&gt; X.45          0.0554     0.0318    1.74   0.0818 .  </span></span>
+<span id="cb23-25"><a href="#cb23-25" tabindex="-1"></a><span class="co">#&gt; X.31          0.0452     0.0311    1.46   0.1457    </span></span>
+<span id="cb23-26"><a href="#cb23-26" tabindex="-1"></a><span class="co">#&gt; X.56          0.0543     0.0327    1.66   0.0972 .  </span></span>
+<span id="cb23-27"><a href="#cb23-27" tabindex="-1"></a><span class="co">#&gt; X.61         -0.0508     0.0317   -1.60   0.1091    </span></span>
+<span id="cb23-28"><a href="#cb23-28" tabindex="-1"></a><span class="co">#&gt; X.60         -0.0513     0.0319   -1.61   0.1083    </span></span>
+<span id="cb23-29"><a href="#cb23-29" tabindex="-1"></a><span class="co">#&gt; X.46          0.0516     0.0327    1.58   0.1153    </span></span>
+<span id="cb23-30"><a href="#cb23-30" tabindex="-1"></a><span class="co">#&gt; X.35          0.0470     0.0315    1.49   0.1358    </span></span>
+<span id="cb23-31"><a href="#cb23-31" tabindex="-1"></a><span class="co">#&gt; X.92          0.0443     0.0310    1.43   0.1533    </span></span>
+<span id="cb23-32"><a href="#cb23-32" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb23-33"><a href="#cb23-33" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb23-34"><a href="#cb23-34" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb23-35"><a href="#cb23-35" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 0.973 on 984 degrees of freedom</span></span>
+<span id="cb23-36"><a href="#cb23-36" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.0442, Adjusted R-squared:  0.0296 </span></span>
+<span id="cb23-37"><a href="#cb23-37" tabindex="-1"></a><span class="co">#&gt; F-statistic: 3.03 on 15 and 984 DF,  p-value: 8.34e-05</span></span>
+<span id="cb23-38"><a href="#cb23-38" tabindex="-1"></a><span class="fu">mse</span>(D<span class="sc">$</span>y, <span class="fu">fitted</span>(m.select))</span>
+<span id="cb23-39"><a href="#cb23-39" tabindex="-1"></a><span class="co">#&gt; [1] 0.93063</span></span></code></pre></div>
 <p>The resulting model has 15 predictors, a very modest <span class="math inline">\(R^2 = .044\)</span>, but a small <span class="math inline">\(p\)</span>-value for its omnibus <span class="math inline">\(F\)</span>-test (which, of course, is entirely
 spurious because the same data were used to select and test the model).
 The MSE for the selected model is smaller than the true error variance
@@ -1269,7 +1290,7 @@ returning a CV criterion. The <code>selectStepAIC()</code> function,
 also in <strong>cv</strong> and based on <code>stepAIC()</code>, is
 suitable for use with <code>cvSelect()</code>:</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>cv.select <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, <span class="at">data=</span>D, <span class="at">seed=</span><span class="dv">3791</span>,</span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>                      <span class="at">model=</span>m.null,<span class="at">direction=</span><span class="st">&quot;forward&quot;</span>,</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>                      <span class="at">model=</span>m.null, <span class="at">direction=</span><span class="st">&quot;forward&quot;</span>,</span>
 <span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>                      <span class="at">scope=</span><span class="fu">list</span>(<span class="at">lower=</span><span class="sc">~</span><span class="dv">1</span>, </span>
 <span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>                                 <span class="at">upper=</span><span class="fu">formula</span>(m.full)))</span>
 <span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3791</span></span>
@@ -1525,9 +1546,9 @@ the occupation, from the 1971 Canadian Census.</li>
 occupation, from the Census.</li>
 <li><code>women</code>: percentage of occupational incumbents who were
 women, also from the Census.</li>
-<li><code>prestige</code>: the average prestige rating of the
-occupaption on a 0–100 “thermometer” scale, in a Canadian social survey
-conducted around the same time.</li>
+<li><code>prestige</code>: the average prestige rating of the occupation
+on a 0–100 “thermometer” scale, in a Canadian social survey conducted
+around the same time.</li>
 <li><code>type</code>, type of occupation, and <code>census</code>, the
 Census occupational code, which are not used in our example.</li>
 </ul>
@@ -1552,10 +1573,10 @@ Scatterplot matrix for the <code>Prestige</code> data.
 </div>
 <p>The <code>powerTransform()</code> function in the
 <strong>car</strong> package transforms variables towards multivariate
-normality by a generalization of Box and Cox’s maximum-liklihood-like
+normality by a generalization of Box and Cox’s maximum-likelihood-like
 approach <span class="citation">(Box &amp; Cox, 1964)</span>. Several
 “families” of power transformations can be used, including the original
-Box-Cox family, simple powers (and roots), and two adapations of the
+Box-Cox family, simple powers (and roots), and two adaptations of the
 Box-Cox family to data that may include negative values and zeros: the
 Box-Cox-with-negatives family and the Yeo-Johnson family; see <span class="citation">Weisberg (2014, Chapter 8)</span>, and <span class="citation">Fox &amp; Weisberg (2019, Chapter 3)</span> for
 details. Because <code>women</code> has some zero values, we use the
@@ -1740,7 +1761,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb42-5"><a href="#cb42-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb42-6"><a href="#cb42-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb42-7"><a href="#cb42-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb42-8"><a href="#cb42-8" tabindex="-1"></a><span class="co">#&gt;   0.238   0.015   0.253</span></span>
+<span id="cb42-8"><a href="#cb42-8" tabindex="-1"></a><span class="co">#&gt;   0.270   0.026   0.297</span></span>
 <span id="cb42-9"><a href="#cb42-9" tabindex="-1"></a></span>
 <span id="cb42-10"><a href="#cb42-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb42-11"><a href="#cb42-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -1750,7 +1771,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb42-15"><a href="#cb42-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb42-16"><a href="#cb42-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb42-17"><a href="#cb42-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb42-18"><a href="#cb42-18" tabindex="-1"></a><span class="co">#&gt;   0.037   0.010   1.603</span></span>
+<span id="cb42-18"><a href="#cb42-18" tabindex="-1"></a><span class="co">#&gt;   0.038   0.024   1.678</span></span>
 <span id="cb42-19"><a href="#cb42-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb42-20"><a href="#cb42-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually

@@ -2,7 +2,10 @@
 #'
 #' A generic function to cross-validate a model-selection procedure,
 #' along with a procedure that applies the \code{\link[MASS]{stepAIC}()}
-#' model-selection function in the \pkg{MASS} package.
+#' model-selection function in the \pkg{MASS} package, and a procedure
+#' for selecting predictor and response transformations in regression, which
+#' uses the \code{\link[car]{powerTransform}()} function in the
+#' \pkg{car} package.
 #'
 #'
 #' @param procedure a model-selection procedure function (see Details).
@@ -51,7 +54,8 @@
 #' argument, see the code for \code{selectStepAIC()} and for
 #' \code{selectTrans()}.
 #'
-#' @seealso \code{\link[MASS]{stepAIC}()}, \code{\link[car]{bcPower}}
+#' @seealso \code{\link[MASS]{stepAIC}()}, \code{\link[car]{bcPower}},
+#' \code{\link[car]{powerTransform}()}
 #'
 #' @export
 cvSelect <- function(procedure, data, k=10, reps=1,

@@ -139,8 +139,9 @@ anova(m.null, m.full)
 summary(m.null)
 
 ## ----forward-selection--------------------------------------------------------
-m.select <- MASS::stepAIC(m.null, direction="forward", trace=FALSE,
-                     scope=list(lower=~1, upper=formula(m.full)))
+m.select <- MASS::stepAIC(m.null,
+                          direction="forward", trace=FALSE,
+                          scope=list(lower=~1, upper=formula(m.full)))
 summary(m.select)
 mse(D$y, fitted(m.select))
 

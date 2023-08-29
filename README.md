@@ -22,6 +22,8 @@ model.
 use with `cvSelect()`, based on the `stepAIC()` function in the **MASS** 
 package.
 
+* `selectTrans()` is a procedure for selecting predictor and response transformations in regression, also suitable for use with `cvSelect()`, based on the `powerTransform()` function in the **car** package.
+
 For the time-being the package resides only on GitHub, but we anticipate
 eventually submitting it to CRAN.
 

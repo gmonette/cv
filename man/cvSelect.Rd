@@ -114,7 +114,10 @@ which is literally a list of \code{c("cvSelect", "cv")} objects.
 \description{
 A generic function to cross-validate a model-selection procedure,
 along with a procedure that applies the \code{\link[MASS]{stepAIC}()}
-model-selection function in the \pkg{MASS} package.
+model-selection function in the \pkg{MASS} package, and a procedure
+for selecting predictor and response transformations in regression, which
+uses the \code{\link[car]{powerTransform}()} function in the
+\pkg{car} package.
 }
 \details{
 The model-selection function supplied as the \code{procedure} argument
@@ -169,5 +172,6 @@ compareFolds(cvt)
 cv(m.pres, seed=123)
 }
 \seealso{
-\code{\link[MASS]{stepAIC}()}, \code{\link[car]{bcPower}}
+\code{\link[MASS]{stepAIC}()}, \code{\link[car]{bcPower}},
+\code{\link[car]{powerTransform}()}
 }

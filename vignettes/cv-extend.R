@@ -100,3 +100,91 @@ cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
 m.beps <- update(m.beps, trace=FALSE)
 cv(m.beps, seed=3465)
 
+## ----swiss--------------------------------------------------------------------
+library("leaps")
+head(swiss)
+nrow(swiss)
+
+## ----swiss-lm-----------------------------------------------------------------
+m.swiss <- lm(Fertility ~ ., data=swiss)
+summary(m.swiss)
+
+mse(swiss$Fertility, fitted(m.swiss))
+
+cv(m.swiss, seed=8433)
+
+## ----subset-selection---------------------------------------------------------
+swiss.sub <- regsubsets(Fertility ~ ., data=swiss)
+summary(swiss.sub)
+(bics <- summary(swiss.sub)$bic)
+which.min(bics)
+car::subsets(swiss.sub, legend="topright")
+
+## ----best-model---------------------------------------------------------------
+m.best <- update(m.swiss, . ~ . - Examination)
+summary(m.best)
+
+mse(swiss$Fertility, fitted(m.best))
+
+cv(m.best, seed=8433) # use same folds as before
+
+## ----selectSubsets------------------------------------------------------------
+selectSubsets <- function(data=insight::get_data(model), 
+                          model,
+                          indices,
+                          criterion=mse,
+                          save.coef=TRUE, ...){
+  if (inherits(model, "lm", which=TRUE) != 1)
+    stop("selectSubsets is appropriate only for 'lm' models")
+  y <- getResponse(model)
+  formula <- formula(model)
+  X <- model.matrix(model)
+
+  if (missing(indices)) {
+    # select best model from the full data by BIC
+    sel <- leaps::regsubsets(formula, data=data, ...)
+    bics <- summary(sel)$bic
+    best <- coef(sel, 1:length(bics))[[which.min(bics)]]
+    x.names <- names(best)
+    m.best <- lm(y ~ X[, x.names])
+    fit.all <- predict(m.best, newdata=data)
+    return(criterion(y, fit.all))
+  }
+
+  # select the best model omitting the i-th fold (indices)
+  sel.i <- leaps::regsubsets(formula, data[-indices, ], ...)
+  bics.i <- summary(sel.i)$bic
+  best.i <- coef(sel.i, 1:length(bics.i))[[which.min(bics.i)]]
+  x.names.i <- names(best.i)
+  m.best.i <- lm(y[-indices] ~ X[-indices, x.names.i] - 1)
+              # predict() doesn't work here:
+  fit.all.i <- as.vector(X[, x.names.i] %*% coef(m.best.i))
+  fit.i <- fit.all.i[indices]
+  list(criterion=c(criterion(y[indices], fit.i),
+                   criterion(y, fit.all.i)),
+       if (save.coef){
+         coefs <- coef(m.best.i)
+         nms <- names(coefs)
+         # fix coefficient names
+         nms <- sub("X\\[-indices, x.names.i\\]", "", nms)
+         names(coefs) <- nms
+         coefs
+       }  else {
+         NULL
+       }
+  )
+}
+
+## ----test-selectSubsets-------------------------------------------------------
+selectSubsets(model=m.swiss)
+
+## ----test-selectSubsets-fold--------------------------------------------------
+selectSubsets(model=m.swiss, indices=1:5)
+
+## ----cvSelect-selectSubsets---------------------------------------------------
+(cv.swiss <- cvSelect(selectSubsets, model=m.swiss,
+                      data=swiss, seed=8433)) # use same folds
+
+## ----best-models-by-folds-----------------------------------------------------
+compareFolds(cv.swiss)
+
