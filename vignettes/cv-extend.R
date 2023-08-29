@@ -109,22 +109,20 @@ nrow(swiss)
 m.swiss <- lm(Fertility ~ ., data=swiss)
 summary(m.swiss)
 
-mse(swiss$Fertility, fitted(m.swiss))
-
 cv(m.swiss, seed=8433)
 
 ## ----subset-selection---------------------------------------------------------
 swiss.sub <- regsubsets(Fertility ~ ., data=swiss)
 summary(swiss.sub)
+
 (bics <- summary(swiss.sub)$bic)
 which.min(bics)
+
 car::subsets(swiss.sub, legend="topright")
 
 ## ----best-model---------------------------------------------------------------
 m.best <- update(m.swiss, . ~ . - Examination)
 summary(m.best)
-
-mse(swiss$Fertility, fitted(m.best))
 
 cv(m.best, seed=8433) # use same folds as before
 
@@ -134,24 +132,27 @@ selectSubsets <- function(data=insight::get_data(model),
                           indices,
                           criterion=mse,
                           save.coef=TRUE, ...){
+  
   if (inherits(model, "lm", which=TRUE) != 1)
     stop("selectSubsets is appropriate only for 'lm' models")
+  
   y <- getResponse(model)
   formula <- formula(model)
   X <- model.matrix(model)
 
   if (missing(indices)) {
-    # select best model from the full data by BIC
+    # select the best model from the full data by BIC
     sel <- leaps::regsubsets(formula, data=data, ...)
     bics <- summary(sel)$bic
     best <- coef(sel, 1:length(bics))[[which.min(bics)]]
     x.names <- names(best)
-    m.best <- lm(y ~ X[, x.names])
+    # fit the best model; intercept is already in X, hence - 1:
+    m.best <- lm(y ~ X[, x.names] - 1) 
     fit.all <- predict(m.best, newdata=data)
-    return(criterion(y, fit.all))
+    return(criterion(y, fit.all)) # return the CV criterion
   }
 
-  # select the best model omitting the i-th fold (indices)
+  # select the best model omitting the i-th fold (given by indices)
   sel.i <- leaps::regsubsets(formula, data[-indices, ], ...)
   bics.i <- summary(sel.i)$bic
   best.i <- coef(sel.i, 1:length(bics.i))[[which.min(bics.i)]]
@@ -160,14 +161,17 @@ selectSubsets <- function(data=insight::get_data(model),
               # predict() doesn't work here:
   fit.all.i <- as.vector(X[, x.names.i] %*% coef(m.best.i))
   fit.i <- fit.all.i[indices]
-  list(criterion=c(criterion(y[indices], fit.i),
-                   criterion(y, fit.all.i)),
-       if (save.coef){
+  # return the CV criteria and the regression coefficients
+  list(criterion=c(criterion(y[indices], fit.i), # for i-th fold
+                   criterion(y, fit.all.i)), # for all data
+       coefs = if (save.coef){
          coefs <- coef(m.best.i)
-         nms <- names(coefs)
+         
          # fix coefficient names
+         nms <- names(coefs)
          nms <- sub("X\\[-indices, x.names.i\\]", "", nms)
          names(coefs) <- nms
+         
          coefs
        }  else {
          NULL
@@ -179,7 +183,7 @@ selectSubsets <- function(data=insight::get_data(model),
 selectSubsets(model=m.swiss)
 
 ## ----test-selectSubsets-fold--------------------------------------------------
-selectSubsets(model=m.swiss, indices=1:5)
+selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 
 ## ----cvSelect-selectSubsets---------------------------------------------------
 (cv.swiss <- cvSelect(selectSubsets, model=m.swiss,
