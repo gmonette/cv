@@ -29,7 +29,7 @@
 #' generator (\code{"seed"}), and (optionally) a list of coefficients
 #' (or, in the case of \code{selectTrans()}, estimated transformation
 #' parameters) for the selected models
-#' for each fold (\code{"coefs"}).
+#' for each fold (\code{"coefficients"}).
 #' If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
 #' which is literally a list of \code{c("cvSelect", "cv")} objects.
 #' @details
@@ -121,7 +121,7 @@ cvSelect <- function(procedure, data, k=10, reps=1,
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 coefs = if (save.coef) coefs else NULL)
+                 coefficients = if (save.coef) coefs else NULL)
   class(result) <- c("cvSelect", "cv")
   if (reps == 1) {
     return(result)
@@ -173,7 +173,7 @@ selectStepAIC <- function(data, indices,
   fit.i <- fit.all.i[indices]
   list(criterion=c(criterion(y[indices], fit.i),
          criterion(y, fit.all.i)),
-       if (save.coef) coefs=coef(model.i) else NULL)
+       if (save.coef) coefficients=coef(model.i) else NULL)
 }
 
 
@@ -354,7 +354,7 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
   # compute and return CV criteria and transformation parameters:
   list(criterion = c(criterion(y[indices], fit.i),
                      criterion(y, fit.o.i)),
-       coefs = if (save.coef) c(lambdas, gammas,
+       coefficients = if (save.coef) c(lambdas, gammas,
                                 lamda.y=as.vector(transy["lambda"]),
                                 if (!is.na(transy["gamma"]))
                                   gamma.y=as.vector(transy["gamma"]))
@@ -374,7 +374,7 @@ compareFolds <- function(object, digits=3, ...){
 
 #' @export
 compareFolds.cvSelect <- function(object, digits=3, ...){
-  coefficients <- object$coefs
+  coefficients <- object$coefficients
   if (is.null(coefficients))
     stop("coefficients for folds not available")
   names <- unlist(lapply(coefficients, names))

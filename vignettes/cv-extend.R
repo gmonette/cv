@@ -168,9 +168,8 @@ selectSubsets <- function(data=insight::get_data(model),
          coefs <- coef(m.best.i)
          
          # fix coefficient names
-         nms <- names(coefs)
-         nms <- sub("X\\[-indices, x.names.i\\]", "", nms)
-         names(coefs) <- nms
+         names(coefs) <- sub("X\\[-indices, x.names.i\\]", "",
+                             names(coefs))
          
          coefs
        }  else {

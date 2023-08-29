@@ -854,16 +854,15 @@ model-selection process:</p>
 <span id="cb18-39"><a href="#cb18-39" tabindex="-1"></a>         coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(m.best.i)</span>
 <span id="cb18-40"><a href="#cb18-40" tabindex="-1"></a>         </span>
 <span id="cb18-41"><a href="#cb18-41" tabindex="-1"></a>         <span class="co"># fix coefficient names</span></span>
-<span id="cb18-42"><a href="#cb18-42" tabindex="-1"></a>         nms <span class="ot">&lt;-</span> <span class="fu">names</span>(coefs)</span>
-<span id="cb18-43"><a href="#cb18-43" tabindex="-1"></a>         nms <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">&quot;X</span><span class="sc">\\</span><span class="st">[-indices, x.names.i</span><span class="sc">\\</span><span class="st">]&quot;</span>, <span class="st">&quot;&quot;</span>, nms)</span>
-<span id="cb18-44"><a href="#cb18-44" tabindex="-1"></a>         <span class="fu">names</span>(coefs) <span class="ot">&lt;-</span> nms</span>
-<span id="cb18-45"><a href="#cb18-45" tabindex="-1"></a>         </span>
-<span id="cb18-46"><a href="#cb18-46" tabindex="-1"></a>         coefs</span>
-<span id="cb18-47"><a href="#cb18-47" tabindex="-1"></a>       }  <span class="cf">else</span> {</span>
-<span id="cb18-48"><a href="#cb18-48" tabindex="-1"></a>         <span class="cn">NULL</span></span>
-<span id="cb18-49"><a href="#cb18-49" tabindex="-1"></a>       }</span>
-<span id="cb18-50"><a href="#cb18-50" tabindex="-1"></a>  )</span>
-<span id="cb18-51"><a href="#cb18-51" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb18-42"><a href="#cb18-42" tabindex="-1"></a>         <span class="fu">names</span>(coefs) <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">&quot;X</span><span class="sc">\\</span><span class="st">[-indices, x.names.i</span><span class="sc">\\</span><span class="st">]&quot;</span>, <span class="st">&quot;&quot;</span>,</span>
+<span id="cb18-43"><a href="#cb18-43" tabindex="-1"></a>                             <span class="fu">names</span>(coefs))</span>
+<span id="cb18-44"><a href="#cb18-44" tabindex="-1"></a>         </span>
+<span id="cb18-45"><a href="#cb18-45" tabindex="-1"></a>         coefs</span>
+<span id="cb18-46"><a href="#cb18-46" tabindex="-1"></a>       }  <span class="cf">else</span> {</span>
+<span id="cb18-47"><a href="#cb18-47" tabindex="-1"></a>         <span class="cn">NULL</span></span>
+<span id="cb18-48"><a href="#cb18-48" tabindex="-1"></a>       }</span>
+<span id="cb18-49"><a href="#cb18-49" tabindex="-1"></a>  )</span>
+<span id="cb18-50"><a href="#cb18-50" tabindex="-1"></a>}</span></code></pre></div>
 <p>A slightly tricky point is that because of scoping issues,
 <code>predict()</code> doesn’t work with the model fit omitting the
 <span class="math inline">\(i\)</span>th fold, and so the fitted values
@@ -877,7 +876,7 @@ is the selected model with the <span class="math inline">\(i\)</span>th
 fold deleted, produces awkward coefficient names like
 <code>&quot;X[-indices, Agriculture]&quot;</code>; purely for aesthetic reasons,
 the command
-<code>nms &lt;- sub(&quot;X\\[-indices, x.names.i\\]&quot;, &quot;&quot;, nms)</code> fixes
+<code>sub(&quot;X\\[-indices, x.names.i\\]&quot;, &quot;&quot;, names(coefs))</code> fixes
 these awkward names.</p>
 <p>Applying <code>selectSubsets()</code> to the full data produces the
 full-data cross-validated MSE (which we obtained previously):</p>

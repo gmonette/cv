@@ -107,7 +107,7 @@ the number of folds (\code{"k"}), the seed for R's random-number
 generator (\code{"seed"}), and (optionally) a list of coefficients
 (or, in the case of \code{selectTrans()}, estimated transformation
 parameters) for the selected models
-for each fold (\code{"coefs"}).
+for each fold (\code{"coefficients"}).
 If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
 which is literally a list of \code{c("cvSelect", "cv")} objects.
 }
