@@ -608,9 +608,8 @@ model-selection process:</p>
 <span>         <span class="va">coefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m.best.i</span><span class="op">)</span></span>
 <span>         </span>
 <span>         <span class="co"># fix coefficient names</span></span>
-<span>         <span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span></span>
-<span>         <span class="va">nms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"X\\[-indices, x.names.i\\]"</span>, <span class="st">""</span>, <span class="va">nms</span><span class="op">)</span></span>
-<span>         <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">nms</span></span>
+<span>         <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"X\\[-indices, x.names.i\\]"</span>, <span class="st">""</span>,</span>
+<span>                             <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span><span class="op">)</span></span>
 <span>         </span>
 <span>         <span class="va">coefs</span></span>
 <span>       <span class="op">}</span>  <span class="kw">else</span> <span class="op">{</span></span>
@@ -631,7 +630,7 @@ is the selected model with the <span class="math inline">\(i\)</span>th
 fold deleted, produces awkward coefficient names like
 <code>"X[-indices, Agriculture]"</code>; purely for aesthetic reasons,
 the command
-<code>nms &lt;- sub("X\\[-indices, x.names.i\\]", "", nms)</code> fixes
+<code>sub("X\\[-indices, x.names.i\\]", "", names(coefs))</code> fixes
 these awkward names.</p>
 <p>Applying <code>selectSubsets()</code> to the full data produces the
 full-data cross-validated MSE (which we obtained previously):</p>
