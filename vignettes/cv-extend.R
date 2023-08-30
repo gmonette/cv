@@ -164,7 +164,7 @@ selectSubsets <- function(data=insight::get_data(model),
   # return the CV criteria and the regression coefficients
   list(criterion=c(criterion(y[indices], fit.i), # for i-th fold
                    criterion(y, fit.all.i)), # for all data
-       coefs = if (save.coef){
+       coefficients = if (save.coef){
          coefs <- coef(m.best.i)
          
          # fix coefficient names

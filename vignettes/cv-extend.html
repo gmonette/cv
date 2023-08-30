@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-08-29" />
+<meta name="date" content="2023-08-30" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-08-29</h4>
+<h4 class="date">2023-08-30</h4>
 
 
 
@@ -850,7 +850,7 @@ model-selection process:</p>
 <span id="cb18-35"><a href="#cb18-35" tabindex="-1"></a>  <span class="co"># return the CV criteria and the regression coefficients</span></span>
 <span id="cb18-36"><a href="#cb18-36" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">criterion=</span><span class="fu">c</span>(<span class="fu">criterion</span>(y[indices], fit.i), <span class="co"># for i-th fold</span></span>
 <span id="cb18-37"><a href="#cb18-37" tabindex="-1"></a>                   <span class="fu">criterion</span>(y, fit.all.i)), <span class="co"># for all data</span></span>
-<span id="cb18-38"><a href="#cb18-38" tabindex="-1"></a>       <span class="at">coefs =</span> <span class="cf">if</span> (save.coef){</span>
+<span id="cb18-38"><a href="#cb18-38" tabindex="-1"></a>       <span class="at">coefficients =</span> <span class="cf">if</span> (save.coef){</span>
 <span id="cb18-39"><a href="#cb18-39" tabindex="-1"></a>         coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(m.best.i)</span>
 <span id="cb18-40"><a href="#cb18-40" tabindex="-1"></a>         </span>
 <span id="cb18-41"><a href="#cb18-41" tabindex="-1"></a>         <span class="co"># fix coefficient names</span></span>
@@ -891,7 +891,7 @@ which includes 4 or the 5 predictors (and the intercept):</p>
 <span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="co">#&gt; $criterion</span></span>
 <span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="co">#&gt; [1] 50.128 46.297</span></span>
 <span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt; $coefs</span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt; $coefficients</span></span>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt;      (Intercept)      Agriculture        Education         Catholic </span></span>
 <span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt;         63.80452         -0.15895         -1.04218          0.13066 </span></span>
 <span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a><span class="co">#&gt; Infant.Mortality </span></span>
