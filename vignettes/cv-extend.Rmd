@@ -268,7 +268,9 @@ selectSubsets <- function(data=insight::get_data(model),
   )
 }
 ```
-A slightly tricky point is that because of scoping issues, `predict()` doesn't work with the model fit omitting the $i$th fold, and so the fitted values for all cases are computed directly as $\widehat{\mathbf{y}}_{-i} = \mathbf{X} \mathbf{b}_{-i}$, where $\mathbf{X}$ is the model-matrix for all of the cases, and $\mathbf{b}_{-i}$ is the vector of least-squares coefficients for the selected model with the $i$th fold omitted. Additionally, the command `lm(y[-indices] ~ X[-indices, x.names.i] - 1)`, which is the selected model with the $i$th fold deleted, produces awkward coefficient names like `"X[-indices, Agriculture]"`; purely for aesthetic reasons, the command `sub("X\\[-indices, x.names.i\\]", "", names(coefs))` fixes these awkward names.
+A slightly tricky point is that because of scoping issues, `predict()` doesn't work with the model fit omitting the $i$th fold, and so the fitted values for all cases are computed directly as $\widehat{\mathbf{y}}_{-i} = \mathbf{X} \mathbf{b}_{-i}$, where $\mathbf{X}$ is the model-matrix for all of the cases, and $\mathbf{b}_{-i}$ is the vector of least-squares coefficients for the selected model with the $i$th fold omitted. 
+
+Additionally, the command `lm(y[-indices] ~ X[-indices, x.names.i] - 1)`, which is the selected model with the $i$th fold deleted, produces awkward coefficient names like `"X[-indices, x.names.i]Infant.Mortality"`. Purely for aesthetic reasons, the command `sub("X\\[-indices, x.names.i\\]", "", names(coefs))` fixes these awkward names, removing the extraneous text, `"X[-indices, x.names.i]"`.
 
 Applying `selectSubsets()` to the full data produces the full-data cross-validated MSE (which we obtained previously):
 ```{r test-selectSubsets}
