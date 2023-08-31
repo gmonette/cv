@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-08-30</h4>
+            <h4 data-toc-skip class="date">2023-08-31</h4>
       
       
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -624,14 +624,16 @@ for all cases are computed directly as <span class="math inline">\(\widehat{\mat
 \mathbf{b}_{-i}\)</span>, where <span class="math inline">\(\mathbf{X}\)</span> is the model-matrix for all of
 the cases, and <span class="math inline">\(\mathbf{b}_{-i}\)</span> is
 the vector of least-squares coefficients for the selected model with the
-<span class="math inline">\(i\)</span>th fold omitted. Additionally, the
-command <code>lm(y[-indices] ~ X[-indices, x.names.i] - 1)</code>, which
-is the selected model with the <span class="math inline">\(i\)</span>th
-fold deleted, produces awkward coefficient names like
-<code>"X[-indices, Agriculture]"</code>; purely for aesthetic reasons,
-the command
+<span class="math inline">\(i\)</span>th fold omitted.</p>
+<p>Additionally, the command
+<code>lm(y[-indices] ~ X[-indices, x.names.i] - 1)</code>, which is the
+selected model with the <span class="math inline">\(i\)</span>th fold
+deleted, produces awkward coefficient names like
+<code>"X[-indices, x.names.i]Infant.Mortality"</code>. Purely for
+aesthetic reasons, the command
 <code>sub("X\\[-indices, x.names.i\\]", "", names(coefs))</code> fixes
-these awkward names.</p>
+these awkward names, removing the extraneous text,
+<code>"X[-indices, x.names.i]"</code>.</p>
 <p>Applying <code>selectSubsets()</code> to the full data produces the
 full-data cross-validated MSE (which we obtained previously):</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
