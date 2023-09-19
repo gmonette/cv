@@ -173,30 +173,33 @@ On our computer, using the hatvalues is about an order of magnitude faster than 
 
 #### Comparing Competing Models
 
-The `cv()` function also has a method that can be applied to a list of regression models for the same data, composed using the `models()` function. For $k$-fold CV, the same folds are used for the competing models, which reduces random error in their comparison. This result can also be obtained by using a common seed for R's random-number generator while applying `cv()` separately to each model, but employing a list of models is more convenient for both $k$-fold and LOO CV (where there is no random component to the composition of the $n$ folds).
+The `cv()` function also has a method that can be applied to a list of regression models for the same data, composed using the `models()` function. For $k$-fold CV, the same folds are used for the competing models, which reduces random error in their comparison. This result can also be obtained by specifying a common seed for R's random-number generator while applying `cv()` separately to each model, but employing a list of models is more convenient for both $k$-fold and LOO CV (where there is no random component to the composition of the $n$ folds).
 
-We illustrate with the polynomial regression models of varying degree fit for the `Auto` data, beginning by fitting the 10 models:
+We illustrate with the polynomial regression models of varying degree for the `Auto` data (discussed previously), beginning by fitting and saving the 10 models:
 ```{r polyomial-models}
 for (p in 1:10){
   assign(paste0("m.", p),
          lm(mpg ~ poly(horsepower, p), data=Auto))
 }
+objects(pattern="m\\.[0-9]")
 summary(m.2) # for example, the quadratic fit
 ```
-We then apply `cv()` to the list of 10 models:
+We then apply `cv()` to the list of 10 models (the `data` argument is required):
 ```{r polynomial-regression-CV}
 # 10-fold CV
 cv.auto.10 <- cv(models(m.1, m.2, m.3, m.4, m.5,
                      m.6, m.7, m.8, m.9, m.10),
               data=Auto, seed=2120)
-cv.auto.10[[2]] # for example, the quadratic model
+cv.auto.10[1:2] # for the linear and quadratic models
 
 # LOO CV
 cv.auto.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
                         m.6, m.7, m.8, m.9, m.10),
                  data=Auto, k="loo")
-cv.auto.loo[[2]] # quadratic model
+cv.auto.loo[1:2] # linear and quadratic models
 ```
+Because we didn't supply names for the models in the calls to the `models()` function, the names `model.1`, `model.2`, etc., are supplied by the function.
+
 Finally, we extract and graph the adjusted MSEs for $10$-fold CV and the MSEs for LOO CV:
 ```{r polynomial-regression-CV-graph}
 #| out.width = "100%",
@@ -213,7 +216,7 @@ legend("topright", inset=0.02,
        legend=c("10-Fold CV", "LOO CV"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 ```
-In this example, 10-fold and LOO CV produce generally similar results, and also results that are similar to those produced by the estimated error variance $\widehat{\sigma}^2$ for each model, reported above (except for the highest-degree polynomials, where the CV results suggest over-fitting).
+In this example, 10-fold and LOO CV produce generally similar results, and also results that are similar to those produced by the estimated error variance $\widehat{\sigma}^2$ for each model, reported above (except for the highest-degree polynomials, where the CV results more clearly suggest over-fitting).
 
 ### Logistic regression for the `Mroz` data
 
