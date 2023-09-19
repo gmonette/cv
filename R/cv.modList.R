@@ -92,3 +92,9 @@ print.cvModList <- function(x, ...){
   return(invisible(x))
 }
 
+#' @export
+`[.cvModList` <- function(x, ...){
+  result <- NextMethod()
+  class(result) <- "cvModList"
+  result
+}
