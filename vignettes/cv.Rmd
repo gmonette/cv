@@ -171,6 +171,50 @@ On our computer, using the hatvalues is about an order of magnitude faster than 
 
 [^microbenchmark]: Out of impatience, we asked `microbenchmark()` to execute each command only 10 times rather than the default 100. With the exception of the last columns, the output is self-explanatory. The last column shows which methods have average timings that are statistically distinguishable. Because of the small number of repetitions (i.e., 10), the `"hatvalues"` and `"Woodbury"` methods aren't distinguishable, but the difference between these methods persists when we perform more repetitions---we invite the reader to redo this computation with the default `times=100` repetitions.
 
+#### Comparing Competing Models
+
+The `cv()` function also has a method that can be applied to a list of regression models for the same data, composed using the `models()` function. For $k$-fold CV, the same folds are used for the competing models, which reduces random error in their comparison. This result can also be obtained by using a common seed for R's random-number generator while applying `cv()` separately to each model, but employing a list of models is more convenient for both $k$-fold and LOO CV (where there is no random component to the composition of the $n$ folds).
+
+We illustrate with the polynomial regression models of varying degree fit for the `Auto` data, beginning by fitting the 10 models:
+```{r polyomial-models}
+for (p in 1:10){
+  assign(paste0("m.", p),
+         lm(mpg ~ poly(horsepower, p), data=Auto))
+}
+summary(m.2) # for example, the quadratic fit
+```
+We then apply `cv()` to the list of 10 models:
+```{r polynomial-regression-CV}
+# 10-fold CV
+cv.auto.10 <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                     m.6, m.7, m.8, m.9, m.10),
+              data=Auto, seed=2120)
+cv.auto.10[[2]] # for example, the quadratic model
+
+# LOO CV
+cv.auto.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                        m.6, m.7, m.8, m.9, m.10),
+                 data=Auto, k="loo")
+cv.auto.loo[[2]] # quadratic model
+```
+Finally, we extract and graph the adjusted MSEs for $10$-fold CV and the MSEs for LOO CV:
+```{r polynomial-regression-CV-graph}
+#| out.width = "100%",
+#| fig.height = 5,
+#| fig.cap = "Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$"
+cv.mse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
+cv.mse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
+plot(c(1, 10), range(cv.mse.10, cv.mse.loo), type="n",
+     xlab="Degree of polynomial, p",
+     ylab="Cross-Validated MSE")
+lines(1:10, cv.mse.10, lwd=2, lty=1, col=2, pch=16, type="b")
+lines(1:10, cv.mse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
+legend("topright", inset=0.02,
+       legend=c("10-Fold CV", "LOO CV"),
+       lwd=2, lty=2:1, col=3:2, pch=17:16)
+```
+In this example, 10-fold and LOO CV produce generally similar results, and also results that are similar to those produced by the estimated error variance $\widehat{\sigma}^2$ for each model, reported above (except for the highest-degree polynomials, where the CV results suggest over-fitting).
+
 ### Logistic regression for the `Mroz` data
 
 The `Mroz` data set from the **carData** package [associated with @FoxWeisberg:2019] has been used by several authors to illustrate binary logistic regression; see, in particular @FoxWeisberg:2019. The data were originally drawn from the U.S. Panel Study of Income Dynamics and pertain to married women. Here are a few cases in the data set:
