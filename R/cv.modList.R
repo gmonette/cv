@@ -3,16 +3,14 @@
 #' A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 #' created by the \code{models()} function. This \code{cv()} method simplifies
 #' the process of cross-validating several models on the same set of folds.
-#'
 #' \code{models()} performs some
-#' "sanity" checks, warning if the models are of differrent classes, and
+#' "sanity" checks, warning if the models are of different classes, and
 #' reporting an error if they are fit to apparently different data sets or
 #' different response variables.
-#' , , =mse, k=10, reps, seed, ...
-#' @param name model a list of regression model objects,
+#' @param model a list of regression model objects,
 #' created by \code{models()}.
 #' @param data (required) the data set to which the models were fit.
-#' @param name criterion the CV criterion (cost) function, defaults to
+#' @param criterion the CV criterion (cost) function, defaults to
 #' \code{\link{mse}}.
 #' @param k the number of CV folds; may be omitted, in which case the value
 #' will depend on the default for the \code{cv()} method invoked for the
@@ -28,7 +26,7 @@
 #' the individual model cross-validations.
 #' @param x an object of class \code{"cvModList"} to be printed.
 #' @return \code{models()} returns a \code{"modList"} object, the
-#' \code{cv()} method for which rturns a \code{"cvModList"} object.
+#' \code{cv()} method for which returns a \code{"cvModList"} object.
 #' @examples
 #' data("Duncan", package="carData")
 #' m1 <- lm(prestige ~ income + education, data=Duncan)
@@ -65,7 +63,7 @@ models <- function(...){
   models
 }
 
-#' @describeIn models \code{cv} method for \code{"modList} objects
+#' @describeIn models \code{cv()} method for \code{"modList"} objects
 #' @exportS3Method
 cv.modList <- function(model, data, criterion=mse, k, reps, seed, ...){
   n.models <- length(model)
@@ -83,7 +81,7 @@ cv.modList <- function(model, data, criterion=mse, k, reps, seed, ...){
   result
 }
 
-#' @describeIn models \code{print()} method for \code{"cvModList} object
+#' @describeIn models \code{print()} method for \code{"cvModList"} objects
 #' @exportS3Method
 print.cvModList <- function(x, ...){
   nms <- names(x)

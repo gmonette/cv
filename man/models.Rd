@@ -19,7 +19,13 @@ the same data; the several models may be named. For the \code{print()}
 method, arguments to be passed to the \code{print()} method for
 the individual model cross-validations.}
 
+\item{model}{a list of regression model objects,
+created by \code{models()}.}
+
 \item{data}{(required) the data set to which the models were fit.}
+
+\item{criterion}{the CV criterion (cost) function, defaults to
+\code{\link{mse}}.}
 
 \item{k}{the number of CV folds; may be omitted, in which case the value
 will depend on the default for the \code{cv()} method invoked for the
@@ -32,33 +38,27 @@ to be used to create the same set of CV folds for all of the models;
 if omitted, a seed will be randomly generated and saved.}
 
 \item{x}{an object of class \code{"cvModList"} to be printed.}
-
-\item{name}{criterion the CV criterion (cost) function, defaults to
-\code{\link{mse}}.}
 }
 \value{
 \code{models()} returns a \code{"modList"} object, the
-\code{cv()} method for which rturns a \code{"cvModList"} object.
+\code{cv()} method for which returns a \code{"cvModList"} object.
 }
 \description{
 A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 created by the \code{models()} function. This \code{cv()} method simplifies
 the process of cross-validating several models on the same set of folds.
-}
-\details{
 \code{models()} performs some
-"sanity" checks, warning if the models are of differrent classes, and
+"sanity" checks, warning if the models are of different classes, and
 reporting an error if they are fit to apparently different data sets or
 different response variables.
-, , =mse, k=10, reps, seed, ...
 }
 \section{Functions}{
 \itemize{
 \item \code{models()}: create a list of models
 
-\item \code{cv(modList)}: \code{cv} method for \code{"modList} objects
+\item \code{cv(modList)}: \code{cv()} method for \code{"modList"} objects
 
-\item \code{print(cvModList)}: \code{print()} method for \code{"cvModList} object
+\item \code{print(cvModList)}: \code{print()} method for \code{"cvModList"} objects
 
 }}
 \examples{
