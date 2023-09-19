@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 382158</span></span>
+<span><span class="co">#&gt; R RNG seed set to 118802</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.142</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.133</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.256</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.242</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -351,10 +351,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.6941    2.8824    2.9031    2.9176    2.9356    3.0807    10</span></span>
-<span><span class="co">#&gt;   Woodbury   26.0014   26.0693   26.2831   26.1719   26.3165   27.1851    10</span></span>
-<span><span class="co">#&gt;      naive  601.5274  603.3335  641.9335  604.1717  612.3495  852.7906    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1047.9912 1052.0614 1088.5936 1056.1600 1167.3430 1175.9767    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    2.6357    2.8533    2.9192    2.8854    3.0693    3.2285    10</span></span>
+<span><span class="co">#&gt;   Woodbury   25.8409   26.0886   26.7399   26.2518   26.6040   30.9583    10</span></span>
+<span><span class="co">#&gt;      naive  588.7233  594.0533  596.4067  596.3484  599.4600  601.9697    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1030.0565 1030.6681 1059.8077 1034.4923 1045.8072 1166.0068    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -375,19 +375,21 @@ default &lt;code&gt;times=100&lt;/code&gt; repetitions.&lt;/p&gt;'><sup>3</sup><
 to a list of regression models for the same data, composed using the
 <code><a href="../reference/models.html">models()</a></code> function. For <span class="math inline">\(k\)</span>-fold CV, the same folds are used for
 the competing models, which reduces random error in their comparison.
-This result can also be obtained by using a common seed for R’s
+This result can also be obtained by specifying a common seed for R’s
 random-number generator while applying <code><a href="../reference/cv.html">cv()</a></code> separately to
 each model, but employing a list of models is more convenient for both
 <span class="math inline">\(k\)</span>-fold and LOO CV (where there is
 no random component to the composition of the <span class="math inline">\(n\)</span> folds).</p>
 <p>We illustrate with the polynomial regression models of varying degree
-fit for the <code>Auto</code> data, beginning by fitting the 10
-models:</p>
+for the <code>Auto</code> data (discussed previously), beginning by
+fitting and saving the 10 models:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">p</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/assign.html" class="external-link">assign</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"m."</span>, <span class="va">p</span><span class="op">)</span>,</span>
 <span>         <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">horsepower</span>, <span class="va">p</span><span class="op">)</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">objects</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"m\\.[0-9]"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "m.1"  "m.10" "m.2"  "m.3"  "m.4"  "m.5"  "m.6"  "m.7"  "m.8"  "m.9"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.2</span><span class="op">)</span> <span class="co"># for example, the quadratic fit</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -408,7 +410,8 @@ models:</p>
 <span><span class="co">#&gt; Residual standard error: 4.37 on 389 degrees of freedom</span></span>
 <span><span class="co">#&gt; Multiple R-squared:  0.688,  Adjusted R-squared:  0.686 </span></span>
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span></code></pre></div>
-<p>We then apply <code><a href="../reference/cv.html">cv()</a></code> to the list of 10 models:</p>
+<p>We then apply <code><a href="../reference/cv.html">cv()</a></code> to the list of 10 models (the
+<code>data</code> argument is required):</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 10-fold CV</span></span>
 <span><span class="va">cv.auto.10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="fu"><a href="../reference/models.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
@@ -424,7 +427,17 @@ models:</p>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
-<span><span class="va">cv.auto.10</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="co"># for example, the quadratic model</span></span>
+<span><span class="va">cv.auto.10</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span> <span class="co"># for the linear and quadratic models</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model model.1:</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 24.246</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 24.23</span></span>
+<span><span class="co">#&gt; full-sample criterion = 23.944 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model model.2:</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
@@ -436,11 +449,21 @@ models:</p>
 <span><span class="va">cv.auto.loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="fu"><a href="../reference/models.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
 <span>                        <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
 <span>                 data<span class="op">=</span><span class="va">Auto</span>, k<span class="op">=</span><span class="st">"loo"</span><span class="op">)</span></span>
-<span><span class="va">cv.auto.loo</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="co"># quadratic model</span></span>
+<span><span class="va">cv.auto.loo</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span> <span class="co"># linear and quadratic models</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model model.1:</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: hatvalues</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 24.232</span></span>
+<span><span class="co">#&gt; Model model.2:</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: hatvalues</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.248</span></span></code></pre></div>
+<p>Because we didn’t supply names for the models in the calls to the
+<code><a href="../reference/models.html">models()</a></code> function, the names <code>model.1</code>,
+<code>model.2</code>, etc., are supplied by the function.</p>
 <p>Finally, we extract and graph the adjusted MSEs for <span class="math inline">\(10\)</span>-fold CV and the MSEs for LOO CV:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.mse.10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">cv.auto.10</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[[</span><span class="st">"adj CV crit"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
@@ -463,7 +486,7 @@ Cross-validated 10-fold and LOO MSE as a function of polynomial degree,
 results, and also results that are similar to those produced by the
 estimated error variance <span class="math inline">\(\widehat{\sigma}^2\)</span> for each model,
 reported above (except for the highest-degree polynomials, where the CV
-results suggest over-fitting).</p>
+results more clearly suggest over-fitting).</p>
 </div>
 </div>
 <div class="section level3">
@@ -634,11 +657,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.013    3.038    3.1196    3.0823    3.1216    3.5451    10</span></span>
-<span><span class="co">#&gt;   Woodbury   84.581   85.180   99.4425   86.0161   88.2384  213.0982    10</span></span>
-<span><span class="co">#&gt;      exact 3748.856 3810.169 3870.3474 3882.4961 3931.7384 3953.4260    10</span></span>
-<span><span class="co">#&gt;     cv.glm 4567.537 4599.591 4653.7104 4650.1577 4687.3057 4815.8711    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.9848    3.0469    3.0839    3.0757    3.0978    3.2635    10</span></span>
+<span><span class="co">#&gt;   Woodbury   84.3228   85.0372   86.0987   85.4170   85.7727   90.7756    10</span></span>
+<span><span class="co">#&gt;      exact 3704.0668 3774.1732 3844.6651 3857.9960 3908.0650 3940.7578    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4523.8775 4544.9418 4633.3595 4639.5449 4700.9958 4781.3210    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -1686,7 +1709,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.447   0.000   0.446</span></span>
+<span><span class="co">#&gt;   0.443   0.000   0.443</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -1696,7 +1719,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.066   0.000   1.734</span></span>
+<span><span class="co">#&gt;   0.062   0.004   1.698</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
