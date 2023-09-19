@@ -38,19 +38,20 @@
 #' @export
 models <- function(...){
   models <- list(...)
-  classes <- sapply(models, function(m) class(m)[1])
+  if (length(models) < 2L) stop("fewer than 2 models to be compared")
+  classes <- sapply(models, function(m) class(m)[1L])
   n <- sapply(models, function(m) nrow(insight::get_data(m)))
-  if (!all(n[1] == n[-1])) {
+  if (!all(n[1L] == n[-1L])) {
     stop("models are fit to data sets of differing numbers of cases")
   }
-  response <- getResponse(models[[1]])
-  for (i in 2:length(models)){
+  response <- getResponse(models[[1L]])
+  for (i in 2L:length(models)){
     if (!isTRUE(all.equal(response, getResponse(models[[i]]),
                           check.attributes=FALSE))){
       stop("models are not all fit to the same response variable")
     }
   }
-  if (length(unique(classes)) > 1)
+  if (length(unique(classes)) > 1L)
     warning("models are not all of the same primary class")
   nms <- names(models)
   if (is.null(nms)) {
@@ -71,7 +72,7 @@ cv.modList <- function(model, data, criterion=mse, k, reps, seed, ...){
   result <- vector(n.models, mode="list")
   names(result) <- names(model)
   class(result) <- "cvModList"
-  for (i in 1:n.models){
+  for (i in 1L:n.models){
     result[[i]] <- if (missing(k)){
       cv(model[[i]], data=data, seed=seed, ...)
     } else {
