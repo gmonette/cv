@@ -61,3 +61,7 @@ getResponse.merMod <- function(model, ...){
 #' @describeIn getResponse \code{merMod} method
 #' @export
 getResponse.lme <- function(model, ...) insight::get_response(model)
+
+#' @describeIn getResponse \code{glmmTMB} method
+#' @export
+getResponse.glmmTMB <- getResponse.merMod
