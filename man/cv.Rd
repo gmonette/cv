@@ -134,6 +134,13 @@ and \code{method="Woodbury"} otherwise; \code{method="naive"} refits
 the model via \code{update()} and is generally much slower. The
 default for generalized linear models is \code{method="exact"},
 which employs \code{update()}.
+
+For additional details, see the "Cross-validation of regression models"
+vignette (\code{vignette("cv", package="cv")}).
+
+\code{cv()} is designed to be extensible to other classes of regression
+models; see the "Extending the cv package" vignette
+(\code{vignette("cv-extend", package="cv")}).
 }
 \section{Methods (by class)}{
 \itemize{

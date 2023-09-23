@@ -140,6 +140,11 @@ the model fit to all of the cases.
 For examples of model-selection functions for the \code{procedure}
 argument, see the code for \code{selectStepAIC()} and for
 \code{selectTrans()}.
+
+For additional information, see the "Cross-validation of regression
+models" vignette (\code{vignette("cv", package="cv")})
+and the "Extending the cv package" vignette
+(\code{vignette("cv-extend", package="cv")}).
 }
 \section{Functions}{
 \itemize{

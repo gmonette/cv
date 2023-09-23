@@ -54,6 +54,11 @@
 #' argument, see the code for \code{selectStepAIC()} and for
 #' \code{selectTrans()}.
 #'
+#' For additional information, see the "Cross-validation of regression
+#' models" vignette (\code{vignette("cv", package="cv")})
+#' and the "Extending the cv package" vignette
+#' (\code{vignette("cv-extend", package="cv")}).
+#'
 #' @seealso \code{\link[MASS]{stepAIC}()}, \code{\link[car]{bcPower}},
 #' \code{\link[car]{powerTransform}()}
 #'

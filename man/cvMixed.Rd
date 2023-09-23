@@ -89,12 +89,14 @@ for clusters}
 \item{predict.clusters.args}{a list of arguments to be used to predict
 the whole data set from a mixed model when performing CV on clusters;
 the first two elements should be
-\code{model} and \code{newdata}; see the "Extending the cv package" vignette.}
+\code{model} and \code{newdata}; see the "Extending the cv package" vignette
+(\code{vignette("cv-extend", package="cv")}).}
 
 \item{predict.cases.args}{a list of arguments to be used to predict
 the whole data set from a mixed model when performing CV on cases;
 the first two elements should be
-\code{model} and \code{newdata}; see the "Extending the cv package" vignette.}
+\code{model} and \code{newdata}; see the "Extending the cv package" vignette
+(\code{vignette("cv-extend", package="cv")}).}
 
 \item{...}{for \code{cv()} methods, to match generic,
 and for \code{cvMixed()}, arguments to be passed to \code{update()}.}

@@ -25,7 +25,13 @@ package.
 
 * `selectTrans()` is a procedure for selecting predictor and response transformations in regression, also suitable for use with `cvSelect()`, based on the `powerTransform()` function in the **car** package.
 
-For the time-being the package resides only on GitHub, but we anticipate
+For additional information on using the **cv** package, see the
+"Cross-validation of regression models" vignette (`vignette("cv", package="cv")`). The **cv** package is designed to be extensible
+to other classes of regression models and other model-selection
+procedures; for details, see the "Extending the cv package"
+vignette (`vignette("cv-extend", package="cv")`).
+
+For the time-being the **cv** package resides only on GitHub, but we anticipate
 eventually submitting it to CRAN.
 
 To install the package:
