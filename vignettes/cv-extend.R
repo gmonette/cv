@@ -80,7 +80,7 @@ xtabs(~ vote, data=BEPS)/nrow(BEPS)
 ## ----BEPS-test-default, error=TRUE--------------------------------------------
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
 
-## ----getRespons.multinom------------------------------------------------------
+## ----getResponse.multinom-----------------------------------------------------
 getResponse.multinom <- function(model, ...) {
   insight::get_response(model)
 }
@@ -99,6 +99,54 @@ cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
 ## ----BEPS-cv------------------------------------------------------------------
 m.beps <- update(m.beps, trace=FALSE)
 cv(m.beps, seed=3465)
+
+## ----cv.lme-------------------------------------------------------------------
+cv:::cv.lme
+
+## ----getResponse.glmmPQL------------------------------------------------------
+getResponse.glmmPQL <- function(model, ...){
+  model <- glm(formula(model), data=model$data, family=model$family)
+  cv::getResponse(model)
+}
+
+## ----cv.glmmPQL---------------------------------------------------------------
+cv.glmmPQL <- function(model, data = model$data, criterion = mse,
+                     k, reps = 1, seed, ncores = 1, clusterVariables, ...){
+  cvMixed(
+    model,
+    data=data,
+    criterion=criterion,
+    k=k,
+    reps=reps,
+    seed=seed,
+    ncores=ncores,
+    clusterVariables=clusterVariables,
+    predict.clusters.args=list(object=model,
+                               newdata=data,
+                               level=0,
+                               type="response"),
+    predict.cases.args=list(object=model,
+                            newdata=data,
+                            level=1,
+                            type="response"),
+    verbose=FALSE,
+    ...)
+}
+
+## ----glmmPQL-example----------------------------------------------------------
+library("MASS")
+m.pql <- glmmPQL(y ~ trt + I(week > 2), random = ~ 1 | ID,
+             family = binomial, data = bacteria)
+summary(m.pql)
+
+## ----compare-to-lme4----------------------------------------------------------
+library("lme4")
+m.glmer <- glmer(y ~ trt + I(week > 2) + (1 | ID),
+               family = binomial, data = bacteria)
+summary(m.glmer)
+
+  # comparison of fixed effects:
+car::compareCoefs(m.pql, m.glmer) 
 
 ## ----swiss--------------------------------------------------------------------
 library("leaps")

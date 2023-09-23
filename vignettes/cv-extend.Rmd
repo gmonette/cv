@@ -47,7 +47,7 @@ colorize <- function(x, color) {
 .opts <- options(digits = 5)
 ```
 
-The **cv** package is designed to be extensible in several directions. In this vignette, we discuss three kinds of extensions, ordered by increasing general complexity: (1) adding a cross-validation cost criterion; (2) adding a model class that's not directly accommodated by the `cv()` default method or by another directly inherited method; and (3) adding a new model-selection procedure suitable for use with `selectModel()`.
+The **cv** package is designed to be extensible in several directions. In this vignette, we discuss three kinds of extensions, ordered by increasing general complexity: (1) adding a cross-validation cost criterion; (2) adding a model class that's not directly accommodated by the `cv()` default method or by another directly inherited method, with separate consideration of mixed-effects models; and (3) adding a new model-selection procedure suitable for use with `selectModel()`.
 
 
 ## Adding a cost criterion
@@ -76,6 +76,8 @@ cv(m.mroz, criterion=AUCcomp, seed=3639)
 As expected, the cross-validated complement to the AUC is somewhat less optimistic that the criterion computed from the model fit to the whole data set.
 
 ## Adding a model class not covered by the default `cv()` method
+
+### Independently sampled cases
 
 Suppose that we want to cross-validate a multinomial logistic regression model fit by the `multinom()` function in the **nnet** package [@VenablesRipley:2002]. We borrow an example from @Fox:2016 [Sec. 14.2.1], with data from the British Election Panel Study on vote choice in the 2001 British election. Data for the example are in the `BEPS` data frame in the **carData** package:
 ```{r BEPS-data}
@@ -134,7 +136,7 @@ We check first whether the default `cv()` method works "out-of-the-box" for the 
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
 ```
 The default method of `getResponse()` (a function supplied by the **cv** package---see `?getResponse`) fails for a `"multinom"` object. A straightforward solution is to supply a `getResponse.multinom()` method that returns the factor response [using the `get_response()` function from the **insight** package, @LudeckeWaggonerMakowski:2019],
-```{r getRespons.multinom}
+```{r getResponse.multinom}
 getResponse.multinom <- function(model, ...) {
   insight::get_response(model)
 }
@@ -160,6 +162,112 @@ m.beps <- update(m.beps, trace=FALSE)
 cv(m.beps, seed=3465)
 ```
 Prior to invoking `cv()`, we called `update()` with `trace=FALSE` to suppress the iteration history reported by default by `multinom()`---it would be tedious to see the iteration history for each fold. The cross-validated polytomous Bayes-rule criterion confirms that the fitted model does substantially better than the marginal Bayes-rule prediction that everyone votes for Labour.
+
+### Mixed-effects models
+
+Adding a `cv()` method for a mixed-model class is somewhat more complicated. We provide the `cvMixed()` function to facilitate this process, and to see how that works, consider the `"lme"` method from the **cv** package:
+```{r cv.lme}
+cv:::cv.lme
+```
+Notice that `cv.lme()` sets up a call to `cvMixed()`, which does the computational work. 
+
+Most of the arguments of `cvMixed()` are familiar:
+
+* `model` is the mixed-model object, here of class `"lme"`.
+
+* `data` is the data set to which the model is fit, by default extracted by the `get_data()` function in the **insight** package.
+
+* `criterion` is the CV criterion, defaulting to the `mse()` function.
+
+* `k` is the number of CV folds, defaulting to `"loo"` for CV by clusters and `10` for CV by cases.
+
+* `reps` is the number of times the CV process is repeated, defaulting to `1`.
+
+* `seed` is the seed for R's random-number generator, defaulting to a randomly selected (and saved) value.
+
+* `ncores` is the number of cores to use for parallel computation; if `1`, the default, then the computation isn't parallelized.
+
+* `clusterVariables` is a character vector of the names of variables defining clusters; if missing, then CV is based on cases rather than clusters. Only nested mixed effects are supported.
+
+The remaining two arguments are unfamiliar:
+
+* `predict.clusters.args` is a named list of arguments to be passed to the `predict()` function to obtain predictions for the full data set from a model fit to a subset of the data for cluster-based CV. The first two arguments should be `object` and `model`. It is typically necessary to tell `cvMixed()` how to base predictions only on fixed effects; in the case of `"lme"` models, this is done by setting `level = 0`.
+
+* Similarly, `predict.cases.args` is a named list of arguments to be passed to `predict()` for case-based CV. Setting `level = 1` includes random effects in the predictions.
+
+Finally, any additional arguments, absorbed by `...`, are passed to `update()` when the model is refit with each fold omitted. `cvMixed()` returns an object of class `"cv"`.
+
+Now imagine that we want to support a new class of mixed-effects models. To be concrete, we illustrate with the `glmmPQL()` function in the **MASS** package [@VenablesRipley:2002], which fits generalized-linear mixed-effects models by penalized quasi-likelihood.[^glmmPQL] Not coincidentally, the arguments of `glmmPQL()` are similar to those of `lme()` (with an additional `family` argument), because the former iteratively invokes the latter; so `cv.glmmPQL()` should resemble `cv.lme()`.
+
+[^glmmPQL]: This example is somewhat artificial in the `glmmPQL()` has largely been superseded by computationally superior functions, such the `glmer()` function in the **lme4** package.
+
+As it turns out, neither the default method for `getResponse()` nor `insight::get_data()` work for `"glmmPQL"` objects. These objects include a `"data"` element, however, and so we can simply extract this element as the default for the `data` argument of our `cv.glmmPQL()` method. To get the response variable is more complicated: We refit the fixed part of the model as a GLM and extract the response from that:
+
+```{r getResponse.glmmPQL}
+getResponse.glmmPQL <- function(model, ...){
+  model <- glm(formula(model), data=model$data, family=model$family)
+  cv::getResponse(model)
+}
+```
+
+Writing the `cv()` method is then straightforward:
+```{r cv.glmmPQL}
+cv.glmmPQL <- function(model, data = model$data, criterion = mse,
+                     k, reps = 1, seed, ncores = 1, clusterVariables, ...){
+  cvMixed(
+    model,
+    data=data,
+    criterion=criterion,
+    k=k,
+    reps=reps,
+    seed=seed,
+    ncores=ncores,
+    clusterVariables=clusterVariables,
+    predict.clusters.args=list(object=model,
+                               newdata=data,
+                               level=0,
+                               type="response"),
+    predict.cases.args=list(object=model,
+                            newdata=data,
+                            level=1,
+                            type="response"),
+    verbose=FALSE,
+    ...)
+}
+```
+We set the argument `verbose=FALSE` to suppress `glmmPQL()`'s iteration counter when `cvMixed()` calls `update()`.
+
+Let's apply our newly minted method to a logistic regression with a random intercept in an example that appears in `?glmmPQL`:
+```{r glmmPQL-example}
+library("MASS")
+m.pql <- glmmPQL(y ~ trt + I(week > 2), random = ~ 1 | ID,
+             family = binomial, data = bacteria)
+summary(m.pql)
+```
+We compare this result to that obtained from `glmer()` in the **lme4** package:
+```{r compare-to-lme4}
+library("lme4")
+m.glmer <- glmer(y ~ trt + I(week > 2) + (1 | ID),
+               family = binomial, data = bacteria)
+summary(m.glmer)
+
+  # comparison of fixed effects:
+car::compareCoefs(m.pql, m.glmer) 
+```
+The two sets of estimates are similar, but not identical
+
+Finally, we try out our `cv.glmmPQL()` method, cross-validating both by clusters and by cases,
+```{r cv-example-glmmPQL, cache=TRUE}
+cv(m.pql, clusterVariables="ID", criterion=BayesRule)
+
+cv(m.pql, data=bacteria, criterion=BayesRule, seed=1490)
+```
+and again compare to `glmer()`:
+```{r cv-example-glmer, cache=TRUE}
+cv(m.glmer, clusterVariables="ID", criterion=BayesRule)
+
+cv(m.glmer, data=bacteria, criterion=BayesRule, seed=1490)
+```
 
 
 ## Adding a model-selection procedure

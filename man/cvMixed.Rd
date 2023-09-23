@@ -87,7 +87,7 @@ if missing, cross-validation is performed for individual cases rather than
 for clusters}
 
 \item{predict.clusters.args}{a list of arguments to be used to predict
-the whole data set from a mixed model when performing CV on cluster;
+the whole data set from a mixed model when performing CV on clusters;
 the first two elements should be
 \code{model} and \code{newdata}; see the "Extending the cv package" vignette.}
 
@@ -96,7 +96,8 @@ the whole data set from a mixed model when performing CV on cases;
 the first two elements should be
 \code{model} and \code{newdata}; see the "Extending the cv package" vignette.}
 
-\item{...}{to match generic}
+\item{...}{for \code{cv()} methods, to match generic,
+and for \code{cvMixed()}, arguments to be passed to \code{update()}.}
 }
 \description{
 \code{\link{cv}()} methods for models of class \code{"merMod"}, fit

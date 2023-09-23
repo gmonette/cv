@@ -39,7 +39,8 @@
 #' the first two elements should be
 #' \code{model} and \code{newdata}; see the "Extending the cv package" vignette.
 #'
-#' @param ... to match generic
+#' @param ... for \code{cv()} methods, to match generic,
+#' and for \code{cvMixed()}, arguments to be passed to \code{update()}.
 #'
 #' @details
 #' For mixed-effects models, cross-validation can be done by "clusters" or by
@@ -82,7 +83,7 @@ cvMixed <- function(model,
   f.clusters <- function(i){
     indices.i <- indices[starts[i]:ends[i]]
     index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
-    predict.clusters.args$object <- update(model, data=data[index, ])
+    predict.clusters.args$object <- update(model, data=data[index, ], ...)
     fit.all.i <- do.call(predict, predict.clusters.args)
     fit.i <- fit.all.i[!index]
     c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
@@ -90,7 +91,7 @@ cvMixed <- function(model,
 
   f.cases <- function(i){
     indices.i <- indices[starts[i]:ends[i]]
-    predict.cases.args$object <- update(model, data=data[ - indices.i, ])
+    predict.cases.args$object <- update(model, data=data[ - indices.i, ], ...)
     fit.all.i <- do.call(predict, predict.cases.args)
     fit.i <- fit.all.i[indices.i]
     c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
