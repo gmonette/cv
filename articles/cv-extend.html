@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-09-22</h4>
+            <h4 data-toc-skip class="date">2023-09-23</h4>
       
       
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -84,8 +84,9 @@ several directions. In this vignette, we discuss three kinds of
 extensions, ordered by increasing general complexity: (1) adding a
 cross-validation cost criterion; (2) adding a model class that’s not
 directly accommodated by the <code><a href="../reference/cv.html">cv()</a></code> default method or by
-another directly inherited method; and (3) adding a new model-selection
-procedure suitable for use with <code>selectModel()</code>.</p>
+another directly inherited method, with separate consideration of
+mixed-effects models; and (3) adding a new model-selection procedure
+suitable for use with <code>selectModel()</code>.</p>
 <div class="section level2">
 <h2 id="adding-a-cost-criterion">Adding a cost criterion<a class="anchor" aria-label="anchor" href="#adding-a-cost-criterion"></a>
 </h2>
@@ -173,6 +174,9 @@ whole data set.</p>
 <h2 id="adding-a-model-class-not-covered-by-the-default-cv-method">Adding a model class not covered by the default <code>cv()</code>
 method<a class="anchor" aria-label="anchor" href="#adding-a-model-class-not-covered-by-the-default-cv-method"></a>
 </h2>
+<div class="section level3">
+<h3 id="independently-sampled-cases">Independently sampled cases<a class="anchor" aria-label="anchor" href="#independently-sampled-cases"></a>
+</h3>
 <p>Suppose that we want to cross-validate a multinomial logistic
 regression model fit by the <code><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom()</a></code> function in the
 <strong>nnet</strong> package <span class="citation">(Venables &amp;
@@ -377,12 +381,268 @@ Bayes-rule criterion confirms that the fitted model does substantially
 better than the marginal Bayes-rule prediction that everyone votes for
 Labour.</p>
 </div>
+<div class="section level3">
+<h3 id="mixed-effects-models">Mixed-effects models<a class="anchor" aria-label="anchor" href="#mixed-effects-models"></a>
+</h3>
+<p>Adding a <code><a href="../reference/cv.html">cv()</a></code> method for a mixed-model class is somewhat
+more complicated. We provide the <code><a href="../reference/cvMixed.html">cvMixed()</a></code> function to
+facilitate this process, and to see how that works, consider the
+<code>"lme"</code> method from the <strong>cv</strong> package:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">cv</span><span class="fu">:::</span><span class="va"><a href="../reference/cvMixed.html">cv.lme</a></span></span>
+<span><span class="co">#&gt; function (model, data = insight::get_data(model), criterion = mse, </span></span>
+<span><span class="co">#&gt;     k, reps = 1, seed, ncores = 1, clusterVariables, ...) </span></span>
+<span><span class="co">#&gt; {</span></span>
+<span><span class="co">#&gt;     cvMixed(model, data = data, criterion = criterion, k = k, </span></span>
+<span><span class="co">#&gt;         reps = reps, seed = seed, ncores = ncores, clusterVariables = clusterVariables, </span></span>
+<span><span class="co">#&gt;         predict.clusters.args = list(object = model, newdata = data, </span></span>
+<span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
+<span><span class="co">#&gt;             newdata = data, level = 1), ...)</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x56090e45a1a8&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
+<p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
+<code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
+<p>Most of the arguments of <code><a href="../reference/cvMixed.html">cvMixed()</a></code> are familiar:</p>
+<ul>
+<li><p><code>model</code> is the mixed-model object, here of class
+<code>"lme"</code>.</p></li>
+<li><p><code>data</code> is the data set to which the model is fit, by
+default extracted by the <code>get_data()</code> function in the
+<strong>insight</strong> package.</p></li>
+<li><p><code>criterion</code> is the CV criterion, defaulting to the
+<code><a href="../reference/cost-functions.html">mse()</a></code> function.</p></li>
+<li><p><code>k</code> is the number of CV folds, defaulting to
+<code>"loo"</code> for CV by clusters and <code>10</code> for CV by
+cases.</p></li>
+<li><p><code>reps</code> is the number of times the CV process is
+repeated, defaulting to <code>1</code>.</p></li>
+<li><p><code>seed</code> is the seed for R’s random-number generator,
+defaulting to a randomly selected (and saved) value.</p></li>
+<li><p><code>ncores</code> is the number of cores to use for parallel
+computation; if <code>1</code>, the default, then the computation isn’t
+parallelized.</p></li>
+<li><p><code>clusterVariables</code> is a character vector of the names
+of variables defining clusters; if missing, then CV is based on cases
+rather than clusters. Only nested mixed effects are supported.</p></li>
+</ul>
+<p>The remaining two arguments are unfamiliar:</p>
+<ul>
+<li><p><code>predict.clusters.args</code> is a named list of arguments
+to be passed to the <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function to obtain
+predictions for the full data set from a model fit to a subset of the
+data for cluster-based CV. The first two arguments should be
+<code>object</code> and <code>model</code>. It is typically necessary to
+tell <code><a href="../reference/cvMixed.html">cvMixed()</a></code> how to base predictions only on fixed
+effects; in the case of <code>"lme"</code> models, this is done by
+setting <code>level = 0</code>.</p></li>
+<li><p>Similarly, <code>predict.cases.args</code> is a named list of
+arguments to be passed to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> for case-based CV.
+Setting <code>level = 1</code> includes random effects in the
+predictions.</p></li>
+</ul>
+<p>Finally, any additional arguments, absorbed by <code>...</code>, are
+passed to <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> when the model is refit with each fold
+omitted. <code><a href="../reference/cvMixed.html">cvMixed()</a></code> returns an object of class
+<code>"cv"</code>.</p>
+<p>Now imagine that we want to support a new class of mixed-effects
+models. To be concrete, we illustrate with the <code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code>
+function in the <strong>MASS</strong> package <span class="citation">(Venables &amp; Ripley, 2002)</span>, which fits
+generalized-linear mixed-effects models by penalized quasi-likelihood.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;This example is somewhat artificial in the
+&lt;code&gt;&lt;a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link"&gt;glmmPQL()&lt;/a&gt;&lt;/code&gt; has largely been superseded by computationally
+superior functions, such the &lt;code&gt;&lt;a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link"&gt;glmer()&lt;/a&gt;&lt;/code&gt; function in the
+&lt;strong&gt;lme4&lt;/strong&gt; package.&lt;/p&gt;'><sup>1</sup></a> Not
+coincidentally, the arguments of <code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code> are similar to
+those of <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme()</a></code> (with an additional <code>family</code>
+argument), because the former iteratively invokes the latter; so
+<code>cv.glmmPQL()</code> should resemble <code><a href="../reference/cvMixed.html">cv.lme()</a></code>.</p>
+<p>As it turns out, neither the default method for
+<code><a href="../reference/getResponse.html">getResponse()</a></code> nor <code><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">insight::get_data()</a></code> work for
+<code>"glmmPQL"</code> objects. These objects include a
+<code>"data"</code> element, however, and so we can simply extract this
+element as the default for the <code>data</code> argument of our
+<code>cv.glmmPQL()</code> method. To get the response variable is more
+complicated: We refit the fixed part of the model as a GLM and extract
+the response from that:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">getResponse.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>, data<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">data</span>, family<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">family</span><span class="op">)</span></span>
+<span>  <span class="fu">cv</span><span class="fu">::</span><span class="fu"><a href="../reference/getResponse.html">getResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Writing the <code><a href="../reference/cv.html">cv()</a></code> method is then straightforward:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cv.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span> <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">data</span>, <span class="va">criterion</span> <span class="op">=</span> <span class="va">mse</span>,</span>
+<span>                     <span class="va">k</span>, <span class="va">reps</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, <span class="va">ncores</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">clusterVariables</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/cvMixed.html">cvMixed</a></span><span class="op">(</span></span>
+<span>    <span class="va">model</span>,</span>
+<span>    data<span class="op">=</span><span class="va">data</span>,</span>
+<span>    criterion<span class="op">=</span><span class="va">criterion</span>,</span>
+<span>    k<span class="op">=</span><span class="va">k</span>,</span>
+<span>    reps<span class="op">=</span><span class="va">reps</span>,</span>
+<span>    seed<span class="op">=</span><span class="va">seed</span>,</span>
+<span>    ncores<span class="op">=</span><span class="va">ncores</span>,</span>
+<span>    clusterVariables<span class="op">=</span><span class="va">clusterVariables</span>,</span>
+<span>    predict.clusters.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>object<span class="op">=</span><span class="va">model</span>,</span>
+<span>                               newdata<span class="op">=</span><span class="va">data</span>,</span>
+<span>                               level<span class="op">=</span><span class="fl">0</span>,</span>
+<span>                               type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span>,</span>
+<span>    predict.cases.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>object<span class="op">=</span><span class="va">model</span>,</span>
+<span>                            newdata<span class="op">=</span><span class="va">data</span>,</span>
+<span>                            level<span class="op">=</span><span class="fl">1</span>,</span>
+<span>                            type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span>,</span>
+<span>    verbose<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>    <span class="va">...</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>We set the argument <code>verbose=FALSE</code> to suppress
+<code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code>’s iteration counter when <code><a href="../reference/cvMixed.html">cvMixed()</a></code>
+calls <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>.</p>
+<p>Let’s apply our newly minted method to a logistic regression with a
+random intercept in an example that appears in
+<code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">?glmmPQL</a></code>:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">"MASS"</a></span><span class="op">)</span></span>
+<span><span class="va">m.pql</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">week</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">)</span>, random <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">|</span> <span class="va">ID</span>,</span>
+<span>             family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">bacteria</span><span class="op">)</span></span>
+<span><span class="co">#&gt; iteration 1</span></span>
+<span><span class="co">#&gt; iteration 2</span></span>
+<span><span class="co">#&gt; iteration 3</span></span>
+<span><span class="co">#&gt; iteration 4</span></span>
+<span><span class="co">#&gt; iteration 5</span></span>
+<span><span class="co">#&gt; iteration 6</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.pql</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear mixed-effects model fit by maximum likelihood</span></span>
+<span><span class="co">#&gt;   Data: bacteria </span></span>
+<span><span class="co">#&gt;   AIC BIC logLik</span></span>
+<span><span class="co">#&gt;    NA  NA     NA</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Formula: ~1 | ID</span></span>
+<span><span class="co">#&gt;         (Intercept) Residual</span></span>
+<span><span class="co">#&gt; StdDev:      1.4106  0.78005</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Variance function:</span></span>
+<span><span class="co">#&gt;  Structure: fixed weights</span></span>
+<span><span class="co">#&gt;  Formula: ~invwt </span></span>
+<span><span class="co">#&gt; Fixed effects:  y ~ trt + I(week &gt; 2) </span></span>
+<span><span class="co">#&gt;                   Value Std.Error  DF t-value p-value</span></span>
+<span><span class="co">#&gt; (Intercept)      3.4120   0.51850 169  6.5805  0.0000</span></span>
+<span><span class="co">#&gt; trtdrug         -1.2474   0.64406  47 -1.9367  0.0588</span></span>
+<span><span class="co">#&gt; trtdrug+        -0.7543   0.64540  47 -1.1688  0.2484</span></span>
+<span><span class="co">#&gt; I(week &gt; 2)TRUE -1.6073   0.35834 169 -4.4853  0.0000</span></span>
+<span><span class="co">#&gt;  Correlation: </span></span>
+<span><span class="co">#&gt;                 (Intr) trtdrg trtdr+</span></span>
+<span><span class="co">#&gt; trtdrug         -0.598              </span></span>
+<span><span class="co">#&gt; trtdrug+        -0.571  0.460       </span></span>
+<span><span class="co">#&gt; I(week &gt; 2)TRUE -0.537  0.047 -0.001</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Standardized Within-Group Residuals:</span></span>
+<span><span class="co">#&gt;      Min       Q1      Med       Q3      Max </span></span>
+<span><span class="co">#&gt; -5.19854  0.15723  0.35131  0.49495  1.74488 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Observations: 220</span></span>
+<span><span class="co">#&gt; Number of Groups: 50</span></span></code></pre></div>
+<p>We compare this result to that obtained from <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer()</a></code> in
+the <strong>lme4</strong> package:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lme4/lme4/" class="external-link">"lme4"</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: Matrix</span></span>
+<span><span class="va">m.glmer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">week</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">ID</span><span class="op">)</span>,</span>
+<span>               family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">bacteria</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.glmer</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
+<span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
+<span><span class="co">#&gt;  Family: binomial  ( logit )</span></span>
+<span><span class="co">#&gt; Formula: y ~ trt + I(week &gt; 2) + (1 | ID)</span></span>
+<span><span class="co">#&gt;    Data: bacteria</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;      AIC      BIC   logLik deviance df.resid </span></span>
+<span><span class="co">#&gt;    202.3    219.2    -96.1    192.3      215 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Scaled residuals: </span></span>
+<span><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></span>
+<span><span class="co">#&gt; -4.561  0.136  0.302  0.422  1.128 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups Name        Variance Std.Dev.</span></span>
+<span><span class="co">#&gt;  ID     (Intercept) 1.54     1.24    </span></span>
+<span><span class="co">#&gt; Number of obs: 220, groups:  ID, 50</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fixed effects:</span></span>
+<span><span class="co">#&gt;                 Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)        3.548      0.696    5.10  3.4e-07 ***</span></span>
+<span><span class="co">#&gt; trtdrug           -1.367      0.677   -2.02  0.04352 *  </span></span>
+<span><span class="co">#&gt; trtdrug+          -0.783      0.683   -1.15  0.25193    </span></span>
+<span><span class="co">#&gt; I(week &gt; 2)TRUE   -1.598      0.476   -3.36  0.00078 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Correlation of Fixed Effects:</span></span>
+<span><span class="co">#&gt;             (Intr) trtdrg trtdr+</span></span>
+<span><span class="co">#&gt; trtdrug     -0.593              </span></span>
+<span><span class="co">#&gt; trtdrug+    -0.537  0.487       </span></span>
+<span><span class="co">#&gt; I(wk&gt;2)TRUE -0.656  0.126  0.064</span></span>
+<span></span>
+<span>  <span class="co"># comparison of fixed effects:</span></span>
+<span><span class="fu">car</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/compareCoefs.html" class="external-link">compareCoefs</a></span><span class="op">(</span><span class="va">m.pql</span>, <span class="va">m.glmer</span><span class="op">)</span> </span>
+<span><span class="co">#&gt; Warning in car::compareCoefs(m.pql, m.glmer): models to be compared are of</span></span>
+<span><span class="co">#&gt; different classes</span></span>
+<span><span class="co">#&gt; Calls:</span></span>
+<span><span class="co">#&gt; 1: glmmPQL(fixed = y ~ trt + I(week &gt; 2), random = ~1 | ID, family = </span></span>
+<span><span class="co">#&gt;   binomial, data = bacteria)</span></span>
+<span><span class="co">#&gt; 2: glmer(formula = y ~ trt + I(week &gt; 2) + (1 | ID), data = bacteria, </span></span>
+<span><span class="co">#&gt;   family = binomial)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;                 Model 1 Model 2</span></span>
+<span><span class="co">#&gt; (Intercept)       3.412   3.548</span></span>
+<span><span class="co">#&gt; SE                0.514   0.696</span></span>
+<span><span class="co">#&gt;                                </span></span>
+<span><span class="co">#&gt; trtdrug          -1.247  -1.367</span></span>
+<span><span class="co">#&gt; SE                0.638   0.677</span></span>
+<span><span class="co">#&gt;                                </span></span>
+<span><span class="co">#&gt; trtdrug+         -0.754  -0.783</span></span>
+<span><span class="co">#&gt; SE                0.640   0.683</span></span>
+<span><span class="co">#&gt;                                </span></span>
+<span><span class="co">#&gt; I(week &gt; 2)TRUE  -1.607  -1.598</span></span>
+<span><span class="co">#&gt; SE                0.355   0.476</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div>
+<p>The two sets of estimates are similar, but not identical</p>
+<p>Finally, we try out our <code>cv.glmmPQL()</code> method,
+cross-validating both by clusters and by cases,</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pql</span>, clusterVariables<span class="op">=</span><span class="st">"ID"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation based on 50 {ID} clusters</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.196</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.196</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.19545</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pql</span>, data<span class="op">=</span><span class="va">bacteria</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">1490</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R RNG seed set to 1490</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.20909</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.20727</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.14545</span></span></code></pre></div>
+<p>and again compare to <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer()</a></code>:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.glmer</span>, clusterVariables<span class="op">=</span><span class="st">"ID"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation based on 50 {ID} clusters</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.196</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.196</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.19545</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.glmer</span>, data<span class="op">=</span><span class="va">bacteria</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">1490</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R RNG seed set to 1490</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19364</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.15</span></span></code></pre></div>
+</div>
+</div>
 <div class="section level2">
 <h2 id="adding-a-model-selection-procedure">Adding a model-selection procedure<a class="anchor" aria-label="anchor" href="#adding-a-model-selection-procedure"></a>
 </h2>
 <p>The <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> function supplied by the
 <strong>cv</strong> package, which is based on the
-<code>stepAIC()</code> function from the <strong>nnet</strong> package
+<code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code> function from the <strong>nnet</strong> package
 <span class="citation">(Venables &amp; Ripley, 2002)</span> for stepwise
 model selection, is suitable for the <code>procedure</code> argument of
 <code><a href="../reference/cvSelect.html">cvSelect()</a></code>. The use of <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> is
@@ -402,10 +662,10 @@ measures of model predictive performance, including the &lt;span class="math inl
 residual sums of squares, Mallows’s &lt;span class="math inline"&gt;\(C_p\)&lt;/span&gt;, and the BIC. Several of these are
 suitable for comparing models with differing numbers of coefficients—we
 use the BIC below—but all necessarily agree when comparing models with
-the &lt;em&gt;same&lt;/em&gt; number of coefficients.&lt;/p&gt;'><sup>1</sup></a> To illustrate the use
+the &lt;em&gt;same&lt;/em&gt; number of coefficients.&lt;/p&gt;'><sup>2</sup></a> To illustrate the use
 of <code><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets()</a></code>, we employ the <code>swiss</code> data
 frame supplied by the <strong>leaps</strong> package:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"leaps"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">swiss</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              Fertility Agriculture Examination Education Catholic</span></span>
@@ -448,7 +708,7 @@ as the percentage of live births surviving less than a year.</li>
 <p>Following <span class="citation">Lumley &amp; Miller (2020)</span>,
 we treat <code>Fertility</code> as the response and the other variables
 as predictors in a linear least-squares regression:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Fertility</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">swiss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.swiss</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -488,7 +748,7 @@ subset of the predictors, taking account of the additional uncertainty
 induced by model selection?</p>
 <p>First, let’s apply best-subset selection to the complete data
 set:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">swiss.sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">Fertility</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">swiss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">swiss.sub</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Subset selection object</span></span>
@@ -525,7 +785,7 @@ Selecting the best model of each size.
 is the best model with 4 predictors, including <code>Agriculture</code>,
 <code>Education</code>, <code>Catholic</code>, and
 <code>Infant.Mortality</code>, but not <code>Examination</code>:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m.swiss</span>, <span class="va">.</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="va">Examination</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.best</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -566,7 +826,7 @@ select and cross-validate a model on the same data.</p>
 <p>Here’s a function named <code>selectSubsets()</code>, meant to be
 used with <code><a href="../reference/cvSelect.html">cvSelect()</a></code>, suitable for cross-validating the
 model-selection process:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">selectSubsets</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">=</span><span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">get_data</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>, </span>
 <span>                          <span class="va">model</span>,</span>
 <span>                          <span class="va">indices</span>,</span>
@@ -636,7 +896,7 @@ these awkward names, removing the extraneous text,
 <code>"X[-indices, x.names.i]"</code>.</p>
 <p>Applying <code>selectSubsets()</code> to the full data produces the
 full-data cross-validated MSE (which we obtained previously):</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">selectSubsets</span><span class="op">(</span>model<span class="op">=</span><span class="va">m.swiss</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 45.916</span></span></code></pre></div>
 <p>Similarly, applying the function to an imaginary “fold” of 5 cases
@@ -644,7 +904,7 @@ returns the MSE for the cases in the fold, based on the model selected
 and fit to the cases omitting the fold; the MSE for all of the cases,
 based on the same model; and the coefficients of the selected model,
 which includes 4 or the 5 predictors (and the intercept):</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">selectSubsets</span><span class="op">(</span>model<span class="op">=</span><span class="va">m.swiss</span>, indices<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">45</span>, by<span class="op">=</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $criterion</span></span>
 <span><span class="co">#&gt; [1] 50.128 46.297</span></span>
@@ -656,7 +916,7 @@ which includes 4 or the 5 predictors (and the intercept):</p>
 <span><span class="co">#&gt;          1.01895</span></span></code></pre></div>
 <p>Then, using <code>selectSubsets()</code> in cross-validation, we
 get:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">cv.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectSubsets</span>, model<span class="op">=</span><span class="va">m.swiss</span>,</span>
 <span>                      data<span class="op">=</span><span class="va">swiss</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span><span class="op">)</span> <span class="co"># use same folds</span></span>
 <span><span class="co">#&gt; R RNG seed set to 8433</span></span>
@@ -668,7 +928,7 @@ get:</p>
 Examining the models selected for the 10 folds reveals that there is
 some uncertainty in identifying the predictors in the “best” model, with
 <code>Agriculture</code> sometimes appearing and sometimes not:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.swiss</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         (Intercept) Catholic Education Infant.Mortality Agriculture</span></span>
 <span><span class="co">#&gt; Fold 1      59.0852   0.1397   -1.0203           1.2985       -0.17</span></span>
