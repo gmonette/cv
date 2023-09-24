@@ -399,7 +399,7 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
 <span><span class="co">#&gt;             newdata = data, level = 1), ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55d03c4c7148&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55be357f0d08&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
@@ -448,10 +448,13 @@ omitted. <code><a href="../reference/cvMixed.html">cvMixed()</a></code> returns 
 <p>Now imagine that we want to support a new class of mixed-effects
 models. To be concrete, we illustrate with the <code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code>
 function in the <strong>MASS</strong> package <span class="citation">(Venables &amp; Ripley, 2002)</span>, which fits
-generalized-linear mixed-effects models by penalized quasi-likelihood.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;This example is somewhat artificial in the
+generalized-linear mixed-effects models by penalized quasi-likelihood.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;This example is somewhat artificial in that
 &lt;code&gt;&lt;a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link"&gt;glmmPQL()&lt;/a&gt;&lt;/code&gt; has largely been superseded by computationally
 superior functions, such the &lt;code&gt;&lt;a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link"&gt;glmer()&lt;/a&gt;&lt;/code&gt; function in the
-&lt;strong&gt;lme4&lt;/strong&gt; package.&lt;/p&gt;'><sup>1</sup></a> Not
+&lt;strong&gt;lme4&lt;/strong&gt; package. There is, however, one situation in which
+&lt;code&gt;&lt;a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link"&gt;glmmPQL()&lt;/a&gt;&lt;/code&gt; might prove useful: to specify serial dependency
+in case-level errors within clusters for longitudinal data, which is not
+currently supported by &lt;code&gt;&lt;a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link"&gt;glmer()&lt;/a&gt;&lt;/code&gt;.&lt;/p&gt;'><sup>1</sup></a> Not
 coincidentally, the arguments of <code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code> are similar to
 those of <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme()</a></code> (with an additional <code>family</code>
 argument), because the former iteratively invokes the latter; so
