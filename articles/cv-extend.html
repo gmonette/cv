@@ -399,7 +399,7 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
 <span><span class="co">#&gt;             newdata = data, level = 1), ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5625f24f2488&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55c7de8c3f30&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
@@ -461,15 +461,18 @@ argument), because the former iteratively invokes the latter; so
 <code>"glmmPQL"</code> objects. These objects include a
 <code>"data"</code> element, however, and so we can simply extract this
 element as the default for the <code>data</code> argument of our
-<code>cv.glmmPQL()</code> method. To get the response variable is more
-complicated: We refit the fixed part of the model, with only the
-regression constant on the right-hand side, as a GLM and extract the
-response from that:</p>
+<code>cv.glmmPQL()</code> method.</p>
+<p>To get the response variable is more complicated: We refit the fixed
+part of the model as a GLM with only the regression constant on the
+right-hand side, and extract the response from that; because all we need
+is the response variable, we limit the number of GLM iterations to 1 and
+suppress warning messages about non-convergence:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">getResponse.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span>  <span class="va">f</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># regression constant only</span></span>
-<span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">f</span>, data<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">data</span>, family<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">family</span><span class="op">)</span></span>
+<span>  <span class="va">f</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># regression constant only on RHS</span></span>
+<span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">f</span>, data<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">data</span>, family<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">family</span>,</span>
+<span>                                control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu">cv</span><span class="fu">::</span><span class="fu"><a href="../reference/getResponse.html">getResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Writing the <code><a href="../reference/cv.html">cv()</a></code> method is then straightforward:</p>

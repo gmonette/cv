@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 142002</span></span>
+<span><span class="co">#&gt; R RNG seed set to 23293</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.166</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.157</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.217</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.204</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -351,10 +351,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.0243    3.1296    3.2222    3.2512    3.2891    3.3399    10</span></span>
-<span><span class="co">#&gt;   Woodbury   26.6866   27.0814   27.8754   27.2439   27.3520   33.5416    10</span></span>
-<span><span class="co">#&gt;      naive  700.1961  701.3908  733.1830  705.0003  709.0005  853.1553    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1184.6376 1189.3407 1205.4133 1191.9603 1198.7969 1326.7260    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    2.8771    3.0669    3.3291    3.3979    3.5155    3.6491    10</span></span>
+<span><span class="co">#&gt;   Woodbury   27.1535   27.3651   29.3423   27.9245   28.8229   35.7737    10</span></span>
+<span><span class="co">#&gt;      naive  705.0608  707.5170  726.9750  710.1337  714.5447  870.7065    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1191.4752 1198.9069 1236.1252 1206.1390 1210.7593 1375.5609    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -658,10 +658,10 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.2808    3.3418    3.3946    3.3874    3.4353    3.6124    10</span></span>
-<span><span class="co">#&gt;   Woodbury   90.5100   91.5235   93.4466   92.3414   95.4873   98.8907    10</span></span>
-<span><span class="co">#&gt;      exact 4047.8763 4085.4759 4187.2554 4213.4739 4284.6064 4302.4385    10</span></span>
-<span><span class="co">#&gt;     cv.glm 4961.4573 4981.0415 5067.6495 5076.1798 5106.8725 5218.7030    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    3.4921    3.5156    3.5776    3.5541    3.6039    3.7435    10</span></span>
+<span><span class="co">#&gt;   Woodbury   94.3924   96.6221   99.0259   97.4677  102.5677  103.9908    10</span></span>
+<span><span class="co">#&gt;      exact 4167.6595 4242.6338 4331.8696 4309.6935 4450.9097 4519.3397    10</span></span>
+<span><span class="co">#&gt;     cv.glm 5089.5114 5110.5414 5210.8568 5233.6138 5255.7827 5323.2470    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -1709,7 +1709,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.477   0.000   0.480</span></span>
+<span><span class="co">#&gt;   0.687   0.000   0.687</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -1719,7 +1719,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.077   0.000   1.939</span></span>
+<span><span class="co">#&gt;   0.074   0.002   2.017</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
