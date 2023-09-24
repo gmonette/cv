@@ -726,16 +726,19 @@ argument), because the former iteratively invokes the latter; so
 <code>&quot;glmmPQL&quot;</code> objects. These objects include a
 <code>&quot;data&quot;</code> element, however, and so we can simply extract this
 element as the default for the <code>data</code> argument of our
-<code>cv.glmmPQL()</code> method. To get the response variable is more
-complicated: We refit the fixed part of the model, with only the
-regression constant on the right-hand side, as a GLM and extract the
-response from that:</p>
+<code>cv.glmmPQL()</code> method.</p>
+<p>To get the response variable is more complicated: We refit the fixed
+part of the model as a GLM with only the regression constant on the
+right-hand side, and extract the response from that; because all we need
+is the response variable, we limit the number of GLM iterations to 1 and
+suppress warning messages about non-convergence:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>getResponse.glmmPQL <span class="ot">&lt;-</span> <span class="cf">function</span>(model, ...){</span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="fu">formula</span>(model)</span>
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  f[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co"># regression constant only</span></span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">glm</span>(f, <span class="at">data=</span>model<span class="sc">$</span>data, <span class="at">family=</span>model<span class="sc">$</span>family)</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>  cv<span class="sc">::</span><span class="fu">getResponse</span>(model)</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">glm</span>(f, <span class="at">data=</span>model<span class="sc">$</span>data, <span class="at">family=</span>model<span class="sc">$</span>family,</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>                                <span class="at">control=</span><span class="fu">list</span>(<span class="at">maxit=</span><span class="dv">1</span>)))</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>  cv<span class="sc">::</span><span class="fu">getResponse</span>(model)</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>}</span></code></pre></div>
 <p>Writing the <code>cv()</code> method is then straightforward:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>cv.glmmPQL <span class="ot">&lt;-</span> <span class="cf">function</span>(model, <span class="at">data =</span> model<span class="sc">$</span>data, <span class="at">criterion =</span> mse,</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>                     k, <span class="at">reps =</span> <span class="dv">1</span>, seed, <span class="at">ncores =</span> <span class="dv">1</span>, clusterVariables, ...){</span>

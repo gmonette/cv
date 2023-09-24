@@ -201,13 +201,16 @@ Now imagine that we want to support a new class of mixed-effects models. To be c
 
 [^glmmPQL]: This example is somewhat artificial in the `glmmPQL()` has largely been superseded by computationally superior functions, such the `glmer()` function in the **lme4** package.
 
-As it turns out, neither the default method for `getResponse()` nor `insight::get_data()` work for `"glmmPQL"` objects. These objects include a `"data"` element, however, and so we can simply extract this element as the default for the `data` argument of our `cv.glmmPQL()` method. To get the response variable is more complicated: We refit the fixed part of the model, with only the regression constant on the right-hand side, as a GLM and extract the response from that:
+As it turns out, neither the default method for `getResponse()` nor `insight::get_data()` work for `"glmmPQL"` objects. These objects include a `"data"` element, however, and so we can simply extract this element as the default for the `data` argument of our `cv.glmmPQL()` method. 
+
+To get the response variable is more complicated: We refit the fixed part of the model as a GLM with only the regression constant on the right-hand side, and extract the response from that; because all we need is the response variable, we limit the number of GLM iterations to 1 and suppress warning messages about non-convergence:
 
 ```{r getResponse.glmmPQL}
 getResponse.glmmPQL <- function(model, ...){
   f <- formula(model)
-  f[[3]] <- 1 # regression constant only
-  model <- glm(f, data=model$data, family=model$family)
+  f[[3]] <- 1 # regression constant only on RHS
+  model <- suppressWarnings(glm(f, data=model$data, family=model$family,
+                                control=list(maxit=1)))
   cv::getResponse(model)
 }
 ```
