@@ -105,7 +105,9 @@ cv:::cv.lme
 
 ## ----getResponse.glmmPQL------------------------------------------------------
 getResponse.glmmPQL <- function(model, ...){
-  model <- glm(formula(model), data=model$data, family=model$family)
+  f <- formula(model)
+  f[[3]] <- 1 # regression constant only
+  model <- glm(f, data=model$data, family=model$family)
   cv::getResponse(model)
 }
 
