@@ -106,7 +106,7 @@ cv:::cv.lme
 ## ----getResponse.glmmPQL------------------------------------------------------
 getResponse.glmmPQL <- function(model, ...){
   f <- formula(model)
-  f[[3]] <- 1 # regression constant only
+  f[[3]] <- 1 # regression constant only on RHS
   model <- suppressWarnings(glm(f, data=model$data, family=model$family,
                                 control=list(maxit=1)))
   cv::getResponse(model)

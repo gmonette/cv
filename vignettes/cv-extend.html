@@ -734,7 +734,7 @@ is the response variable, we limit the number of GLM iterations to 1 and
 suppress warning messages about non-convergence:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>getResponse.glmmPQL <span class="ot">&lt;-</span> <span class="cf">function</span>(model, ...){</span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="fu">formula</span>(model)</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  f[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co"># regression constant only</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  f[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co"># regression constant only on RHS</span></span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">glm</span>(f, <span class="at">data=</span>model<span class="sc">$</span>data, <span class="at">family=</span>model<span class="sc">$</span>family,</span>
 <span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>                                <span class="at">control=</span><span class="fu">list</span>(<span class="at">maxit=</span><span class="dv">1</span>)))</span>
 <span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>  cv<span class="sc">::</span><span class="fu">getResponse</span>(model)</span>
@@ -1227,10 +1227,13 @@ Springer.
 <div class="footnotes footnotes-end-of-document">
 <hr />
 <ol>
-<li id="fn1"><p>This example is somewhat artificial in the
+<li id="fn1"><p>This example is somewhat artificial in that
 <code>glmmPQL()</code> has largely been superseded by computationally
 superior functions, such the <code>glmer()</code> function in the
-<strong>lme4</strong> package.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<strong>lme4</strong> package. There is, however, one situation in which
+<code>glmmPQL()</code> might prove useful: to specify serial dependency
+in case-level errors within clusters for longitudinal data, which is not
+currently supported by <code>glmer()</code>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
 <li id="fn2"><p>The <code>regsubsets()</code> function computes several
 measures of model predictive performance, including the <span class="math inline">\(R^2\)</span> and <span class="math inline">\(R^2\)</span> adjusted for degrees of freedom, the
 residual sums of squares, Mallows’s <span class="math inline">\(C_p\)</span>, and the BIC. Several of these are

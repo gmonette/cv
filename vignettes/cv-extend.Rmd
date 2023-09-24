@@ -199,7 +199,7 @@ Finally, any additional arguments, absorbed by `...`, are passed to `update()` w
 
 Now imagine that we want to support a new class of mixed-effects models. To be concrete, we illustrate with the `glmmPQL()` function in the **MASS** package [@VenablesRipley:2002], which fits generalized-linear mixed-effects models by penalized quasi-likelihood.[^glmmPQL] Not coincidentally, the arguments of `glmmPQL()` are similar to those of `lme()` (with an additional `family` argument), because the former iteratively invokes the latter; so `cv.glmmPQL()` should resemble `cv.lme()`.
 
-[^glmmPQL]: This example is somewhat artificial in the `glmmPQL()` has largely been superseded by computationally superior functions, such the `glmer()` function in the **lme4** package.
+[^glmmPQL]: This example is somewhat artificial in that `glmmPQL()` has largely been superseded by computationally superior functions, such the `glmer()` function in the **lme4** package. There is, however, one situation in which `glmmPQL()` might prove useful: to specify serial dependency in case-level errors within clusters for longitudinal data, which is not currently supported by `glmer()`.
 
 As it turns out, neither the default method for `getResponse()` nor `insight::get_data()` work for `"glmmPQL"` objects. These objects include a `"data"` element, however, and so we can simply extract this element as the default for the `data` argument of our `cv.glmmPQL()` method. 
 
