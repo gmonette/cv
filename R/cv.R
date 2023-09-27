@@ -6,11 +6,11 @@
 #' more computationally efficient.
 #'
 #' @param model a regression model object (see Details).
-#' @param data data frame to which the model was fit (not usually necessary)
-#' @param criterion cross-validation criterion function of form \code{f(y, yhat)}
+#' @param data data frame to which the model was fit (not usually necessary).
+#' @param criterion cross-validation criterion ("cost") function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
 #'        \code{yhat} the predicted values; the default is \code{\link{mse}}
-#'        (the mean-squared error)
+#'        (the mean-squared error).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
@@ -27,7 +27,7 @@
 #' \code{type} argument of \code{predict()};
 #' the default is `type="response"`, which is appropriate, e.g., for a `"glm"` model
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
-#' @param ... to match generic.
+#' @param ... to match generic; passed to \code{predict()} for the default method.
 #' @returns An object of class \code{"cv"}, with the averaged CV criterion
 #' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
@@ -104,7 +104,7 @@ cv.default <- function(model, data=insight::get_data(model),
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
     model.i <- update(model, data=data[ - indices.i, ])
-    fit.all.i <- predict(model.i, newdata=data, type=type)
+    fit.all.i <- predict(model.i, newdata=data, type=type, ...)
     fit.i <- fit.all.i[indices.i]
     c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
@@ -146,7 +146,7 @@ cv.default <- function(model, data=insight::get_data(model),
     }
   }
   cv <- weighted.mean(result[, 1L], folds)
-  cv.full <- criterion(y, predict(model, type=type))
+  cv.full <- criterion(y, predict(model, type=type, ...))
   adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,

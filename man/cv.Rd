@@ -55,12 +55,12 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \arguments{
 \item{model}{a regression model object (see Details).}
 
-\item{data}{data frame to which the model was fit (not usually necessary)}
+\item{data}{data frame to which the model was fit (not usually necessary).}
 
-\item{criterion}{cross-validation criterion function of form \code{f(y, yhat)}
+\item{criterion}{cross-validation criterion ("cost") function of form \code{f(y, yhat)}
 where \code{y} is the observed values of the response and
 \code{yhat} the predicted values; the default is \code{\link{mse}}
-(the mean-squared error)}
+(the mean-squared error).}
 
 \item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
@@ -72,7 +72,7 @@ cross-validation.}
 supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation}
 
-\item{...}{to match generic.}
+\item{...}{to match generic; passed to \code{predict()} for the default method.}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}
