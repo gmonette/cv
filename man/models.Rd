@@ -4,6 +4,7 @@
 \alias{models}
 \alias{cv.modList}
 \alias{print.cvModList}
+\alias{plot.cvModList}
 \title{Cross-Validate Several Models Fit to the Same Data}
 \usage{
 models(...)
@@ -11,13 +12,26 @@ models(...)
 \method{cv}{modList}(model, data, criterion = mse, k, reps, seed, quietly = TRUE, ...)
 
 \method{print}{cvModList}(x, ...)
+
+\method{plot}{cvModList}(
+  x,
+  y,
+  ylab = paste("Cross-Validated", x[[1L]]$criterion),
+  main = "Model Comparison",
+  axis.args = list(labels = names(x), las = 3L),
+  col = palette()[2L],
+  lwd = 2,
+  ...
+)
 }
 \arguments{
 \item{...}{for \code{cv()}, additional arguments to be passed to the \code{cv()} method
 applied to each model. For \code{models()}, two or more competing models fit to the
 the same data; the several models may be named. For the \code{print()}
 method, arguments to be passed to the \code{print()} method for
-the individual model cross-validations.}
+the individual model cross-validations. For the \code{plot()},
+method, arguments to be passed to the base \code{\link[base]{plot}()}
+function.}
 
 \item{model}{a list of regression model objects,
 created by \code{models()}.}
@@ -41,7 +55,26 @@ if omitted, a seed will be randomly generated and saved.}
 value to which the random-number generator seed is set), but not warnings or
 errors, are suppressed.}
 
-\item{x}{an object of class \code{"cvModList"} to be printed.}
+\item{x}{an object of class \code{"cvModList"} to be printed or plotted.}
+
+\item{y}{the name of the element in each \code{"cv"} object to be
+plotted; defaults to \code{"adj CV crit"}, if it exists, or to
+\code{"CV crit"}.}
+
+\item{ylab}{label for the y-axis.}
+
+\item{main}{main title for the graph.}
+
+\item{axis.args}{a list of arguments for the \code{\link{axis}()}
+function, used to draw the horizontal axis. In addition to
+the axis arguments given explicitly, \code{side=1} (the horizontal
+axis) and \code{at=seq(along=x)} (i.e., 1 to the number of models)
+are used and can't be modified.}
+
+\item{col}{color for the line and points, defaults to the second
+element of the color palette; see \code{\link{palette}()}.}
+
+\item{lwd}{line width for the line (defaults to 2).}
 }
 \value{
 \code{models()} returns a \code{"modList"} object, the
@@ -64,11 +97,15 @@ different response variables.
 
 \item \code{print(cvModList)}: \code{print()} method for \code{"cvModList"} objects
 
+\item \code{plot(cvModList)}: \code{plot()} method for \code{"cvModList"} objects
+
 }}
 \examples{
 data("Duncan", package="carData")
 m1 <- lm(prestige ~ income + education, data=Duncan)
 m2 <- lm(prestige ~ income + education + type, data=Duncan)
 m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
-cv(models(m1=m1, m2=m2, m3=m3), data=Duncan, seed=7949)
+(cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
+                 data=Duncan, seed=7949))
+plot(cv.models)
 }

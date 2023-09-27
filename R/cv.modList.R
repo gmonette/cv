@@ -26,8 +26,23 @@
 #' applied to each model. For \code{models()}, two or more competing models fit to the
 #' the same data; the several models may be named. For the \code{print()}
 #' method, arguments to be passed to the \code{print()} method for
-#' the individual model cross-validations.
-#' @param x an object of class \code{"cvModList"} to be printed.
+#' the individual model cross-validations. For the \code{plot()},
+#' method, arguments to be passed to the base \code{\link[base]{plot}()}
+#' function.
+#' @param x an object of class \code{"cvModList"} to be printed or plotted.
+#' @param y the name of the element in each \code{"cv"} object to be
+#' plotted; defaults to \code{"adj CV crit"}, if it exists, or to
+#' \code{"CV crit"}.
+#' @param ylab label for the y-axis.
+#' @param main main title for the graph.
+#' @param axis.args a list of arguments for the \code{\link{axis}()}
+#' function, used to draw the horizontal axis. In addition to
+#' the axis arguments given explicitly, \code{side=1} (the horizontal
+#' axis) and \code{at=seq(along=x)} (i.e., 1 to the number of models)
+#' are used and can't be modified.
+#' @param col color for the line and points, defaults to the second
+#' element of the color palette; see \code{\link{palette}()}.
+#' @param lwd line width for the line (defaults to 2).
 #' @return \code{models()} returns a \code{"modList"} object, the
 #' \code{cv()} method for which returns a \code{"cvModList"} object.
 #' @examples
@@ -35,8 +50,9 @@
 #' m1 <- lm(prestige ~ income + education, data=Duncan)
 #' m2 <- lm(prestige ~ income + education + type, data=Duncan)
 #' m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
-#' cv(models(m1=m1, m2=m2, m3=m3), data=Duncan, seed=7949)
-
+#' (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
+#'                  data=Duncan, seed=7949))
+#' plot(cv.models)
 #' @describeIn models create a list of models
 #' @export
 models <- function(...){
@@ -102,6 +118,42 @@ print.cvModList <- function(x, ...){
     print(x[[i]], ...)
   }
   return(invisible(x))
+}
+
+#' @describeIn models \code{plot()} method for \code{"cvModList"} objects
+#' @importFrom grDevices palette
+#' @importFrom graphics abline axis box par strwidth
+#' @importFrom stats na.omit
+#' @exportS3Method
+plot.cvModList <- function(x, y,
+                           ylab=paste("Cross-Validated", x[[1L]]$criterion),
+                           main="Model Comparison",
+                           axis.args = list(labels=names(x), las=3L),
+                           col=palette()[2L], lwd=2, ...){
+  if (missing(y)){
+    nms <- names(x[[1L]])
+    which.crit <- na.omit(match(c("adj CV crit", "CV crit"), nms))
+    if (length(which.crit) == 0L){
+      stop('can\'t find "adj CV crit" or "CV crit"\n',
+           'specify the y argument')
+    }
+    y <- nms[which.crit[1L]]
+  }
+  if (isTRUE(axis.args$las == 3L)){
+    mai <- par("mai")
+    mai[1] <- max(strwidth(axis.args$labels, units="inches")) + 0.5
+    save.mai <- par(mai = mai)
+    on.exit(par(save.mai))
+  }
+  crit <- sapply(x, function (x) x[[y]])
+  plot(seq(along=crit), crit, xlab="", ylab=ylab, main=main,
+       axes=FALSE, type="b", col=col, lwd=lwd, ...)
+  abline(h=min(crit), lty=2L, col=col)
+  box()
+  axis(2)
+  axis.args$side <- 1L
+  axis.args$at <- seq(along=x)
+  do.call(axis, axis.args)
 }
 
 #' @export
