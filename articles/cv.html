@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 864745</span></span>
+<span><span class="co">#&gt; R RNG seed set to 144078</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.246</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.233</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.322</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.304</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -350,11 +350,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.688    2.7599    2.9059    2.9503    2.9758    3.1605    10</span></span>
-<span><span class="co">#&gt;   Woodbury   26.131   26.3512   27.4558   26.6621   27.3830   31.5269    10</span></span>
-<span><span class="co">#&gt;      naive  597.052  598.1408  613.3084  599.7156  605.2062  728.2455    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1039.634 1040.1314 1075.8648 1051.0205 1055.6139 1317.6511    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.8385    2.8902    3.1633    3.1271    3.3069    3.9096    10</span></span>
+<span><span class="co">#&gt;   Woodbury   27.0607   27.3077   28.5260   27.4824   29.1433   34.9781    10</span></span>
+<span><span class="co">#&gt;      naive  689.2032  696.0951  714.2142  698.1433  706.5580  847.7779    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1170.2367 1174.2081 1181.3197 1180.8432 1189.1142 1193.7308    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -647,11 +647,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.0447    3.0801    3.1484    3.1082    3.2683    3.3072    10</span></span>
-<span><span class="co">#&gt;   Woodbury   85.4867   85.9091   87.0413   86.6666   87.7789   90.5494    10</span></span>
-<span><span class="co">#&gt;      exact 3798.6441 3909.1957 3945.6422 3935.3649 3981.0559 4127.9806    10</span></span>
-<span><span class="co">#&gt;     cv.glm 4657.9977 4707.6291 4795.8518 4794.6674 4849.7371 5007.5285    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median       uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    3.3008    3.3484    3.3961    3.3741    3.395    3.5682    10</span></span>
+<span><span class="co">#&gt;   Woodbury   91.1995   92.4848   93.8471   92.8794   93.823  101.6282    10</span></span>
+<span><span class="co">#&gt;      exact 4053.2069 4092.3538 4170.8433 4158.3822 4232.715 4311.7717    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4936.8389 4948.0569 5033.9146 5030.3801 5102.679 5160.4103    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -827,7 +827,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, seed<span class="op">=</span><span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
 <span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587141 (tol = 0.002, component 1)</span></span>
+<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587038 (tol = 0.002, component 1)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 37.445</span></span>
@@ -1699,7 +1699,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.460   0.000   0.461</span></span>
+<span><span class="co">#&gt;   0.494   0.000   0.495</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -1709,7 +1709,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.063   0.003   1.783</span></span>
+<span><span class="co">#&gt;   0.069   0.004   1.929</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually

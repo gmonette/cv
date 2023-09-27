@@ -84,6 +84,7 @@ different response variables.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Cross-Validated"</span>, <span class="va">x</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">criterion</span><span class="op">)</span>,</span>
 <span>  main <span class="op">=</span> <span class="st">"Model Comparison"</span>,</span>
 <span>  axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, las <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span>,</span>
@@ -149,6 +150,10 @@ errors, are suppressed.</p></dd>
 <dd><p>the name of the element in each <code>"cv"</code> object to be
 plotted; defaults to <code>"adj CV crit"</code>, if it exists, or to
 <code>"CV crit"</code>.</p></dd>
+
+
+<dt>xlab</dt>
+<dd><p>label for the x-axis (defaults to blank).</p></dd>
 
 
 <dt>ylab</dt>
