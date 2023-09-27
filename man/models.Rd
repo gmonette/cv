@@ -16,6 +16,7 @@ models(...)
 \method{plot}{cvModList}(
   x,
   y,
+  xlab = "",
   ylab = paste("Cross-Validated", x[[1L]]$criterion),
   main = "Model Comparison",
   axis.args = list(labels = names(x), las = 3L),
@@ -60,6 +61,8 @@ errors, are suppressed.}
 \item{y}{the name of the element in each \code{"cv"} object to be
 plotted; defaults to \code{"adj CV crit"}, if it exists, or to
 \code{"CV crit"}.}
+
+\item{xlab}{label for the x-axis (defaults to blank).}
 
 \item{ylab}{label for the y-axis.}
 

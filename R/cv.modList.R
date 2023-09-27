@@ -33,6 +33,7 @@
 #' @param y the name of the element in each \code{"cv"} object to be
 #' plotted; defaults to \code{"adj CV crit"}, if it exists, or to
 #' \code{"CV crit"}.
+#' @param xlab label for the x-axis (defaults to blank).
 #' @param ylab label for the y-axis.
 #' @param main main title for the graph.
 #' @param axis.args a list of arguments for the \code{\link{axis}()}
@@ -126,6 +127,7 @@ print.cvModList <- function(x, ...){
 #' @importFrom stats na.omit
 #' @exportS3Method
 plot.cvModList <- function(x, y,
+                           xlab="",
                            ylab=paste("Cross-Validated", x[[1L]]$criterion),
                            main="Model Comparison",
                            axis.args = list(labels=names(x), las=3L),
@@ -146,7 +148,7 @@ plot.cvModList <- function(x, y,
     on.exit(par(save.mai))
   }
   crit <- sapply(x, function (x) x[[y]])
-  plot(seq(along=crit), crit, xlab="", ylab=ylab, main=main,
+  plot(seq(along=crit), crit, xlab=xlab, ylab=ylab, main=main,
        axes=FALSE, type="b", col=col, lwd=lwd, ...)
   abline(h=min(crit), lty=2L, col=col)
   box()
