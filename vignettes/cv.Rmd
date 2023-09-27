@@ -216,6 +216,19 @@ legend("topright", inset=0.02,
        legend=c("10-Fold CV", "LOO CV"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 ```
+
+Alternatively, we can use the `plot()` method for `"cvModList"` objects to compare the models, though with separate graphs for 10-fold and LOO CV:
+
+```{r, polynomial-regression-CV-graph-2, fig.show="hold"}
+#| out.width = "45%",
+#| fig.height = 6,
+#| fig.cap = "Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$"
+plot(cv.auto.10, main="Polynomial Regressions, 10-Fold CV",
+     axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
+plot(cv.auto.loo, main="Polynomial Regressions, LOO CV",
+     axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
+```
+
 In this example, 10-fold and LOO CV produce generally similar results, and also results that are similar to those produced by the estimated error variance $\widehat{\sigma}^2$ for each model, reported above (except for the highest-degree polynomials, where the CV results more clearly suggest over-fitting).
 
 ### Logistic regression for the `Mroz` data

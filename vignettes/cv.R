@@ -117,6 +117,12 @@ legend("topright", inset=0.02,
        legend=c("10-Fold CV", "LOO CV"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 
+## ----polynomial-regression-CV-graph-2, fig.show="hold"------------------------
+plot(cv.auto.10, main="Polynomial Regressions, 10-Fold CV",
+     axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
+plot(cv.auto.loo, main="Polynomial Regressions, LOO CV",
+     axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
+
 ## ----Mroz-data----------------------------------------------------------------
 data("Mroz", package="carData")
 head(Mroz, 3)
