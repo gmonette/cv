@@ -119,14 +119,14 @@ more computationally efficient.</p>
 
 
 <dt>data</dt>
-<dd><p>data frame to which the model was fit (not usually necessary)</p></dd>
+<dd><p>data frame to which the model was fit (not usually necessary).</p></dd>
 
 
 <dt>criterion</dt>
-<dd><p>cross-validation criterion function of form <code>f(y, yhat)</code>
+<dd><p>cross-validation criterion ("cost") function of form <code>f(y, yhat)</code>
 where <code>y</code> is the observed values of the response and
 <code>yhat</code> the predicted values; the default is <code><a href="cost-functions.html">mse</a></code>
-(the mean-squared error)</p></dd>
+(the mean-squared error).</p></dd>
 
 
 <dt>k</dt>
@@ -146,7 +146,7 @@ for n-fold cross-validation</p></dd>
 
 
 <dt>...</dt>
-<dd><p>to match generic.</p></dd>
+<dd><p>to match generic; passed to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> for the default method.</p></dd>
 
 
 <dt>ncores</dt>
