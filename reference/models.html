@@ -75,7 +75,7 @@ different response variables.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">models</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for modList</span></span>
-<span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, criterion <span class="op">=</span> <span class="va">mse</span>, <span class="va">k</span>, <span class="va">reps</span>, <span class="va">seed</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, criterion <span class="op">=</span> <span class="va">mse</span>, <span class="va">k</span>, <span class="va">reps</span>, <span class="va">seed</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for cvModList</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -121,6 +121,12 @@ to be used to create the same set of CV folds for all of the models;
 if omitted, a seed will be randomly generated and saved.</p></dd>
 
 
+<dt>quietly</dt>
+<dd><p>If <code>TRUE</code> (the default), simple messages (for example about the
+value to which the random-number generator seed is set), but not warnings or
+errors, are suppressed.</p></dd>
+
+
 <dt>x</dt>
 <dd><p>an object of class <code>"cvModList"</code> to be printed.</p></dd>
 
@@ -147,9 +153,6 @@ if omitted, a seed will be randomly generated and saved.</p></dd>
 <span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="op">(</span><span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span><span class="op">*</span><span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="fu">models</span><span class="op">(</span>m1<span class="op">=</span><span class="va">m1</span>, m2<span class="op">=</span><span class="va">m2</span>, m3<span class="op">=</span><span class="va">m3</span><span class="op">)</span>, data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">7949</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 7949</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 7949</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 7949</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m1:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
