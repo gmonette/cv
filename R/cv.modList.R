@@ -19,6 +19,9 @@
 #' @param seed (optional) seed for R's pseudo-random-number generator,
 #' to be used to create the same set of CV folds for all of the models;
 #' if omitted, a seed will be randomly generated and saved.
+#' @param quietly If \code{TRUE} (the default), simple messages (for example about the
+#' value to which the random-number generator seed is set), but not warnings or
+#' errors, are suppressed.
 #' @param ... for \code{cv()}, additional arguments to be passed to the \code{cv()} method
 #' applied to each model. For \code{models()}, two or more competing models fit to the
 #' the same data; the several models may be named. For the \code{print()}
@@ -66,7 +69,7 @@ models <- function(...){
 
 #' @describeIn models \code{cv()} method for \code{"modList"} objects
 #' @exportS3Method
-cv.modList <- function(model, data, criterion=mse, k, reps, seed, ...){
+cv.modList <- function(model, data, criterion=mse, k, reps, seed, quietly=TRUE, ...){
   n.models <- length(model)
   if (missing(seed)) seed <- sample(1e6, 1L)
   result <- vector(n.models, mode="list")
@@ -74,9 +77,17 @@ cv.modList <- function(model, data, criterion=mse, k, reps, seed, ...){
   class(result) <- "cvModList"
   for (i in 1L:n.models){
     result[[i]] <- if (missing(k)){
-      cv(model[[i]], data=data, seed=seed, ...)
+      if (quietly){
+        suppressMessages(cv(model[[i]], data=data, seed=seed, ...))
+      } else {
+        cv(model[[i]], data=data, seed=seed, ...)
+      }
     } else {
-      cv(model[[i]], data=data, k=k, seed=seed, ...)
+      if (quietly){
+        suppressMessages(cv(model[[i]], data=data, k=k, seed=seed, ...))
+      } else {
+        cv(model[[i]], data=data, k=k, seed=seed, ...)
+      }
     }
   }
   result

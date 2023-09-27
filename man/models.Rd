@@ -8,7 +8,7 @@
 \usage{
 models(...)
 
-\method{cv}{modList}(model, data, criterion = mse, k, reps, seed, ...)
+\method{cv}{modList}(model, data, criterion = mse, k, reps, seed, quietly = TRUE, ...)
 
 \method{print}{cvModList}(x, ...)
 }
@@ -36,6 +36,10 @@ individual models.}
 \item{seed}{(optional) seed for R's pseudo-random-number generator,
 to be used to create the same set of CV folds for all of the models;
 if omitted, a seed will be randomly generated and saved.}
+
+\item{quietly}{If \code{TRUE} (the default), simple messages (for example about the
+value to which the random-number generator seed is set), but not warnings or
+errors, are suppressed.}
 
 \item{x}{an object of class \code{"cvModList"} to be printed.}
 }
