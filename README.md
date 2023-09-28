@@ -4,6 +4,7 @@
   [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
   [![Last Commit](https://img.shields.io/github/last-commit/gmonette/cv)](https://github.com/gmonette/cv)
   [![CRAN](https://www.r-pkg.org/badges/version/cv)](https://cran.r-project.org/package=cv)
+  [![](https://img.shields.io/badge/pkgdown%20site-darhgreen)](https://gmonette.github.io/cv)
   <!-- badges: end -->
   
 # cv package for R: Various Functions for Cross-Validation of Regression Models <img src="man/figures/cv-hex.png" style="float:right; height:200px;" />
