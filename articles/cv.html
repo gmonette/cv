@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 428401</span></span>
+<span><span class="co">#&gt; R RNG seed set to 483178</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.194</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.183</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.353</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.333</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -350,11 +350,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.5646    4.3273    4.6227    4.5651    5.0093    6.105    10</span></span>
-<span><span class="co">#&gt;   Woodbury   44.5792   48.9312   50.7780   50.6458   52.5794   55.397    10</span></span>
-<span><span class="co">#&gt;      naive  983.1926 1007.4818 1105.6710 1079.4252 1104.4850 1353.246    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1680.4443 1730.5131 1815.5954 1822.3137 1886.2492 1977.991    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.9092    2.9667    3.1505    3.2097    3.2958    3.3854    10</span></span>
+<span><span class="co">#&gt;   Woodbury   26.4771   26.5318   27.8774   26.8907   27.3214   32.3187    10</span></span>
+<span><span class="co">#&gt;      naive  676.3098  681.2772  712.4608  687.4239  699.6347  820.6059    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1155.1453 1158.1846 1202.0655 1160.3340 1294.0900 1312.3539    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -662,10 +662,10 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    4.5799    4.7372    5.1155    4.9722    5.4781    6.0334    10</span></span>
-<span><span class="co">#&gt;   Woodbury  160.2251  161.5703  165.9156  165.3312  169.8661  173.1245    10</span></span>
-<span><span class="co">#&gt;      exact 5905.5738 6174.6289 6211.4314 6210.9878 6278.1925 6561.7123    10</span></span>
-<span><span class="co">#&gt;     cv.glm 7335.1179 7501.1999 7588.6225 7596.3547 7645.1887 7996.5643    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    3.2922    3.3253    3.3512    3.3414    3.3473    3.4857    10</span></span>
+<span><span class="co">#&gt;   Woodbury   89.2575   90.8499   92.9166   91.8435   94.9620   97.7964    10</span></span>
+<span><span class="co">#&gt;      exact 3987.6345 4040.7465 4136.3033 4142.7724 4190.6593 4305.3072    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4920.2926 4942.5587 5042.8573 5003.1048 5157.7692 5246.9942    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -1055,6 +1055,23 @@ seed, however, makes the entire process easily replicable, and the seed
 for each repetition is stored in the corresponding element of the
 <code>"cvList"</code> object (which isn’t, however, saved in the
 example).</p>
+<p>It’s also possible to replicate CV when comparing competing models
+via the <code><a href="../reference/cv.html">cv()</a></code> method for <code>"modList"</code> objects.
+Recall our comparison of polynomial regressions of varying degree fit to
+the <code>Auto</code> data; we performed 10-fold CV for each of 10
+models. Here, we replicate that process 5 times for each model and graph
+the results:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cv.auto.reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="fu"><a href="../reference/models.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
+<span>                        <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
+<span>                 data<span class="op">=</span><span class="va">Auto</span>, seed<span class="op">=</span><span class="fl">8004</span>, reps<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/model-comparison-with-reps-1.png" alt=" Replicated cross-validated 10-fold CV as a function of polynomial degree, $p$" width="100%"><p class="caption">
+Replicated cross-validated 10-fold CV as a function of polynomial
+degree, <span class="math inline">\(p\)</span>
+</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="cross-validating-model-selection">Cross-validating model selection<a class="anchor" aria-label="anchor" href="#cross-validating-model-selection"></a>
@@ -1080,7 +1097,7 @@ response has nothing to do with the predictors and so the population
 linear-regression model <span class="math inline">\(y_i = \alpha +
 \beta_1 x_{i1} + \cdots + \beta_{100} x_{i,100} + \varepsilon_i\)</span>
 has <span class="math inline">\(\alpha = 10\)</span> and all <span class="math inline">\(\beta_j = 0\)</span>.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">24361</span><span class="op">)</span> <span class="co"># for reproducibility</span></span>
 <span><span class="va">D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span>, mean<span class="op">=</span><span class="fl">10</span><span class="op">)</span>,</span>
@@ -1101,7 +1118,7 @@ including only the regression constant; moreover, the omnibus <span class="math 
 that all of the <span class="math inline">\(\beta\)</span>s are 0 for
 the “full model” with all 100 <span class="math inline">\(x\)</span>s is
 associated with a large <span class="math inline">\(p\)</span>-value:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">D</span><span class="op">)</span></span>
 <span><span class="va">m.null</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, data<span class="op">=</span><span class="va">D</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">m.null</span>, <span class="va">m.full</span><span class="op">)</span></span>
@@ -1149,7 +1166,7 @@ model, here the one with 100 predictors, and proceed by backward
 elimination. In this demonstration, however, where all of the &lt;span class="math inline"&gt;\(\beta\)&lt;/span&gt;s are really 0, the selected model
 will be small, and so we proceed by forward selection from the null
 model to save computing time.&lt;/p&gt;'><sup>8</sup></a></p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.select</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.null</span>,</span>
 <span>                          direction<span class="op">=</span><span class="st">"forward"</span>, trace<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>                          scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, upper<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">m.full</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -1196,7 +1213,7 @@ The MSE for the selected model is smaller than the true error variance
 error variance for the selected model, <span class="math inline">\(\widehat{\sigma}^2 = 0.973^2 = 0.947\)</span>.</p>
 <p>If we cross-validate the selected model, we also obtain an optimistic
 estimate of its predictive power:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.select</span>, seed<span class="op">=</span><span class="fl">2529</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2529</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -1212,7 +1229,7 @@ function capable of refitting the model with a fold omitted and
 returning a CV criterion. The <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> function,
 also in <strong>cv</strong> and based on <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code>, is
 suitable for use with <code><a href="../reference/cvSelect.html">cvSelect()</a></code>:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.select</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, data<span class="op">=</span><span class="va">D</span>, seed<span class="op">=</span><span class="fl">3791</span>,</span>
 <span>                      model<span class="op">=</span><span class="va">m.null</span>, direction<span class="op">=</span><span class="st">"forward"</span>,</span>
 <span>                      scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, </span>
@@ -1245,7 +1262,7 @@ an estimate of MSE for the model-selection procedure even
 In this example, the <code><a href="../reference/cvSelect.html">compareFolds()</a></code> function reveals that
 the variables retained by the model-selection process in the several
 folds are quite different:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.select</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         (Intercept)    X.87    X.90    X.99    X.91    X.54    X.53    X.56</span></span>
 <span><span class="co">#&gt; Fold 1       9.9187 -0.0615 -0.0994 -0.0942  0.0512  0.0516                </span></span>
@@ -1310,7 +1327,7 @@ folds are quite different:</p>
 regression for married women’s labor-force participation. First, recall
 the logistic regression model that we fit to the <code>Mroz</code>
 data:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -1340,7 +1357,7 @@ data:</p>
 BIC as the model-selection criterion (via the argument
 <code>k=log(nrow(Mroz))</code> to <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code>) selects 5 of
 the 7 original predictors:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.mroz.sel</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.mroz</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                            trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz.sel</span><span class="op">)</span></span>
@@ -1374,7 +1391,7 @@ the 7 original predictors:</p>
 cases in the <code>Mroz</code> data.</p>
 <p>Cross-validating the selected model produces a similar, slightly
 larger, estimate of misclassification, about 33%:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz.sel</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">345266</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 345266</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -1386,7 +1403,7 @@ larger, estimate of misclassification, about 33%:</p>
 <p>Is this estimate of predictive performance optimistic?</p>
 <p>We proceed to apply the model-selection procedure by
 cross-validation, producing more or less the same result:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>, </span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
 <span>                          criterion<span class="op">=</span><span class="va">BayesRule</span>,</span>
@@ -1403,7 +1420,7 @@ uses the BIC rather than the AIC as the model-selection criterion. As it
 turns out, exactly the same predictors are selected when each of the 10
 folds are omitted, and the several coefficient estimates are very
 similar, as we show using <code><a href="../reference/cvSelect.html">compareFolds()</a></code>:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         (Intercept)     age     inc      k5     lwg wcyes</span></span>
 <span><span class="co">#&gt; Fold 1       2.5014 -0.0454 -0.0388 -1.3613  0.5653  0.85</span></span>
@@ -1448,7 +1465,7 @@ Chapter 3 on transforming data), using data on the prestige and other
 characteristics of 102 Canadian occupations circa 1970. The data are in
 the <code>Prestige</code> data frame in the <strong>carData</strong>
 package:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Prestige"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                     education income women prestige census type</span></span>
@@ -1501,7 +1518,7 @@ in the data reveals that the distributions of <code>income</code> and
 <code>women</code> are positively skewed, and that some of the
 relationships among the three predictors, and between the predictors and
 the response (i.e., <code>prestige</code>), are nonlinear:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-forge.r-project.org/projects/car/" class="external-link">"car"</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: carData</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1526,7 +1543,7 @@ Box-Cox family to data that may include negative values and zeros: the
 Box-Cox-with-negatives family and the Yeo-Johnson family; see <span class="citation">Weisberg (2014, Chapter 8)</span>, and <span class="citation">Fox &amp; Weisberg (2019, Chapter 3)</span> for
 details. Because <code>women</code> has some zero values, we use the
 Yeo-Johnson family:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">education</span>, <span class="va">women</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>,</span>
 <span>                         data<span class="op">=</span><span class="va">Prestige</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trans</span><span class="op">)</span></span>
@@ -1545,7 +1562,7 @@ power) and <code>women</code> (by the <span class="math inline">\(0.16\)</span> 
 power, i.e., the log transformation), but not <code>education</code>.
 Applying the “rounded” power transformations makes the predictors
 better-behaved:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">P</span> <span class="op">&lt;-</span> <span class="va">Prestige</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"prestige"</span>, <span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="op">(</span><span class="va">lambdas</span> <span class="op">&lt;-</span> <span class="va">trans</span><span class="op">$</span><span class="va">roundlam</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    income education     women </span></span>
@@ -1573,7 +1590,7 @@ predictors transformed.
 </div>
 <p>Comparing the MSE for the regressions with the original and
 transformed predictors shows a advantage to the latter:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.pres</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data<span class="op">=</span><span class="va">Prestige</span><span class="op">)</span></span>
 <span><span class="va">m.pres.trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data<span class="op">=</span><span class="va">P</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span><span class="op">)</span></span>
@@ -1588,7 +1605,7 @@ but the transformation of <code>women</code> fails to capture what
 appears to be a slight quadratic partial relationship; the partial
 relationship of <code>prestige</code> to <code>education</code> is close
 to linear in both regressions:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/CR-plots-untransformed-1.png" alt="Component+residual plots for the `Prestige` regression with the original predicctors." width="672"><p class="caption">
@@ -1596,7 +1613,7 @@ Component+residual plots for the <code>Prestige</code> regression with
 the original predicctors.
 </p>
 </div>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/CR-plots-transformed-1.png" alt="Component+residual plots for the `Prestige` regression with transformed predicctors." width="672"><p class="caption">
@@ -1608,7 +1625,7 @@ transformed predicctors.
 consider whether there’s evidence for transforming the response (using
 <code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform()</a></code> for Box and Cox’s original method), and we
 discover that there’s not:</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; bcPower Transformation to Normality </span></span>
 <span><span class="co">#&gt;    Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd</span></span>
@@ -1638,7 +1655,7 @@ the zeros in <code>women</code>. <code><a href="../reference/cvSelect.html">sele
 result of applying a lack-of-fit criterion to the model after the
 selected transformation is applied, with the default
 <code>criterion=mse</code>:</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">selectTrans</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">Prestige</span>, model<span class="op">=</span><span class="va">m.pres</span>,</span>
 <span>            predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span>
 <span>            response<span class="op">=</span><span class="st">"prestige"</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
@@ -1647,7 +1664,7 @@ selected transformation is applied, with the default
 <code>indices</code> argument, making it suitable for doing computations
 on a subset of the data (i.e., a CV fold), and hence for use with
 <code><a href="../reference/cvSelect.html">cvSelect()</a></code> (see <code><a href="../reference/cvSelect.html">?selectTrans</a></code> for details):</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectTrans</span>, data<span class="op">=</span><span class="va">Prestige</span>, model<span class="op">=</span><span class="va">m.pres</span>, seed<span class="op">=</span><span class="fl">1463</span>,</span>
 <span>                predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span>
 <span>                response<span class="op">=</span><span class="st">"prestige"</span>,</span>
@@ -1705,7 +1722,7 @@ the program.</p>
 <p>To illustrate, let’s time model selection in Mroz’s logistic
 regression, repeating the computation as performed previously and then
 doing it in parallel using 2 cores:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
 <span>                          criterion<span class="op">=</span><span class="va">BayesRule</span>,</span>
@@ -1713,7 +1730,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   1.023   0.000   1.024</span></span>
+<span><span class="co">#&gt;   0.498   0.000   0.498</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -1723,7 +1740,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.099   0.008   2.602</span></span>
+<span><span class="co">#&gt;   0.072   0.004   2.110</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
