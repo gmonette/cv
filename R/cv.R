@@ -489,8 +489,12 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
 summarizeReps <- function(x){
   CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
   CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
+  CVcritRange <- range(sapply(x, function(x) x[["CV crit"]]))
   adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
   adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
+  adjCVcritRange<- range(sapply(x, function(x) x[["adj CV crit"]]))
   list("CV crit" = CVcrit, "adj CV crit" = adjCVcrit,
-       "SD CV crit" = CVcritSD, "SD adj CV crit" = adjCVcritSD)
+       "CV crit range" = CVcritRange,
+       "SD CV crit" = CVcritSD, "SD adj CV crit" = adjCVcritSD,
+       "adj CV crit range" = adjCVcritRange)
 }

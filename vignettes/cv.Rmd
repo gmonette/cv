@@ -406,7 +406,7 @@ cv.auto.reps <- cv(models(m.1, m.2, m.3, m.4, m.5,
                  data=Auto, seed=8004, reps=5)
 plot(cv.auto.reps)
 ```
-
+The graph shows both the average CV criterion and its range for each of the competing models.
 
 ## Cross-validating model selection
 
