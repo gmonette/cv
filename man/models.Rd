@@ -9,7 +9,7 @@
 \usage{
 models(...)
 
-\method{cv}{modList}(model, data, criterion = mse, k, reps, seed, quietly = TRUE, ...)
+\method{cv}{modList}(model, data, criterion = mse, k, reps = 1, seed, quietly = TRUE, ...)
 
 \method{print}{cvModList}(x, ...)
 
@@ -17,8 +17,8 @@ models(...)
   x,
   y,
   xlab = "",
-  ylab = paste("Cross-Validated", x[[1L]]$criterion),
-  main = "Model Comparison",
+  ylab,
+  main,
   axis.args = list(labels = names(x), las = 3L),
   col = palette()[2L],
   lwd = 2,
@@ -46,7 +46,7 @@ created by \code{models()}.}
 will depend on the default for the \code{cv()} method invoked for the
 individual models.}
 
-\item{reps}{ignored (present only to match the generic function).}
+\item{reps}{number of replications of CV for each model.}
 
 \item{seed}{(optional) seed for R's pseudo-random-number generator,
 to be used to create the same set of CV folds for all of the models;
@@ -64,9 +64,9 @@ plotted; defaults to \code{"adj CV crit"}, if it exists, or to
 
 \item{xlab}{label for the x-axis (defaults to blank).}
 
-\item{ylab}{label for the y-axis.}
+\item{ylab}{label for the y-axis (if missing, a label is constructed).}
 
-\item{main}{main title for the graph.}
+\item{main}{main title for the graph (if missing, a label is constructed).}
 
 \item{axis.args}{a list of arguments for the \code{\link{axis}()}
 function, used to draw the horizontal axis. In addition to

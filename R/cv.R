@@ -213,16 +213,17 @@ print.cv <- function(x, digits=getOption("digits"), ...){
 #' @export
 print.cvList <- function(x, ...){
   reps <- length(x)
-  names(x) <- paste("Replicate", 1:reps)
-  CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
-  CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
-  adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
-  adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
-  x$Average <- x[[1]]
-  x$Average[["CV crit"]] <- CVcrit
-  x$Average[["adj CV crit"]] <- adjCVcrit
-  x$Average[["SD CV crit"]] <- CVcritSD
-  x$Average[["SD adj CV crit"]] <- adjCVcritSD
+  names(x) <- paste("Replicate", 1L:reps)
+  # CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
+  # CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
+  # adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
+  # adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
+  x$Average <- x[[1L]]
+  sumry <-   summarizeReps(x)
+  x$Average[["CV crit"]] <- sumry[["CV crit"]]
+  x$Average[["adj CV crit"]] <- sumry[["adj CV crit"]]
+  x$Average[["SD CV crit"]] <- sumry[["SD CV crit"]]
+  x$Average[["SD adj CV crit"]] <- sumry[["SD adj CV crit"]]
   for (rep in seq_along(x)){
     cat("\n", names(x)[rep], ":\n", sep="")
     print(x[[rep]])
@@ -481,4 +482,15 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
       return(res)
     }
   }
+}
+
+# not exported
+
+summarizeReps <- function(x){
+  CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
+  CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
+  adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
+  adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
+  list("CV crit" = CVcrit, "adj CV crit" = adjCVcrit,
+       "SD CV crit" = CVcritSD, "SD adj CV crit" = adjCVcritSD)
 }

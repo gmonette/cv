@@ -15,7 +15,7 @@
 #' @param k the number of CV folds; may be omitted, in which case the value
 #' will depend on the default for the \code{cv()} method invoked for the
 #' individual models.
-#' @param reps ignored (present only to match the generic function).
+#' @param reps number of replications of CV for each model.
 #' @param seed (optional) seed for R's pseudo-random-number generator,
 #' to be used to create the same set of CV folds for all of the models;
 #' if omitted, a seed will be randomly generated and saved.
@@ -34,8 +34,8 @@
 #' plotted; defaults to \code{"adj CV crit"}, if it exists, or to
 #' \code{"CV crit"}.
 #' @param xlab label for the x-axis (defaults to blank).
-#' @param ylab label for the y-axis.
-#' @param main main title for the graph.
+#' @param ylab label for the y-axis (if missing, a label is constructed).
+#' @param main main title for the graph (if missing, a label is constructed).
 #' @param axis.args a list of arguments for the \code{\link{axis}()}
 #' function, used to draw the horizontal axis. In addition to
 #' the axis arguments given explicitly, \code{side=1} (the horizontal
@@ -86,7 +86,7 @@ models <- function(...){
 
 #' @describeIn models \code{cv()} method for \code{"modList"} objects
 #' @exportS3Method
-cv.modList <- function(model, data, criterion=mse, k, reps, seed, quietly=TRUE, ...){
+cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE, ...){
   n.models <- length(model)
   if (missing(seed)) seed <- sample(1e6, 1L)
   result <- vector(n.models, mode="list")
@@ -95,15 +95,15 @@ cv.modList <- function(model, data, criterion=mse, k, reps, seed, quietly=TRUE, 
   for (i in 1L:n.models){
     result[[i]] <- if (missing(k)){
       if (quietly){
-        suppressMessages(cv(model[[i]], data=data, seed=seed, ...))
+        suppressMessages(cv(model[[i]], data=data, seed=seed, reps=reps, ...))
       } else {
-        cv(model[[i]], data=data, seed=seed, ...)
+        cv(model[[i]], data=data, seed=seed, reps=reps, ...)
       }
     } else {
       if (quietly){
-        suppressMessages(cv(model[[i]], data=data, k=k, seed=seed, ...))
+        suppressMessages(cv(model[[i]], data=data, k=k, seed=seed, reps=reps, ...))
       } else {
-        cv(model[[i]], data=data, k=k, seed=seed, ...)
+        cv(model[[i]], data=data, k=k, seed=seed, reps=reps, ...)
       }
     }
   }
@@ -114,26 +114,57 @@ cv.modList <- function(model, data, criterion=mse, k, reps, seed, quietly=TRUE, 
 #' @exportS3Method
 print.cvModList <- function(x, ...){
   nms <- names(x)
+  if (inherits(x[[1L]], "cvList")){
+    reps <- length(x[[1L]])
+    nms <- paste0(nms, " (averaged across ", reps, " replications)")
+  }
   for (i in seq_along(x)){
     cat(paste0("\nModel ", nms[i], ":\n"))
-    print(x[[i]], ...)
+    if (inherits(x[[i]], "cvList")){
+      sumry <- summarizeReps(x[[i]])
+      xi <- x[[i]][[1L]]
+      nms.sumry <- names(sumry)
+      xi[nms.sumry] <- sumry
+      print(xi)
+    } else {
+      print(x[[i]], ...)
+    }
   }
   return(invisible(x))
 }
 
 #' @describeIn models \code{plot()} method for \code{"cvModList"} objects
 #' @importFrom grDevices palette
-#' @importFrom graphics abline axis box par strwidth
+#' @importFrom graphics abline arrows axis box par points strwidth
 #' @importFrom stats na.omit
 #' @exportS3Method
 plot.cvModList <- function(x, y,
                            xlab="",
-                           ylab=paste("Cross-Validated", x[[1L]]$criterion),
-                           main="Model Comparison",
+                           ylab,
+                           main,
                            axis.args = list(labels=names(x), las=3L),
                            col=palette()[2L], lwd=2, ...){
+  if (missing(ylab)){
+    ylab <- if (inherits(x[[1L]], "cvList")){
+      paste("Cross-Validated", x[[1L]][[1L]]$criterion,
+            "(Averaged  +/- SD)")
+    } else {
+      paste("Cross-Validated", x[[1L]]$criterion)
+    }
+  }
+  if (missing(main)){
+    main <- "Model Comparison"
+    if (inherits(x[[1L]], "cvList")){
+      main <- paste(main, "\nAveraged Across",
+                    length(x[[1L]]), "Replications")
+    }
+  }
   if (missing(y)){
-    nms <- names(x[[1L]])
+    nms <- if (inherits(x[[1L]], "cvList")){
+      names(x[[1L]][[1L]])
+    } else {
+      names(x[[1L]])
+    }
     which.crit <- na.omit(match(c("adj CV crit", "CV crit"), nms))
     if (length(which.crit) == 0L){
       stop('can\'t find "adj CV crit" or "CV crit"\n',
@@ -147,9 +178,24 @@ plot.cvModList <- function(x, y,
     save.mai <- par(mai = mai)
     on.exit(par(save.mai))
   }
-  crit <- sapply(x, function (x) x[[y]])
-  plot(seq(along=crit), crit, xlab=xlab, ylab=ylab, main=main,
-       axes=FALSE, type="b", col=col, lwd=lwd, ...)
+  if (inherits(x[[1L]], "cvList")){
+    sd <- paste("SD", y)
+    sumry <- lapply(x, summarizeReps)
+    min.y <- sapply(sumry, function(x) x[[y]] - x[[sd]])
+    max.y <- sapply(sumry, function(x) x[[y]] + x[[sd]])
+    plot(c(1L, length(x)), c(min(min.y), max(max.y)),
+         xlab=xlab, ylab=ylab,
+         main=main, axes=FALSE, type="n")
+    crit <- sapply(sumry, function (x) x[[y]])
+    xs <- seq(along=x)
+    points(xs, crit, type="b", col=col, lwd=lwd)
+    arrows(xs, min.y, xs, max.y, length=0.125, angle=90,
+           col=col, code=3, lty=1, lwd=1)
+  } else {
+    crit <- sapply(x, function (x) x[[y]])
+    plot(seq(along=crit), crit, xlab=xlab, ylab=ylab, main=main,
+         axes=FALSE, type="b", col=col, lwd=lwd, ...)
+  }
   abline(h=min(crit), lty=2L, col=col)
   box()
   axis(2)
