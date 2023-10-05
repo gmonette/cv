@@ -75,7 +75,7 @@ different response variables.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">models</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for modList</span></span>
-<span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, criterion <span class="op">=</span> <span class="va">mse</span>, <span class="va">k</span>, <span class="va">reps</span>, <span class="va">seed</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, criterion <span class="op">=</span> <span class="va">mse</span>, <span class="va">k</span>, reps <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for cvModList</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -85,8 +85,8 @@ different response variables.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Cross-Validated"</span>, <span class="va">x</span><span class="op">[[</span><span class="fl">1L</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">criterion</span><span class="op">)</span>,</span>
-<span>  main <span class="op">=</span> <span class="st">"Model Comparison"</span>,</span>
+<span>  <span class="va">ylab</span>,</span>
+<span>  <span class="va">main</span>,</span>
 <span>  axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, las <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span>,</span>
 <span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palette.html" class="external-link">palette</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">2L</span><span class="op">]</span>,</span>
 <span>  lwd <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -127,7 +127,7 @@ individual models.</p></dd>
 
 
 <dt>reps</dt>
-<dd><p>ignored (present only to match the generic function).</p></dd>
+<dd><p>number of replications of CV for each model.</p></dd>
 
 
 <dt>seed</dt>
@@ -157,11 +157,11 @@ plotted; defaults to <code>"adj CV crit"</code>, if it exists, or to
 
 
 <dt>ylab</dt>
-<dd><p>label for the y-axis.</p></dd>
+<dd><p>label for the y-axis (if missing, a label is constructed).</p></dd>
 
 
 <dt>main</dt>
-<dd><p>main title for the graph.</p></dd>
+<dd><p>main title for the graph (if missing, a label is constructed).</p></dd>
 
 
 <dt>axis.args</dt>
