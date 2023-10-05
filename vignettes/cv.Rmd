@@ -396,6 +396,17 @@ Notice that the seed that's set in the `cv()` command pertains to the first repe
 
 [^replicates]: Because of the manner in which the computation is performed, the order of the replicates in the `"cvList"` object returned by `cv()` isn't the same as the order in which the replicates are computed. Each element of the result, however, is a `"cv"` object with the correct random-number seed saved, and so this technical detail can be safely ignored. The individual `"cv"` objects are printed in the order in which they are stored rather than the order in which they are computed.
 
+It's also possible to replicate CV when comparing competing models via the `cv()` method for `"modList"` objects. Recall our comparison of polynomial regressions of varying degree fit to the `Auto` data; we performed 10-fold CV for each of 10 models. Here, we replicate that process 5 times for each model and graph the results:
+```{r model-comparison-with-reps}
+#| out.width = "100%",
+#| fig.height = 5,
+#| fig.cap = " Replicated cross-validated 10-fold CV as a function of polynomial degree, $p$"
+cv.auto.reps <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                        m.6, m.7, m.8, m.9, m.10),
+                 data=Auto, seed=8004, reps=5)
+plot(cv.auto.reps)
+```
+
 
 ## Cross-validating model selection
 

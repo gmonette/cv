@@ -162,6 +162,12 @@ tail(MathAchSchool, 2)
 cv(m.mroz, criterion=BayesRule, seed=248, reps=5, 
    method="Woodbury")
 
+## ----model-comparison-with-reps-----------------------------------------------
+cv.auto.reps <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                        m.6, m.7, m.8, m.9, m.10),
+                 data=Auto, seed=8004, reps=5)
+plot(cv.auto.reps)
+
 ## ----generate-selection-data--------------------------------------------------
 set.seed(24361) # for reproducibility
 D <- data.frame(
