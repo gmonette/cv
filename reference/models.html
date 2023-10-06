@@ -204,30 +204,30 @@ element of the color palette; see <code><a href="https://rdrr.io/r/grDevices/pal
 <span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="op">(</span><span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span><span class="op">*</span><span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">cv.models</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="fu">models</span><span class="op">(</span>m1<span class="op">=</span><span class="va">m1</span>, m2<span class="op">=</span><span class="va">m2</span>, m3<span class="op">=</span><span class="va">m3</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                 data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">7949</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                 data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">7949</span>, reps<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model m1:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model m1 (averaged across 5 replications):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 192.8524</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 191.517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 195.0866 (2.307011)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 193.5434 (2.195082)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model m2:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model m2 (averaged across 5 replications):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 116.3501</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 114.5397</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 111.7281 (4.908514)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 110.1813 (4.623137)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 84.39899 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Model m3:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model m3 (averaged across 5 replications):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 149.7113</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 144.95</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 142.3619 (5.682756)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 137.932 (5.264929)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 74.45878 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.models</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="models-1.png" alt="" width="700" height="433"></span>
