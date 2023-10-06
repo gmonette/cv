@@ -52,7 +52,7 @@
 #' m2 <- lm(prestige ~ income + education + type, data=Duncan)
 #' m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
 #' (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
-#'                  data=Duncan, seed=7949))
+#'                  data=Duncan, seed=7949, reps=5))
 #' plot(cv.models)
 #' @describeIn models create a list of models
 #' @export
