@@ -72,7 +72,7 @@ data("Auto", package="ISLR2")
 head(Auto)
 dim(Auto)
 ```
-With the exception of `origin` (which we'll address later), these variables are largely self-explanatory, with the possible exception of units of measurement: for details see `help("Auto", package="ISLR2")`.
+With the exception of `origin` (which we don't use here), these variables are largely self-explanatory, except possibly for units of measurement: for details see `help("Auto", package="ISLR2")`.
 
 We'll focus here on the relationship of `mpg` (miles per gallon) to `horsepower`, as displayed in the following scatterplot:
 
@@ -633,9 +633,11 @@ In this small problem, the parallel computation is actually *slower*, because th
 
 ## Computational notes
 
+### Efficient computations for linear and generalized linear models
+
 The most straightforward way to implement cross-validation in R for statistical modeling functions that are written in the canonical manner is to use `update()` to refit the model with each fold removed. This is the approach taken in the default method for `cv()`, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds in modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.
 
-The `"lm"` and `"glm"` methods for `cv()` take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the error matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
+The `"lm"` and `"glm"` methods for `cv()` take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the weight matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
 
 The weighted-least-squares (WLS) estimator of $\boldsymbol{\beta}$ is [see, e.g., @Fox:2016, Sec. 12.2.2] [^WLS]
 $$
@@ -671,6 +673,22 @@ The Woodbury identity also requires that the model matrix be of full rank. We im
 `glm()` computes the maximum-likelihood estimates for a generalized linear model by iterated weighted least squares [see, e.g., @FoxWeisberg:2019, Sec. 6.12]. The last iteration is therefore just a WLS fit of the "working response" on the model matrix using "working weights." Both the working weights and the working response at convergence are available from the information in the object returned by `glm()`. 
 
 We then treat re-estimation of the model with a case or cases deleted as a WLS problem, using the hatvalues or the Woodbury matrix identity. The resulting fitted values for the deleted fold aren't exact---that is, except for the Gaussian family, the result isn't identical to what we would obtain by literally refitting the model---but in our (limited) experience, the approximation is very good, especially for LOO CV, which is when we would be most tempted to use it. Nevertheless, because these results are approximate, the default for the `"glm"` `cv()` method is to perform the exact computation, which entails refitting the model with each fold omitted.
+
+### Computation of the bias-corrected CV criterion
+
+Let $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ represent a cross-validation cost criterion, such as mean-squared error, computed for all of the $n$ values of the response $\mathbf{y}$ based on fitted values $\widehat{\mathbf{y}}$ from the model fit to all of the data. We divide the $n$ cases into $k$ folds of approximately $n_j \approx n/k$ cases each, where $n = \sum n_j$. As above, let $\mathbf{j}$ denote the indices of the cases in the $j$th fold.
+
+Now define $\mathrm{CV}_j = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})$ and $\mathrm{CV}_j^{(j)} = \mathrm{CV}(\mathbf{y}_{\mathbf{j}}, \widehat{\mathbf{y}}^{(j)}_{\mathbf{j}})$. The superscript $(j)$ on $\widehat{\mathbf{y}}^{(j)}$ and $\widehat{\mathbf{y}}^{(j)}_{\mathbf{j}}$ represents fitted values computed from the model with fold $j$ omitted, respectively for all of the cases (i.e., $\mathrm{CV}_j$) and for the cases only in the $j$th fold ($\mathrm{CV}_j^{(j)}$).
+
+Then the cross-validation criterion is the weighted average of the $\mathrm{CV}_j^{(j)}$
+$$
+\mathrm{CV} = \frac{1}{n} \sum_{j = 1}^{k} n_j \mathrm{CV}_j^{(j)}
+$$
+Following @DavisonHinkley1997[pp. 293--295], the bias-adjusted cross-validation criterion is
+$$
+\mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
+$$
+
 
 ## References
 
