@@ -95,15 +95,19 @@ cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE
   for (i in 1L:n.models){
     result[[i]] <- if (missing(k)){
       if (quietly){
-        suppressMessages(cv(model[[i]], data=data, seed=seed, reps=reps, ...))
+        suppressMessages(cv(model[[i]], data=data, criterion=criterion,
+                            seed=seed, reps=reps, ...))
       } else {
-        cv(model[[i]], data=data, seed=seed, reps=reps, ...)
+        cv(model[[i]], data=data, criterion=criterion, seed=seed,
+           reps=reps, ...)
       }
     } else {
       if (quietly){
-        suppressMessages(cv(model[[i]], data=data, k=k, seed=seed, reps=reps, ...))
+        suppressMessages(cv(model[[i]], data=data, criterion=criterion,
+                            k=k, seed=seed, reps=reps, ...))
       } else {
-        cv(model[[i]], data=data, k=k, seed=seed, reps=reps, ...)
+        cv(model[[i]], data=data, criterion=criterion, k=k, seed=seed,
+           reps=reps, ...)
       }
     }
   }
