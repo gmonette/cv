@@ -574,11 +574,11 @@ mse(P$prestige, fitted(m.pres.trans))
 ```
 Similarly, component+residual plots for the two regressions, produced by the `crPlots()` function in the **car** package, suggest that the partial relationship of `prestige` to `income` is more nearly linear in the transformed data, but the transformation of `women` fails to capture what appears to be a slight quadratic partial relationship; the partial relationship of `prestige` to `education` is close to linear in both regressions:
 ```{r CR-plots-untransformed}
-#| fig.cap = "Component+residual plots for the `Prestige` regression with the original predicctors."
+#| fig.cap = "Component+residual plots for the `Prestige` regression with the original predictors."
 crPlots(m.pres)
 ```
 ```{r CR-plots-transformed}
-#| fig.cap = "Component+residual plots for the `Prestige` regression with transformed predicctors."
+#| fig.cap = "Component+residual plots for the `Prestige` regression with transformed predictors."
 crPlots(m.pres.trans)
 ```
 
