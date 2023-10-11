@@ -151,7 +151,7 @@ Data <- data.frame(
 #| fig.height = 6,
 #| fig.cap = "Hierarchical data set with 10 clusters"
 plot <- xyplot(y ~ x, data=Data[ 1:50,], group=group,
-               ylim=c(0, 20),
+               ylim=c(4, 16),
                par.settings=list(superpose.symbol=list(pch=1, cex=0.7))) +
     layer(panel.ellipse(..., center.cex=0))
 plot
@@ -199,7 +199,7 @@ Data <- within(Data, {
 })
 
 Data_long <- reshape(Data[1:50, ], direction = "long", sep = ".", 
-              timevar = "effect", varying = grep("\\.", names(Data.10)))
+              timevar = "effect", varying = grep("\\.", names(Data[1:50, ])))
 Data_long$id <- 1:nrow(Data_long)
 Data_long <- reshape(Data_long, direction = "long", sep = "_", 
               timevar = "modelcode",  varying = grep("_", names(Data_long)))
@@ -238,7 +238,7 @@ Data_long$model <- factor(c("~ 1", "~ 1 + x", "~ 1 + x + xm")
                          effect == "re"), 
          groups=group, type="l", lwd=2, lty=3)
 ) |> update(
-  ylim=c(-20, 40),
+  ylim=c(4, 16),
   key=list(
     space="right",
     text=list(c("fixed effects only","fixed and random")),
@@ -257,7 +257,7 @@ Data_long$model <- factor(c("~ 1", "~ 1 + x", "~ 1 + x + xm")
                          effect == "re"), 
          groups=group, type="l", lwd=2, lty=3)
 ) |> update(
-  ylim = c(0, 20),
+  ylim=c(4, 16),
   key=list(
     space="right",
     text=list(c("fixed effects only","fixed and random")),
