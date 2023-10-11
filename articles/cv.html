@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-10-10</h4>
+            <h4 data-toc-skip class="date">2023-10-11</h4>
       
       
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 181084</span></span>
+<span><span class="co">#&gt; R RNG seed set to 616161</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.237</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.223</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.126</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.118</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -351,10 +351,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq     mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.9525    3.2821    3.304    3.3098    3.3602    3.7154    10</span></span>
-<span><span class="co">#&gt;   Woodbury   26.6301   27.2164   27.643   27.3078   27.4974   30.5701    10</span></span>
-<span><span class="co">#&gt;      naive  695.3997  698.0586  713.388  698.4740  702.5198  841.7307    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1177.9989 1183.9605 1256.458 1188.6647 1327.5904 1473.9233    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    2.6432    2.8826    2.980    2.9135    2.9761    3.7249    10</span></span>
+<span><span class="co">#&gt;   Woodbury   26.0278   26.1454   26.381   26.2798   26.4360   27.0134    10</span></span>
+<span><span class="co">#&gt;      naive  595.8042  599.7116  615.130  601.5295  603.7339  727.1486    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1033.2048 1038.4333 1090.899 1041.7731 1166.6847 1294.0089    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -437,6 +437,35 @@ fitting and saving the 10 models:</p>
 <span><span class="va">cv.auto.loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="fu"><a href="../reference/models.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
 <span>                        <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
 <span>                 data<span class="op">=</span><span class="va">Auto</span>, k<span class="op">=</span><span class="st">"loo"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
+<span></span>
+<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
+<span><span class="co">#&gt; ignored for n-fold CV</span></span>
 <span><span class="va">cv.auto.loo</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span> <span class="co"># linear and quadratic models</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model model.1:</span></span>
@@ -657,11 +686,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.3684    3.3725    3.4702    3.4419    3.5483    3.627    10</span></span>
-<span><span class="co">#&gt;   Woodbury   92.2446   93.1014   95.4887   95.0487   97.5371  100.766    10</span></span>
-<span><span class="co">#&gt;      exact 4076.3028 4186.2452 4260.9761 4240.1022 4330.6682 4457.244    10</span></span>
-<span><span class="co">#&gt;     cv.glm 5005.2731 5086.5265 5162.7962 5154.3688 5217.5175 5324.810    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.9737    3.0435    3.1504    3.0853    3.2671    3.4831    10</span></span>
+<span><span class="co">#&gt;   Woodbury   85.1320   86.1909   87.4788   86.6277   88.3257   94.1930    10</span></span>
+<span><span class="co">#&gt;      exact 3776.4067 3917.6672 3950.7372 3952.5700 3993.0692 4108.0919    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4589.7404 4600.8699 4654.2647 4632.7040 4694.6013 4763.9200    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -837,7 +866,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, seed<span class="op">=</span><span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
 <span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587038 (tol = 0.002, component 1)</span></span>
+<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587141 (tol = 0.002, component 1)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 37.445</span></span>
@@ -1728,7 +1757,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.505   0.000   0.506</span></span>
+<span><span class="co">#&gt;   0.629   0.000   0.628</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -1738,7 +1767,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.073   0.002   2.140</span></span>
+<span><span class="co">#&gt;   0.064   0.004   1.739</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
