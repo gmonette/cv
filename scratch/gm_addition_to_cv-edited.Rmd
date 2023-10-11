@@ -121,8 +121,8 @@ We start by generating and plotting the data.
 # Generate data set
 
 # Parameters:
-set.seed(123) # set.seed(9693)
-Nb <- 10     # number of groups
+set.seed(9693) # set.seed(123) 
+Nb <- 100     # number of groups
 Nw <- 5      # number of individuals within groups
 Bb <- 0      # between-group regression coefficient on group mean
 SDre <- 2.0  # between-group SD of random level relative to group mean of x
@@ -150,7 +150,7 @@ Data <- data.frame(
 #| out.width = "100%",
 #| fig.height = 6,
 #| fig.cap = "Hierarchical data set with 10 clusters"
-plot <- xyplot(y ~ x, data=Data, group=group,
+plot <- xyplot(y ~ x, data=Data[ 1:50,], group=group,
                ylim=c(0, 20),
                par.settings=list(superpose.symbol=list(pch=1, cex=0.7))) +
     layer(panel.ellipse(..., center.cex=0))
@@ -198,8 +198,8 @@ Data <- within(Data, {
   fit_mod2.re <- predict(fit2)
 })
 
-Data_long <- reshape(Data, direction = "long", sep = ".", 
-              timevar = "effect", varying = grep("\\.", names(Data)))
+Data_long <- reshape(Data[1:50, ], direction = "long", sep = ".", 
+              timevar = "effect", varying = grep("\\.", names(Data.10)))
 Data_long$id <- 1:nrow(Data_long)
 Data_long <- reshape(Data_long, direction = "long", sep = "_", 
               timevar = "modelcode",  varying = grep("_", names(Data_long)))
@@ -281,7 +281,7 @@ criterion that stems from the random variation in training set selection.
 #| fig.cap = "Cross-validation comparing random intercept models with varying fixed effects and with case- and cluster-based resampling."
 modlist <- models("~ 1"=fit0, "~ x"=fit1, "~ x + xm"=fit2)
 cvs_cases <- cv(modlist, data=Data, seed=9693)
-cvs_clusters <- cv(modlist, data=Data, cluster="group")
+cvs_clusters <- cv(modlist, data=Data, cluster="group", k=10, seed=6449)
 
 cvs_cases <- cvs_cases |> lapply(rbind) |> 
   do.call(rbind, args = _) |> as.data.frame()
