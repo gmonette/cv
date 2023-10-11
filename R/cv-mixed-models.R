@@ -128,8 +128,11 @@ cvMixed <- function(model,
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
+    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
+    if (!missing(seed) && !is.null(seed)) message("Note: seed ignored for n-fold CV")
     seed <- NULL
   }
+
   nk <-  n %/% k # number in each fold
   rem <- n %% k  # remainder
   folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder

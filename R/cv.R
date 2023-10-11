@@ -124,6 +124,7 @@ cv.default <- function(model, data=insight::get_data(model),
     message("R RNG seed set to ", seed)
   } else {
     if (reps > 1) stop("reps should not be > 1 for n-fold CV")
+    if (!missing(seed) && !is.null(seed)) warning("seed ignored for n-fold CV")
     seed <- NULL
   }
   nk <-  n %/% k # number of cases in each fold
@@ -267,7 +268,11 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
-  if (k == n && reps > 1) stop("reps should not be > 1 for n-fold CV")
+  if (k == n){
+    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
+    if (!missing(seed) && !is.null(seed)) warning("seed ignored for n-fold CV")
+    seed <- NULL
+  }
 
   b <- coef(model)
   p <- length(b)
@@ -387,8 +392,11 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
-  if (k == n && reps > 1) stop("reps should not be > 1 for n-fold CV")
-
+  if (k == n){
+    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
+    if (!missing(seed) && !is.null(seed)) warning("seed ignored for n-fold CV")
+    seed <- NULL
+  }
   method <- match.arg(method)
   if (k != n){
     if (missing(seed)) seed <- sample(1e6, 1L)

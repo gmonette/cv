@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-10-10" />
+<meta name="date" content="2023-10-11" />
 
 <title>Cross-validation of regression models: mixed model examples (edited)</title>
 
@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Cross-validation of regression models:
 mixed model examples (edited)</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-10-10</h4>
+<h4 class="date">2023-10-11</h4>
 
 
 
@@ -571,7 +571,7 @@ cross-validation criterion that stems from the random variation in
 training set selection.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>modlist <span class="ot">&lt;-</span> <span class="fu">models</span>(<span class="st">&quot;~ 1&quot;</span><span class="ot">=</span>fit0, <span class="st">&quot;~ x&quot;</span><span class="ot">=</span>fit1, <span class="st">&quot;~ x + xm&quot;</span><span class="ot">=</span>fit2)</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>cvs_cases <span class="ot">&lt;-</span> <span class="fu">cv</span>(modlist, <span class="at">data=</span>Data, <span class="at">seed=</span><span class="dv">9693</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>cvs_clusters <span class="ot">&lt;-</span> <span class="fu">cv</span>(modlist, <span class="at">data=</span>Data, <span class="at">cluster=</span><span class="st">&quot;group&quot;</span>, <span class="at">seed=</span><span class="dv">4576</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>cvs_clusters <span class="ot">&lt;-</span> <span class="fu">cv</span>(modlist, <span class="at">data=</span>Data, <span class="at">cluster=</span><span class="st">&quot;group&quot;</span>)</span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>cvs_cases <span class="ot">&lt;-</span> cvs_cases <span class="sc">|&gt;</span> <span class="fu">lapply</span>(rbind) <span class="sc">|&gt;</span> </span>
 <span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, <span class="at">args =</span> _) <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>()</span>

@@ -281,7 +281,7 @@ criterion that stems from the random variation in training set selection.
 #| fig.cap = "Cross-validation comparing random intercept models with varying fixed effects and with case- and cluster-based resampling."
 modlist <- models("~ 1"=fit0, "~ x"=fit1, "~ x + xm"=fit2)
 cvs_cases <- cv(modlist, data=Data, seed=9693)
-cvs_clusters <- cv(modlist, data=Data, cluster="group", seed=4576)
+cvs_clusters <- cv(modlist, data=Data, cluster="group")
 
 cvs_cases <- cvs_cases |> lapply(rbind) |> 
   do.call(rbind, args = _) |> as.data.frame()
