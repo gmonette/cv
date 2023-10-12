@@ -150,10 +150,9 @@ plot.cvModList <- function(x, y,
                            col=palette()[2L], lwd=2, ...){
   if (missing(ylab)){
     ylab <- if (inherits(x[[1L]], "cvList")){
-      paste("Cross-Validated", x[[1L]][[1L]]$criterion,
-            "(Average and Range)")
+      "Cross-Validation Criterion (Average and Range)"
     } else {
-      paste("Cross-Validated", x[[1L]]$criterion)
+      "Cross-Validation Criterion"
     }
   }
   if (missing(main)){
