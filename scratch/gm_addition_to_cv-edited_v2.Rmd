@@ -55,21 +55,82 @@ library(lattice)
 library(latticeExtra)
 library(lme4)
 ```
-The following artificial data set exemplifies a difference between cluster-based
-and individual-based cross-validation in hierarchical models.
+The following artificial data set exemplifies striking aspects of cross-validation
+with hierarchical models. Model comparisons using cluster-based versus individual-based 
+cross-validation may not agree on a best model. Furthermore, commonly-used measures
+of fit, such as least-squares, do not necessarily become smaller as 
+models becomes larger.
 
-It also shows how, in contrast with ordinary least-squares
-models, the variance at different levels of a hierarchical
-model need not necessarily become smaller as the model becomes larger.
+Varying the parameters of the model, particularly the between-subject variance
+relative to the within-subject variance, can also reveal strong differences in the
+behaviour of different algorithms used to fit mixed models. These
+issues are not pursued in any depth in this vignette.
 
-In this example, the simplest random intercept model results in a between-cluster variance
-that is much smaller than that of a model that also includes $x$ as a predictor.
-Consequently, different methods of assessing model fit may result in
-different best models, underscoring the importance of assessing hierarchical models
-at different levels.
+This example exhibits both phenomena described above. Consider a researcher studying the improvement
+in a skill, yodelling for example, among students enrolled in a four-year
+yodelling program. The plan is to measure each student's skill level
+at the beginning of the program and every year thereafter until
+the end of the program, resulting in five annual measurements for each student.
 
-Adjusting the parameters generating this data can be used to create examples
-that illustrates problems of non-convergence with hierarchical models.
+It turns out that yodelling appeals to students of all ages.
+Students enrolling in the program range in age from 20 to 70.
+Moreover, participants' untrained yodelling skill is similar at all ages, as is
+their rate of progress with training. All students complete the
+five-year program.
+
+The researcher, with more expertise in yodelling than modelling,
+decides to model the response $Y$, yodelling skill, against
+age, $X$, reasoning that students get older during their stay in the program,
+and age can serve as a proxy for elapsed time.
+The researcher knows that a mixed model should be used to account for clustering
+due to the expected similarity of measurements taken from each student.
+
+The figures below show the pattern of responses expected from a representative
+subset of individuals.    
+
+The between-student effect of age is zero but the within-student effect is 1.
+Due to the large variation in ages between students, a least-squares model
+fitting age as a predictor would produce an estimated slope that is close to
+zero, since the estimated slope is heavily weighted toward the between-student effect.
+Consider a mixed model using the same fixed-effects model with the addition of a random intercept.
+
+Depending on the estimated variance parameters of the model, a mixed model will apply 
+varying degrees of
+shrinkage to the random intercept BLUPs [insert reference to ARA&GLM] that
+correspond to the variation in the heights of the parallel fitted lines for each student, measured
+at a common value of age.
+
+In the example below, the model applies little shrinkage, allowing a large variability in the heights
+of fitted lines, which approach closely the observed values for each student.
+Consequently, the model's fit is similar to that of
+a fixed-effects model with an effect of age together with a categorical predictor for 
+individual students. Thus, the model fits individual observations well, resulting in a
+favourable assessment using individual-based cross-validation. In contrast, the very large
+variability in the BLUPs results in large residuals for
+cluster-based cross-validation, producing an
+unfavourable assessment compared with the smaller model using only a random intercept.
+
+By comparison, if the mixed model had applied considerable shrinkage, neither the
+between-cluster nor the between-individual cross-validations would have shown much 
+improvement over the random-intercept only model.  In our experience, the degree of
+shrinkage does not vary smoothly as parameters are changed but tends to be
+"all or nothing." Its behaviour is affected considerably by the choice of the
+algorithm used to fit the model.
+
+Finally, a model that also includes a compositional variable consisting of the mean age
+of each student, results in the random intercept BLUPs representing variation in the students' fitted
+lines measured at the mean age of each student. Thus, with this example, both 
+the cluster-based and the individual-based fits are relatively good.
+
+To serve as a comparison, we also include cross-validation using the model known to 
+have generated the data, namely a model with a between-subject age effect equal to zero by
+modelling the response $Y$ with a fixed effects model using an age centered within
+each student, i.e. the age at assessment less the mean age of each student's 
+assessments, plus a random term for each student.
+
+A closely related question is that of non-convergence of mixed-model
+algorithms. Adjusting the parameters generating this data can be used to create examples
+illustrating problems of non-convergence with hierarchical models.
 Fitted models with relatively small between-cluster variance, even those using simple
 random intercept models, are prone to non-convergence due to the
 nature of optimizing algorithms used in `lme` and `lmer`.
@@ -100,10 +161,11 @@ compare the performance of different optimizers.
 
 At present, the results below are based on a data set that does not
 produce non-convergence and are limited to comparisons obtained
-by varying three factors:
+by varying two factors:
 
-- Three models: random intercept only, adding x as a predictor, and also adding the group means of x as a predictor,
-- The method used for fitting: `lmer` in `lme4` or `lme` in `nlme`,
+- Four models: random intercept only, adding x as a predictor, adding the 
+  group means of x (xm) as a predictor, and
+  a fourth model with a random intercept and x centered within each student.
 - Cross-validation resampling individual cases or resampling clusters.
 
 Since the independence of clusters may be a reasonable assumption, as is the
@@ -186,15 +248,8 @@ We can compare estimated fixed-effect coefficients.
 compareCoefs(fit0,  fit1, fit2, fit3)
 ```
 
-With this data set, the two functions `lme` and `lmer` converged for all models and produced consistent results.
-The differences between these two functions, and differences that depend on the optimizer used
-within each function, would manifest themselves if the data were generated with a smaller
-between-cluster variance.
-
 We visualize predicted values using population predictions with the fixed effects model only
-and using BLUPs for random effects.  Since `lme` and `lmer` produced almost identical results, the
-figures below are produced only with the `lmer` results.
-
+and using BLUPs for random effects. 
 ```{r}
 Data <- within(Data, {
   fit_mod0.fe <- predict(fit0, re.form = ~ 0)
@@ -296,8 +351,7 @@ fixed effects only.
 In order to reduce between-model variability in comparisons of models,
 the `cv` method applied to the list of models created by the `models` function,
 performs cross-validation with the same training and validation sets
-for each model in order to reduce the between-model variability in the cross-validation
-criterion that stems from the random variation in training set selection.
+for each model.
 
 ```{r cross-validation-clusters}
 #| out.width = "100%",
@@ -316,7 +370,8 @@ cvs_cases <- cv(modlist, data=Data, seed=9693)
 plot(cvs_cases, main="Model Comparison, Case-Based CV")
 ```
 
-With this example, `lme` and `lmer` give similar results, but resampling cases versus resampling clusters provides
-very different comparisons of models.  The model with X alone, without the contextual mean of X, is assessed as
-fitting very poorly sampling clusters and, relatively, much better resampling individual cases.  This illustrates the
-need to perform cross-validation at different levels.
+In summary, the model with $X$ alone, without the compositional mean of $X$, is assessed as
+fitting very poorly sampling clusters but, relatively, much better resampling individual cases.
+The model that includes both $X$ and its compositional mean produces better results using both
+criteria: resampling individual cases and resampling cluster, illustrating the need to
+assess models at different levels of resampling.
