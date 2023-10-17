@@ -7,5 +7,5 @@ vignettes/cv_cache/*
 ^docs$
 ^pkgdown$
 ^scratch$
-*.tar.gz
+.*\.tar\.gz
 for-CRAN/*
