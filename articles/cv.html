@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-10-17</h4>
+            <h4 data-toc-skip class="date">2023-10-18</h4>
       
       
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 503477</span></span>
+<span><span class="co">#&gt; R RNG seed set to 455713</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.242</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.229</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.292</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.276</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -350,11 +350,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min       lq      mean    median        uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.5917    2.790    2.8487    2.8433    2.9777    3.057    10</span></span>
-<span><span class="co">#&gt;   Woodbury   25.9076   26.134   26.1621   26.1652   26.2494   26.345    10</span></span>
-<span><span class="co">#&gt;      naive  590.3774  592.905  606.9951  594.1452  596.4894  721.785    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1029.2654 1031.345 1073.2502 1036.1375 1040.6322 1289.807    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq     mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    3.4516    3.5777    3.853    3.7799    4.1024    4.5754    10</span></span>
+<span><span class="co">#&gt;   Woodbury   28.0174   29.1966   29.967   29.8133   30.7670   32.6182    10</span></span>
+<span><span class="co">#&gt;      naive  761.2710  891.0543  905.314  898.3963  910.7770 1099.1594    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1279.5321 1365.9279 1480.661 1504.6351 1531.9371 1783.7565    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -686,17 +686,18 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.9825    3.0074    3.5364    3.0342    3.1382    7.6899    10</span></span>
-<span><span class="co">#&gt;   Woodbury   83.8859   84.9347   86.6933   85.2644   87.0503   94.7461    10</span></span>
-<span><span class="co">#&gt;      exact 3745.3564 3773.0520 3843.1002 3825.8032 3905.9629 3987.5098    10</span></span>
-<span><span class="co">#&gt;     cv.glm 4526.8263 4545.6598 4647.2238 4673.2816 4702.1072 4787.9621    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq     mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    3.8426    3.9905    4.979    4.5383    4.7752    9.2803    10</span></span>
+<span><span class="co">#&gt;   Woodbury  112.5628  114.4743  119.598  117.9437  123.9495  132.8389    10</span></span>
+<span><span class="co">#&gt;      exact 4790.4124 5285.2227 5485.607 5577.3841 5702.8772 6190.6151    10</span></span>
+<span><span class="co">#&gt;     cv.glm 6016.1435 6479.2902 6552.136 6569.3218 6703.4972 6937.1193    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
-<div class="section level3">
-<h3 id="cross-validating-mixed-effects-models">Cross-validating mixed-effects models<a class="anchor" aria-label="anchor" href="#cross-validating-mixed-effects-models"></a>
-</h3>
+</div>
+<div class="section level2">
+<h2 id="cross-validating-mixed-effects-models">Cross-validating mixed-effects models<a class="anchor" aria-label="anchor" href="#cross-validating-mixed-effects-models"></a>
+</h2>
 <p>The fundamental analogy for cross-validation is to the collection of
 new data. That is, predicting the response in each fold from the model
 fit to data in the other folds is like using the model fit to all of the
@@ -739,7 +740,6 @@ observed case in an <em>existing cluster</em>. In this instance, the
 folds comprise one or more individual cases, and the predictions can use
 both the fixed and random effects.</p></li>
 </ol>
-</div>
 <div class="section level3">
 <h3 id="example-the-high-school-and-beyond-data">Example: The High-School and Beyond data<a class="anchor" aria-label="anchor" href="#example-the-high-school-and-beyond-data"></a>
 </h3>
@@ -866,7 +866,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, seed<span class="op">=</span><span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
 <span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587141 (tol = 0.002, component 1)</span></span>
+<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587038 (tol = 0.002, component 1)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 37.445</span></span>
@@ -980,6 +980,438 @@ CV results for the <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class=
 identical, while the case-level CV results are very similar but not
 identical.</p>
 </div>
+<div class="section level3">
+<h3 id="example-contrived-hierarchical-data">Example: Contrived Hierarchical Data<a class="anchor" aria-label="anchor" href="#example-contrived-hierarchical-data"></a>
+</h3>
+<p>We introduce an artificial data set that exemplifies aspects of
+cross-validation particular to hierarchical models. Using this data set,
+we show that model comparisons employing cluster-based and those
+employing case-based cross-validation may not agree on a “best” model.
+Furthermore, commonly used measures of fit, such as mean-squared error,
+do not necessarily become smaller as models become larger, even when the
+models are nested, and even when the measure of fit is computed for the
+whole data set.</p>
+<p>Consider a researcher studying improvement in a skill, yodeling, for
+example, among students enrolled in a four-year yodeling program. The
+plan is to measure each student’s skill level at the beginning of the
+program and every year thereafter until the end of the program,
+resulting in five annual measurements for each student. It turns out
+that yodeling appeals to students of all ages, and students enrolling in
+the program range in age from 20 to 70. Moreover, participants’
+untrained yodeling skill is similar at all ages, as is their rate of
+progress with training. All students complete the five-year program.</p>
+<p>The researcher, who has more expertise in yodeling than in modeling,
+decides to model the response, <span class="math inline">\(y\)</span>,
+yodeling skill, as a function of age, <span class="math inline">\(x\)</span>, reasoning that students get older
+during their stay in the program, and (incorrectly) that age can serve
+as a proxy for elapsed time. The researcher knows that a mixed model
+should be used to account for clustering due to the expected similarity
+of measurements taken from each student.</p>
+<p>We start by generating the data, using parameters consistent with the
+description above and meant to highlight the issues that arise in
+cross-validating mixed-effects models:<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;We invite the interested reader to experiment with
+varying the parameters of our example.&lt;/p&gt;"><sup>7</sup></a></p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Parameters:</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">9693</span><span class="op">)</span> </span>
+<span><span class="va">Nb</span> <span class="op">&lt;-</span> <span class="fl">100</span>     <span class="co"># number of groups</span></span>
+<span><span class="va">Nw</span> <span class="op">&lt;-</span> <span class="fl">5</span>       <span class="co"># number of individuals within groups</span></span>
+<span><span class="va">Bb</span> <span class="op">&lt;-</span> <span class="fl">0</span>       <span class="co"># between-group regression coefficient on group mean</span></span>
+<span><span class="va">SDre</span> <span class="op">&lt;-</span> <span class="fl">2.0</span>   <span class="co"># between-group SD of random level relative to group mean of x</span></span>
+<span><span class="va">SDwithin</span> <span class="op">&lt;-</span> <span class="fl">0.5</span>  <span class="co"># within group SD</span></span>
+<span><span class="va">Bw</span> <span class="op">&lt;-</span> <span class="fl">1</span>          <span class="co"># within group effect of x</span></span>
+<span><span class="va">Ay</span> <span class="op">&lt;-</span> <span class="fl">10</span>         <span class="co"># intercept for response</span></span>
+<span><span class="va">Ax</span> <span class="op">&lt;-</span> <span class="fl">20</span>         <span class="co"># starting level of x</span></span>
+<span><span class="va">Nx</span> <span class="op">&lt;-</span> <span class="va">Nw</span><span class="op">*</span><span class="fl">10</span>      <span class="co"># number of distinct x values</span></span>
+<span></span>
+<span><span class="va">Data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">Nb</span>, each<span class="op">=</span><span class="va">Nw</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  x <span class="op">=</span> <span class="va">Ax</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">Nx</span>, length.out <span class="op">=</span> <span class="va">Nw</span><span class="op">*</span><span class="va">Nb</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span></span>
+<span>    <span class="op">{</span></span>
+<span>      <span class="va">xm</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ave.html" class="external-link">ave</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">group</span>, FUN <span class="op">=</span> <span class="va">mean</span><span class="op">)</span> <span class="co"># within-group mean</span></span>
+<span>      <span class="va">y</span> <span class="op">&lt;-</span> <span class="va">Ay</span> <span class="op">+</span></span>
+<span>        <span class="va">Bb</span> <span class="op">*</span> <span class="va">xm</span> <span class="op">+</span>                    <span class="co"># contextual effect</span></span>
+<span>        <span class="va">Bw</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">xm</span><span class="op">)</span> <span class="op">+</span>              <span class="co"># within-group effect</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">Nb</span>, sd<span class="op">=</span><span class="va">SDre</span><span class="op">)</span><span class="op">[</span><span class="va">group</span><span class="op">]</span> <span class="op">+</span>  <span class="co"># random level by group</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">Nb</span><span class="op">*</span><span class="va">Nw</span>, sd<span class="op">=</span><span class="va">SDwithin</span><span class="op">)</span>    <span class="co"># random error within groups</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p>Here is scatterplot of the data for a representative group of 10
+(without loss of generality, the first 10) of 100 students, showing the
+95% concentration ellipse for each cluster:<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;We find it convenient to use the
+&lt;strong&gt;lattice&lt;/strong&gt; &lt;span class="citation"&gt;(Sarkar, 2008)&lt;/span&gt;
+and &lt;strong&gt;latticeExtra&lt;/strong&gt; &lt;span class="citation"&gt;(Sarkar &amp;amp;
+Andrews, 2022)&lt;/span&gt; packages for this and other graphs in this
+section.&lt;/p&gt;'><sup>8</sup></a></p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://lattice.r-forge.r-project.org/" class="external-link">"lattice"</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://latticeextra.r-forge.r-project.org/" class="external-link">"latticeExtra"</a></span><span class="op">)</span></span>
+<span><span class="va">plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, data<span class="op">=</span><span class="va">Data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">Nx</span>, <span class="op">]</span>, group<span class="op">=</span><span class="va">group</span>,</span>
+<span>               ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">16</span><span class="op">)</span>,</span>
+<span>               par.settings<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>superpose.symbol<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pch<span class="op">=</span><span class="fl">1</span>, cex<span class="op">=</span><span class="fl">0.7</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/latticeExtra/man/layer.html" class="external-link">layer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/latticeExtra/man/panel.ellipse.html" class="external-link">panel.ellipse</a></span><span class="op">(</span><span class="va">...</span>, center.cex<span class="op">=</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">plot</span> <span class="co"># display graph</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/plot1-1.png" alt="Hierarchical data set, showing the first 10 of 100 students." width="100%"><p class="caption">
+Hierarchical data set, showing the first 10 of 100 students.
+</p>
+</div>
+<p>The between-student effect of age is 0 but the within-student effect
+is 1. Due to the large variation in ages between students, the
+least-squares regression of yodeling skill on age (for the 500
+observations among all 100 students) produces an estimated slope close
+to 0 (though with a small <span class="math inline">\(p\)</span>-value),
+because the slope is heavily weighted toward the between-student
+effect:</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, data<span class="op">=</span><span class="va">Data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = y ~ x, data = Data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></span>
+<span><span class="co">#&gt; -5.771 -1.658 -0.089  1.552  7.624 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  9.05043    0.34719   26.07   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; x            0.02091    0.00727    2.87   0.0042 ** </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 2.35 on 498 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.0163, Adjusted R-squared:  0.0143 </span></span>
+<span><span class="co">#&gt; F-statistic: 8.26 on 1 and 498 DF,  p-value: 0.00422</span></span></code></pre></div>
+<p>The initial mixed-effects model that we fit to the data is a simple
+random-intercepts model:</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># random intercept only:</span></span>
+<span><span class="va">mod.0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">group</span><span class="op">)</span>, <span class="va">Data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.0</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
+<span><span class="co">#&gt; Formula: y ~ 1 + (1 | group)</span></span>
+<span><span class="co">#&gt;    Data: Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; REML criterion at convergence: 2103.1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Scaled residuals: </span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -2.0351 -0.7264 -0.0117  0.7848  2.0438 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups   Name        Variance Std.Dev.</span></span>
+<span><span class="co">#&gt;  group    (Intercept) 2.90     1.70    </span></span>
+<span><span class="co">#&gt;  Residual             2.71     1.65    </span></span>
+<span><span class="co">#&gt; Number of obs: 500, groups:  group, 100</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fixed effects:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value</span></span>
+<span><span class="co">#&gt; (Intercept)   10.002      0.186    53.9</span></span></code></pre></div>
+<p>We will shortly consider three other, more complex, mixed models;
+because of data-management considerations, it is convenient to fit them
+now, but we defer discussion of these models:</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># effect of x and random intercept:</span></span>
+<span><span class="va">mod.1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">group</span><span class="op">)</span>, <span class="va">Data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># effect of x, contextual (student) mean of x, and random intercept:</span></span>
+<span><span class="va">mod.2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="va">xm</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">group</span><span class="op">)</span>, <span class="va">Data</span><span class="op">)</span></span>
+<span>        <span class="co"># equivalent to y ~ I(x - xm) + xm + (1 | group)</span></span>
+<span></span>
+<span><span class="co"># model generating the data (where Bb = 0)</span></span>
+<span><span class="va">mod.3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">xm</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">group</span><span class="op">)</span>, <span class="va">Data</span><span class="op">)</span></span></code></pre></div>
+<p>We proceed to obtain predictions from the random-intercept model
+(<code>mod.0</code>) and the other models (<code>mod.1</code>,
+<code>mod.2</code>, and <code>mod.3</code>) based on fixed effects
+alone, as would be used for cross-validation based on clusters (i.e.,
+students), and for fixed and random effects—so-called best linear
+unbiased predictions or BLUPs—as would be used for cross-validation
+based on cases (i.e., occasions within students):</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">Data</span>, <span class="op">{</span></span>
+<span>  <span class="va">fit_mod0.fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.0</span>, re.form <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span> <span class="co"># fixed effects only</span></span>
+<span>  <span class="va">fit_mod0.re</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.0</span><span class="op">)</span> <span class="co"># fixed and random effects (BLUPs)</span></span>
+<span>  <span class="va">fit_mod1.fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.1</span>, re.form <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="va">fit_mod1.re</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.1</span><span class="op">)</span></span>
+<span>  <span class="va">fit_mod2.fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.2</span>, re.form <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="va">fit_mod2.re</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.2</span><span class="op">)</span></span>
+<span>  <span class="va">fit_mod3.fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.3</span>, re.form <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="va">fit_mod3.re</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.3</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p>We then prepare the data for plotting:</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Data_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">reshape</a></span><span class="op">(</span><span class="va">Data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">Nx</span>, <span class="op">]</span>, direction <span class="op">=</span> <span class="st">"long"</span>, sep <span class="op">=</span> <span class="st">"."</span>, </span>
+<span>              timevar <span class="op">=</span> <span class="st">"effect"</span>, varying <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"\\."</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">Data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">Nx</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">Data_long</span><span class="op">$</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Data_long</span><span class="op">)</span></span>
+<span><span class="va">Data_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">reshape</a></span><span class="op">(</span><span class="va">Data_long</span>, direction <span class="op">=</span> <span class="st">"long"</span>, sep <span class="op">=</span> <span class="st">"_"</span>, </span>
+<span>              timevar <span class="op">=</span> <span class="st">"modelcode"</span>,  varying <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">Data_long</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">Data_long</span><span class="op">$</span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"~ 1"</span>, <span class="st">"~ 1 + x"</span>, <span class="st">"~ 1 + x + xm"</span>, <span class="st">"~ 1 + I(x - xm)"</span><span class="op">)</span></span>
+<span>  <span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">Data_long</span><span class="op">$</span><span class="va">modelcode</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mod0"</span>, <span class="st">"mod1"</span>, <span class="st">"mod2"</span>, <span class="st">"mod3"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Predictions based on the random-intercept model <code>mod.0</code>
+for the first 10 students are shown in the following graph:</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">fit</span> <span class="op">~</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Data_long</span>, <span class="va">modelcode</span> <span class="op">==</span> <span class="st">"mod0"</span> <span class="op">&amp;</span> <span class="va">effect</span> <span class="op">==</span> <span class="st">"fe"</span><span class="op">)</span>,</span>
+<span>         groups<span class="op">=</span><span class="va">group</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">fit</span> <span class="op">~</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Data_long</span>, <span class="va">modelcode</span> <span class="op">==</span> <span class="st">"mod0"</span> <span class="op">&amp;</span>  <span class="va">effect</span> <span class="op">==</span> <span class="st">"re"</span><span class="op">)</span>,</span>
+<span>         groups<span class="op">=</span><span class="va">group</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span>, lty<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span></span>
+<span>  main<span class="op">=</span><span class="st">"Model: y ~ 1 + (1 | group)"</span>,</span>
+<span>  key<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    corner<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.05</span><span class="op">)</span>,</span>
+<span>    text<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed effects only"</span>,<span class="st">"fixed and random"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    lines<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/plot-fits-mod0-1.png" alt="Predictions from the random intercept model." width="100%"><p class="caption">
+Predictions from the random intercept model.
+</p>
+</div>
+<p>The fixed-effect predictions for the various individuals are
+identical—the estimated fixed-effects intercept or estimated general
+mean of <span class="math inline">\(y\)</span>—while the BLUPs are the
+sums of the fixed-effects intercept and the random intercepts, and are
+only slightly shrunken towards the general mean. Because in our
+artificial data there is no population relationship between age and
+skill, the fixed-effect-only predictions and the BLUPs are not very
+different.</p>
+<p>Our next model, <code>mod.1</code>, includes a fixed intercept and
+fixed effect of <code>x</code> along with a random intercept:</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
+<span><span class="co">#&gt; Formula: y ~ x + (1 | group)</span></span>
+<span><span class="co">#&gt;    Data: Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; REML criterion at convergence: 1564.5</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Scaled residuals: </span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -2.9016 -0.6350  0.0188  0.5541  2.8293 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups   Name        Variance Std.Dev.</span></span>
+<span><span class="co">#&gt;  group    (Intercept) 192.941  13.890  </span></span>
+<span><span class="co">#&gt;  Residual               0.257   0.507  </span></span>
+<span><span class="co">#&gt; Number of obs: 500, groups:  group, 100</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fixed effects:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value</span></span>
+<span><span class="co">#&gt; (Intercept) -33.9189     1.5645   -21.7</span></span>
+<span><span class="co">#&gt; x             0.9653     0.0158    61.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Correlation of Fixed Effects:</span></span>
+<span><span class="co">#&gt;   (Intr)</span></span>
+<span><span class="co">#&gt; x -0.460</span></span></code></pre></div>
+<p>Predictions from this model appear in the following graph:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">fit</span> <span class="op">~</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Data_long</span>, <span class="va">modelcode</span> <span class="op">==</span> <span class="st">"mod1"</span> <span class="op">&amp;</span> <span class="va">effect</span> <span class="op">==</span> <span class="st">"fe"</span><span class="op">)</span>,</span>
+<span>         groups<span class="op">=</span><span class="va">group</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">fit</span> <span class="op">~</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Data_long</span>, <span class="va">modelcode</span> <span class="op">==</span> <span class="st">"mod1"</span> <span class="op">&amp;</span> <span class="va">effect</span> <span class="op">==</span> <span class="st">"re"</span><span class="op">)</span>,</span>
+<span>         groups<span class="op">=</span><span class="va">group</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span>, lty<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span></span>
+<span>  main<span class="op">=</span><span class="st">"Model: y ~ 1 + x + (1 | group)"</span>,</span>
+<span>  ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">15</span>, <span class="fl">35</span><span class="op">)</span>,</span>
+<span>  key<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    corner<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.05</span><span class="op">)</span>,</span>
+<span>    text<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed effects only"</span>,<span class="st">"fixed and random"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    lines<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/plot-fits-mod1-1.png" alt="Predictions from the model with random intercepts and $x$ as a fixed-effect predictor." width="100%"><p class="caption">
+Predictions from the model with random intercepts and <span class="math inline">\(x\)</span> as a fixed-effect predictor.
+</p>
+</div>
+<p>The BLUPs fit the observed data very closely, but predictions based
+on the fixed effects alone, with a common intercept and slope for all
+clusters, are very poor—indeed, much worse than the fixed-effects-only
+predictions based on the simpler random-intercept model,
+<code>mod.0</code>. We therefore anticipate (and show later in this
+section) that case-based cross-validation will prefer <code>mod1</code>
+to <code>mod0</code>, but that cluster-based cross-validation will
+prefer <code>mod0</code> to <code>mod1</code>.</p>
+<p>Our third model, <code>mod.2</code>, includes the contextual effect
+of <span class="math inline">\(x\)</span>—that is, the cluster mean
+<code>xm</code>—along with <span class="math inline">\(x\)</span> and
+the intercept in the fixed-effect part of the model, and a random
+intercept:</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
+<span><span class="co">#&gt; Formula: y ~ x + xm + (1 | group)</span></span>
+<span><span class="co">#&gt;    Data: Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; REML criterion at convergence: 1169.2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Scaled residuals: </span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -2.9847 -0.6375  0.0019  0.5568  2.7325 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups   Name        Variance Std.Dev.</span></span>
+<span><span class="co">#&gt;  group    (Intercept) 3.399    1.844   </span></span>
+<span><span class="co">#&gt;  Residual             0.255    0.505   </span></span>
+<span><span class="co">#&gt; Number of obs: 500, groups:  group, 100</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fixed effects:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value</span></span>
+<span><span class="co">#&gt; (Intercept)   9.4787     0.6171    15.4</span></span>
+<span><span class="co">#&gt; x             0.9915     0.0160    62.1</span></span>
+<span><span class="co">#&gt; xm           -0.9800     0.0206   -47.7</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Correlation of Fixed Effects:</span></span>
+<span><span class="co">#&gt;    (Intr) x     </span></span>
+<span><span class="co">#&gt; x   0.000       </span></span>
+<span><span class="co">#&gt; xm -0.600 -0.777</span></span></code></pre></div>
+<p>This model is equivalent to fitting
+<code>y ~ I(x - xm) + xm + (1 | group)</code>, which is the model that
+generated the data once the coefficient of the contextual predictor
+<code>xm</code> is set to 0 (as it is in <code>mod.3</code>, discussed
+below).</p>
+<p>Predictions from model <code>mod.2</code> appear in the following
+graph:</p>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">fit</span> <span class="op">~</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Data_long</span>, <span class="va">modelcode</span> <span class="op">==</span> <span class="st">"mod2"</span> <span class="op">&amp;</span> <span class="va">effect</span> <span class="op">==</span> <span class="st">"fe"</span><span class="op">)</span>,</span>
+<span>         groups<span class="op">=</span><span class="va">group</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">fit</span> <span class="op">~</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Data_long</span>, <span class="va">modelcode</span> <span class="op">==</span> <span class="st">"mod2"</span> <span class="op">&amp;</span> <span class="va">effect</span> <span class="op">==</span> <span class="st">"re"</span><span class="op">)</span>,</span>
+<span>         groups<span class="op">=</span><span class="va">group</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span>, lty<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span></span>
+<span>  main<span class="op">=</span><span class="st">"Model: y ~ 1 + x + xm + (1 | group)"</span>,</span>
+<span>  ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">16</span><span class="op">)</span>,</span>
+<span>  key<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    corner<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.05</span><span class="op">)</span>,</span>
+<span>    text<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed effects only"</span>,<span class="st">"fixed and random"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    lines<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/plot-fits-mod2-1.png" alt="Predictors from the model with random intercepts, $x$, and the group (student) mean of $x$ as predictors." width="100%"><p class="caption">
+Predictors from the model with random intercepts, <span class="math inline">\(x\)</span>, and the group (student) mean of <span class="math inline">\(x\)</span> as predictors.
+</p>
+</div>
+<p>Depending on the estimated variance parameters of the model, a mixed
+model like <code>mod.2</code> will apply varying degrees of shrinkage to
+the random-intercept BLUPs that correspond to variation in the heights
+of the parallel fitted lines for the individual students. In our
+contrived data, the <code>mod.2</code> applies little shrinkage,
+allowing substantial variability in the heights of the fitted lines,
+which closely approach the observed values for each student. The fit of
+the mixed model <code>mod.2</code> is consequently similar to that of a
+fixed-effects model with age and a categorical predictor for individual
+students (i.e., treating students as a factor, and not shown here).</p>
+<p>The mixed model <code>mod.2</code> therefore fits individual
+observations well, and we anticipate a favorable assessment using
+individual-based cross-validation. In contrast, the large variability in
+the BLUPs results in larger residuals for predictions based on fixed
+effects alone, and so we expect that cluster-based cross-validation
+won’t show an advantage for model <code>mod.2</code> compared to the
+smaller model <code>mod.0</code>, which includes only fixed and random
+intercepts.</p>
+<p>Had the mixed model applied considerable shrinkage, then neither
+cluster-based nor case-based cross-validation would show much
+improvement over the random-intercept-only model. In our experience, the
+degree of shrinkage does not vary smoothly as parameters are changed but
+tends to be “all or nothing,” and near the tipping point, the behavior
+of estimates can be affected considerably by the choice of algorithm
+used to fit the model.</p>
+<p>Finally, <code>mod.3</code> directly estimates the model used to
+generate the data. As mentioned, it is a constrained version of
+<code>mod.2</code>, with the coefficient of <code>xm</code> set to 0,
+and with <code>x</code> expressed as a deviation from the cluster mean
+<code>xm</code>:</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
+<span><span class="co">#&gt; Formula: y ~ I(x - xm) + (1 | group)</span></span>
+<span><span class="co">#&gt;    Data: Data</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; REML criterion at convergence: 1163.2</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Scaled residuals: </span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -2.9770 -0.6320  0.0063  0.5603  2.7249 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Random effects:</span></span>
+<span><span class="co">#&gt;  Groups   Name        Variance Std.Dev.</span></span>
+<span><span class="co">#&gt;  group    (Intercept) 3.391    1.842   </span></span>
+<span><span class="co">#&gt;  Residual             0.255    0.505   </span></span>
+<span><span class="co">#&gt; Number of obs: 500, groups:  group, 100</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fixed effects:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value</span></span>
+<span><span class="co">#&gt; (Intercept)   10.002      0.185    53.9</span></span>
+<span><span class="co">#&gt; I(x - xm)      0.992      0.016    62.1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Correlation of Fixed Effects:</span></span>
+<span><span class="co">#&gt;           (Intr)</span></span>
+<span><span class="co">#&gt; I(x - xm) 0.000</span></span></code></pre></div>
+<p>The predictions from <code>mod.3</code> are therefore similar to
+those from <code>mod.2</code>:</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">plot</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">fit</span> <span class="op">~</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Data_long</span>, <span class="va">modelcode</span> <span class="op">==</span> <span class="st">"mod3"</span> <span class="op">&amp;</span> <span class="va">effect</span> <span class="op">==</span> <span class="st">"fe"</span><span class="op">)</span>,</span>
+<span>         groups<span class="op">=</span><span class="va">group</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span><span class="va">fit</span> <span class="op">~</span> <span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">Data_long</span>, <span class="va">modelcode</span> <span class="op">==</span> <span class="st">"mod3"</span> <span class="op">&amp;</span> <span class="va">effect</span> <span class="op">==</span> <span class="st">"re"</span><span class="op">)</span>,</span>
+<span>         groups<span class="op">=</span><span class="va">group</span>, type<span class="op">=</span><span class="st">"l"</span>, lwd<span class="op">=</span><span class="fl">2</span>, lty<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span></span>
+<span>  main<span class="op">=</span><span class="st">"Model: y ~ 1 + I(x - xm) + (1 | group)"</span>,</span>
+<span>  ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">16</span><span class="op">)</span>,</span>
+<span>  key<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    corner<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.05</span><span class="op">)</span>,</span>
+<span>    text<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed effects only"</span>,<span class="st">"fixed and random"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    lines<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/plot-fits-mod3-1.png" alt="Predictions from the estimated model generating the data." width="100%"><p class="caption">
+Predictions from the estimated model generating the data.
+</p>
+</div>
+<p>We next carry out case-based cross-validation, which, as we have
+explained, is based on both fixed and predicted random effects (i.e.,
+BLUPs), and cluster-based cross-validation, which is based on fixed
+effects only. In order to reduce between-model random variability in
+comparisons of models, we apply <code><a href="../reference/cv.html">cv()</a></code> to the list of models
+created by the <code><a href="../reference/models.html">models()</a></code> function (introduced previously),
+performing cross-validation with the same folds for each model:</p>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">modlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/models.html">models</a></span><span class="op">(</span><span class="st">"~ 1"</span><span class="op">=</span><span class="va">mod.0</span>, <span class="st">"~ 1 + x"</span><span class="op">=</span><span class="va">mod.1</span>, </span>
+<span>                  <span class="st">"~ 1 + x + xm"</span><span class="op">=</span><span class="va">mod.2</span>, <span class="st">"~ 1 + I(x - xm)"</span><span class="op">=</span><span class="va">mod.3</span><span class="op">)</span></span>
+<span><span class="va">cvs_clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">modlist</span>, data<span class="op">=</span><span class="va">Data</span>, cluster<span class="op">=</span><span class="st">"group"</span>, k<span class="op">=</span><span class="fl">10</span>, seed<span class="op">=</span><span class="fl">6449</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvs_clusters</span>, main<span class="op">=</span><span class="st">"Model Comparison, Cluster-Based CV"</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/cross-validation-clusters-1.png" alt="10-fold cluster-based cross-validation comparing random intercept models with varying fixed effects." width="100%"><p class="caption">
+10-fold cluster-based cross-validation comparing random intercept models
+with varying fixed effects.
+</p>
+</div>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cvs_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">modlist</span>, data<span class="op">=</span><span class="va">Data</span>, seed<span class="op">=</span><span class="fl">9693</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvs_cases</span>, main<span class="op">=</span><span class="st">"Model Comparison, Case-Based CV"</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/cross-validation-cases-1.png" alt="10-fold case-based cross-validation comparing random intercept models with varying fixed effects." width="100%"><p class="caption">
+10-fold case-based cross-validation comparing random intercept models
+with varying fixed effects.
+</p>
+</div>
+<p>In summary, model <code>mod.1</code>, with <span class="math inline">\(x\)</span> alone and without the contextual mean
+of <span class="math inline">\(x\)</span>, is assessed as fitting very
+poorly by cluster-based CV, but relatively much better by case-based CV.
+Model <code>mod.2</code>, which includes both <span class="math inline">\(x\)</span> and its contextual mean, produces
+better results using both cluster-based and case-based CV. The
+data-generating model, <code>mod.3</code>, which includes the fixed
+effect of <code>x - xm</code> in place of separate terms in
+<code>x</code> and <code>xm</code>, isn’t distinguishable from model
+<code>mod.2</code>, which includes <code>x</code> and <code>xm</code>
+separately, even though <code>mod.2</code> has an unnecessary parameter
+(recall that the population coefficient of <code>xm</code> is 0 when
+<code>x</code> is expressed as deviations from the contextual mean).
+These conclusions are consistent with our observations based on graphing
+predictions from the various models, and they illustrate the
+desirability of assessing mixed-effect models at different hierarchical
+levels.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="replicating-cross-validation">Replicating cross-validation<a class="anchor" aria-label="anchor" href="#replicating-cross-validation"></a>
@@ -1002,7 +1434,7 @@ controlled by the <code>reps</code> argument, which defaults to
 <code>1</code>.</p>
 <p>Here, for example, is 10-fold CV for the Mroz logistic regression,
 repeated 5 times:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">248</span>, reps<span class="op">=</span><span class="fl">5</span>, </span>
 <span>   method<span class="op">=</span><span class="st">"Woodbury"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 248</span></span>
@@ -1075,7 +1507,7 @@ which the replicates are computed. Each element of the result, however,
 is a &lt;code&gt;"cv"&lt;/code&gt; object with the correct random-number seed saved,
 and so this technical detail can be safely ignored. The individual
 &lt;code&gt;"cv"&lt;/code&gt; objects are printed in the order in which they are
-stored rather than the order in which they are computed.&lt;/p&gt;'><sup>7</sup></a> Setting the first
+stored rather than the order in which they are computed.&lt;/p&gt;'><sup>9</sup></a> Setting the first
 seed, however, makes the entire process easily replicable, and the seed
 for each repetition is stored in the corresponding element of the
 <code>"cvList"</code> object (which isn’t, however, saved in the
@@ -1086,7 +1518,7 @@ Recall our comparison of polynomial regressions of varying degree fit to
 the <code>Auto</code> data; we performed 10-fold CV for each of 10
 models. Here, we replicate that process 5 times for each model and graph
 the results:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.auto.reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="fu"><a href="../reference/models.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
 <span>                        <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
 <span>                 data<span class="op">=</span><span class="va">Auto</span>, seed<span class="op">=</span><span class="fl">8004</span>, reps<span class="op">=</span><span class="fl">5</span><span class="op">)</span></span>
@@ -1124,7 +1556,7 @@ response has nothing to do with the predictors and so the population
 linear-regression model <span class="math inline">\(y_i = \alpha +
 \beta_1 x_{i1} + \cdots + \beta_{100} x_{i,100} + \varepsilon_i\)</span>
 has <span class="math inline">\(\alpha = 10\)</span> and all <span class="math inline">\(\beta_j = 0\)</span>.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">24361</span><span class="op">)</span> <span class="co"># for reproducibility</span></span>
 <span><span class="va">D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span>, mean<span class="op">=</span><span class="fl">10</span><span class="op">)</span>,</span>
@@ -1145,7 +1577,7 @@ including only the regression constant; moreover, the omnibus <span class="math 
 that all of the <span class="math inline">\(\beta\)</span>s are 0 for
 the “full model” with all 100 <span class="math inline">\(x\)</span>s is
 associated with a large <span class="math inline">\(p\)</span>-value:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.full</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">D</span><span class="op">)</span></span>
 <span><span class="va">m.null</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span>, data<span class="op">=</span><span class="va">D</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html" class="external-link">anova</a></span><span class="op">(</span><span class="va">m.null</span>, <span class="va">m.full</span><span class="op">)</span></span>
@@ -1192,8 +1624,8 @@ the model-selection criterion (see the help page for
 model, here the one with 100 predictors, and proceed by backward
 elimination. In this demonstration, however, where all of the &lt;span class="math inline"&gt;\(\beta\)&lt;/span&gt;s are really 0, the selected model
 will be small, and so we proceed by forward selection from the null
-model to save computing time.&lt;/p&gt;'><sup>8</sup></a></p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+model to save computing time.&lt;/p&gt;'><sup>10</sup></a></p>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.select</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.null</span>,</span>
 <span>                          direction<span class="op">=</span><span class="st">"forward"</span>, trace<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>                          scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, upper<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">m.full</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -1240,7 +1672,7 @@ The MSE for the selected model is smaller than the true error variance
 error variance for the selected model, <span class="math inline">\(\widehat{\sigma}^2 = 0.973^2 = 0.947\)</span>.</p>
 <p>If we cross-validate the selected model, we also obtain an optimistic
 estimate of its predictive power:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.select</span>, seed<span class="op">=</span><span class="fl">2529</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2529</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -1256,7 +1688,7 @@ function capable of refitting the model with a fold omitted and
 returning a CV criterion. The <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> function,
 also in <strong>cv</strong> and based on <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code>, is
 suitable for use with <code><a href="../reference/cvSelect.html">cvSelect()</a></code>:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.select</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, data<span class="op">=</span><span class="va">D</span>, seed<span class="op">=</span><span class="fl">3791</span>,</span>
 <span>                      model<span class="op">=</span><span class="va">m.null</span>, direction<span class="op">=</span><span class="st">"forward"</span>,</span>
 <span>                      scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, </span>
@@ -1289,7 +1721,7 @@ an estimate of MSE for the model-selection procedure even
 In this example, the <code><a href="../reference/cvSelect.html">compareFolds()</a></code> function reveals that
 the variables retained by the model-selection process in the several
 folds are quite different:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.select</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         (Intercept)    X.87    X.90    X.99    X.91    X.54    X.53    X.56</span></span>
 <span><span class="co">#&gt; Fold 1       9.9187 -0.0615 -0.0994 -0.0942  0.0512  0.0516                </span></span>
@@ -1354,7 +1786,7 @@ folds are quite different:</p>
 regression for married women’s labor-force participation. First, recall
 the logistic regression model that we fit to the <code>Mroz</code>
 data:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -1384,7 +1816,7 @@ data:</p>
 BIC as the model-selection criterion (via the argument
 <code>k=log(nrow(Mroz))</code> to <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code>) selects 5 of
 the 7 original predictors:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.mroz.sel</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.mroz</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                            trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz.sel</span><span class="op">)</span></span>
@@ -1418,7 +1850,7 @@ the 7 original predictors:</p>
 cases in the <code>Mroz</code> data.</p>
 <p>Cross-validating the selected model produces a similar, slightly
 larger, estimate of misclassification, about 33%:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz.sel</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">345266</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 345266</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -1430,7 +1862,7 @@ larger, estimate of misclassification, about 33%:</p>
 <p>Is this estimate of predictive performance optimistic?</p>
 <p>We proceed to apply the model-selection procedure by
 cross-validation, producing more or less the same result:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>, </span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
 <span>                          criterion<span class="op">=</span><span class="va">BayesRule</span>,</span>
@@ -1447,7 +1879,7 @@ uses the BIC rather than the AIC as the model-selection criterion. As it
 turns out, exactly the same predictors are selected when each of the 10
 folds are omitted, and the several coefficient estimates are very
 similar, as we show using <code><a href="../reference/cvSelect.html">compareFolds()</a></code>:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         (Intercept)     age     inc      k5     lwg wcyes</span></span>
 <span><span class="co">#&gt; Fold 1       2.5014 -0.0454 -0.0388 -1.3613  0.5653  0.85</span></span>
@@ -1492,7 +1924,7 @@ Chapter 3 on transforming data), using data on the prestige and other
 characteristics of 102 Canadian occupations circa 1970. The data are in
 the <code>Prestige</code> data frame in the <strong>carData</strong>
 package:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Prestige"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                     education income women prestige census type</span></span>
@@ -1545,7 +1977,7 @@ in the data reveals that the distributions of <code>income</code> and
 <code>women</code> are positively skewed, and that some of the
 relationships among the three predictors, and between the predictors and
 the response (i.e., <code>prestige</code>), are nonlinear:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-forge.r-project.org/projects/car/" class="external-link">"car"</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: carData</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1570,7 +2002,7 @@ Box-Cox family to data that may include negative values and zeros: the
 Box-Cox-with-negatives family and the Yeo-Johnson family; see <span class="citation">Weisberg (2014, Chapter 8)</span>, and <span class="citation">Fox &amp; Weisberg (2019, Chapter 3)</span> for
 details. Because <code>women</code> has some zero values, we use the
 Yeo-Johnson family:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">education</span>, <span class="va">women</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>,</span>
 <span>                         data<span class="op">=</span><span class="va">Prestige</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">trans</span><span class="op">)</span></span>
@@ -1589,7 +2021,7 @@ power) and <code>women</code> (by the <span class="math inline">\(0.16\)</span> 
 power, i.e., the log transformation), but not <code>education</code>.
 Applying the “rounded” power transformations makes the predictors
 better-behaved:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">P</span> <span class="op">&lt;-</span> <span class="va">Prestige</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"prestige"</span>, <span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="op">(</span><span class="va">lambdas</span> <span class="op">&lt;-</span> <span class="va">trans</span><span class="op">$</span><span class="va">roundlam</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    income education     women </span></span>
@@ -1617,7 +2049,7 @@ predictors transformed.
 </div>
 <p>Comparing the MSE for the regressions with the original and
 transformed predictors shows a advantage to the latter:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.pres</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data<span class="op">=</span><span class="va">Prestige</span><span class="op">)</span></span>
 <span><span class="va">m.pres.trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data<span class="op">=</span><span class="va">P</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span><span class="op">)</span></span>
@@ -1632,7 +2064,7 @@ but the transformation of <code>women</code> fails to capture what
 appears to be a slight quadratic partial relationship; the partial
 relationship of <code>prestige</code> to <code>education</code> is close
 to linear in both regressions:</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/CR-plots-untransformed-1.png" alt="Component+residual plots for the `Prestige` regression with the original predictors." width="672"><p class="caption">
@@ -1640,7 +2072,7 @@ Component+residual plots for the <code>Prestige</code> regression with
 the original predictors.
 </p>
 </div>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/CR-plots-transformed-1.png" alt="Component+residual plots for the `Prestige` regression with transformed predictors." width="672"><p class="caption">
@@ -1652,7 +2084,7 @@ transformed predictors.
 consider whether there’s evidence for transforming the response (using
 <code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform()</a></code> for Box and Cox’s original method), and we
 discover that there’s not:</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; bcPower Transformation to Normality </span></span>
 <span><span class="co">#&gt;    Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd</span></span>
@@ -1682,7 +2114,7 @@ the zeros in <code>women</code>. <code><a href="../reference/cvSelect.html">sele
 result of applying a lack-of-fit criterion to the model after the
 selected transformation is applied, with the default
 <code>criterion=mse</code>:</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">selectTrans</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">Prestige</span>, model<span class="op">=</span><span class="va">m.pres</span>,</span>
 <span>            predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span>
 <span>            response<span class="op">=</span><span class="st">"prestige"</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
@@ -1691,7 +2123,7 @@ selected transformation is applied, with the default
 <code>indices</code> argument, making it suitable for doing computations
 on a subset of the data (i.e., a CV fold), and hence for use with
 <code><a href="../reference/cvSelect.html">cvSelect()</a></code> (see <code><a href="../reference/cvSelect.html">?selectTrans</a></code> for details):</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectTrans</span>, data<span class="op">=</span><span class="va">Prestige</span>, model<span class="op">=</span><span class="va">m.pres</span>, seed<span class="op">=</span><span class="fl">1463</span>,</span>
 <span>                predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span>
 <span>                response<span class="op">=</span><span class="st">"prestige"</span>,</span>
@@ -1749,7 +2181,7 @@ the program.</p>
 <p>To illustrate, let’s time model selection in Mroz’s logistic
 regression, repeating the computation as performed previously and then
 doing it in parallel using 2 cores:</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
 <span>                          criterion<span class="op">=</span><span class="va">BayesRule</span>,</span>
@@ -1757,7 +2189,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.436   0.000   0.435</span></span>
+<span><span class="co">#&gt;   0.646   0.000   0.646</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -1767,7 +2199,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.061   0.004   1.809</span></span>
+<span><span class="co">#&gt;   0.090   0.004   2.560</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -1811,7 +2243,7 @@ model matrix &lt;span class="math inline"&gt;\(\mathbf{X}\)&lt;/span&gt; is of f
 column rank, and which can be subject to numerical instability when
 &lt;span class="math inline"&gt;\(\mathbf{X}\)&lt;/span&gt; is ill-conditioned.
 &lt;code&gt;&lt;a href="https://rdrr.io/r/stats/lm.html" class="external-link"&gt;lm()&lt;/a&gt;&lt;/code&gt; uses the singular-value decomposition of the model
-matrix to obtain computationally more stable results.&lt;/p&gt;'><sup>9</sup></a> <span class="math display">\[
+matrix to obtain computationally more stable results.&lt;/p&gt;'><sup>11</sup></a> <span class="math display">\[
 \mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X}
 \right)^{-1}
   \mathbf{X}^T \mathbf{W} \mathbf{y}
@@ -1967,6 +2399,14 @@ Pinheiro, J. C., &amp; Bates, D. M. (2000). <em>Mixed-effects models in
 Raudenbush, S. W., &amp; Bryk, A. S. (2002). <em>Hierarchical linear
 models: Applications and data analysis methods</em> (Second edition).
 Thousand Oaks <span>CA</span>: Sage.
+</div>
+<div id="ref-Sarkar:2008" class="csl-entry">
+Sarkar, D. (2008). <em>Lattice: Multivariate data visualization with
+r</em>. New York: Springer. Retrieved from <a href="http://lmdvr.r-forge.r-project.org" class="external-link">http://lmdvr.r-forge.r-project.org</a>
+</div>
+<div id="ref-SarkarAndrews:2022" class="csl-entry">
+Sarkar, D., &amp; Andrews, F. (2022). <em>latticeExtra: Extra graphical
+utilities based on lattice</em>. Retrieved from <a href="https://CRAN.R-project.org/package=latticeExtra" class="external-link">https://CRAN.R-project.org/package=latticeExtra</a>
 </div>
 <div id="ref-VenablesRipley:2002" class="csl-entry">
 Venables, W. N., &amp; Ripley, B. D. (2002). <em>Modern applied
