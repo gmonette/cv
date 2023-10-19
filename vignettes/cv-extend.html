@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-09-24" />
+<meta name="date" content="2023-10-18" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-09-24</h4>
+<h4 class="date">2023-10-18</h4>
 
 
 
@@ -390,15 +390,16 @@ the binary response coded <code>0</code> for a “failure” or
 probability of success; and where the proportion of <em>incorrectly</em>
 classified cases is returned.</p>
 <p>To illustrate using a different prediction cost criterion, we’ll base
-a cost criterion on the the area under the receiver operating
-characteristic (“ROC”) curve for a logistic regression. The ROC curve is
-a graphical representation of the classification power of a binary
-regression model, and the area under the ROC curve (“AOC”), which varies
-from 0 to 1, is a common summary measure based on the ROC <span class="citation">(see &quot;Receiver operating characteristic&quot;, 2023)</span>.
-The <strong>Metrics</strong> package <span class="citation">(Hamner
-&amp; Frasco, 2018)</span> includes a variety of measures useful for
-model selection, including an <code>auc()</code> function. We convert
-the AUC into a cost measure by taking its complement:</p>
+a cost criterion on the area under the receiver operating characteristic
+(“ROC”) curve for a logistic regression. The ROC curve is a graphical
+representation of the classification power of a binary regression model,
+and the area under the ROC curve (“AUC”), which varies from 0 to 1, is a
+common summary measure based on the ROC <span class="citation">(see
+&quot;Receiver operating characteristic&quot;, 2023)</span>. The
+<strong>Metrics</strong> package <span class="citation">(Hamner &amp;
+Frasco, 2018)</span> includes a variety of measures useful for model
+selection, including an <code>auc()</code> function. We convert the AUC
+into a cost measure by taking its complement:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>AUCcomp <span class="ot">&lt;-</span> <span class="cf">function</span>(y, yhat) <span class="dv">1</span> <span class="sc">-</span> Metrics<span class="sc">::</span><span class="fu">auc</span>(y, yhat)</span></code></pre></div>
 <p>We then apply <code>AUCcomp()</code> to the the Mroz logistic
 regression discussed in the main <strong>cv</strong> package vignette,
@@ -446,7 +447,7 @@ Weisberg, 2019)</span>:</p>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.27636</span></span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.26362</span></span></code></pre></div>
 <p>As expected, the cross-validated complement to the AUC is somewhat
-less optimistic that the criterion computed from the model fit to the
+less optimistic than the criterion computed from the model fit to the
 whole data set.</p>
 </div>
 <div id="adding-a-model-class-not-covered-by-the-default-cv-method" class="section level2">
@@ -700,8 +701,8 @@ rather than clusters. Only nested mixed effects are supported.</p></li>
 to be passed to the <code>predict()</code> function to obtain
 predictions for the full data set from a model fit to a subset of the
 data for cluster-based CV. The first two arguments should be
-<code>object</code> and <code>model</code>. It is typically necessary to
-tell <code>cvMixed()</code> how to base predictions only on fixed
+<code>object</code> and <code>newdata</code>. It is typically necessary
+to tell <code>cvMixed()</code> how to base predictions only on fixed
 effects; in the case of <code>&quot;lme&quot;</code> models, this is done by
 setting <code>level = 0</code>.</p></li>
 <li><p>Similarly, <code>predict.cases.args</code> is a named list of
