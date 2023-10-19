@@ -9,3 +9,5 @@ vignettes/cv_cache/*
 ^scratch$
 .*\.tar\.gz
 for-CRAN/*
+^doc$
+^Meta$

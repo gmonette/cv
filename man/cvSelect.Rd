@@ -72,7 +72,7 @@ cross-validation.}
 \item{criterion}{a CV criterion function.}
 
 \item{AIC}{if \code{TRUE} (the default) use the AIC as the
-model-selection criterion; if {FALSE}, use the BIC.
+model-selection criterion; if \code{FALSE}, use the BIC.
 The \code{k} argument to \code{\link[MASS]{stepAIC}()}
 is set accordingly (note that this is distinct from the number of
 folds \code{k}).}

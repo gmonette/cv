@@ -197,6 +197,9 @@ plot # display graph
 ## -----------------------------------------------------------------------------
 summary(lm(y ~ x, data=Data))
 
+## ----include=FALSE, echo=FALSE------------------------------------------------
+library(lme4) # necessary for some reason to knit vignette in RStudio, harmless otherwise
+
 ## -----------------------------------------------------------------------------
 # random intercept only:
 mod.0 <- lmer(y ~ 1 + (1 | group), Data)

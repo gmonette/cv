@@ -48,7 +48,7 @@ colorize <- function(x, color) {
 
 ## Cross-validation
 
-Cross-validation (CV) is an essentially simple and intuitively reasonable approach to estimating the predictive accuracy of regression models. CV is developed in many standard sources on regression modeling and "machine learning"---we particularly recommend @JamesEtAl:2013 [Secs. 5.1, 5.3]---and so we will describe the method only briefly here before taking up computational issues and some examples.
+Cross-validation (CV) is an essentially simple and intuitively reasonable approach to estimating the predictive accuracy of regression models. CV is developed in many standard sources on regression modeling and "machine learning"---we particularly recommend @JamesEtAl:2021 [Secs. 5.1, 5.3]---and so we will describe the method only briefly here before taking up computational issues and some examples.
 
 Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit a statistical model; and then the second part is used to assess the adequacy of the model fit to the first part of the data. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, particularly in smaller samples, the results can vary substantially based on the random division of the data: See @Harrell:2015 [Sec. 5.3] for this and other remarks about data-division and cross-validation.
 
@@ -60,9 +60,9 @@ Because the $k$ models are each fit to $n - 1$ cases, LOO CV produces a nearly u
 
 ### Polynomial regression for the `Auto` data
 
-The data for this example are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2013, and the presentation here is close (though not identical) to that in the original source [@JamesEtAl:2013 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function in the **cv** package.[^boot] 
+The data for this example are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2021, and the presentation here is close (though not identical) to that in the original source [@JamesEtAl:2021 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function in the **cv** package.[^boot] 
 
-[^boot]: @JamesEtAl:2013 use the `cv.glm()` function in the **boot** package [@CantyRipley2022; @DavisonHinkley1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function.
+[^boot]: @JamesEtAl:2021 use the `cv.glm()` function in the **boot** package [@CantyRipley2022; @DavisonHinkley1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function.
 
 The `Auto` dataset contains information about 392 cars:
 
@@ -81,7 +81,7 @@ We'll focus here on the relationship of `mpg` (miles per gallon) to `horsepower`
 #| fig.cap = "`mpg` vs `horsepower` for the `Auto` data"
 plot(mpg ~ horsepower, data=Auto)
 ```
-The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2013, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^log-trans] Polynomial fits  for $p = 1$ to $5$ are shown in the following figure:
+The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2021, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^log-trans] Polynomial fits  for $p = 1$ to $5$ are shown in the following figure:
 
 [^log-trans]: Although it serves to illustrate the use of CV, a polynomial is probably not the best choice here. Consider, for example the scatterplot for log-transformed `mpg` and `horsepower`, produced by `plot(mpg ~ horsepower, data=Auto, log="xy")` (execution of which is left to the reader).
 
@@ -442,7 +442,9 @@ summary(lm(y ~ x, data=Data))
 ```
 
 The initial mixed-effects model that we fit to the data is a simple random-intercepts model:
-
+```{r include=FALSE, echo=FALSE}
+library(lme4) # necessary for some reason to knit vignette in RStudio, harmless otherwise
+```
 ```{r}
 # random intercept only:
 mod.0 <- lmer(y ~ 1 + (1 | group), Data)
