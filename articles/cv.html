@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 34291</span></span>
+<span><span class="co">#&gt; R RNG seed set to 433550</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.287</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.271</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.241</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.227</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -350,11 +350,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.3737    3.7083    3.7275    3.7473    3.7947    4.0787    10</span></span>
-<span><span class="co">#&gt;   Woodbury   31.6543   31.7029   32.1970   32.0349   32.3472   33.7936    10</span></span>
-<span><span class="co">#&gt;      naive  829.2737  833.7045  882.0373  834.9257  985.5213  999.7383    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1389.3449 1393.4513 1431.2356 1405.1736 1407.7948 1571.9393    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq     mean   median       uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.8335    2.9252    3.025    2.974    3.193    3.212    10</span></span>
+<span><span class="co">#&gt;   Woodbury   26.7397   26.9810   27.100   27.051   27.226   27.554    10</span></span>
+<span><span class="co">#&gt;      naive  676.7243  682.8809  707.342  688.314  702.641  867.061    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1149.5292 1151.7948 1175.639 1158.371 1163.867 1299.188    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -686,11 +686,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq     mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.8561    3.8849    3.993    3.9263    4.0352    4.2847    10</span></span>
-<span><span class="co">#&gt;   Woodbury  114.2698  117.1096  119.041  118.7079  120.4169  126.4389    10</span></span>
-<span><span class="co">#&gt;      exact 4753.9341 4803.8772 4891.232 4903.6545 4954.6527 5040.7906    10</span></span>
-<span><span class="co">#&gt;     cv.glm 5811.6246 5859.6168 5959.236 5933.1360 6038.1343 6194.3601    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    3.2693    3.2831    3.5831    3.3206    3.4424    5.6849    10</span></span>
+<span><span class="co">#&gt;   Woodbury   91.6865   91.8355   96.1476   95.4186   99.3985  104.5174    10</span></span>
+<span><span class="co">#&gt;      exact 4035.6755 4158.0353 4214.4257 4209.9316 4271.5685 4464.0264    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4890.6395 4940.6126 5016.0592 5020.8391 5080.4026 5185.7466    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -999,7 +999,7 @@ resulting in five annual measurements for each student. It turns out
 that yodeling appeals to students of all ages, and students enrolling in
 the program range in age from 20 to 70. Moreover, participants’
 untrained yodeling skill is similar at all ages, as is their rate of
-progress with training. All students complete the five-year program.</p>
+progress with training. All students complete the four-year program.</p>
 <p>The researcher, who has more expertise in yodeling than in modeling,
 decides to model the response, <span class="math inline">\(y\)</span>,
 yodeling skill, as a function of age, <span class="math inline">\(x\)</span>, reasoning that students get older
@@ -1038,7 +1038,7 @@ varying the parameters of our example.&lt;/p&gt;"><sup>7</sup></a></p>
 <span>        <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">Nb</span><span class="op">*</span><span class="va">Nw</span>, sd<span class="op">=</span><span class="va">SDwithin</span><span class="op">)</span>    <span class="co"># random error within groups</span></span>
 <span>    <span class="op">}</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p>Here is scatterplot of the data for a representative group of 10
+<p>Here is a scatterplot of the data for a representative group of 10
 (without loss of generality, the first 10) of 100 students, showing the
 95% concentration ellipse for each cluster:<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;We find it convenient to use the
 &lt;strong&gt;lattice&lt;/strong&gt; &lt;span class="citation"&gt;(Sarkar, 2008)&lt;/span&gt;
@@ -2189,7 +2189,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.599   0.000   0.599</span></span>
+<span><span class="co">#&gt;   0.470   0.000   0.469</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2199,7 +2199,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.088   0.002   2.366</span></span>
+<span><span class="co">#&gt;   0.068   0.004   1.938</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
