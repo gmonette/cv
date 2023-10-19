@@ -381,7 +381,7 @@ We used the same random-number generator seeds as in the previous example cross-
 
 We introduce an artificial data set that exemplifies aspects of cross-validation particular to hierarchical models. Using this data set, we show that model comparisons employing cluster-based and those employing case-based cross-validation may not agree on a "best" model. Furthermore, commonly used measures of fit, such as mean-squared error, do not necessarily become smaller as models become larger, even when the models are nested, and even when the measure of fit is computed for the whole data set.
 
-Consider a researcher studying improvement in a skill, yodeling, for example, among students enrolled in a four-year yodeling program. The plan is to measure each student's skill level at the beginning of the program and every year thereafter until the end of the program, resulting in five annual measurements for each student. It turns out that yodeling appeals to students of all ages, and students enrolling in the program range in age from 20 to 70. Moreover, participants' untrained yodeling skill is similar at all ages, as is their rate of progress with training. All students complete the five-year program.
+Consider a researcher studying improvement in a skill, yodeling, for example, among students enrolled in a four-year yodeling program. The plan is to measure each student's skill level at the beginning of the program and every year thereafter until the end of the program, resulting in five annual measurements for each student. It turns out that yodeling appeals to students of all ages, and students enrolling in the program range in age from 20 to 70. Moreover, participants' untrained yodeling skill is similar at all ages, as is their rate of progress with training. All students complete the four-year program.
 
 The researcher, who has more expertise in yodeling than in modeling, decides to model the response, $y$, yodeling skill, as a function of age, $x$, reasoning that students get older during their stay in the program, and (incorrectly) that age can serve as a proxy for elapsed time. The researcher knows that a mixed model should be used to account for clustering due to the expected similarity of measurements taken from each student.
 
@@ -418,7 +418,7 @@ Data <- data.frame(
   )
 ```
 
-Here is scatterplot of the data for a representative group of 10 (without loss of generality, the first 10) of 100 students, showing the 95% concentration ellipse for each cluster:[^2]
+Here is a scatterplot of the data for a representative group of 10 (without loss of generality, the first 10) of 100 students, showing the 95% concentration ellipse for each cluster:[^2]
 
 [^2]: We find it convenient to use the **lattice** [@Sarkar:2008] and **latticeExtra** [@SarkarAndrews:2022] packages for this and other graphs in this section.
 
