@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-10-18" />
+<meta name="date" content="2023-10-19" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-10-18</h4>
+<h4 class="date">2023-10-19</h4>
 
 
 
@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 952799</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 290840</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.243</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.229</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.351</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.331</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -1215,7 +1215,7 @@ resulting in five annual measurements for each student. It turns out
 that yodeling appeals to students of all ages, and students enrolling in
 the program range in age from 20 to 70. Moreover, participants’
 untrained yodeling skill is similar at all ages, as is their rate of
-progress with training. All students complete the five-year program.</p>
+progress with training. All students complete the four-year program.</p>
 <p>The researcher, who has more expertise in yodeling than in modeling,
 decides to model the response, <span class="math inline">\(y\)</span>,
 yodeling skill, as a function of age, <span class="math inline">\(x\)</span>, reasoning that students get older
@@ -1252,7 +1252,7 @@ cross-validating mixed-effects models:<a href="#fn7" class="footnote-ref" id="fn
 <span id="cb24-24"><a href="#cb24-24" tabindex="-1"></a>        <span class="fu">rnorm</span>(Nb<span class="sc">*</span>Nw, <span class="at">sd=</span>SDwithin)    <span class="co"># random error within groups</span></span>
 <span id="cb24-25"><a href="#cb24-25" tabindex="-1"></a>    }</span>
 <span id="cb24-26"><a href="#cb24-26" tabindex="-1"></a>  )</span></code></pre></div>
-<p>Here is scatterplot of the data for a representative group of 10
+<p>Here is a scatterplot of the data for a representative group of 10
 (without loss of generality, the first 10) of 100 students, showing the
 95% concentration ellipse for each cluster:<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;lattice&quot;</span>)</span>
@@ -2343,7 +2343,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb63-5"><a href="#cb63-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb63-6"><a href="#cb63-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb63-7"><a href="#cb63-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb63-8"><a href="#cb63-8" tabindex="-1"></a><span class="co">#&gt;   0.326   0.017   0.343</span></span>
+<span id="cb63-8"><a href="#cb63-8" tabindex="-1"></a><span class="co">#&gt;   0.242   0.008   0.251</span></span>
 <span id="cb63-9"><a href="#cb63-9" tabindex="-1"></a></span>
 <span id="cb63-10"><a href="#cb63-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb63-11"><a href="#cb63-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -2353,7 +2353,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb63-15"><a href="#cb63-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb63-16"><a href="#cb63-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb63-17"><a href="#cb63-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb63-18"><a href="#cb63-18" tabindex="-1"></a><span class="co">#&gt;   0.034   0.004   1.506</span></span>
+<span id="cb63-18"><a href="#cb63-18" tabindex="-1"></a><span class="co">#&gt;   0.033   0.005   1.583</span></span>
 <span id="cb63-19"><a href="#cb63-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb63-20"><a href="#cb63-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
