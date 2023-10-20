@@ -119,7 +119,6 @@ cv.default <- function(model, data=insight::get_data(model),
     predict.args <- c(list(object=update(model, data=data[ - indices.i, ]),
       newdata=data, type=type), dots)
     fit.all.i <- do.call(predict, predict.args)
-      # predict(model.i, newdata=data, type=type)
     fit.i <- fit.all.i[indices.i]
     c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
