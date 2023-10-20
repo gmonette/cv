@@ -100,6 +100,7 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10, reps=1, seed, ncores=1,
                        method=NULL, type="response", ...){
+
   f <- function(i){
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
@@ -108,6 +109,21 @@ cv.default <- function(model, data=insight::get_data(model),
     fit.i <- fit.all.i[indices.i]
     c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
+
+  fPara <- function(i){
+    # helper function to compute cv criterion for each fold
+    #  with parallel computations
+    indices.i <- indices[starts[i]:ends[i]]
+    # the following deals with a scoping issue that can
+    #   occur with args passed via ... (which is saved in dots)
+    predict.args <- c(list(object=update(model, data=data[ - indices.i, ]),
+      newdata=data, type=type), dots)
+    fit.all.i <- do.call(predict, predict.args)
+      # predict(model.i, newdata=data, type=type)
+    fit.i <- fit.all.i[indices.i]
+    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
+  }
+
   y <- getResponse(model)
   n <- nrow(data)
   if (is.character(k)){
@@ -134,10 +150,11 @@ cv.default <- function(model, data=insight::get_data(model),
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
   if (ncores > 1){
+    dots <- list(...)
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
-      f(i)
+      fPara(i)
     }
     stopCluster(cl)
   } else {

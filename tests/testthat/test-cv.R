@@ -79,8 +79,8 @@ test_that("parallel computations glm k=10", {
 
 test_that("parallel computations glm loo", {
   skip_on_cran()
-  expect_equal(cv(m.caravan, k="loo", criterion=BayesRule, seed=123),
-               cv(m.caravan, k="loo", criterion=BayesRule, seed=123,
+  expect_equal(cv(m.caravan, k="loo", criterion=BayesRule),
+               cv(m.caravan, k="loo", criterion=BayesRule,
                   ncores=2))
 })
 
