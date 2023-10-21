@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-10-20</h4>
+            <h4 data-toc-skip class="date">2023-10-21</h4>
       
       
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 378626</span></span>
+<span><span class="co">#&gt; R RNG seed set to 347890</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.305</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.288</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.267</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.252</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -350,11 +350,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median       uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.0966    3.3632    3.4776    3.4147    3.575    4.0266    10</span></span>
-<span><span class="co">#&gt;   Woodbury   27.1981   27.3193   27.6137   27.6788   27.784   28.0663    10</span></span>
-<span><span class="co">#&gt;      naive  702.9421  715.0267  747.0363  736.5472  747.399  886.6961    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1192.0566 1208.3381 1263.9194 1229.1770 1359.132 1389.8773    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.5766    2.6297    2.8508    2.8453    2.9872    3.2463    10</span></span>
+<span><span class="co">#&gt;   Woodbury   26.0500   26.3016   26.6310   26.5162   26.6249   28.4217    10</span></span>
+<span><span class="co">#&gt;      naive  604.9584  605.3650  633.0476  607.7607  609.2521  737.7820    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1045.4301 1053.8210 1080.1043 1056.0464 1058.6553 1190.4777    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -686,11 +686,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean   median      uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.5124    3.5614    3.6679    3.576    3.79    4.1194    10</span></span>
-<span><span class="co">#&gt;   Woodbury   96.7661   97.4559  101.2102   99.650  102.38  116.5063    10</span></span>
-<span><span class="co">#&gt;      exact 4257.0464 4346.2173 4425.1340 4435.342 4457.24 4590.4670    10</span></span>
-<span><span class="co">#&gt;     cv.glm 5175.5667 5201.2818 5288.4339 5291.722 5331.68 5431.1796    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.9899    3.0782    3.1417    3.0983    3.1915    3.4498    10</span></span>
+<span><span class="co">#&gt;   Woodbury   85.4767   86.1659   87.5011   86.8270   88.3236   93.2043    10</span></span>
+<span><span class="co">#&gt;      exact 3788.5080 3866.2393 3901.4011 3887.0441 3946.7847 4001.5386    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4605.8720 4633.4357 4703.3759 4720.2269 4770.4300 4783.7866    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -866,7 +866,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, seed<span class="op">=</span><span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
 <span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587038 (tol = 0.002, component 1)</span></span>
+<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587141 (tol = 0.002, component 1)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 37.445</span></span>
@@ -2189,7 +2189,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.525   0.000   0.525</span></span>
+<span><span class="co">#&gt;   0.447   0.000   0.447</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2199,7 +2199,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.077   0.001   2.046</span></span>
+<span><span class="co">#&gt;   0.061   0.005   1.748</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -2401,11 +2401,11 @@ Thousand Oaks <span>CA</span>: Sage.
 </div>
 <div id="ref-Sarkar:2008" class="csl-entry">
 Sarkar, D. (2008). <em>Lattice: Multivariate data visualization with
-r</em>. New York: Springer. Retrieved from <a href="http://lmdvr.r-forge.r-project.org" class="external-link">http://lmdvr.r-forge.r-project.org</a>
+<span>R</span></em>. New York: Springer. Retrieved from <a href="http://lmdvr.r-forge.r-project.org" class="external-link">http://lmdvr.r-forge.r-project.org</a>
 </div>
 <div id="ref-SarkarAndrews:2022" class="csl-entry">
-Sarkar, D., &amp; Andrews, F. (2022). <em>latticeExtra: Extra graphical
-utilities based on lattice</em>. Retrieved from <a href="https://CRAN.R-project.org/package=latticeExtra" class="external-link">https://CRAN.R-project.org/package=latticeExtra</a>
+Sarkar, D., &amp; Andrews, F. (2022). <em><span class="nocase">latticeExtra</span>: Extra graphical utilities based on
+<span class="nocase">lattice</span></em>. Retrieved from <a href="https://CRAN.R-project.org/package=latticeExtra" class="external-link">https://CRAN.R-project.org/package=latticeExtra</a>
 </div>
 <div id="ref-VenablesRipley:2002" class="csl-entry">
 Venables, W. N., &amp; Ripley, B. D. (2002). <em>Modern applied
