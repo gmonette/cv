@@ -101,6 +101,11 @@ the first two elements should be
 \item{...}{for \code{cv()} methods, to match generic,
 and for \code{cvMixed()}, arguments to be passed to \code{update()}.}
 }
+\value{
+\code{cvMixed()}, and functions based on it, such as the methods
+\code{cv.merMod()}, \code{cv.lme()}, \code{cv.glmmTMB()}, return objects of class \code{"cv"}, or,
+if \code{reps > 1}, of class \code{"cvList"} (see \code{\link{cv}()}).
+}
 \description{
 \code{\link{cv}()} methods for models of class \code{"merMod"}, fit
 by the \code{\link[lme4]{lmer}()} and \code{\link[lme4]{glmer}()} functions

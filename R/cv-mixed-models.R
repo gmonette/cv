@@ -190,6 +190,10 @@ cvMixed <- function(model,
   }
 }
 
+#' @returns \code{cvMixed()}, and functions based on it, such as the methods
+#' \code{cv.merMod()}, \code{cv.lme()}, \code{cv.glmmTMB()}, return objects of class \code{"cv"}, or,
+#' if \code{reps > 1}, of class \code{"cvList"} (see \code{\link{cv}()}).
+
 #' @describeIn cvMixed \code{cv()} method
 #' @export
 cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,

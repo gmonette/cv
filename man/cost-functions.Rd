@@ -18,6 +18,11 @@ BayesRule2(y, yhat)
 
 \item{yhat}{fitted value}
 }
+\value{
+In general, cost functions should return a single numeric
+value measuring lack-of-fit. \code{mse()} returns the mean-squared error; \code{BayesRule()} and
+\code{BayesRule2()} return the proportion of misclassified cases.
+}
 \description{
 Compute cost functions (cross-validation criteria) for fitted
 regression models.

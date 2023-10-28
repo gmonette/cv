@@ -1,6 +1,7 @@
 # test that lm and glm methods produce the same results for a linear model
 
-data("Auto", package="ISLR2")
+data("Auto", package="ISLR2", envir=environment())
+
 lm.fit <- lm(mpg ~ horsepower, data=Auto)
 glm.fit <- glm(mpg ~ horsepower,data=Auto)
 
@@ -66,8 +67,8 @@ test_that("parallel computations lm k=10", {
 
 # test that parallel computations work for a generalized linear model
 
-data("Caravan", package="ISLR2")
-assign("Cara", Caravan[1:500, c(1:10, 86)], envir=.GlobalEnv)
+data("Caravan", package="ISLR2", envir=environment())
+Cara <- Caravan[1:500, c(1:10, 86)]
 m.caravan <- glm(Purchase ~ ., data=Cara, family=binomial)
 
 test_that("parallel computations glm k=10", {

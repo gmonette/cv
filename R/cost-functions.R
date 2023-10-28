@@ -21,6 +21,10 @@
 #' and that the \code{yhat} values are all between 0 and 1, while
 #' the latter doesn't and is therefore faster.
 #'
+#' @returns In general, cost functions should return a single numeric
+#' value measuring lack-of-fit. `mse()` returns the mean-squared error; `BayesRule()` and
+#' `BayesRule2()` return the proportion of misclassified cases.
+
 #' @describeIn cost-functions Mean-square error
 #' @export
 mse <- function(y, yhat){
