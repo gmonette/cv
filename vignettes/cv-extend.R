@@ -242,3 +242,6 @@ selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 ## ----best-models-by-folds-----------------------------------------------------
 compareFolds(cv.swiss)
 
+## ----coda, include = FALSE----------------------------------------------------
+options(.opts)
+

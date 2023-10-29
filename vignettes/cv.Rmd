@@ -935,6 +935,9 @@ $$
 \mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
 $$
 
+```{r coda, include = FALSE}
+options(.opts)
+```
 
 ## References
 

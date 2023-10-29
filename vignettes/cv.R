@@ -448,3 +448,6 @@ system.time(m.mroz.sel.cv.p <- cvSelect(selectStepAIC, Mroz,
                           ncores=2))
 all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
 
+## ----coda, include = FALSE----------------------------------------------------
+options(.opts)
+

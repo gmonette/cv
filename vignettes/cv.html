@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-10-19" />
+<meta name="date" content="2023-10-29" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-10-19</h4>
+<h4 class="date">2023-10-29</h4>
 
 
 
@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 279418</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 398475</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.594</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.561</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.238</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.224</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -617,11 +617,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = &quot;loo&quot;), :</span></span>
 <span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
 <span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;       expr       min       lq     mean median       uq      max neval cld</span></span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues    974.12   1093.3   1163.5   1185   1205.1   1354.4    10 a  </span></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10344.34  10532.1  11264.6  10970  11887.5  13543.6    10 a  </span></span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 212722.06 213274.9 215508.3 215576 217008.7 219221.3    10  b </span></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 380021.13 382474.2 400724.6 384221 388611.5 500394.6    10   c</span></span></code></pre></div>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq     mean   median       uq      max neval cld</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues    964.69    967.64   1129.8   1160.3   1196.3   1340.6    10 a  </span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10483.78  10762.46  11264.0  10867.0  11363.8  14419.1    10 a  </span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 215370.33 216389.64 229553.3 218345.7 220837.6 276001.9    10  b </span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 377467.48 380847.03 405010.5 383950.0 437946.5 495947.4    10   c</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
@@ -927,15 +927,15 @@ comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
 <span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span>)</span>
 <span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.3304    1.3396    1.3926    1.3689    1.4208    1.5809    10</span></span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   40.0052   40.3015   48.4736   41.3104   41.5205  115.5971    10</span></span>
-<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co">#&gt;      exact 1793.4726 1816.1915 1872.6608 1850.0776 1920.0666 1996.1432    10</span></span>
-<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2095.5638 2132.3699 2189.3575 2183.2882 2248.8241 2286.4775    10</span></span>
-<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt;  cld</span></span>
-<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
-<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
-<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a><span class="co">#&gt;   b </span></span>
-<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a><span class="co">#&gt;    c</span></span></code></pre></div>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2892    1.3212    1.3524    1.3414    1.3998    1.4421    10</span></span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   39.0116   40.4098   41.0037   40.9399   41.5998   44.2752    10</span></span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co">#&gt;      exact 1750.1111 1753.7966 1778.0720 1757.7403 1802.9704 1855.2706    10</span></span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2008.0623 2038.1417 2081.1113 2090.7808 2106.6058 2137.6914    10</span></span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt;   cld</span></span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co">#&gt;  a   </span></span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a><span class="co">#&gt;   b  </span></span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a><span class="co">#&gt;    c </span></span>
+<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a><span class="co">#&gt;     d</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -2343,7 +2343,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb63-5"><a href="#cb63-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb63-6"><a href="#cb63-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb63-7"><a href="#cb63-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb63-8"><a href="#cb63-8" tabindex="-1"></a><span class="co">#&gt;   0.404   0.001   0.404</span></span>
+<span id="cb63-8"><a href="#cb63-8" tabindex="-1"></a><span class="co">#&gt;   0.237   0.002   0.239</span></span>
 <span id="cb63-9"><a href="#cb63-9" tabindex="-1"></a></span>
 <span id="cb63-10"><a href="#cb63-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb63-11"><a href="#cb63-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -2353,7 +2353,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb63-15"><a href="#cb63-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb63-16"><a href="#cb63-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb63-17"><a href="#cb63-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb63-18"><a href="#cb63-18" tabindex="-1"></a><span class="co">#&gt;   0.037   0.006   1.598</span></span>
+<span id="cb63-18"><a href="#cb63-18" tabindex="-1"></a><span class="co">#&gt;   0.033   0.005   0.974</span></span>
 <span id="cb63-19"><a href="#cb63-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb63-20"><a href="#cb63-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -2546,11 +2546,11 @@ Thousand Oaks <span>CA</span>: Sage.
 </div>
 <div id="ref-Sarkar:2008" class="csl-entry">
 Sarkar, D. (2008). <em>Lattice: Multivariate data visualization with
-r</em>. New York: Springer. Retrieved from <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>
+<span>R</span></em>. New York: Springer. Retrieved from <a href="http://lmdvr.r-forge.r-project.org">http://lmdvr.r-forge.r-project.org</a>
 </div>
 <div id="ref-SarkarAndrews:2022" class="csl-entry">
-Sarkar, D., &amp; Andrews, F. (2022). <em>latticeExtra: Extra graphical
-utilities based on lattice</em>. Retrieved from <a href="https://CRAN.R-project.org/package=latticeExtra">https://CRAN.R-project.org/package=latticeExtra</a>
+Sarkar, D., &amp; Andrews, F. (2022). <em><span class="nocase">latticeExtra</span>: Extra graphical utilities based on
+<span class="nocase">lattice</span></em>. Retrieved from <a href="https://CRAN.R-project.org/package=latticeExtra">https://CRAN.R-project.org/package=latticeExtra</a>
 </div>
 <div id="ref-VenablesRipley:2002" class="csl-entry">
 Venables, W. N., &amp; Ripley, B. D. (2002). <em>Modern applied

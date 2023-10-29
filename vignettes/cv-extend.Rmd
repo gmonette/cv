@@ -404,6 +404,10 @@ Cross-validation shows that model selection exacts a penalty in MSE. Examining t
 compareFolds(cv.swiss)
 ```
 
+```{r coda, include = FALSE}
+options(.opts)
+```
+
 ## References
 
 
