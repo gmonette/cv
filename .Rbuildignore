@@ -1,13 +1,12 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-__notes_*
 ^\.github$
 vignettes/cv_cache/*
+vignettes/cv-extend_cache/*
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
 ^scratch$
 .*\.tar\.gz
-for-CRAN/*
 ^doc$
 ^Meta$

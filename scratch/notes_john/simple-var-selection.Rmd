@@ -1,0 +1,81 @@
+Now suppose that we use a simple-minded variable-selection procedure to pick the $p' = 5$ predictors that are most highly correlated with $y$ and use them in a least-squares regression:
+```{r pick-best-5}
+r <- as.vector(cor(X, y))
+names(r) <- 1:100
+(best5 <- sort(r, decreasing=TRUE)[1:5])
+m <- lm(y ~ X[, names(best5)])
+summary(m)
+mse(y, fitted(m))
+```
+The $R^2$ for the selected model is small, but the omnibus $F$-test that all of the 5 $\beta$s are 0 is (spuriously) "statistically significant," as are the regression coefficients for 2 of the 5 selected $x$s. These results are, of course, nonsense. Notice that the mean-squared error of prediction for the model is $0.962$, which is smaller than the true error variance $\sigma^2 = 1$. The estimated error variance for the least-squares regression is also too small, $\widehat{\sigma}^2 = 0.984^2 = 0.968$.
+
+Now let us cross-validate the MSE for the selected model:
+```{r cv-best-5}
+cv(m, seed=4354)
+```
+Cross-validation consequently also over-states the predictive power of the model because, to reiterate, the model was selected on the same data used in the CV process.
+
+How then can one proceed correctly to cross-validate a model-selection procedure? The model-selection procedure should be applied with each fold removed, and the resulting selected model applied to predict the response for the cases in the omitted fold.
+
+For our simple variable-selection procedure this process can be automated:
+```{r cvSelect}
+selectBest <- function(data, n.best, y, x){
+  # data: data frame containing all of the data
+  # n.best: number of xs to select
+  # y: name or index of the response
+  # x: vector of names or indices of candidate predictors
+  y <- data[ , y]
+  X <- as.matrix(data[ , x])
+  colnames(X) <- 1:ncol(X)
+  r <- as.vector(cor(X, y))
+  names(r) <- 1:ncol(X)
+  (best <- sort(r, decreasing=TRUE)[1:n.best])
+  best <- names(best)
+  X <- X[, best]
+  data <- data.frame(y, X)
+  lm(y ~ X, data=data)
+  }
+
+D <- data.frame(y, X)
+selectBest(data=D, n.best=5, y=1, x=2:101)
+```
+Next, we write a function to apply `selectBest()` with a fold removed:
+```{r cvSelectBest}
+cvSelectBest <- function(data, indices, n.best, y, x){
+  # data: data frame containing all of the data
+  # indices: row indices in data for the current fold
+  #          if omitted, the function returns the MSE
+  #          for the full data set
+  # n.best: number of xs to select
+  # y: name or index of the response
+  # x: vector of names or indices of candidate predictors
+  if (missing(indices)) {
+    model.i <- selectBest(data, n.best=n.best, y=y, x=x)
+    fit.o.i <- fitted(model.i)
+    return(mse(data[, y], fit.o.i))
+  }
+  data.minus.fold <- data[-indices, ]
+  model.i <- selectBest(data.minus.fold, n.best, y, x)
+  X <- cbind(1, as.matrix(data[, names(coef(model.i))[-1]]))
+  fit.o.i <- as.vector(X %*% coef(model.i))
+  fit.i <- fit.o.i[indices]
+  c(mse(data[indices, y], fit.i), mse(data[, y], fit.o.i))
+}
+```
+For example:
+```{r try-cvSelectBest}
+cvSelectBest(data=D, n.best=5, y=1, x=2:101) # whole data set
+cvSelectBest(data=D, indices=1:100,
+             n.best=5, y=1, x=2:101) # omit first 100 cases
+```
+
+We wrote `cvSelectBest()` so that it's useable  with the `cvSelect()` function in the **cv** package. `cvSelect()` applies a model-selection procedure, such as our `cvSelectBest()`, in $k$-fold or LOO CV.
+
+`cvSelectBest()` has two required arguments: `procedure`, a model-selection function whose first two arguments should be `data`, a full data frame, and `indices`, the case indices for the current fold. The user can also supply `k` and `seed` arguments to `cvSelectBest()`; as for `cv()`, `k` defaults to `10`, and if `seed` isn't supplied, a random-number generator seed is randomly selected and saved. Any other arguments to `cvSelect()` are passed through to the model-selection function.
+
+So, we can cross-validate our simple model-selection procedure applied to the randomly generated data by
+```{r cv-select-best-5}
+cvSelect(cvSelectBest, data=D, seed=321,
+         n.best=5, y=1, x=2:101)
+```
+Properly cross-validating model selection for the example produces a realistic estimate of the poor predictive power of the selected model, with the estimated MSE of prediction very slightly larger than the marginal variance of $y$, that is, $\sigma^2 = 1$.

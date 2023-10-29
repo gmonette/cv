@@ -1,0 +1,7 @@
+
+ℹ Copying vignettes
+ℹ Moving cv-extend.html, cv.html, cv-extend.R, and cv.R to doc/
+ℹ Copying cv-extend.Rmd and cv.Rmd to doc/
+ℹ Building vignette index
+   user  system elapsed
+ 83.685   2.695  88.371
