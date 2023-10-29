@@ -1,9 +1,9 @@
 ## The tests in this file run only if the environment variable
-##   RUN_ALL_TESTS is set to true, in which case the tests create
+##   RUN_ALL_CV_TESTS is set to true, in which case the tests create
 ##   three data sets in the global environment, Auto, Cara, and
 ##   Caravan.
 
-if (Sys.getenv("RUN_ALL_TESTS") == "true"){
+if (Sys.getenv("RUN_ALL_CV_TESTS") == "true"){
 
 # test that different algorithms produce the same results
 #  using selectStepAIC() for a lm
