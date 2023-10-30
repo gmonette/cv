@@ -1,0 +1,359 @@
+---
+title: "Cross-validation of regression models: mixed model examples (edited)"
+author: "John Fox and Georges Monette"
+date: "`r Sys.Date()`"
+package: cv
+output:
+  rmarkdown::html_vignette:
+  fig_caption: yes
+bibliography: ["cv.bib"]
+csl: apa.csl
+vignette: >
+  %\VignetteIndexEntry{Cross-validation of regression models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  message = TRUE,
+  warning = TRUE,
+  fig.align = "center",
+  fig.height = 6,
+  fig.width = 7,
+  fig.path = "fig/",
+  dev = "png",
+  comment = "#>" #,
+  # eval = nzchar(Sys.getenv("REBUILD_VIGNETTES"))
+)
+
+# save some typing
+knitr::set_alias(w = "fig.width",
+                 h = "fig.height",
+                 cap = "fig.cap")
+
+# colorize text: use inline as `r colorize(text, color)`
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color,
+      x)
+  } else x
+}
+
+.opts <- options(digits = 5)
+
+knitr::opts_chunk$set(comment="    ")
+```
+
+```{r packages, include=FALSE}
+library(cv)
+library(car)
+library(lattice)
+library(latticeExtra)
+library(lme4)
+```
+The following artificial data set exemplifies a difference between cluster-based
+and individual-based cross-validation in hierarchical models.
+
+It also shows how, in contrast with ordinary least-squares
+models, the variance at different levels of a hierarchical
+model need not necessarily become smaller as the model becomes larger.
+
+In this example, the simplest random intercept model results in a between-cluster variance
+that is much smaller than that of a model that also includes $x$ as a predictor.
+Consequently, different methods of assessing model fit may result in
+different best models, underscoring the importance of assessing hierarchical models
+at different levels.
+
+Adjusting the parameters generating this data can be used to create examples
+that illustrates problems of non-convergence with hierarchical models.
+Fitted models with relatively small between-cluster variance, even those using simple
+random intercept models, are prone to non-convergence due to the
+nature of optimizing algorithms used in `lme` and `lmer`.
+
+In some contexts, non-convergence,
+can be viewed as a diagnostic of a poor model. However, with a simple
+random intercept model where it may indicate a small between-cluster
+variance, non-convergence is an annoyance because it would be statistically correct to
+report that the data are consistent with a zero between-cluster population variance,
+i.e. that observed between-cluster variance in the data can be explained by
+the between-individual variability within clusters.  This leads to
+valid statistical inferences. Although the calculation of accurate p-values for hypotheses concerning
+random effects may be complicated
+by the fact that the estimated variance is at the boundary of the parameter space,
+the estimated variance-covariance matrix of fixed-effect parameters will generally
+be non-singular and may be used for valid Wald tests of linear hypotheses
+of fixed-effect parameters.
+
+Using cross-validation based on fitting random subsets compounds the problem
+since subsets for which there is non-convergence cause the cross-validation to
+fail unless non-converging subsets are omitted, which may bias results since non-convergence
+is likely to be related to the estimated between-cluster variances.
+
+Varying the parameter for between-cluster variance (`SDre` in the code below),
+will generate data sets with varying propensities to produce
+non-convergence. These data sets can be used to explore the consequences of non-convergence and to
+compare the performance of different optimizers.
+
+At present, the results below are based on a data set that does not
+produce non-convergence and are limited to comparisons obtained
+by varying three factors:
+
+- Three models: random intercept only, adding x as a predictor, and also adding the group means of x as a predictor,
+- The method used for fitting: `lmer` in `lme4` or `lme` in `nlme`,
+- Cross-validation resampling individual cases or resampling clusters.
+
+Since the independence of clusters may be a reasonable assumption, as is the
+the independence of individual observations from the same cluster *conditional*
+on clusters, each form of resampling addresses the
+suitability of models
+to answer different questions.
+Results based on individual resampling generalize to new samples from the same
+clusters. Resampling clusters generalizes to new samples of clusters and
+cases.
+
+We start by generating and plotting the data.
+
+```{r data}
+# Generate data set
+
+# Parameters:
+set.seed(9665) # set.seed(123) # set.seed(9693)
+Nb <- 10     # number of groups
+Nw <- 5      # number of individuals within groups
+Bb <- 0      # between-group regression coefficient on group mean
+SDre <- 2.0  # between-group SD of random level relative to group mean of x
+SDwithin <- 0.5  # within group SD
+Bw <- 1  # within group effect of x
+
+Data <- data.frame(
+  group = factor(rep(1:Nb, each=Nw)),
+  x = 20 + seq(1, Nb*Nw)
+) |>
+  within(
+    {
+      xm  <- ave(x, group, FUN = mean) # within-group mean
+      y <- 10 +
+        Bb * xm +                  # contextual effect
+        Bw * (x - xm) +            # within-group effect
+        SDre * rnorm(Nb)[group] +  # random level by group
+        SDwithin * rnorm(Nb*Nw)    # random error within groups
+    }
+  )
+```
+
+
+```{r plot1}
+#| out.width = "100%",
+#| fig.height = 6,
+#| fig.cap = "Hierarchical data set with 10 clusters"
+plot <- xyplot(y ~ x, data=Data, group=group,
+               ylim=c(0, 20),
+               par.settings=list(superpose.symbol=list(pch=1, cex=0.7))) +
+    layer(panel.ellipse(..., center.cex=0))
+plot
+```
+
+The Y variable could represent scores on a programming aptitude test of 10 students
+of varying ages, each tested
+annually during a 5-year training program.  The X variable is the age
+at which each test occurred.
+
+We next obtain six fits with three models and two fitting functions.
+```{r}
+# random intercept only model:
+fit0 <- lmer(y ~ 1 + (1|group), Data)
+
+# effect of x and random intercept:
+fit1 <- lmer(y ~ x + (1|group), Data)
+
+# effect of x, mean of x, and random intercept:
+fit2 <- lmer(y ~ x + xm + (1|group), Data)
+```
+We can compare estimated fixed-effect coefficients.
+
+```{r, message=FALSE,warning=FALSE}
+compareCoefs(fit0,  fit1, fit2)
+```
+
+With this data set, the two functions `lme` and `lmer` converged for all models and produced consistent results.
+The differences between these two functions, and differences that depend on the optimizer used
+within each function, would manifest themselves if the data were generated with a smaller
+between-cluster variance.
+
+We visualize predicted values using population predictions with the fixed effects model only
+and using BLUPs for random effects.  Since `lme` and `lmer` produced almost identical results, the
+figures below are produced only with the `lmer` results.
+
+```{r}
+Data <- within(Data, {
+  fit_mod0.fe <- predict(fit0, re.form = ~ 0)
+  fit_mod0.re <- predict(fit0)
+  fit_mod1.fe <- predict(fit1, re.form = ~ 0)
+  fit_mod1.re <- predict(fit1)
+  fit_mod2.fe <- predict(fit2, re.form = ~ 0)
+  fit_mod2.re <- predict(fit2)
+})
+
+Data_long <- reshape(Data, direction = "long", sep = ".", 
+              timevar = "effect", varying = grep("\\.", names(Data)))
+Data_long$id <- 1:nrow(Data_long)
+Data_long <- reshape(Data_long, direction = "long", sep = "_", 
+              timevar = "modelcode",  varying = grep("_", names(Data_long)))
+
+Data_long$model <- factor(c("~ 1", "~ 1 + x", "~ 1 + x + xm")
+                   [match(Data_long$modelcode, c("mod0","mod1","mod2"))])
+```
+
+
+```{r plot-fits-mod0}
+#| out.width = "100%",
+#| fig.height = 6,
+#| fig.cap = "Fitted values with random intercept model"
+(plot +
+  xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" & 
+                         effect == "fe"),
+         groups=group, type="l", lwd=2) +
+  xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" & 
+                         effect == "re"),
+         groups=group, type="l", lwd=2, lty=3)
+) |> update(
+  key=list(
+    space="right",
+    text=list(c("fixed effects only","fixed and random")),
+    lines=list(lty=c(1, 3))))
+```
+```{r plot-fits-mod1}
+#| out.width = "100%",
+#| fig.height = 6,
+#| fig.cap = "Fitted values with random intercept model and x as a predictor"
+(plot +
+  xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & 
+                         effect == "fe"), 
+         groups=group, type="l", lwd=2) +
+  xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & 
+                         effect == "re"), 
+         groups=group, type="l", lwd=2, lty=3)
+) |> update(
+  ylim=c(-20, 40),
+  key=list(
+    space="right",
+    text=list(c("fixed effects only","fixed and random")),
+    lines=list(lty=c(1, 3))))
+```
+```{r plot-fits-mod2}
+#| out.width = "100%",
+#| fig.height = 6,
+#| fig.cap = "Fitted values with random intercept model and x and the group mean of x as predictors"
+(plot +
+  xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & 
+                         
+                           effect == "fe"), 
+         groups=group, type="l", lwd=2) +
+  xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & 
+                         effect == "re"), 
+         groups=group, type="l", lwd=2, lty=3)
+) |> update(
+  ylim = c(0, 20),
+  key=list(
+    space="right",
+    text=list(c("fixed effects only","fixed and random")),
+    lines=list(lty=c(1, 3))))
+```
+
+### Cross-validation of models
+
+We carry out cross-validation resampling individuals within clusters, based on
+fixed and predicted random effects, and resampling clusters, based on
+fixed effects only.
+In order to reduce between-model variability in comparisons of models,
+the `cv` method applied to the list of models created by the `models` function,
+performs cross-validation with the same training and validation sets
+for each model in order to reduce the between-model variability in the cross-validation
+criterion that stems from the random variation in training set selection.
+
+```{r cross-validation}
+#| out.width = "100%",
+#| fig.height = 6,
+#| fig.cap = "Cross-validation comparing random intercept models with varying fixed effects and with case- and cluster-based resampling."
+
+
+
+modlist <- models("~ 1"=fit0, "~ x"=fit1, "~ x + xm"=fit2)
+cvs_cases <- cv(modlist, data=Data, seed=9693)
+cvs_clusters <- cv(modlist, data=Data, cluster="group", seed=4576)
+
+
+{
+  
+  # play
+  cv0 <- replicate(10,cv(fit0))
+  cv1 <- replicate(10,cv(fit1))
+  cv2 <- replicate(10,cv(fit2))
+  
+  cv0
+  cv1
+  cv2
+  
+  
+  
+  
+  cv12 <- cv(fit1)
+  cv13 <- cv(fit1)
+  cv14 <- cv(fit1)
+  cv01 <- cv(fit0)
+  cv12 <- cv(fit0)
+  cv13 <- cv(fit0)
+  cv14 <- cv(fit0)
+  # 
+  # 
+  cv11
+  cv12
+  cv13
+  cv14
+  
+  
+  
+  cvs_cases <- cv(modlist, data=Data)
+  cvs_clusters <- cv(modlist, data=Data, cluster="group")
+  
+  
+  
+  cvs_cases <- cvs_cases |> lapply(rbind) |> 
+    do.call(rbind, args = _) |> as.data.frame()
+  cvs_clusters <- cvs_clusters |> lapply(rbind) |> 
+    do.call(rbind, args = _) |> as.data.frame()
+  
+  cvs_cases$modlist <- names(modlist)
+  cvs_clusters$modlist <- names(modlist)
+  cvs_cases$cv_method <- "cases"
+  cvs_clusters$cv_method <- "clusters"
+  
+  dout <- within(
+    as.data.frame(rbind(cvs_cases, cvs_clusters)),
+    {
+      model <- factor(modlist)
+      CV <- as.numeric(as.character(`CV crit`))
+    }
+  )
+  
+  dout <- dout[order(dout$model), ]
+  
+  xyplot(CV ~ model, data=dout, groups=cv_method,
+         par.settings =
+           list(superpose.line=list(lty=c(2, 3), lwd=3), 
+                superpose.symbol=list(pch=15:16, 
+                                      cex=1.5)),
+         type="b",
+         auto.key=TRUE,
+         scales=list(y=list(log=TRUE)))
+}
+```
+
+With this example, `lme` and `lmer` give similar results, but resampling cases versus resampling clusters provides
+very different comparisons of models.  The model with X alone, without the contextual mean of X, is assessed as
+fitting very poorly sampling clusters and, relatively, much better resampling individual cases.  This illustrates the
+need to perform cross-validation at different levels.
