@@ -1,6 +1,8 @@
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![Last Commit](https://img.shields.io/github/last-commit/gmonette/cv)](https://github.com/gmonette/cv) [![CRAN](https://www.r-pkg.org/badges/version/cv)](https://cran.r-project.org/package=cv) [![](https://img.shields.io/badge/pkgdown%20site-darhgreen)](https://gmonette.github.io/cv/) <!-- badges: end -->
+[![R-CMD-check](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) [![Last Commit](https://img.shields.io/github/last-commit/gmonette/cv)](https://github.com/gmonette/cv) [![CRAN](https://www.r-pkg.org/badges/version/cv)](https://cran.r-project.org/package=cv) [![](https://img.shields.io/badge/pkgdown%20site-darhgreen)](https://gmonette.github.io/cv/) 
+
+<!-- badges: end -->
 
 # cv package for R: Various Functions for Cross-Validation of Regression Models <img src="man/figures/cv-hex.png" style="float:right; height:200px;"/>
 
@@ -17,6 +19,12 @@ Some of the functions supplied by the package:
 -   `selectTrans()` is a procedure for selecting predictor and response transformations in regression, also suitable for use with `cvSelect()`, based on the `powerTransform()` function in the **car** package.
 
 For additional information on using the **cv** package, see the "[Cross-validation of regression models](https://gmonette.github.io/cv/articles/cv.html)" vignette (`vignette("cv", package="cv")`). The **cv** package is designed to be extensible to other classes of regression models and other model-selection procedures; for details, see the "[Extending the cv package](https://gmonette.github.io/cv/articles/cv-extend.html)" vignette (`vignette("cv-extend", package="cv")`).
+
+To install the current version of the **cv** package from CRAN:
+
+```
+install.packages("cv")
+```
 
 To install the development version of the **cv** package from GitHub:
 
