@@ -83,7 +83,7 @@ cvSelect <- function(procedure, data, k=10, reps=1,
     if (reps > 1) stop("reps should not be > 1 for n-fold CV")
     if (k == n){
       if (reps > 1) stop("reps should not be > 1 for n-fold CV")
-      if (!missing(seed) && !is.null(seed)) warning("seed ignored for n-fold CV")
+      if (!missing(seed) && !is.null(seed)) message("Note: seed ignored for n-fold CV")
       seed <- NULL
     }
     seed <- NULL

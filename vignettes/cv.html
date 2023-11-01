@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-10-29" />
+<meta name="date" content="2023-11-01" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-10-29</h4>
+<h4 class="date">2023-11-01</h4>
 
 
 
@@ -412,9 +412,9 @@ below).</p>
 <h3>Polynomial regression for the <code>Auto</code> data</h3>
 <p>The data for this example are drawn from the <strong>ISLR2</strong>
 package for R, associated with <span class="citation">James et al.
-(2021)</span>, and the presentation here is close (though not identical)
-to that in the original source <span class="citation">(James et al.,
-2021, secs. 5.1, 5.3)</span>, and it demonstrates the use of the
+(2021)</span>. The presentation here is close (though not identical) to
+that in the original source <span class="citation">(James et al., 2021,
+secs. 5.1, 5.3)</span>, and it demonstrates the use of the
 <code>cv()</code> function in the <strong>cv</strong> package.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
 <p>The <code>Auto</code> dataset contains information about 392
 cars:</p>
@@ -475,9 +475,9 @@ Polynomial fits for <span class="math inline">\(p = 1\)</span> to <span class="m
 data
 </p>
 </div>
-<p>The linear fit is clearly inappropriate; the fits for <span class="math inline">\(p = 2\)</span> (quadratic) through <span class="math inline">\(4\)</span> are very similar; and the fit for <span class="math inline">\(p = 5\)</span> probably over-fits the data by
-chasing one or two relatively high <code>mpg</code> values at the
-right.</p>
+<p>The linear fit is clearly inappropriate; the fits for <span class="math inline">\(p = 2\)</span> (quadratic) through <span class="math inline">\(4\)</span> are very similar; and the fit for <span class="math inline">\(p = 5\)</span> may over-fit the data by chasing
+one or two relatively high <code>mpg</code> values at the right (but see
+the CV results reported below).</p>
 <p>The following graph shows two measures of estimated squared error as
 a function of polynomial-regression degree: The mean-squared error
 (MSE), defined as <span class="math inline">\(\mathsf{MSE} = \sum (y_i -
@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 398475</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 248691</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.238</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.224</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.217</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.204</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -692,45 +692,16 @@ fitting and saving the 10 models:</p>
 <span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>cv.auto.loo <span class="ot">&lt;-</span> <span class="fu">cv</span>(<span class="fu">models</span>(m<span class="fl">.1</span>, m<span class="fl">.2</span>, m<span class="fl">.3</span>, m<span class="fl">.4</span>, m<span class="fl">.5</span>,</span>
 <span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a>                        m<span class="fl">.6</span>, m<span class="fl">.7</span>, m<span class="fl">.8</span>, m<span class="fl">.9</span>, m<span class="fl">.10</span>),</span>
 <span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a>                 <span class="at">data=</span>Auto, <span class="at">k=</span><span class="st">&quot;loo&quot;</span>)</span>
-<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a></span>
-<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a></span>
-<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-33"><a href="#cb10-33" tabindex="-1"></a></span>
-<span id="cb10-34"><a href="#cb10-34" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-35"><a href="#cb10-35" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-36"><a href="#cb10-36" tabindex="-1"></a></span>
-<span id="cb10-37"><a href="#cb10-37" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-38"><a href="#cb10-38" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-39"><a href="#cb10-39" tabindex="-1"></a></span>
-<span id="cb10-40"><a href="#cb10-40" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-41"><a href="#cb10-41" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-42"><a href="#cb10-42" tabindex="-1"></a></span>
-<span id="cb10-43"><a href="#cb10-43" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-44"><a href="#cb10-44" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-45"><a href="#cb10-45" tabindex="-1"></a></span>
-<span id="cb10-46"><a href="#cb10-46" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-47"><a href="#cb10-47" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-48"><a href="#cb10-48" tabindex="-1"></a></span>
-<span id="cb10-49"><a href="#cb10-49" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-50"><a href="#cb10-50" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-51"><a href="#cb10-51" tabindex="-1"></a></span>
-<span id="cb10-52"><a href="#cb10-52" tabindex="-1"></a><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span id="cb10-53"><a href="#cb10-53" tabindex="-1"></a><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span id="cb10-54"><a href="#cb10-54" tabindex="-1"></a>cv.auto.loo[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="co"># linear and quadratic models</span></span>
-<span id="cb10-55"><a href="#cb10-55" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb10-56"><a href="#cb10-56" tabindex="-1"></a><span class="co">#&gt; Model model.1:</span></span>
-<span id="cb10-57"><a href="#cb10-57" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span id="cb10-58"><a href="#cb10-58" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
-<span id="cb10-59"><a href="#cb10-59" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 24.232</span></span>
-<span id="cb10-60"><a href="#cb10-60" tabindex="-1"></a><span class="co">#&gt; Model model.2:</span></span>
-<span id="cb10-61"><a href="#cb10-61" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span id="cb10-62"><a href="#cb10-62" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
-<span id="cb10-63"><a href="#cb10-63" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span></code></pre></div>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a>cv.auto.loo[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="co"># linear and quadratic models</span></span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a><span class="co">#&gt; Model model.1:</span></span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
+<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 24.232</span></span>
+<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a><span class="co">#&gt; Model model.2:</span></span>
+<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span id="cb10-33"><a href="#cb10-33" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
+<span id="cb10-34"><a href="#cb10-34" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span></code></pre></div>
 <p>Because we didn’t supply names for the models in the calls to the
 <code>models()</code> function, the names <code>model.1</code>,
 <code>model.2</code>, etc., are supplied by the function.</p>
@@ -2343,7 +2314,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb63-5"><a href="#cb63-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb63-6"><a href="#cb63-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb63-7"><a href="#cb63-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb63-8"><a href="#cb63-8" tabindex="-1"></a><span class="co">#&gt;   0.237   0.002   0.239</span></span>
+<span id="cb63-8"><a href="#cb63-8" tabindex="-1"></a><span class="co">#&gt;   0.319   0.002   0.321</span></span>
 <span id="cb63-9"><a href="#cb63-9" tabindex="-1"></a></span>
 <span id="cb63-10"><a href="#cb63-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb63-11"><a href="#cb63-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -2353,7 +2324,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb63-15"><a href="#cb63-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb63-16"><a href="#cb63-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb63-17"><a href="#cb63-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb63-18"><a href="#cb63-18" tabindex="-1"></a><span class="co">#&gt;   0.033   0.005   0.974</span></span>
+<span id="cb63-18"><a href="#cb63-18" tabindex="-1"></a><span class="co">#&gt;   0.035   0.007   1.746</span></span>
 <span id="cb63-19"><a href="#cb63-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb63-20"><a href="#cb63-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually

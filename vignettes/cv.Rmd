@@ -60,7 +60,7 @@ Because the $k$ models are each fit to $n - 1$ cases, LOO CV produces a nearly u
 
 ### Polynomial regression for the `Auto` data
 
-The data for this example are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2021, and the presentation here is close (though not identical) to that in the original source [@JamesEtAl:2021 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function in the **cv** package.[^boot] 
+The data for this example are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2021. The presentation here is close (though not identical) to that in the original source [@JamesEtAl:2021 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function in the **cv** package.[^boot] 
 
 [^boot]: @JamesEtAl:2021 use the `cv.glm()` function in the **boot** package [@CantyRipley2022; @DavisonHinkley1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function.
 
@@ -101,7 +101,7 @@ for (p in 1:5){
 legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
        title="Degree", inset=0.02)
 ```
-The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ probably over-fits the data by chasing one or two relatively high `mpg` values at the right.
+The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ may over-fit the data by chasing one or two relatively high `mpg` values at the right (but see the CV results reported below).
 
 The following graph shows two measures of estimated squared error as a function of polynomial-regression degree: The mean-squared error (MSE), defined as $\mathsf{MSE} = \sum (y_i - \widehat{y}_i)^2/n$, and the usual unbiased estimated error variance, defined as $\widehat{\sigma}^2 = \sum (y_i - \widehat{y}_i)^2/(n - p - 1)$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
 
