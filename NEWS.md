@@ -1,6 +1,6 @@
 # cv 1.0.2
 
-- Generally suppress spuriously message about setting the seed in cv.modList() for LOO CV.
+- Generally suppress spurious messages about setting the seed in cv.modList() for LOO CV.
 
 # cv 1.0.1
 
