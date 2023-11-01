@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-10-31</h4>
+            <h4 data-toc-skip class="date">2023-11-01</h4>
       
       
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -128,9 +128,9 @@ below).</p>
 </h3>
 <p>The data for this example are drawn from the <strong>ISLR2</strong>
 package for R, associated with <span class="citation">James et al.
-(2021)</span>, and the presentation here is close (though not identical)
-to that in the original source <span class="citation">(James et al.,
-2021, secs. 5.1, 5.3)</span>, and it demonstrates the use of the
+(2021)</span>. The presentation here is close (though not identical) to
+that in the original source <span class="citation">(James et al., 2021,
+secs. 5.1, 5.3)</span>, and it demonstrates the use of the
 <code><a href="../reference/cv.html">cv()</a></code> function in the <strong>cv</strong> package.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;&lt;span class="citation"&gt;James et al. (2021)&lt;/span&gt; use
 the &lt;code&gt;&lt;a href="../reference/cv.html"&gt;cv.glm()&lt;/a&gt;&lt;/code&gt; function in the &lt;strong&gt;boot&lt;/strong&gt; package
 &lt;span class="citation"&gt;(Canty &amp;amp; Ripley, 2022; Davison &amp;amp; Hinkley,
@@ -201,9 +201,9 @@ Polynomial fits for <span class="math inline">\(p = 1\)</span> to <span class="m
 data
 </p>
 </div>
-<p>The linear fit is clearly inappropriate; the fits for <span class="math inline">\(p = 2\)</span> (quadratic) through <span class="math inline">\(4\)</span> are very similar; and the fit for <span class="math inline">\(p = 5\)</span> probably over-fits the data by
-chasing one or two relatively high <code>mpg</code> values at the
-right.</p>
+<p>The linear fit is clearly inappropriate; the fits for <span class="math inline">\(p = 2\)</span> (quadratic) through <span class="math inline">\(4\)</span> are very similar; and the fit for <span class="math inline">\(p = 5\)</span> may over-fit the data by chasing
+one or two relatively high <code>mpg</code> values at the right (but see
+the CV results reported below).</p>
 <p>The following graph shows two measures of estimated squared error as
 a function of polynomial-regression degree: The mean-squared error
 (MSE), defined as <span class="math inline">\(\mathsf{MSE} = \sum (y_i -
@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 367245</span></span>
+<span><span class="co">#&gt; R RNG seed set to 317648</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.289</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.273</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.22</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.207</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -350,11 +350,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    4.3583    4.5229    4.7365    4.7738    4.9411    5.0577    10</span></span>
-<span><span class="co">#&gt;   Woodbury   48.9328   49.9421   52.7764   51.3714   56.7468   58.5884    10</span></span>
-<span><span class="co">#&gt;      naive 1015.9041 1025.7048 1061.7388 1042.6570 1066.8720 1232.9188    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1716.9966 1742.6182 1812.1125 1778.7671 1917.8556 1957.1681    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean   median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.6694    2.6945    2.8724    2.938    2.9579    3.1585    10</span></span>
+<span><span class="co">#&gt;   Woodbury   26.2050   26.3655   26.6538   26.500   26.8069   27.9809    10</span></span>
+<span><span class="co">#&gt;      naive  598.4411  600.3183  628.5366  603.616  614.7378  729.9394    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1042.0654 1047.3966 1076.3591 1052.575 1057.4303 1304.5176    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -437,35 +437,6 @@ fitting and saving the 10 models:</p>
 <span><span class="va">cv.auto.loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="fu"><a href="../reference/models.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
 <span>                        <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
 <span>                 data<span class="op">=</span><span class="va">Auto</span>, k<span class="op">=</span><span class="st">"loo"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in cv.lm(model[[i]], data = data, criterion = criterion, k = k, : seed</span></span>
-<span><span class="co">#&gt; ignored for n-fold CV</span></span>
 <span><span class="va">cv.auto.loo</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span> <span class="co"># linear and quadratic models</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model model.1:</span></span>
@@ -686,11 +657,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    4.6499    4.7535    4.9953    4.9848    5.1095    5.7638    10</span></span>
-<span><span class="co">#&gt;   Woodbury  151.2520  152.1739  156.0058  156.4018  157.9986  161.5901    10</span></span>
-<span><span class="co">#&gt;      exact 5942.3314 6078.2210 6148.0613 6111.8642 6247.5921 6359.4370    10</span></span>
-<span><span class="co">#&gt;     cv.glm 7287.0067 7417.2083 7524.9147 7521.8105 7645.2763 7715.0459    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq     mean    median        uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.9852    3.0486    3.119    3.1014    3.1849    3.302    10</span></span>
+<span><span class="co">#&gt;   Woodbury   85.6626   86.2470   88.196   86.9411   90.4059   92.977    10</span></span>
+<span><span class="co">#&gt;      exact 3797.1216 3802.7398 3895.390 3909.7346 3944.2904 4006.222    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4592.1184 4636.6674 4736.179 4719.0755 4804.3489 4940.115    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -866,7 +837,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, seed<span class="op">=</span><span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
 <span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
-<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587038 (tol = 0.002, component 1)</span></span>
+<span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587141 (tol = 0.002, component 1)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 37.445</span></span>
@@ -2189,7 +2160,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.721   0.000   0.721</span></span>
+<span><span class="co">#&gt;   0.618   0.000   0.618</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2199,7 +2170,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.087   0.008   2.568</span></span>
+<span><span class="co">#&gt;   0.063   0.004   1.785</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
