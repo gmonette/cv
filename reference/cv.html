@@ -123,7 +123,7 @@ more computationally efficient.</p>
 
 
 <dt>criterion</dt>
-<dd><p>cross-validation criterion ("cost") function of form <code>f(y, yhat)</code>
+<dd><p>cross-validation criterion ("cost" or lack-of-fit) function of form <code>f(y, yhat)</code>
 where <code>y</code> is the observed values of the response and
 <code>yhat</code> the predicted values; the default is <code><a href="cost-functions.html">mse</a></code>
 (the mean-squared error).</p></dd>
@@ -168,7 +168,7 @@ and may be recognized or ignored by <code><a href="https://rdrr.io/r/stats/predi
 
 
 <dt>x</dt>
-<dd><p>a <code>cv</code> object to be printed</p></dd>
+<dd><p>a <code>"cv"</code> or <code>"cvList"</code> object to be printed</p></dd>
 
 
 <dt>digits</dt>
@@ -180,7 +180,7 @@ default taken from the <code>"digits"</code> option</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An object of class <code>"cv"</code>, with the averaged CV criterion
+<p>The <code>cv()</code> methods return an object of class <code>"cv"</code>, with the averaged CV criterion
 (<code>"CV crit"</code>), the adjusted average CV criterion (<code>"adj CV crit"</code>),
 the criterion for the model applied to the full data (<code>"full crit"</code>),
 the number of folds (<code>"k"</code>), and the seed for R's random-number
@@ -191,9 +191,9 @@ which is literally a list of <code>"cv"</code> objects.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The default method uses <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a>()</code> to refit the model
+    <p>The default <code>cv()</code> method uses <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a>()</code> to refit the model
 to each fold, and should work if there are appropriate <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>
-and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a>()</code> methods and if the default method for <code><a href="getResponse.html">getResponse</a>()</code>
+and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a>()</code> methods, and if the default method for <code><a href="getResponse.html">getResponse</a>()</code>
 works or if a <code><a href="getResponse.html">getResponse()</a></code> method is supplied.</p>
 <p>The <code>"lm"</code> and <code>"glm"</code> methods can use much faster computational
 algorithms, as selected by the <code>method</code> argument. The linear-model
@@ -236,6 +236,10 @@ models; see the "Extending the cv package" vignette
     
 <ul><li><p><code>print(cvList)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="cvMixed.html">cvMixed</a></code>, <code><a href="cvSelect.html">cvSelect</a></code>.</p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

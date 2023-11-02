@@ -84,11 +84,11 @@ value measuring lack-of-fit. <code>mse()</code> returns the mean-squared error; 
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Two cost functions (cross-validation criteria) are provided: (1)
+    <p>Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Two cost functions are provided: (1)
 <code>mse()</code> returns the mean-squared error of prediction for
 a numeric response variable <code>y</code> and predictions <code>yhat</code>.
 (2) <code>BayesRule()</code> and <code>BayesRule2()</code> report the proportion
-of correct predictions for a dichotomous response variable <code>y</code>, assumed
+of incorrect predictions for a dichotomous response variable <code>y</code>, assumed
 coded <code>0</code> and <code>1</code>. The <code>yhat</code> values are
 predicted probabilities and are rounded to 0 or 1. The distinction
 between <code>BayesRule()</code> and <code>BayesRule2()</code> is that the former
