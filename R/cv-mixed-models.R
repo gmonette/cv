@@ -9,10 +9,11 @@
 #' The implementations here should be regarded
 #' as experimental. The \code{cvMixed()} function is meant to be called by
 #' \code{cv()} methods for mixed-effect models and not directly by the user.
+#' It can be used to extend \code{cv()} to other classes of mixed-effects models.
 #'
-#' @param model a regression model object of class \code{"merMod"}.
+#' @param model a mixed-effects model object for which a \code{cv()} method is available.
 #' @param data data frame to which the model was fit (not usually necessary)
-#' @param criterion cross-validation criterion function of form \code{f(y, yhat)}
+#' @param criterion cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
 #'        \code{yhat} the predicted values; the default is \code{\link{mse}}
 #'        (the mean-squared error)
@@ -47,8 +48,9 @@
 #' @details
 #' For mixed-effects models, cross-validation can be done by "clusters" or by
 #' individual observations. If the former, predictions are based only on fixed
-#' effects; if the latter, predictions include the random effects. Only mixed
-#' models with fully nested random effects are supported.
+#' effects; if the latter, predictions include the random effects (i.e., are the
+#' best linear unbiased predictors or "BLUPS").
+#' Only mixed models with fully nested random effects are supported.
 #'
 #' @seealso \code{\link{cv}}, \code{\link[lme4]{lmer}}, \code{\link[lme4]{glmer}},
 #' \code{\link[nlme]{lme}}, \code{\link[glmmTMB]{glmmTMB}}
@@ -191,7 +193,7 @@ cvMixed <- function(model,
 }
 
 #' @returns \code{cvMixed()}, and functions based on it, such as the methods
-#' \code{cv.merMod()}, \code{cv.lme()}, \code{cv.glmmTMB()}, return objects of class \code{"cv"}, or,
+#' \code{cv.merMod()}, \code{cv.lme()}, and \code{cv.glmmTMB()}, return objects of class \code{"cv"}, or,
 #' if \code{reps > 1}, of class \code{"cvList"} (see \code{\link{cv}()}).
 
 #' @describeIn cvMixed \code{cv()} method

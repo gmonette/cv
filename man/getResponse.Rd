@@ -24,7 +24,7 @@ getResponse(model, ...)
 \item{...}{additional parameters for specific methods}
 }
 \value{
-a numeric vector containing the values of the response variable
+a numeric vector containing the values of the response variable.
 }
 \description{
 Generic function to extract the response variable from a fitted model.
@@ -37,10 +37,10 @@ the \pkg{insight} package. If this result is \code{NULL}, the result of
 \code{model.response(model.frame(model))} is returned, checking in any case whether
 the result is a numeric vector.
 
-There is also an \code{"lme"} method, and a \code{"merMod"}
-method that converts factor
+There is also an \code{"lme"} method, and \code{"merMod"}
+and \code{"glmmTMB"} methods that convert factor
 responses to numeric 0/1 responses, as would be appropriate
-for a generalized linear mixed models with a binary response.
+for a generalized linear mixed model with a binary response.
 }
 \section{Methods (by class)}{
 \itemize{

@@ -57,7 +57,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 
 \item{data}{data frame to which the model was fit (not usually necessary).}
 
-\item{criterion}{cross-validation criterion ("cost") function of form \code{f(y, yhat)}
+\item{criterion}{cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 where \code{y} is the observed values of the response and
 \code{yhat} the predicted values; the default is \code{\link{mse}}
 (the mean-squared error).}
@@ -86,13 +86,13 @@ of the available options.}
 the default is \code{type="response"}, which is appropriate, e.g., for a \code{"glm"} model
 and may be recognized or ignored by \code{predict()} methods for other model classes.}
 
-\item{x}{a \code{cv} object to be printed}
+\item{x}{a \code{"cv"} or \code{"cvList"} object to be printed}
 
 \item{digits}{significant digits for printing,
 default taken from the \code{"digits"} option}
 }
 \value{
-An object of class \code{"cv"}, with the averaged CV criterion
+The \code{cv()} methods return an object of class \code{"cv"}, with the averaged CV criterion
 (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 the criterion for the model applied to the full data (\code{"full crit"}),
 the number of folds (\code{"k"}), and the seed for R's random-number
@@ -108,9 +108,9 @@ specific methods for linear and generalized-linear models that can be much
 more computationally efficient.
 }
 \details{
-The default method uses \code{\link{update}()} to refit the model
+The default \code{cv()} method uses \code{\link{update}()} to refit the model
 to each fold, and should work if there are appropriate \code{update()}
-and \code{\link{predict}()} methods and if the default method for \code{\link{getResponse}()}
+and \code{\link{predict}()} methods, and if the default method for \code{\link{getResponse}()}
 works or if a \code{getResponse()} method is supplied.
 
 The \code{"lm"} and \code{"glm"} methods can use much faster computational
@@ -171,4 +171,7 @@ cv(m.auto, seed=1234, reps=3)
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
 cv(m.mroz, criterion=BayesRule, seed=123)
+}
+\seealso{
+\code{\link{cvMixed}}, \code{\link{cvSelect}}.
 }

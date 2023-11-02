@@ -1,8 +1,8 @@
 #' Cross-Validate a Model-Selection Procedure
 #'
-#' A generic function to cross-validate a model-selection procedure,
-#' along with a procedure that applies the \code{\link[MASS]{stepAIC}()}
-#' model-selection function in the \pkg{MASS} package, and a procedure
+#' \code{cvSelect()} is a general function to cross-validate a model-selection procedure;
+#' \code{selectStepAIC()} is a procedure that applies the \code{\link[MASS]{stepAIC}()}
+#' model-selection function in the \pkg{MASS} package; and \code{selectTrans()} is a procedure
 #' for selecting predictor and response transformations in regression, which
 #' uses the \code{\link[car]{powerTransform}()} function in the
 #' \pkg{car} package.
@@ -19,10 +19,11 @@
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel)
-#' @param ... arguments to be passed to \code{procedure()}.
+#' @param ... for \code{cvSelect()}, arguments to be passed to \code{procedure()};
+#' for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.
 #' @importFrom MASS stepAIC
 #' @describeIn cvSelect apply cross-validation to a model-selection procedure.
-#' @returns An object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
+#' @returns \code{cvSelect()} returns an object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
 #' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
 #' the number of folds (\code{"k"}), the seed for R's random-number
@@ -45,7 +46,7 @@
 #' \code{procedure()} should return a two-element vector with the result
 #' of applying a cross-validation criterion to the cases in
 #' the current fold for the model deleting that fold, and to
-#' all of the cases again for the model deleting the current fold.
+#' all of the cases, again for the model deleting the current fold.
 #'
 #' When the \code{indices} argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
 #' the model fit to all of the cases.
@@ -153,7 +154,7 @@ cvSelect <- function(procedure, data, k=10, reps=1,
 #' \pkg{MASS} package.
 #' @param indices indices of cases in data defining the current fold.
 #' @param model a regression model object fit to data.
-#' @param criterion a CV criterion function.
+#' @param criterion a CV criterion ("cost" or lack-of-fit) function.
 #' @param AIC if \code{TRUE} (the default) use the AIC as the
 #' model-selection criterion; if \code{FALSE}, use the BIC.
 #' The \code{k} argument to \code{\link[MASS]{stepAIC}()}
@@ -254,11 +255,11 @@ yjPowerInverse <- function(y, lambda) {
 #' @param family transformation family for the predictors, one of
 #' \code{"bcPower", "bcnPower", "yjPower", "basicPower"},
 #' with \code{"bcPower"} as the default. These are the names of transformation
-#' functions in the \pkg{car} package; see \code{\link[car]{bcPower}}
+#' functions in the \pkg{car} package; see \code{\link[car]{bcPower}()}
 #' @param family.y transformation family for the response,
 #' with \code{"bcPower"} as the default.
 #' @param rounded if \code{TRUE} (the default) use nicely rounded versions
-#' of the estimated transformation parameters (see \code{\link[car]{bcPower}}).
+#' of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).
 #' @examples
 #'
 #' data("Prestige", package="carData")
@@ -375,7 +376,7 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
 #' @describeIn cvSelect print the coefficients from the selected models
 #' for the several folds.
 #' @param object an object of class \code{"cvSelect"}.
-#' @param digits significant digits for printing coefficients,
+#' @param digits significant digits for printing coefficients
 #' (default \code{3}).
 #' @export
 compareFolds <- function(object, digits=3, ...){

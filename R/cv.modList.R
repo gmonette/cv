@@ -2,7 +2,7 @@
 #'
 #' A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 #' created by the \code{models()} function. This \code{cv()} method simplifies
-#' the process of cross-validating several models on the same set of folds.
+#' the process of cross-validating several models on the same set of CV folds.
 #' \code{models()} performs some
 #' "sanity" checks, warning if the models are of different classes, and
 #' reporting an error if they are fit to apparently different data sets or
@@ -10,7 +10,7 @@
 #' @param model a list of regression model objects,
 #' created by \code{models()}.
 #' @param data (required) the data set to which the models were fit.
-#' @param criterion the CV criterion (cost) function, defaults to
+#' @param criterion the CV criterion ("cost" or lack-of-fit) function, defaults to
 #' \code{\link{mse}}.
 #' @param k the number of CV folds; may be omitted, in which case the value
 #' will depend on the default for the \code{cv()} method invoked for the
@@ -22,9 +22,10 @@
 #' @param quietly If \code{TRUE} (the default), simple messages (for example about the
 #' value to which the random-number generator seed is set), but not warnings or
 #' errors, are suppressed.
-#' @param ... for \code{cv()}, additional arguments to be passed to the \code{cv()} method
-#' applied to each model. For \code{models()}, two or more competing models fit to the
-#' the same data; the several models may be named. For the \code{print()}
+#' @param ... for \code{models()}, two or more competing models fit to the
+#' the same data; the several models may be named.
+#' For \code{cv()}, additional arguments to be passed to the \code{cv()} method
+#' applied to each model. For the \code{print()}
 #' method, arguments to be passed to the \code{print()} method for
 #' the individual model cross-validations. For the \code{plot()},
 #' method, arguments to be passed to the base \code{\link[base]{plot}()}
@@ -46,6 +47,7 @@
 #' @param lwd line width for the line (defaults to 2).
 #' @return \code{models()} returns a \code{"modList"} object, the
 #' \code{cv()} method for which returns a \code{"cvModList"} object.
+#' @seealso \code{\link{cv}}, \code{\link{cvMixed}}.
 #' @examples
 #' data("Duncan", package="carData")
 #' m1 <- lm(prestige ~ income + education, data=Duncan)

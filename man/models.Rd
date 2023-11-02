@@ -26,9 +26,10 @@ models(...)
 )
 }
 \arguments{
-\item{...}{for \code{cv()}, additional arguments to be passed to the \code{cv()} method
-applied to each model. For \code{models()}, two or more competing models fit to the
-the same data; the several models may be named. For the \code{print()}
+\item{...}{for \code{models()}, two or more competing models fit to the
+the same data; the several models may be named.
+For \code{cv()}, additional arguments to be passed to the \code{cv()} method
+applied to each model. For the \code{print()}
 method, arguments to be passed to the \code{print()} method for
 the individual model cross-validations. For the \code{plot()},
 method, arguments to be passed to the base \code{\link[base]{plot}()}
@@ -39,7 +40,7 @@ created by \code{models()}.}
 
 \item{data}{(required) the data set to which the models were fit.}
 
-\item{criterion}{the CV criterion (cost) function, defaults to
+\item{criterion}{the CV criterion ("cost" or lack-of-fit) function, defaults to
 \code{\link{mse}}.}
 
 \item{k}{the number of CV folds; may be omitted, in which case the value
@@ -86,7 +87,7 @@ element of the color palette; see \code{\link{palette}()}.}
 \description{
 A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 created by the \code{models()} function. This \code{cv()} method simplifies
-the process of cross-validating several models on the same set of folds.
+the process of cross-validating several models on the same set of CV folds.
 \code{models()} performs some
 "sanity" checks, warning if the models are of different classes, and
 reporting an error if they are fit to apparently different data sets or
@@ -111,4 +112,7 @@ m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
 (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
                  data=Duncan, seed=7949, reps=5))
 plot(cv.models)
+}
+\seealso{
+\code{\link{cv}}, \code{\link{cvMixed}}.
 }

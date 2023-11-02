@@ -5,7 +5,7 @@
 #' @param model a fitted model
 #' @param ... additional parameters for specific methods
 #'
-#' @returns a numeric vector containing the values of the response variable
+#' @returns a numeric vector containing the values of the response variable.
 #'
 #' @details
 #' The supplied \code{default} method returns the \code{model$y} component
@@ -15,10 +15,10 @@
 #' \code{model.response(model.frame(model))} is returned, checking in any case whether
 #' the result is a numeric vector.
 #'
-#' There is also an \code{"lme"} method, and a \code{"merMod"}
-#' method that converts factor
+#' There is also an \code{"lme"} method, and \code{"merMod"}
+#' and \code{"glmmTMB"} methods that convert factor
 #' responses to numeric 0/1 responses, as would be appropriate
-#' for a generalized linear mixed models with a binary response.
+#' for a generalized linear mixed model with a binary response.
 #'
 #' @examples
 #'     fit <- lm(mpg ~ gear, mtcars)

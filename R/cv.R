@@ -7,7 +7,7 @@
 #'
 #' @param model a regression model object (see Details).
 #' @param data data frame to which the model was fit (not usually necessary).
-#' @param criterion cross-validation criterion ("cost") function of form \code{f(y, yhat)}
+#' @param criterion cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
 #'        \code{yhat} the predicted values; the default is \code{\link{mse}}
 #'        (the mean-squared error).
@@ -28,7 +28,8 @@
 #' the default is `type="response"`, which is appropriate, e.g., for a `"glm"` model
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
-#' @returns An object of class \code{"cv"}, with the averaged CV criterion
+#'
+#' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the averaged CV criterion
 #' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
 #' the number of folds (\code{"k"}), and the seed for R's random-number
@@ -37,10 +38,12 @@
 #' If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
 #' which is literally a list of \code{"cv"} objects.
 #'
+#' @seealso \code{\link{cvMixed}}, \code{\link{cvSelect}}.
+#'
 #' @details
-#' The default method uses \code{\link{update}()} to refit the model
+#' The default \code{cv()} method uses \code{\link{update}()} to refit the model
 #' to each fold, and should work if there are appropriate \code{update()}
-#' and \code{\link{predict}()} methods and if the default method for \code{\link{getResponse}()}
+#' and \code{\link{predict}()} methods, and if the default method for \code{\link{getResponse}()}
 #' works or if a \code{getResponse()} method is supplied.
 #'
 #' The \code{"lm"} and \code{"glm"} methods can use much faster computational
@@ -189,7 +192,7 @@ cv.default <- function(model, data=insight::get_data(model),
 }
 
 #' @describeIn cv \code{print()} method
-#' @param x a \code{cv} object to be printed
+#' @param x a \code{"cv"} or \code{"cvList"} object to be printed
 #' @param digits significant digits for printing,
 #' default taken from the \code{"digits"} option
 #' @export
