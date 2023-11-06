@@ -5,6 +5,7 @@
 \alias{selectStepAIC}
 \alias{selectTrans}
 \alias{compareFolds}
+\alias{coef.cvSelect}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
 cvSelect(
@@ -43,6 +44,8 @@ selectTrans(
 )
 
 compareFolds(object, digits = 3, ...)
+
+\method{coef}{cvSelect}(object, average, NAs = 0, ...)
 }
 \arguments{
 \item{procedure}{a model-selection procedure function (see Details).}
@@ -99,6 +102,15 @@ of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).}
 
 \item{digits}{significant digits for printing coefficients
 (default \code{3}).}
+
+\item{average}{if supplied, a function, such as \code{mean} or \code{median},
+to use us in averaging estimates across folds; if missing, the
+estimates for each fold are returned.}
+
+\item{NAs}{values to substitute for \code{NA}s in calculating
+averaged estimates; the default, \code{0}, is appropriate, e.g.,
+for regression coefficients; the value \code{1} might be appropriate
+for power-transformation estimates.}
 }
 \value{
 \code{cvSelect()} returns an object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
@@ -147,6 +159,12 @@ models" vignette (\code{vignette("cv", package="cv")})
 and the "Extending the cv package" vignette
 (\code{vignette("cv-extend", package="cv")}).
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{coef(cvSelect)}: extract the coefficients from the selected models
+for the several folds and possibly average them.
+
+}}
 \section{Functions}{
 \itemize{
 \item \code{cvSelect()}: apply cross-validation to a model-selection procedure.
@@ -175,6 +193,7 @@ cvt <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=123,
                 response="prestige", family="yjPower")
 cvt
 compareFolds(cvt)
+coef(cvt, average=median, NAs=1) # NAs not really needed here
 cv(m.pres, seed=123)
 }
 \seealso{

@@ -270,6 +270,7 @@ yjPowerInverse <- function(y, lambda) {
 #'                 response="prestige", family="yjPower")
 #' cvt
 #' compareFolds(cvt)
+#' coef(cvt, average=median, NAs=1) # NAs not really needed here
 #' cv(m.pres, seed=123)
 #' @export
 selectTrans <- function(data, indices, save.coef=TRUE, model,
@@ -402,4 +403,24 @@ compareFolds.cvSelect <- function(object, digits=3, ...){
     table[i, names(coefficients[[i]])] <- coefficients[[i]]
   }
   printCoefmat(table, na.print="", digits=digits)
+}
+
+#' @describeIn cvSelect extract the coefficients from the selected models
+#' for the several folds and possibly average them.
+#' @param average if supplied, a function, such as \code{mean} or \code{median},
+#' to use us in averaging estimates across folds; if missing, the
+#' estimates for each fold are returned.
+#' @param NAs values to substitute for \code{NA}s in calculating
+#' averaged estimates; the default, \code{0}, is appropriate, e.g.,
+#' for regression coefficients; the value \code{1} might be appropriate
+#' for power-transformation estimates.
+#' @importFrom utils capture.output
+#' @export
+coef.cvSelect <- function(object, average, NAs=0, ...){
+  capture.output(coef <- compareFolds(object))
+  if (missing(average)){
+    return(coef)
+  }
+  coef[is.na(coef)] <- NAs
+  apply(coef, 2, average)
 }

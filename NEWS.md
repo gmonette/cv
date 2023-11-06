@@ -4,6 +4,8 @@
 
 - Fix bugs in selectTrans() that caused errors when one of response and predictors arguments not specified.
 
+- Add coef.cvSelect() method.
+
 - Improvements to documentation.
 
 # cv 1.0.1
