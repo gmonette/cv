@@ -278,6 +278,9 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
                         family.y=c("bcPower", "bcnPower", "yjPower", "basicPower"),
                         rounded=TRUE,
                         ...){
+  if (missing(predictors) && missing(response))
+    stop("'predictors' and 'response' arguments both missing;",
+         "\n no transformations specified")
   y <- getResponse(model)
   family <- match.arg(family)
   family.y <- match.arg(family.y)
@@ -327,6 +330,8 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
       }
     }
     model <- update(model, data=data[-indices, ])
+  } else {
+    lambdas <- gammas <- NULL
   }
 
   # transform response:
@@ -342,6 +347,8 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
     # refit model with transformed predictors and response,
     #   omitting current fold
     model <- update(model, data=data[-indices, ])
+  } else {
+    transy <- NULL
   }
 
   # get predicted values for *all* cases:
@@ -365,11 +372,8 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
   # compute and return CV criteria and transformation parameters:
   list(criterion = c(criterion(y[indices], fit.i),
                      criterion(y, fit.o.i)),
-       coefficients = if (save.coef) c(lambdas, gammas,
-                                lamda.y=as.vector(transy["lambda"]),
-                                if (!is.na(transy["gamma"]))
-                                  gamma.y=as.vector(transy["gamma"]))
-       else NULL)
+       coefficients = if (save.coef) c(lambdas, gammas, transy)
+  )
 }
 
 

@@ -2,6 +2,8 @@
 
 - Generally suppress spurious messages about setting the seed in cv.modList() for LOO CV.
 
+- Fix bugs in selectTrans() that caused errors when one of response and predictors arguments not specified.
+
 - Improvements to documentation.
 
 # cv 1.0.1
