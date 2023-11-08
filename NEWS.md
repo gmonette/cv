@@ -4,6 +4,8 @@
 
 - Fix bugs in selectTrans() that caused errors when one of response and predictors arguments not specified.
 
+- Fix small bug in cvSelect(), returning properly named "coefficients" element when save.coef is TRUE.
+
 - Add coef.cvSelect() method.
 
 - Improvements to documentation.

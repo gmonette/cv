@@ -112,6 +112,7 @@ cvSelect <- function(procedure, data, k=10, reps=1,
       #   coefficients in even-numbered elements
       result <- do.call(rbind, selection[is %% 2 == 1])
       coefs <- do.call(list, selection[is %% 2 == 0])
+      names(coefs) <- NULL
     } else {
       result <- do.call(rbind, selection)
       coefs <- NULL
@@ -184,7 +185,7 @@ selectStepAIC <- function(data, indices,
   fit.i <- fit.all.i[indices]
   list(criterion=c(criterion(y[indices], fit.i),
          criterion(y, fit.all.i)),
-       if (save.coef) coefficients=coef(model.i) else NULL)
+       coefficients=if (save.coef) coef(model.i) else NULL)
 }
 
 
