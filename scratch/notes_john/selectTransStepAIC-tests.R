@@ -53,11 +53,3 @@ cvs
 mse(Auto$mpg, exp(fitted(m.step))) # check
 cv(m.auto) # pre-transformation & selection
 compareFolds(cvs)
-
-  # on transformed scale
-cvs.tr <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
-                predictors=c("cylinders", "displacement", "horsepower",
-                             "weight", "acceleration"),
-                response="mpg", AIC=FALSE, response.scale="transformed")
-cvs.tr
-mse(log(Auto$mpg), fitted(m.step)) # check

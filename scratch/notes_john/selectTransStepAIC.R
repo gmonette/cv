@@ -10,13 +10,11 @@ selectTransStepAIC <- function(data,
                                family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
                                family.y = c("bcPower", "bcnPower", "yjPower", "basicPower"),
                                rounded = TRUE,
-                               response.scale = c("original", "transformed"),
                                AIC = TRUE,
                                ...) {
 
   family <- match.arg(family)
   family.y <- match.arg(family.y)
-  response.scale <- match.arg(response.scale)
 
   powertrans <- switch(family,
                        bcPower = car::bcPower,
@@ -132,8 +130,6 @@ selectTransStepAIC <- function(data,
 
   # re-estimate with transformed data:
   model <- update(model, data = data)
-  y.trans <- if (response.scale == "transformed")
-    getResponse(model) else NULL
 
   # perform variable selection:
 
@@ -149,7 +145,7 @@ selectTransStepAIC <- function(data,
   }
 
   # express fitted values on original response scale
-  fit.all.i  <- if (!missing(response) && response.scale == "original"){
+  fit.all.i  <- if (!missing(response)){
     if (is.na(powers["gamma"])){
       inverse.pt.y(predict(model.i, newdata = data),
                    lambda=powers["lambda"])
@@ -161,8 +157,6 @@ selectTransStepAIC <- function(data,
   } else {
     predict(model.i, newdata = data)
   }
-
-  if (response.scale == "transformed") y <- y.trans
 
   if (missing(indices)) return(criterion(y, fit.all.i))
 
