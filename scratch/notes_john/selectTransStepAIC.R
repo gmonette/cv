@@ -121,7 +121,7 @@ selectTransStepAIC <- function(data,
     if (family.y == "bcnPower") {
       lambda <- powers["lambda"]
       gamma <- powers["gamma"]
-      data[, predictor] <- car::bcnPower(data[, response],
+      data[, response] <- car::bcnPower(data[, response],
                                          lambda = lambda, gamma = gamma)
     } else {
       lambda <- powers["lambda"]
