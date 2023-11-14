@@ -69,3 +69,4 @@ modList
 selectTrans
 coef
 selectTransAndStepAIC
+medAbsErr

@@ -3,11 +3,14 @@
 \name{mse}
 \alias{mse}
 \alias{costFunctions}
+\alias{medAbsErr}
 \alias{BayesRule}
 \alias{BayesRule2}
 \title{Cost Functions for Fitted Regression Models}
 \usage{
 mse(y, yhat)
+
+medAbsErr(y, yhat)
 
 BayesRule(y, yhat)
 
@@ -28,10 +31,13 @@ Compute cost functions (cross-validation criteria) for fitted
 regression models.
 }
 \details{
-Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Two cost functions are provided: (1)
-\code{mse()} returns the mean-squared error of prediction for
+Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Three cost functions are provided:
+\enumerate{
+\item \code{mse()} returns the mean-squared error of prediction for
 a numeric response variable \code{y} and predictions \code{yhat}.
-(2) \code{BayesRule()} and \code{BayesRule2()} report the proportion
+\item \code{medAbsErr()} returns the median absolute error of predictor for a numeric
+response \code{y} and predictions \code{yhat}.
+\item \code{BayesRule()} and \code{BayesRule2()} report the proportion
 of incorrect predictions for a dichotomous response variable \code{y}, assumed
 coded \code{0} and \code{1}. The \code{yhat} values are
 predicted probabilities and are rounded to 0 or 1. The distinction
@@ -40,12 +46,18 @@ checks that the \code{y} values are all either \code{0} or \code{1}
 and that the \code{yhat} values are all between 0 and 1, while
 the latter doesn't and is therefore faster.
 }
+}
 \section{Functions}{
 \itemize{
 \item \code{mse()}: Mean-square error
+
+\item \code{medAbsErr()}: Median absolute error
 
 \item \code{BayesRule()}: Bayes Rule for a binary response
 
 \item \code{BayesRule2()}: Bayes rule for a binary response (without bounds checking)
 
 }}
+\seealso{
+\code{\link{cv}}, \code{\link{cvSelect}}
+}

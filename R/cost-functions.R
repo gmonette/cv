@@ -8,11 +8,15 @@
 #' @param y response
 #' @param yhat fitted value
 #'
+#' @seealso \code{\link{cv}}, \code{\link{cvSelect}}
+#'
 #' @details
-#' Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Two cost functions are provided: (1)
-#' \code{mse()} returns the mean-squared error of prediction for
+#' Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Three cost functions are provided:
+#' 1. \code{mse()} returns the mean-squared error of prediction for
 #' a numeric response variable \code{y} and predictions \code{yhat}.
-#' (2) \code{BayesRule()} and \code{BayesRule2()} report the proportion
+#' 2. \code{medAbsErr()} returns the median absolute error of predictor for a numeric
+#' response \code{y} and predictions \code{yhat}.
+#' 3. \code{BayesRule()} and \code{BayesRule2()} report the proportion
 #' of incorrect predictions for a dichotomous response variable \code{y}, assumed
 #' coded \code{0} and \code{1}. The \code{yhat} values are
 #' predicted probabilities and are rounded to 0 or 1. The distinction
@@ -29,6 +33,13 @@
 #' @export
 mse <- function(y, yhat){
   mean((y - yhat)^2)
+}
+
+#' @describeIn cost-functions Median absolute error
+#' @importFrom stats median
+#' @export
+medAbsErr <- function(y, yhat){
+  median(abs(y - yhat))
 }
 
 #' @describeIn cost-functions Bayes Rule for a binary response

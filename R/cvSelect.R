@@ -391,6 +391,7 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
 #' Auto$name <- NULL
 #' m.auto <- lm(mpg ~ . , data=Auto)
 #' cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
+#'                 criterion=medAbsErr,
 #'                 predictors=c("cylinders", "displacement", "horsepower",
 #'                              "weight", "acceleration"),
 #'                 response="mpg", AIC=FALSE)

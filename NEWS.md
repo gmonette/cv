@@ -8,6 +8,8 @@
 
 - Add selectTransAndStepAIC() procedure for use with cvSelect().
 
+- Add medAbsErr() cost criterion.
+
 - Add coef.cvSelect() method.
 
 - Improvements to documentation.
