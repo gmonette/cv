@@ -6,6 +6,8 @@
 
 - Fix small bug in cvSelect(), returning properly named "coefficients" element when save.coef is TRUE.
 
+- Add selectTransAndStepAIC() procedure for use with cvSelect().
+
 - Add coef.cvSelect() method.
 
 - Improvements to documentation.

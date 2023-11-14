@@ -18,7 +18,9 @@ Some of the functions supplied by the package:
 
 -   `selectStepAIC()` is a model-selection procedure, suitable for use with `cvSelect()`, based on the `stepAIC()` function in the **MASS** package.
 
--   `selectTrans()` is a procedure for selecting predictor and response transformations in regression, also suitable for use with `cvSelect()`, based on the `powerTransform()` function in the **car** package.
+-   `selectTrans()` is a procedure for selecting predictor and response transformations in regression, suitable for use with `cvSelect()`, based on the `powerTransform()` function in the **car** package.
+
+-   `selectTransStepAIC()` is a procedure also suitable for use with `cvSelect()`,  that first selects predictor and response transformations and then selects predictors.
 
 For additional information on using the **cv** package, see the "[Cross-validation of regression models](https://gmonette.github.io/cv/articles/cv.html)" vignette (`vignette("cv", package="cv")`). The **cv** package is designed to be extensible to other classes of regression models and other model-selection procedures; for details, see the "[Extending the cv package](https://gmonette.github.io/cv/articles/cv-extend.html)" vignette (`vignette("cv-extend", package="cv")`).
 

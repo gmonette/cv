@@ -4,6 +4,7 @@
 \alias{cvSelect}
 \alias{selectStepAIC}
 \alias{selectTrans}
+\alias{selectTransStepAIC}
 \alias{compareFolds}
 \alias{coef.cvSelect}
 \title{Cross-Validate a Model-Selection Procedure}
@@ -40,6 +41,21 @@ selectTrans(
   family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
   family.y = c("bcPower", "bcnPower", "yjPower", "basicPower"),
   rounded = TRUE,
+  ...
+)
+
+selectTransStepAIC(
+  data,
+  indices,
+  save.coef = TRUE,
+  model,
+  criterion = mse,
+  predictors,
+  response,
+  family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
+  family.y = c("bcPower", "bcnPower", "yjPower", "basicPower"),
+  rounded = TRUE,
+  AIC = TRUE,
   ...
 )
 
@@ -113,13 +129,14 @@ for regression coefficients; the value \code{1} might be appropriate
 for power-transformation estimates.}
 }
 \value{
-\code{cvSelect()} returns an object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
+An object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
 (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
 the criterion for the model applied to the full data (\code{"full crit"}),
 the number of folds (\code{"k"}), the seed for R's random-number
 generator (\code{"seed"}), and (optionally) a list of coefficients
 (or, in the case of \code{selectTrans()}, estimated transformation
-parameters) for the selected models
+parameters, and in the case of \code{selectTransAndStepAIC()}, both regression coefficients
+and transformation parameters) for the selected models
 for each fold (\code{"coefficients"}).
 If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
 which is literally a list of \code{c("cvSelect", "cv")} objects.
@@ -127,10 +144,11 @@ which is literally a list of \code{c("cvSelect", "cv")} objects.
 \description{
 \code{cvSelect()} is a general function to cross-validate a model-selection procedure;
 \code{selectStepAIC()} is a procedure that applies the \code{\link[MASS]{stepAIC}()}
-model-selection function in the \pkg{MASS} package; and \code{selectTrans()} is a procedure
+model-selection function in the \pkg{MASS} package; \code{selectTrans()} is a procedure
 for selecting predictor and response transformations in regression, which
 uses the \code{\link[car]{powerTransform}()} function in the
-\pkg{car} package.
+\pkg{car} package; and \code{selectTransAndStepAIC()} combines predictor and response
+transformation with predictor selection.
 }
 \details{
 The model-selection function supplied as the \code{procedure} argument
@@ -151,8 +169,8 @@ When the \code{indices} argument is missing, \code{procedure()} returns the cros
 the model fit to all of the cases.
 
 For examples of model-selection functions for the \code{procedure}
-argument, see the code for \code{selectStepAIC()} and for
-\code{selectTrans()}.
+argument, see the code for \code{selectStepAIC()},
+\code{selectTrans()}, and \code{selectTransAndStepAIC()}.
 
 For additional information, see the "Cross-validation of regression
 models" vignette (\code{vignette("cv", package="cv")})
@@ -173,6 +191,9 @@ for the several folds and possibly average them.
 \pkg{MASS} package.
 
 \item \code{selectTrans()}: select transformations of the predictors and response.
+
+\item \code{selectTransStepAIC()}: select transformations of the predictors and response,
+and then select predictors.
 
 \item \code{compareFolds()}: print the coefficients from the selected models
 for the several folds.
@@ -195,8 +216,21 @@ cvt
 compareFolds(cvt)
 coef(cvt, average=median, NAs=1) # NAs not really needed here
 cv(m.pres, seed=123)
+data("Auto", package="ISLR2")
+Auto$year <- as.factor(Auto$year)
+Auto$origin <- factor(Auto$origin,
+                      labels=c("America", "Europe", "Japan"))
+rownames(Auto) <- make.names(Auto$name, unique=TRUE)
+Auto$name <- NULL
+m.auto <- lm(mpg ~ . , data=Auto)
+cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
+                predictors=c("cylinders", "displacement", "horsepower",
+                             "weight", "acceleration"),
+                response="mpg", AIC=FALSE)
+cvs
+compareFolds(cvs)
 }
 \seealso{
-\code{\link[MASS]{stepAIC}()}, \code{\link[car]{bcPower}},
-\code{\link[car]{powerTransform}()}
+\code{\link[MASS]{stepAIC}}, \code{\link[car]{bcPower}},
+\code{\link[car]{powerTransform}}
 }
