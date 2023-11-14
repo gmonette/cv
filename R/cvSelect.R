@@ -428,10 +428,10 @@ selectTransStepAIC <- function(data,
   )
 
   inverse.pt.y <- switch(family.y,
-                         bcPower = cv:::bcPowerInverse,
+                         bcPower = bcPowerInverse,
                          bcnPower = car::bcnPowerInverse,
-                         yjPower = cv:::yjPowerInverse,
-                         basicPower = cv:::basicPowerInverse
+                         yjPower = yjPowerInverse,
+                         basicPower = basicPowerInverse
   )
 
   y <- getResponse(model) # untransformed response

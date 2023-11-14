@@ -68,3 +68,4 @@ metacran
 modList
 selectTrans
 coef
+selectTransAndStepAIC
