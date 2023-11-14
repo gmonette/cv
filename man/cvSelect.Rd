@@ -216,7 +216,7 @@ cvt
 compareFolds(cvt)
 coef(cvt, average=median, NAs=1) # NAs not really needed here
 cv(m.pres, seed=123)
-data("Auto", package="ISLR2")
+
 Auto$year <- as.factor(Auto$year)
 Auto$origin <- factor(Auto$origin,
                       labels=c("America", "Europe", "Japan"))

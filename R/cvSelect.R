@@ -383,7 +383,7 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
 #' @describeIn cvSelect select transformations of the predictors and response,
 #' and then select predictors.
 #' @examples
-#' data("Auto", package="ISLR2")
+#'
 #' Auto$year <- as.factor(Auto$year)
 #' Auto$origin <- factor(Auto$origin,
 #'                       labels=c("America", "Europe", "Japan"))
