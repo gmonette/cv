@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-11-14</h4>
+            <h4 data-toc-skip class="date">2023-11-15</h4>
       
       
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -274,12 +274,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 523624</span></span>
+<span><span class="co">#&gt; R RNG seed set to 120380</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.1</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.094</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.363</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.343</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -350,11 +350,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min        lq      mean    median        uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    4.003    4.0629    5.8344    4.2253    7.7421   10.026    10</span></span>
-<span><span class="co">#&gt;   Woodbury   42.237   43.2960   50.1669   44.5271   46.2416   83.280    10</span></span>
-<span><span class="co">#&gt;      naive  922.930 1013.5407 1172.9766 1105.2894 1425.0909 1551.993    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1588.126 1888.2798 2123.8097 1962.0720 2414.8554 2714.012    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    3.7136    4.0326    4.8472    4.2072    4.6697    8.7242    10</span></span>
+<span><span class="co">#&gt;   Woodbury   42.5076   42.9683   57.2962   50.2381   66.8371   84.3898    10</span></span>
+<span><span class="co">#&gt;      naive  852.2412  884.7559 1194.6880 1201.8896 1411.8612 1680.2302    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1505.0564 1570.2618 1768.9078 1645.1299 1935.1403 2267.4934    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -657,11 +657,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median         uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    4.0684    4.2774    6.0679    4.4511     6.3794    17.566    10</span></span>
-<span><span class="co">#&gt;   Woodbury  134.0737  135.6664  159.8544  144.4203   158.0555   238.844    10</span></span>
-<span><span class="co">#&gt;      exact 7038.6753 7627.5374 7932.7131 7889.1051  8328.4649  8837.599    10</span></span>
-<span><span class="co">#&gt;     cv.glm 7826.5589 8543.8339 9288.1141 9215.3370 10253.5683 10887.855    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min        lq      mean    median        uq        max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    4.026    4.0772    4.7739    4.1744    4.3774     9.7935    10</span></span>
+<span><span class="co">#&gt;   Woodbury  133.314  139.4859  149.6203  140.8121  169.1832   178.1294    10</span></span>
+<span><span class="co">#&gt;      exact 6171.706 6356.5007 7085.2743 6995.3770 7702.5050  8637.9084    10</span></span>
+<span><span class="co">#&gt;     cv.glm 7226.996 7582.5642 8665.7508 8614.5442 9176.4824 11188.0835    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -1597,9 +1597,15 @@ elimination. In this demonstration, however, where all of the &lt;span class="ma
 will be small, and so we proceed by forward selection from the null
 model to save computing time.&lt;/p&gt;'><sup>10</sup></a></p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m.select</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.null</span>,</span>
-<span>                          direction<span class="op">=</span><span class="st">"forward"</span>, trace<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>                          scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, upper<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">m.full</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">"MASS"</a></span><span class="op">)</span>  <span class="co"># for stepAIC()</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'MASS'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     select</span></span>
+<span><span class="va">m.select</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.null</span>,</span>
+<span>                    direction<span class="op">=</span><span class="st">"forward"</span>, trace<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>                    scope<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower<span class="op">=</span><span class="op">~</span><span class="fl">1</span>, upper<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">m.full</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.select</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -1788,8 +1794,8 @@ BIC as the model-selection criterion (via the argument
 <code>k=log(nrow(Mroz))</code> to <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code>) selects 5 of
 the 7 original predictors:</p>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m.mroz.sel</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.mroz</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                            trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">m.mroz.sel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.mroz</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                      trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz.sel</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -2139,6 +2145,500 @@ transformation selected for <code>women</code> varies narrowly across
 the folds between the <span class="math inline">\(0\)</span>th power
 (i.e., log) and the <span class="math inline">\(1/3\)</span> power.</p>
 </div>
+<div class="section level3">
+<h3 id="selecting-both-transformations-and-predictorsvenables">Selecting both transformations and predictors<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The presentation in the section benefits from an email
+conversation with Bill Venables, who of course isn’t responsible for the
+use to which we’ve put his insightful remarks.&lt;/p&gt;"><sup>11</sup></a><a class="anchor" aria-label="anchor" href="#selecting-both-transformations-and-predictorsvenables"></a>
+</h3>
+<p>As we mentioned, <span class="citation">Hastie et al. (2009, sec.
+7.10.2: “The Wrong and Right Way to Do Cross-validation”)</span> explain
+that honest cross-validation has to take account of model specification
+and selection. Statistical modeling is at least partly a craft, and one
+could imagine applying that craft to successive partial data sets, each
+with a fold removed. The resulting procedure would be tedious, though
+possibly worth the effort, but it would also be difficult to realize in
+practice: After all, we can hardly erase our memory of statistical
+modeling choices between analyzing partial data sets.</p>
+<p>Alternatively, if we’re able to automate the process of model
+selection, then we can more realistically apply CV mechanically. That’s
+what we did in the preceding two sections, first for predictor selection
+and then for selection of transformations in regression. In this
+section, we consider the case where we both select variable
+transformations and then proceed to select predictors. It’s insufficient
+to apply these steps sequentially, first, for example, using
+<code><a href="../reference/cvSelect.html">cvSelect()</a></code> with <code><a href="../reference/cvSelect.html">selectTrans()</a></code> and then with
+<code><a href="../reference/cvSelect.html">selectStepAIC()</a></code>; rather we should apply the whole
+model-selection procedure with each fold omitted. The
+<code>selectTransAndStepAIC()</code> function, also supplied by the
+<strong>cv</strong> package, does exactly that.</p>
+<p>To illustrate this process, we return to the <code>Auto</code> data
+set:</p>
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       mpg         cylinders     displacement   horsepower        weight    </span></span>
+<span><span class="co">#&gt;  Min.   : 9.0   Min.   :3.00   Min.   : 68   Min.   : 46.0   Min.   :1613  </span></span>
+<span><span class="co">#&gt;  1st Qu.:17.0   1st Qu.:4.00   1st Qu.:105   1st Qu.: 75.0   1st Qu.:2225  </span></span>
+<span><span class="co">#&gt;  Median :22.8   Median :4.00   Median :151   Median : 93.5   Median :2804  </span></span>
+<span><span class="co">#&gt;  Mean   :23.4   Mean   :5.47   Mean   :194   Mean   :104.5   Mean   :2978  </span></span>
+<span><span class="co">#&gt;  3rd Qu.:29.0   3rd Qu.:8.00   3rd Qu.:276   3rd Qu.:126.0   3rd Qu.:3615  </span></span>
+<span><span class="co">#&gt;  Max.   :46.6   Max.   :8.00   Max.   :455   Max.   :230.0   Max.   :5140  </span></span>
+<span><span class="co">#&gt;                                                                            </span></span>
+<span><span class="co">#&gt;   acceleration       year        origin                     name    </span></span>
+<span><span class="co">#&gt;  Min.   : 8.0   Min.   :70   Min.   :1.00   amc matador       :  5  </span></span>
+<span><span class="co">#&gt;  1st Qu.:13.8   1st Qu.:73   1st Qu.:1.00   ford pinto        :  5  </span></span>
+<span><span class="co">#&gt;  Median :15.5   Median :76   Median :1.00   toyota corolla    :  5  </span></span>
+<span><span class="co">#&gt;  Mean   :15.5   Mean   :76   Mean   :1.58   amc gremlin       :  4  </span></span>
+<span><span class="co">#&gt;  3rd Qu.:17.0   3rd Qu.:79   3rd Qu.:2.00   amc hornet        :  4  </span></span>
+<span><span class="co">#&gt;  Max.   :24.8   Max.   :82   Max.   :3.00   chevrolet chevette:  4  </span></span>
+<span><span class="co">#&gt;                                             (Other)           :365</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">year</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; year</span></span>
+<span><span class="co">#&gt; 70 71 72 73 74 75 76 77 78 79 80 81 82 </span></span>
+<span><span class="co">#&gt; 29 27 28 40 26 30 34 28 36 29 27 28 30</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">origin</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; origin</span></span>
+<span><span class="co">#&gt;   1   2   3 </span></span>
+<span><span class="co">#&gt; 245  68  79</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span><span class="op">~</span> <span class="va">cylinders</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; cylinders</span></span>
+<span><span class="co">#&gt;   3   4   5   6   8 </span></span>
+<span><span class="co">#&gt;   4 199   3  83 103</span></span></code></pre></div>
+<p>We previously used the <code>Auto</code> here in a preliminary
+example where we employed CV to inform the selection of the order of a
+polynomial regression of <code>mpg</code> on <code>horsepower</code>.
+Here, we consider more generally the problem of predicting
+<code>mpg</code> from the other variables in the <code>Auto</code> data.
+We begin with a bit of data management, and then examine the pairwise
+relationships among the numeric variables in the data set:</p>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Auto</span><span class="op">$</span><span class="va">cylinders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">cylinders</span>,</span>
+<span>                         labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"3.4"</span>, <span class="st">"3.4"</span>, <span class="st">"5.6"</span>, <span class="st">"5.6"</span>, <span class="st">"8"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">Auto</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">year</span><span class="op">)</span></span>
+<span><span class="va">Auto</span><span class="op">$</span><span class="va">origin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">origin</span>,</span>
+<span>                      labels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"America"</span>, <span class="st">"Europe"</span>, <span class="st">"Japan"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/make.names.html" class="external-link">make.names</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">name</span>, unique<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">Auto</span><span class="op">$</span><span class="va">name</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix</a></span><span class="op">(</span><span class="op">~</span> <span class="va">mpg</span> <span class="op">+</span> <span class="va">displacement</span> <span class="op">+</span> <span class="va">horsepower</span> <span class="op">+</span> <span class="va">weight</span> <span class="op">+</span> <span class="va">acceleration</span>, </span>
+<span>                  smooth<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spread<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/Auto-explore-1.png" alt="Scatterplot matrix for the numeric variables in the `Auto` data" width="100%"><p class="caption">
+Scatterplot matrix for the numeric variables in the <code>Auto</code>
+data
+</p>
+</div>
+<p>A comment before we proceed: <code>origin</code> is clearly
+categorical and so converting it to a factor is natural, but we could
+imagine treating <code>cylinders</code> and <code>year</code> as numeric
+predictors. There are, however, only 5 distinct values of
+<code>cylinders</code> (ranging from 3 to 8), but cars with 3 or 5
+cylinders are rare. and none of the cars has 7 cylinders. There are
+similarly only 13 distinct years between 1970 and 1982 in the data, and
+the relationship between <code>mpg</code> and <code>year</code> is
+difficult to characterize.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Of course, making the decision to treat
+&lt;code&gt;year&lt;/code&gt; as a factor on this basis could be construed as
+cheating in the current context, which illustrates the difficulty of
+automating the whole model-selection process.&lt;/p&gt;"><sup>12</sup></a> It’s apparent that most these variables
+are positively skewed and that many of the pairwise relationships among
+them are nonlinear.</p>
+<p>We begin with a “working model” that specifies linear partial
+relationships of the response to the numeric predictors:</p>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m.auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = mpg ~ ., data = Auto)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;    Min     1Q Median     3Q    Max </span></span>
+<span><span class="co">#&gt; -9.006 -1.745 -0.092  1.525 10.950 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;               Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  37.034132   1.969393   18.80  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; cylinders5.6 -2.602941   0.655200   -3.97  8.5e-05 ***</span></span>
+<span><span class="co">#&gt; cylinders8   -0.582458   1.171452   -0.50  0.61934    </span></span>
+<span><span class="co">#&gt; displacement  0.017425   0.006734    2.59  0.01004 *  </span></span>
+<span><span class="co">#&gt; horsepower   -0.041353   0.013379   -3.09  0.00215 ** </span></span>
+<span><span class="co">#&gt; weight       -0.005548   0.000632   -8.77  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; acceleration  0.061527   0.088313    0.70  0.48643    </span></span>
+<span><span class="co">#&gt; year71        0.968058   0.837390    1.16  0.24841    </span></span>
+<span><span class="co">#&gt; year72       -0.601435   0.825115   -0.73  0.46652    </span></span>
+<span><span class="co">#&gt; year73       -0.687689   0.740272   -0.93  0.35351    </span></span>
+<span><span class="co">#&gt; year74        1.375576   0.876500    1.57  0.11741    </span></span>
+<span><span class="co">#&gt; year75        0.929929   0.859072    1.08  0.27974    </span></span>
+<span><span class="co">#&gt; year76        1.559893   0.822505    1.90  0.05867 .  </span></span>
+<span><span class="co">#&gt; year77        2.909416   0.841729    3.46  0.00061 ***</span></span>
+<span><span class="co">#&gt; year78        3.175198   0.798940    3.97  8.5e-05 ***</span></span>
+<span><span class="co">#&gt; year79        5.019299   0.845759    5.93  6.8e-09 ***</span></span>
+<span><span class="co">#&gt; year80        9.099763   0.897293   10.14  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; year81        6.688660   0.885218    7.56  3.3e-13 ***</span></span>
+<span><span class="co">#&gt; year82        8.071125   0.870668    9.27  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; originEurope  2.046664   0.517124    3.96  9.1e-05 ***</span></span>
+<span><span class="co">#&gt; originJapan   2.144887   0.507717    4.22  3.0e-05 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 2.92 on 371 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.867,  Adjusted R-squared:  0.86 </span></span>
+<span><span class="co">#&gt; F-statistic:  121 on 20 and 371 DF,  p-value: &lt;2e-16</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">Anova</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Anova Table (Type II tests)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Response: mpg</span></span>
+<span><span class="co">#&gt;              Sum Sq  Df F value  Pr(&gt;F)    </span></span>
+<span><span class="co">#&gt; cylinders       292   2   17.09 7.9e-08 ***</span></span>
+<span><span class="co">#&gt; displacement     57   1    6.70  0.0100 *  </span></span>
+<span><span class="co">#&gt; horsepower       82   1    9.55  0.0021 ** </span></span>
+<span><span class="co">#&gt; weight          658   1   76.98 &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; acceleration      4   1    0.49  0.4864    </span></span>
+<span><span class="co">#&gt; year           3017  12   29.40 &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; origin          190   2   11.13 2.0e-05 ***</span></span>
+<span><span class="co">#&gt; Residuals      3173 371                    </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/Auto-working-model-1.png" alt="Component+residual plots for the working model fit to the `Auto` data" width="100%"><p class="caption">
+Component+residual plots for the working model fit to the
+<code>Auto</code> data
+</p>
+</div>
+<p>The component+residual plots, created with the <code><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots()</a></code>
+function in the previously loaded <strong>car</strong> package, clearly
+reveal the inadequacy of the model.</p>
+<p>We proceed to transform the numeric predictors towards
+multi-normality:</p>
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">num.predictors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"displacement"</span>, <span class="st">"horsepower"</span>, <span class="st">"weight"</span>, <span class="st">"acceleration"</span><span class="op">)</span></span>
+<span><span class="va">tr.x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">[</span>, <span class="va">num.predictors</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">tr.x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; bcPower Transformations to Multinormality </span></span>
+<span><span class="co">#&gt;              Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd</span></span>
+<span><span class="co">#&gt; displacement   -0.0509           0      -0.2082       0.1065</span></span>
+<span><span class="co">#&gt; horsepower     -0.1249           0      -0.2693       0.0194</span></span>
+<span><span class="co">#&gt; weight         -0.0870           0      -0.2948       0.1208</span></span>
+<span><span class="co">#&gt; acceleration    0.3061           0      -0.0255       0.6376</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Likelihood ratio test that transformation parameters are equal to 0</span></span>
+<span><span class="co">#&gt;  (all log transformations)</span></span>
+<span><span class="co">#&gt;                                LRT df  pval</span></span>
+<span><span class="co">#&gt; LR test, lambda = (0 0 0 0) 4.8729  4 0.301</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Likelihood ratio test that no transformations are needed</span></span>
+<span><span class="co">#&gt;                                LRT df   pval</span></span>
+<span><span class="co">#&gt; LR test, lambda = (1 1 1 1) 390.08  4 &lt;2e-16</span></span></code></pre></div>
+<p>We then apply the (rounded) transformations—all, as it turns out,
+logs—to the data and re-estimate the model:</p>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">A</span> <span class="op">&lt;-</span> <span class="va">Auto</span></span>
+<span><span class="va">powers</span> <span class="op">&lt;-</span> <span class="va">tr.x</span><span class="op">$</span><span class="va">roundlam</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">pred</span> <span class="kw">in</span> <span class="va">num.predictors</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">A</span><span class="op">[</span>, <span class="va">pred</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/bcPower.html" class="external-link">bcPower</a></span><span class="op">(</span><span class="va">A</span><span class="op">[</span>, <span class="va">pred</span><span class="op">]</span>, lambda<span class="op">=</span><span class="va">powers</span><span class="op">[</span><span class="va">pred</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                           mpg cylinders displacement horsepower weight</span></span>
+<span><span class="co">#&gt; chevrolet.chevelle.malibu  18         8       5.7268     4.8675 8.1617</span></span>
+<span><span class="co">#&gt; buick.skylark.320          15         8       5.8579     5.1059 8.2142</span></span>
+<span><span class="co">#&gt; plymouth.satellite         18         8       5.7621     5.0106 8.1421</span></span>
+<span><span class="co">#&gt; amc.rebel.sst              16         8       5.7170     5.0106 8.1412</span></span>
+<span><span class="co">#&gt; ford.torino                17         8       5.7104     4.9416 8.1458</span></span>
+<span><span class="co">#&gt; ford.galaxie.500           15         8       6.0615     5.2883 8.3759</span></span>
+<span><span class="co">#&gt;                           acceleration year  origin</span></span>
+<span><span class="co">#&gt; chevrolet.chevelle.malibu       2.4849   70 America</span></span>
+<span><span class="co">#&gt; buick.skylark.320               2.4423   70 America</span></span>
+<span><span class="co">#&gt; plymouth.satellite              2.3979   70 America</span></span>
+<span><span class="co">#&gt; amc.rebel.sst                   2.4849   70 America</span></span>
+<span><span class="co">#&gt; ford.torino                     2.3514   70 America</span></span>
+<span><span class="co">#&gt; ford.galaxie.500                2.3026   70 America</span></span>
+<span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m.auto</span>, data<span class="op">=</span><span class="va">A</span><span class="op">)</span></span></code></pre></div>
+<p>Finally, we perform Box-Cox regression to transform the response
+(also obtaining a log transformation):</p>
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; bcPower Transformation to Normality </span></span>
+<span><span class="co">#&gt;    Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd</span></span>
+<span><span class="co">#&gt; Y1    0.0024           0      -0.1607       0.1654</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Likelihood ratio test that transformation parameter is equal to 0</span></span>
+<span><span class="co">#&gt;  (log transformation)</span></span>
+<span><span class="co">#&gt;                              LRT df  pval</span></span>
+<span><span class="co">#&gt; LR test, lambda = (0) 0.00080154  1 0.977</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Likelihood ratio test that no transformation is needed</span></span>
+<span><span class="co">#&gt;                          LRT df   pval</span></span>
+<span><span class="co">#&gt; LR test, lambda = (1) 124.13  1 &lt;2e-16</span></span>
+<span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = log(mpg) ~ cylinders + displacement + horsepower + </span></span>
+<span><span class="co">#&gt;     weight + acceleration + year + origin, data = A)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -0.3341 -0.0577  0.0041  0.0607  0.3808 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;              Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)    8.8965     0.3582   24.84  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; cylinders5.6  -0.0636     0.0257   -2.47    0.014 *  </span></span>
+<span><span class="co">#&gt; cylinders8    -0.0769     0.0390   -1.97    0.049 *  </span></span>
+<span><span class="co">#&gt; displacement   0.0280     0.0515    0.54    0.587    </span></span>
+<span><span class="co">#&gt; horsepower    -0.2901     0.0563   -5.15  4.2e-07 ***</span></span>
+<span><span class="co">#&gt; weight        -0.5427     0.0819   -6.62  1.2e-10 ***</span></span>
+<span><span class="co">#&gt; acceleration  -0.1421     0.0563   -2.52    0.012 *  </span></span>
+<span><span class="co">#&gt; year71         0.0250     0.0289    0.87    0.387    </span></span>
+<span><span class="co">#&gt; year72        -0.0168     0.0289   -0.58    0.562    </span></span>
+<span><span class="co">#&gt; year73        -0.0426     0.0260   -1.64    0.103    </span></span>
+<span><span class="co">#&gt; year74         0.0493     0.0304    1.62    0.106    </span></span>
+<span><span class="co">#&gt; year75         0.0472     0.0296    1.59    0.112    </span></span>
+<span><span class="co">#&gt; year76         0.0709     0.0284    2.49    0.013 *  </span></span>
+<span><span class="co">#&gt; year77         0.1324     0.0293    4.52  8.2e-06 ***</span></span>
+<span><span class="co">#&gt; year78         0.1447     0.0278    5.21  3.1e-07 ***</span></span>
+<span><span class="co">#&gt; year79         0.2335     0.0292    7.99  1.7e-14 ***</span></span>
+<span><span class="co">#&gt; year80         0.3238     0.0317   10.22  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; year81         0.2565     0.0309    8.29  2.1e-15 ***</span></span>
+<span><span class="co">#&gt; year82         0.3076     0.0304   10.13  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; originEurope   0.0492     0.0195    2.52    0.012 *  </span></span>
+<span><span class="co">#&gt; originJapan    0.0441     0.0195    2.26    0.024 *  </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 0.104 on 371 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.911,  Adjusted R-squared:  0.906 </span></span>
+<span><span class="co">#&gt; F-statistic:  189 on 20 and 371 DF,  p-value: &lt;2e-16</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">Anova</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Anova Table (Type II tests)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Response: log(mpg)</span></span>
+<span><span class="co">#&gt;              Sum Sq  Df F value  Pr(&gt;F)    </span></span>
+<span><span class="co">#&gt; cylinders      0.07   2    3.05   0.048 *  </span></span>
+<span><span class="co">#&gt; displacement   0.00   1    0.30   0.587    </span></span>
+<span><span class="co">#&gt; horsepower     0.29   1   26.54 4.2e-07 ***</span></span>
+<span><span class="co">#&gt; weight         0.48   1   43.88 1.2e-10 ***</span></span>
+<span><span class="co">#&gt; acceleration   0.07   1    6.37   0.012 *  </span></span>
+<span><span class="co">#&gt; year           4.45  12   34.13 &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; origin         0.08   2    3.71   0.025 *  </span></span>
+<span><span class="co">#&gt; Residuals      4.03 371                    </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+<p>The transformed numeric variables are much better-behaved:</p>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span> <span class="op">+</span> <span class="va">displacement</span> <span class="op">+</span> <span class="va">horsepower</span> <span class="op">+</span> <span class="va">weight</span> </span>
+<span>                  <span class="op">+</span> <span class="va">acceleration</span>, </span>
+<span>                  smooth<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spread<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>, data<span class="op">=</span><span class="va">A</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/Auto-transformed-scatterplot-matrix-1.png" alt="Scatterplot matrix for the transformed numeric variables in the `Auto` data" width="100%"><p class="caption">
+Scatterplot matrix for the transformed numeric variables in the
+<code>Auto</code> data
+</p>
+</div>
+<p>And the partial relationships in the model fit to the transformed
+data are much more nearly linear:</p>
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="fig/Auto-CR-plots-transformed-1.png" alt="Component+residual plots for the model fit to the transformed `Auto` data" width="100%"><p class="caption">
+Component+residual plots for the model fit to the transformed
+<code>Auto</code> data
+</p>
+</div>
+<p>Having transformed both the numeric predictors and the response, we
+proceed to use the <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code> function in the
+<strong>MASS</strong> package to perform predictor selection, employing
+the BIC model-selection criterion (by setting the <code>k</code>
+argument of <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code> to <span class="math inline">\(\log(n)\)</span>):</p>
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m.step</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span><span class="op">)</span>, trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = log(mpg) ~ horsepower + weight + acceleration + </span></span>
+<span><span class="co">#&gt;     year + origin, data = A)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -0.3523 -0.0568  0.0068  0.0674  0.3586 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;              Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)   9.43459    0.26153   36.07  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; horsepower   -0.27625    0.05614   -4.92  1.3e-06 ***</span></span>
+<span><span class="co">#&gt; weight       -0.60907    0.05600  -10.88  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; acceleration -0.13138    0.05319   -2.47  0.01397 *  </span></span>
+<span><span class="co">#&gt; year71        0.02798    0.02894    0.97  0.33412    </span></span>
+<span><span class="co">#&gt; year72       -0.00711    0.02845   -0.25  0.80274    </span></span>
+<span><span class="co">#&gt; year73       -0.03953    0.02601   -1.52  0.12947    </span></span>
+<span><span class="co">#&gt; year74        0.05275    0.02999    1.76  0.07936 .  </span></span>
+<span><span class="co">#&gt; year75        0.05320    0.02928    1.82  0.07004 .  </span></span>
+<span><span class="co">#&gt; year76        0.07432    0.02821    2.63  0.00878 ** </span></span>
+<span><span class="co">#&gt; year77        0.13793    0.02888    4.78  2.6e-06 ***</span></span>
+<span><span class="co">#&gt; year78        0.14588    0.02753    5.30  2.0e-07 ***</span></span>
+<span><span class="co">#&gt; year79        0.23604    0.02908    8.12  7.0e-15 ***</span></span>
+<span><span class="co">#&gt; year80        0.33527    0.03115   10.76  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; year81        0.26287    0.03056    8.60  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; year82        0.32339    0.02961   10.92  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; originEurope  0.05582    0.01678    3.33  0.00097 ***</span></span>
+<span><span class="co">#&gt; originJapan   0.04355    0.01748    2.49  0.01314 *  </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 0.105 on 374 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.909,  Adjusted R-squared:  0.905 </span></span>
+<span><span class="co">#&gt; F-statistic:  220 on 17 and 374 DF,  p-value: &lt;2e-16</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">Anova</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Anova Table (Type II tests)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Response: log(mpg)</span></span>
+<span><span class="co">#&gt;              Sum Sq  Df F value  Pr(&gt;F)    </span></span>
+<span><span class="co">#&gt; horsepower     0.27   1   24.21 1.3e-06 ***</span></span>
+<span><span class="co">#&gt; weight         1.30   1  118.28 &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; acceleration   0.07   1    6.10  0.0140 *  </span></span>
+<span><span class="co">#&gt; year           4.76  12   36.05 &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; origin         0.14   2    6.21  0.0022 ** </span></span>
+<span><span class="co">#&gt; Residuals      4.11 374                    </span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
+<p>The selected model includes three of the numeric predictors,
+<code>horsepower</code>, <code>weight</code>, and
+<code>acceleration</code>, along with the factors <code>year</code> and
+<code>origin</code>. We can calculate the MSE for this model, but we
+expect that the result will be optimistic because we used the whole data
+to help specify the model</p>
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6.5121</span></span></code></pre></div>
+<p>This is considerably smaller than the MSE for the original working
+model:</p>
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 8.0932</span></span></code></pre></div>
+<p>A perhaps subtle point is that we compute the MSE for the selected
+model on the original <code>mpg</code> response scale rather than the
+log scale, so as to make the selected model comparable to the working
+model. That’s slightly uncomfortable given the skewed distribution of
+<code>mpg</code>. An alternative is to use the median absolute error
+instead of the mean-squared error, employing the
+<code><a href="../reference/cost-functions.html">medAbsErr()</a></code> function from the <strong>cv</strong>
+package:</p>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">medAbsErr</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1.3396</span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">medAbsErr</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1.6661</span></span></code></pre></div>
+<p>Now let’s use <code><a href="../reference/cvSelect.html">cvSelect()</a></code> with
+<code>selectTransAndStepAIC()</code> to automate and cross-validate the
+whole model-specification process:</p>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">num.predictors</span></span>
+<span><span class="co">#&gt; [1] "displacement" "horsepower"   "weight"       "acceleration"</span></span>
+<span><span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectTransStepAIC</span>, data<span class="op">=</span><span class="va">Auto</span>, seed<span class="op">=</span><span class="fl">76692</span>, model<span class="op">=</span><span class="va">m.auto</span>,</span>
+<span>                predictors<span class="op">=</span><span class="va">num.predictors</span>,</span>
+<span>                response<span class="op">=</span><span class="st">"mpg"</span>, AIC<span class="op">=</span><span class="cn">FALSE</span>, criterion<span class="op">=</span><span class="va">medAbsErr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R RNG seed set to 76692</span></span>
+<span><span class="va">cvs</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 1.3841</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.3484</span></span>
+<span><span class="co">#&gt; full-sample criterion = 1.3396</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cvs</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         (Intercept) horsepower lam.acceleration lam.displacement lam.horsepower</span></span>
+<span><span class="co">#&gt; Fold 1      9.71384   -0.17408          0.50000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt; Fold 2      9.21713   -0.31480          0.00000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt; Fold 3      9.61824   -0.19248          0.00000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt; Fold 4      8.69910   -0.25523          0.50000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt; Fold 5      9.14403   -0.14934          0.00000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt; Fold 6      9.63481   -0.16739          0.50000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt; Fold 7      9.98933   -0.36847          0.00000          0.00000       -0.15447</span></span>
+<span><span class="co">#&gt; Fold 8      9.06301   -0.29721          0.00000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt; Fold 9      8.88315   -0.22684          0.00000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt; Fold 10     9.61727   -0.17086          0.00000          0.00000        0.00000</span></span>
+<span><span class="co">#&gt;         lam.weight   lambda   weight   year71   year72   year73   year74</span></span>
+<span><span class="co">#&gt; Fold 1     0.00000  0.00000 -0.74636  0.03764 -0.00327 -0.02477  0.05606</span></span>
+<span><span class="co">#&gt; Fold 2     0.00000  0.00000 -0.47728  0.02173 -0.01488 -0.03770  0.04312</span></span>
+<span><span class="co">#&gt; Fold 3     0.00000  0.00000 -0.72085  0.01128 -0.02569 -0.03872  0.05187</span></span>
+<span><span class="co">#&gt; Fold 4     0.00000  0.00000 -0.53846  0.02153 -0.02922 -0.05181  0.04136</span></span>
+<span><span class="co">#&gt; Fold 5     0.00000  0.00000 -0.69081  0.02531 -0.01062 -0.04625  0.05039</span></span>
+<span><span class="co">#&gt; Fold 6     0.00000  0.00000 -0.74049  0.02456  0.00759 -0.03412  0.06266</span></span>
+<span><span class="co">#&gt; Fold 7     0.00000  0.00000 -0.72843  0.02532 -0.01271 -0.04144  0.04568</span></span>
+<span><span class="co">#&gt; Fold 8     0.00000  0.00000 -0.46392  0.02702 -0.02041 -0.05605  0.04437</span></span>
+<span><span class="co">#&gt; Fold 9     0.00000  0.00000 -0.47136  0.00860 -0.03620 -0.04835  0.01906</span></span>
+<span><span class="co">#&gt; Fold 10    0.00000  0.00000 -0.73550  0.02937 -0.00899 -0.03814  0.05408</span></span>
+<span><span class="co">#&gt;           year75   year76   year77   year78   year79   year80   year81   year82</span></span>
+<span><span class="co">#&gt; Fold 1   0.07080  0.07250  0.14420  0.14281  0.23266  0.35127  0.25635  0.30546</span></span>
+<span><span class="co">#&gt; Fold 2   0.04031  0.06718  0.13094  0.14917  0.21871  0.33192  0.26196  0.30943</span></span>
+<span><span class="co">#&gt; Fold 3   0.03837  0.06399  0.11593  0.12601  0.20499  0.32821  0.24478  0.29204</span></span>
+<span><span class="co">#&gt; Fold 4   0.04072  0.05537  0.12292  0.14083  0.22878  0.32947  0.25140  0.27248</span></span>
+<span><span class="co">#&gt; Fold 5   0.05596  0.07044  0.13356  0.14724  0.24675  0.33331  0.26938  0.32594</span></span>
+<span><span class="co">#&gt; Fold 6   0.06940  0.07769  0.14211  0.14647  0.23532  0.34761  0.26737  0.33062</span></span>
+<span><span class="co">#&gt; Fold 7   0.03614  0.07385  0.12976  0.14040  0.23976  0.33998  0.27652  0.30659</span></span>
+<span><span class="co">#&gt; Fold 8   0.06573  0.08135  0.13158  0.13987  0.23011  0.32880  0.25886  0.30538</span></span>
+<span><span class="co">#&gt; Fold 9   0.03018  0.05846  0.10536  0.11722  0.20665  0.31533  0.23352  0.29375</span></span>
+<span><span class="co">#&gt; Fold 10  0.04881  0.07862  0.14101  0.14313  0.23258  0.35649  0.26214  0.32421</span></span>
+<span><span class="co">#&gt;         acceleration displacement cylinders5.6 cylinders8 originEurope</span></span>
+<span><span class="co">#&gt; Fold 1                                                                </span></span>
+<span><span class="co">#&gt; Fold 2      -0.18909     -0.09197                                     </span></span>
+<span><span class="co">#&gt; Fold 3                                                                </span></span>
+<span><span class="co">#&gt; Fold 4      -0.03484                  -0.09080   -0.10909             </span></span>
+<span><span class="co">#&gt; Fold 5                                                         0.06261</span></span>
+<span><span class="co">#&gt; Fold 6                                                                </span></span>
+<span><span class="co">#&gt; Fold 7                                                                </span></span>
+<span><span class="co">#&gt; Fold 8      -0.17676     -0.10542                                     </span></span>
+<span><span class="co">#&gt; Fold 9      -0.14514     -0.13452                                     </span></span>
+<span><span class="co">#&gt; Fold 10                                                               </span></span>
+<span><span class="co">#&gt;         originJapan</span></span>
+<span><span class="co">#&gt; Fold 1             </span></span>
+<span><span class="co">#&gt; Fold 2             </span></span>
+<span><span class="co">#&gt; Fold 3             </span></span>
+<span><span class="co">#&gt; Fold 4             </span></span>
+<span><span class="co">#&gt; Fold 5         0.04</span></span>
+<span><span class="co">#&gt; Fold 6             </span></span>
+<span><span class="co">#&gt; Fold 7             </span></span>
+<span><span class="co">#&gt; Fold 8             </span></span>
+<span><span class="co">#&gt; Fold 9             </span></span>
+<span><span class="co">#&gt; Fold 10</span></span></code></pre></div>
+<p>Here, as for <code><a href="../reference/cvSelect.html">selectTrans()</a></code>, the <code>predictors</code>
+and <code>response</code> arguments specify candidate variables for
+transformation, and <code>AIC=FALSE</code> use the BIC for model
+selection. The starting model <code>model=m.auto</code> is the working
+model fit to the <code>Auto</code> data.</p>
+<p>Some noteworthy points:</p>
+<ul>
+<li>
+<code><a href="../reference/cvSelect.html">selectTransStepAIC()</a></code> automatically computes CV cost
+criteria, here the median absolute error, on the untransformed response
+scale.</li>
+<li>The unbiased estimate of the median absolute error that we obtain by
+cross-validating the whole model-specification process is in this case
+only a little larger than the median absolute error computed for the
+model we fit to the <code>Auto</code> data separately selecting
+transformations of the predictors and the response and then selecting
+predictors for the whole data set.</li>
+<li>When we look at the transformations and predictors selected with
+each of the 10 folds omitted (i.e., the output of
+<code><a href="../reference/cvSelect.html">compareFolds()</a></code>), we see that there is little uncertainty in
+choosing variable transformations (the <code>lam.*</code>s for the <span class="math inline">\(x\)</span>s and <code>lambda</code> for <span class="math inline">\(y\)</span> in the output), but considerably more
+uncertainty in subsequently selecting predictors:
+<code>horsepower</code>, <code>weight</code>, and <code>year</code> are
+always included among the selected predictors; <code>acceleration</code>
+and <code>displacement</code> are each included respectively in 4 and 3
+of 10 selected models; and <code>cylinders</code> and
+<code>origin</code> are each included in only 1 of 10 models. Recall
+that when we selected predictors for the full data, we obtained a model
+with <code>horsepower</code>, <code>weight</code>,
+<code>acceleration</code>, <code>year</code>, and
+<code>origin</code>.</li>
+</ul>
+</div>
 </div>
 <div class="section level2">
 <h2 id="parallel-computations">Parallel computations<a class="anchor" aria-label="anchor" href="#parallel-computations"></a>
@@ -2152,7 +2652,7 @@ the program.</p>
 <p>To illustrate, let’s time model selection in Mroz’s logistic
 regression, repeating the computation as performed previously and then
 doing it in parallel using 2 cores:</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
 <span>                          criterion<span class="op">=</span><span class="va">BayesRule</span>,</span>
@@ -2160,7 +2660,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.685   0.037   0.969</span></span>
+<span><span class="co">#&gt;   0.728   0.049   0.810</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2170,7 +2670,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.084   0.014   4.044</span></span>
+<span><span class="co">#&gt;   0.085   0.016   4.722</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -2214,7 +2714,7 @@ model matrix &lt;span class="math inline"&gt;\(\mathbf{X}\)&lt;/span&gt; is of f
 column rank, and which can be subject to numerical instability when
 &lt;span class="math inline"&gt;\(\mathbf{X}\)&lt;/span&gt; is ill-conditioned.
 &lt;code&gt;&lt;a href="https://rdrr.io/r/stats/lm.html" class="external-link"&gt;lm()&lt;/a&gt;&lt;/code&gt; uses the singular-value decomposition of the model
-matrix to obtain computationally more stable results.&lt;/p&gt;'><sup>11</sup></a> <span class="math display">\[
+matrix to obtain computationally more stable results.&lt;/p&gt;'><sup>13</sup></a> <span class="math display">\[
 \mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X}
 \right)^{-1}
   \mathbf{X}^T \mathbf{W} \mathbf{y}
