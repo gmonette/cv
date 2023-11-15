@@ -70,3 +70,5 @@ selectTrans
 coef
 selectTransAndStepAIC
 medAbsErr
+Venables
+Rmd

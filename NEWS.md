@@ -12,7 +12,7 @@
 
 - Add coef.cvSelect() method.
 
-- Improvements to documentation.
+- Improvements to documentation and expanded cv.Rmd vignette.
 
 # cv 1.0.1
 

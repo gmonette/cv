@@ -683,9 +683,10 @@ Next, using the `stepAIC()` function in the **MASS** package [@VenablesRipley:20
 [^selection-order]: It's generally advantageous to start with the largest model, here the one with 100 predictors, and proceed by backward elimination. In this demonstration, however, where all of the $\beta$s are really 0, the selected model will be small, and so we proceed by forward selection from the null model to save computing time.
 
 ```{r forward-selection}
-m.select <- MASS::stepAIC(m.null,
-                          direction="forward", trace=FALSE,
-                          scope=list(lower=~1, upper=formula(m.full)))
+library("MASS")  # for stepAIC()
+m.select <- stepAIC(m.null,
+                    direction="forward", trace=FALSE,
+                    scope=list(lower=~1, upper=formula(m.full)))
 summary(m.select)
 mse(D$y, fitted(m.select))
 ```
@@ -727,8 +728,8 @@ summary(m.mroz)
 
 Applying stepwise model selection Mroz's logistic regression, using BIC as the model-selection criterion (via the argument `k=log(nrow(Mroz))` to `stepAIC()`) selects 5 of the 7 original predictors:
 ```{r mroz-selection}
-m.mroz.sel <- MASS::stepAIC(m.mroz, k=log(nrow(Mroz)),
-                            trace=FALSE)
+m.mroz.sel <- stepAIC(m.mroz, k=log(nrow(Mroz)),
+                      trace=FALSE)
 summary(m.mroz.sel)
 BayesRule(Mroz$lfp == "yes",
           predict(m.mroz.sel, type="response"))
@@ -853,6 +854,141 @@ cv(m.pres, seed=1463) # untransformed model with same folds
 compareFolds(cvs)
 ```
 The results suggest that the predictive power of the transformed regression is reliably greater than that of the untransformed regression (though in both case, the cross-validated MSE is considerably higher than the MSE computed for the whole data). Examining the selected transformations for each fold reveals that the predictor `education` and the response `prestige` are never transformed; that the $1/3$ power is selected for `income` in all of the folds; and that the transformation selected for `women` varies narrowly across the folds between the $0$th power (i.e., log) and the $1/3$ power.
+
+
+### Selecting both transformations and predictors[^Venables]
+
+[^Venables]: The presentation in the section benefits from an email conversation with Bill Venables, who of course isn't responsible for the use to which we've put his insightful remarks.
+
+As we mentioned, @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"] explain that honest cross-validation has to take account of model specification and selection. Statistical modeling is at least partly a craft, and one could imagine applying that craft to successive partial data sets, each with a fold removed. The resulting procedure would be tedious, though possibly worth the effort, but it would also be difficult to realize in practice: After all, we can hardly erase our memory of statistical modeling choices between analyzing partial data sets.
+
+Alternatively, if we're able to automate the process of model selection, then we can more realistically apply CV mechanically. That's what we did in the preceding two sections, first for predictor selection and then for selection of transformations in regression. In this section, we consider the case where we both select variable transformations and then proceed to select predictors. It's insufficient to apply these steps sequentially, first, for example, using `cvSelect()` with `selectTrans()` and then with `selectStepAIC()`; rather we should apply the whole model-selection procedure with each fold omitted. The `selectTransAndStepAIC()` function, also supplied by the **cv** package, does exactly that.
+
+To illustrate this process, we return to the `Auto` data set:
+```{r Auto-redux}
+summary(Auto)
+xtabs(~ year, data=Auto)
+xtabs(~ origin, data=Auto)
+xtabs(~ cylinders, data=Auto)
+```
+We previously used the `Auto` here in a preliminary example where we employed CV to inform the selection of the order of a polynomial regression of `mpg` on `horsepower`. Here, we consider more generally the problem of predicting `mpg` from the other variables in the `Auto` data. We begin with a bit of data management, and then examine the pairwise relationships among the numeric variables in the data set:
+```{r Auto-explore}
+#| out.width = "100%",
+#| fig.height = 7,
+#| fig.cap = "Scatterplot matrix for the numeric variables in the `Auto` data"
+Auto$cylinders <- factor(Auto$cylinders,
+                         labels=c("3.4", "3.4", "5.6", "5.6", "8"))
+Auto$year <- as.factor(Auto$year)
+Auto$origin <- factor(Auto$origin,
+                      labels=c("America", "Europe", "Japan"))
+rownames(Auto) <- make.names(Auto$name, unique=TRUE)
+Auto$name <- NULL
+
+scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
+                  smooth=list(spread=FALSE), data=Auto)
+```
+A comment before we proceed: `origin` is clearly categorical and so converting it to a factor is natural, but we could imagine treating `cylinders` and `year` as numeric predictors. There are, however, only 5 distinct values of `cylinders` (ranging from 3 to 8), but cars with 3 or 5 cylinders are rare. and none of the cars has 7 cylinders. There are similarly only 13 distinct years between 1970 and 1982 in the data, and the relationship between `mpg` and `year` is difficult to characterize.[^year] It's apparent that most these variables are positively skewed and that many of the pairwise relationships among them are nonlinear.
+
+[^year]: Of course, making the decision to treat `year` as a factor on this basis could be construed as cheating in the current context, which illustrates the difficulty of automating the whole model-selection process.
+
+We begin with a "working model" that specifies linear partial relationships of the response to the numeric predictors:
+```{r Auto-working-model}
+#| out.width = "100%",
+#| fig.height = 7,
+#| fig.cap = "Component+residual plots for the working model fit to the `Auto` data"
+m.auto <- lm(mpg ~ ., data = Auto)
+summary(m.auto)
+
+Anova(m.auto)
+
+crPlots(m.auto)
+```
+The component+residual plots, created with the `crPlots()` function in the previously loaded **car** package, clearly reveal the inadequacy of the model.
+
+We proceed to transform the numeric predictors towards multi-normality: 
+```{r Auto-transform}
+num.predictors <- c("displacement", "horsepower", "weight", "acceleration")
+tr.x <- powerTransform(Auto[, num.predictors])
+summary(tr.x)
+```
+We then apply the (rounded) transformations---all, as it turns out, logs---to the data and re-estimate the model:
+```{r Auto-with-transformed-predictors}
+A <- Auto
+powers <- tr.x$roundlam
+for (pred in num.predictors){
+  A[, pred] <- bcPower(A[, pred], lambda=powers[pred])
+}
+head(A)
+
+m <- update(m.auto, data=A)
+```
+Finally, we perform Box-Cox regression to transform the response (also obtaining a log transformation):
+```{r Auto-Box-Cox}
+summary(powerTransform(m))
+
+m <- update(m, log(mpg) ~ .)
+summary(m)
+
+Anova(m)
+```
+
+The transformed numeric variables are much better-behaved:
+```{r Auto-transformed-scatterplot-matrix}
+#| out.width = "100%",
+#| fig.height = 7,
+#| fig.cap = "Scatterplot matrix for the transformed numeric variables in the `Auto` data"
+scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight 
+                  + acceleration, 
+                  smooth=list(spread=FALSE), data=A)
+```
+And the partial relationships in the model fit to the transformed data are much more nearly linear:
+```{r Auto-CR-plots-transformed}
+#| out.width = "100%",
+#| fig.height = 7,
+#| fig.cap = "Component+residual plots for the model fit to the transformed `Auto` data"
+crPlots(m)
+```
+
+Having transformed both the numeric predictors and the response, we proceed to use the `stepAIC()` function in the **MASS** package to perform predictor selection, employing the BIC model-selection criterion (by setting the `k` argument of `stepAIC()` to $\log(n)$):
+```{r}
+m.step <- stepAIC(m, k=log(nrow(A)), trace=FALSE)
+summary(m.step)
+
+Anova(m.step)
+```
+The selected model includes three of the numeric predictors, `horsepower`, `weight`, and `acceleration`, along with the factors `year` and `origin`. We can calculate the MSE for this model, but we expect that the result will be optimistic because we used the whole data to help specify the model
+```{r MSE-whole-selected-model}
+mse(Auto$mpg, exp(fitted(m.step)))
+```
+This is considerably smaller than the MSE for the original working model:
+```{r MSE-working-model}
+mse(Auto$mpg, fitted(m.auto))
+```
+A perhaps subtle point is that we compute the MSE for the selected model on the original `mpg` response scale rather than the log scale, so as to make the selected model comparable to the working model. That's slightly uncomfortable given the skewed distribution of `mpg`. An alternative is to use the median absolute error instead of the mean-squared error, employing the `medAbsErr()` function from the **cv** package:
+```{r Auto-median-absolute-error}
+medAbsErr(Auto$mpg, exp(fitted(m.step)))
+medAbsErr(Auto$mpg, fitted(m.auto))
+```
+
+Now let's use `cvSelect()` with `selectTransAndStepAIC()` to automate and cross-validate the whole model-specification process:
+```{r Auto-transform-and-select}
+num.predictors
+cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
+                predictors=num.predictors,
+                response="mpg", AIC=FALSE, criterion=medAbsErr)
+cvs
+
+compareFolds(cvs)
+```
+Here, as for `selectTrans()`, the `predictors` and `response` arguments specify candidate variables for transformation,
+and `AIC=FALSE` use the BIC for model selection. The starting model `model=m.auto` is the working model fit to the `Auto` data.
+
+Some noteworthy points:
+
+* `selectTransStepAIC()` automatically computes CV cost criteria, here the median absolute error, on the untransformed response scale.
+* The unbiased estimate of the median absolute error that we obtain by cross-validating the whole model-specification process is in this case only a little larger than the median absolute error computed for the model we fit to the `Auto` data separately selecting transformations of the predictors and the response and then selecting predictors for the whole data set.
+* When we look at the transformations and predictors selected with each of the 10 folds omitted (i.e., the output of `compareFolds()`), we see that there is little uncertainty in choosing variable transformations (the `lam.*`s for the $x$s and `lambda` for $y$ in the output), but considerably more uncertainty in subsequently selecting predictors: `horsepower`, `weight`, and `year` are always included among the selected predictors; `acceleration` and `displacement` are each included respectively in 4 and 3 of 10 selected models; and `cylinders` and `origin` are each included in only 1 of 10 models. Recall that when we selected predictors for the full data, we obtained a model with `horsepower`, `weight`, `acceleration`, `year`, and `origin`.
+
 
 ## Parallel computations
 

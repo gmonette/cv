@@ -339,9 +339,10 @@ anova(m.null, m.full)
 summary(m.null)
 
 ## ----forward-selection--------------------------------------------------------
-m.select <- MASS::stepAIC(m.null,
-                          direction="forward", trace=FALSE,
-                          scope=list(lower=~1, upper=formula(m.full)))
+library("MASS")  # for stepAIC()
+m.select <- stepAIC(m.null,
+                    direction="forward", trace=FALSE,
+                    scope=list(lower=~1, upper=formula(m.full)))
 summary(m.select)
 mse(D$y, fitted(m.select))
 
@@ -355,8 +356,8 @@ compareFolds(cv.select)
 summary(m.mroz)
 
 ## ----mroz-selection-----------------------------------------------------------
-m.mroz.sel <- MASS::stepAIC(m.mroz, k=log(nrow(Mroz)),
-                            trace=FALSE)
+m.mroz.sel <- stepAIC(m.mroz, k=log(nrow(Mroz)),
+                      trace=FALSE)
 summary(m.mroz.sel)
 BayesRule(Mroz$lfp == "yes",
           predict(m.mroz.sel, type="response"))
@@ -430,6 +431,88 @@ cvs <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=1463,
 cvs
 
 cv(m.pres, seed=1463) # untransformed model with same folds
+
+compareFolds(cvs)
+
+## ----Auto-redux---------------------------------------------------------------
+summary(Auto)
+xtabs(~ year, data=Auto)
+xtabs(~ origin, data=Auto)
+xtabs(~ cylinders, data=Auto)
+
+## ----Auto-explore-------------------------------------------------------------
+Auto$cylinders <- factor(Auto$cylinders,
+                         labels=c("3.4", "3.4", "5.6", "5.6", "8"))
+Auto$year <- as.factor(Auto$year)
+Auto$origin <- factor(Auto$origin,
+                      labels=c("America", "Europe", "Japan"))
+rownames(Auto) <- make.names(Auto$name, unique=TRUE)
+Auto$name <- NULL
+
+scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
+                  smooth=list(spread=FALSE), data=Auto)
+
+## ----Auto-working-model-------------------------------------------------------
+m.auto <- lm(mpg ~ ., data = Auto)
+summary(m.auto)
+
+Anova(m.auto)
+
+crPlots(m.auto)
+
+## ----Auto-transform-----------------------------------------------------------
+num.predictors <- c("displacement", "horsepower", "weight", "acceleration")
+tr.x <- powerTransform(Auto[, num.predictors])
+summary(tr.x)
+
+## ----Auto-with-transformed-predictors-----------------------------------------
+A <- Auto
+powers <- tr.x$roundlam
+for (pred in num.predictors){
+  A[, pred] <- bcPower(A[, pred], lambda=powers[pred])
+}
+head(A)
+
+m <- update(m.auto, data=A)
+
+## ----Auto-Box-Cox-------------------------------------------------------------
+summary(powerTransform(m))
+
+m <- update(m, log(mpg) ~ .)
+summary(m)
+
+Anova(m)
+
+## ----Auto-transformed-scatterplot-matrix--------------------------------------
+scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight 
+                  + acceleration, 
+                  smooth=list(spread=FALSE), data=A)
+
+## ----Auto-CR-plots-transformed------------------------------------------------
+crPlots(m)
+
+## -----------------------------------------------------------------------------
+m.step <- stepAIC(m, k=log(nrow(A)), trace=FALSE)
+summary(m.step)
+
+Anova(m.step)
+
+## ----MSE-whole-selected-model-------------------------------------------------
+mse(Auto$mpg, exp(fitted(m.step)))
+
+## ----MSE-working-model--------------------------------------------------------
+mse(Auto$mpg, fitted(m.auto))
+
+## ----Auto-median-absolute-error-----------------------------------------------
+medAbsErr(Auto$mpg, exp(fitted(m.step)))
+medAbsErr(Auto$mpg, fitted(m.auto))
+
+## ----Auto-transform-and-select------------------------------------------------
+num.predictors
+cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
+                predictors=num.predictors,
+                response="mpg", AIC=FALSE, criterion=medAbsErr)
+cvs
 
 compareFolds(cvs)
 
