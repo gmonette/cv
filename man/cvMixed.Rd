@@ -161,7 +161,7 @@ library("glmmTMB")
                zi=~mined,
                family=poisson, data=Salamanders))
 cv(m1, seed=97816, k=5) # 5-fold CV of clusters
-cv(m1, seed=34506, k=5) # 5-gold CV of cases
+cv(m1, seed=34506, k=5) # 5-fold CV of cases
 }
 \seealso{
 \code{\link{cv}}, \code{\link[lme4]{lmer}}, \code{\link[lme4]{glmer}},

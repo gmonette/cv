@@ -93,15 +93,6 @@ cvMixed <- function(model,
                     predict.cases.args=list(object=model, newdata=data),
                     ...){
 
-  # f.clusters <- function(i){
-  #   indices.i <- indices[starts[i]:ends[i]]
-  #   index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
-  #   predict.clusters.args$object <- update(model, data=data[index, ], ...)
-  #   fit.all.i <- do.call(predict, predict.clusters.args)
-  #   fit.i <- fit.all.i[!index]
-  #   c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
-  # }
-
   f.clusters <- function(i, predict.clusters.args, predict.cases.args, ...){
     indices.i <- indices[starts[i]:ends[i]]
     index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
@@ -113,14 +104,6 @@ cvMixed <- function(model,
     fit.i <- fit.all.i[!index]
     c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
   }
-
-  # f.cases <- function(i){
-  #   indices.i <- indices[starts[i]:ends[i]]
-  #   predict.cases.args$object <- update(model, data=data[ - indices.i, ], ...)
-  #   fit.all.i <- do.call(predict, predict.cases.args)
-  #   fit.i <- fit.all.i[indices.i]
-  #   c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
-  # }
 
   f.cases <- function(i, predict.clusters.args, predict.cases.args, ...){
     indices.i <- indices[starts[i]:ends[i]]
@@ -144,12 +127,12 @@ cvMixed <- function(model,
         k <- n
       }
     }
-    f <- f.cases # if (ncores > 1) f.cases.parallel else f.cases
+    f <- f.cases
   } else {
     clusters <- defineClusters(clusterVariables, data)
     n <- nrow(clusters)
     if (missing(k)) k <- nrow(clusters)
-    f <- f.clusters # if (ncores > 1) f.clusters.parallel else f.clusters
+    f <- f.clusters
   }
 
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
@@ -184,7 +167,7 @@ cvMixed <- function(model,
   } else {
     result <- matrix(0, k, 2L)
     for (i in 1L:k){
-      result[i, ] <- f(i, predict.clusters.args, predict.cases.args, ...) # f(i)
+      result[i, ] <- f(i, predict.clusters.args, predict.cases.args, ...)
     }
   }
   cv <- weighted.mean(result[, 1L], folds)

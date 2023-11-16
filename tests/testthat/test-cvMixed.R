@@ -1,5 +1,7 @@
 # test parallel computations for mixed models
 
+if (Sys.getenv("RUN_ALL_CV_TESTS") == "true"){
+
 data("sleepstudy", package="lme4")
 fm1 <- lme4::lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
 
@@ -61,7 +63,6 @@ test_that("parallel computations glmmTMB k-fold cases", {
 
 m1p <- update(m1, data=Salamanders[1:100, ])
 test_that("parallel computations glmmTMB LOO cases", {
-  skip_on_cran()
   expect_equal(suppressWarnings(cv(m1p, k="loo")),
                cv(m1p, k="loo", ncores=2))
 })
@@ -76,3 +77,5 @@ test_that("parallel computations glmmTMB LOO clusters", {
   expect_equal(cv(m1, clusterVariables="site"),
                cv(m1, clusterVariables="site", ncores=2))
 })
+
+}
