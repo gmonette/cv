@@ -71,7 +71,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-11-15</h4>
+            <h4 data-toc-skip class="date">2023-11-16</h4>
       
       
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -394,13 +394,13 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt; function (model, data = insight::get_data(model), criterion = mse, </span></span>
 <span><span class="co">#&gt;     k, reps = 1, seed, ncores = 1, clusterVariables, ...) </span></span>
 <span><span class="co">#&gt; {</span></span>
-<span><span class="co">#&gt;     cvMixed(model, data = data, criterion = criterion, k = k, </span></span>
-<span><span class="co">#&gt;         reps = reps, seed = seed, ncores = ncores, clusterVariables = clusterVariables, </span></span>
+<span><span class="co">#&gt;     cvMixed(model, fun = nlme::lme, data = data, criterion = criterion, </span></span>
+<span><span class="co">#&gt;         k = k, reps = reps, seed = seed, ncores = ncores, clusterVariables = clusterVariables, </span></span>
 <span><span class="co">#&gt;         predict.clusters.args = list(object = model, newdata = data, </span></span>
 <span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
 <span><span class="co">#&gt;             newdata = data, level = 1), ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x7fd2f04952a8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x7f9a6467c2a0&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
@@ -408,6 +408,10 @@ facilitate this process, and to see how that works, consider the
 <ul>
 <li><p><code>model</code> is the mixed-model object, here of class
 <code>"lme"</code>.</p></li>
+<li><p><code>fun</code> is the mixed-modeling function used to fit the
+model, here <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">nlme::lme</a></code>; <code><a href="../reference/cvMixed.html">cvMixed()</a></code> uses this
+argument to infer the package namespace in which the modeling function
+lives.</p></li>
 <li><p><code>data</code> is the data set to which the model is fit, by
 default extracted by the <code>get_data()</code> function in the
 <strong>insight</strong> package.</p></li>
@@ -485,6 +489,7 @@ suppress warning messages about non-convergence:</p>
 <span>                     <span class="va">k</span>, <span class="va">reps</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, <span class="va">ncores</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">clusterVariables</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/cvMixed.html">cvMixed</a></span><span class="op">(</span></span>
 <span>    <span class="va">model</span>,</span>
+<span>    fun<span class="op">=</span><span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL</a></span>,</span>
 <span>    data<span class="op">=</span><span class="va">data</span>,</span>
 <span>    criterion<span class="op">=</span><span class="va">criterion</span>,</span>
 <span>    k<span class="op">=</span><span class="va">k</span>,</span>
