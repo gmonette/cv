@@ -4,6 +4,8 @@
 
 - Fix bugs in selectTrans() that caused errors when one of response and predictors arguments not specified.
 
+- Fix bug in cvMixed() that prevented parallel computations (reported by Craig See).
+
 - Fix small bug in cvSelect(), returning properly named "coefficients" element when save.coef is TRUE.
 
 - Add selectTransAndStepAIC() procedure for use with cvSelect().

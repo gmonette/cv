@@ -12,6 +12,7 @@
 #' It can be used to extend \code{cv()} to other classes of mixed-effects models.
 #'
 #' @param model a mixed-effects model object for which a \code{cv()} method is available.
+#' @param fun the mixed-modeling function employed.
 #' @param data data frame to which the model was fit (not usually necessary)
 #' @param criterion cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
@@ -70,9 +71,17 @@
 #' cv(fm2) # LOO CV of cases
 #' cv(fm2, clusterVariables="Subject", k=5, seed=321) # 5-fold CV of clusters
 #'
+#' library("glmmTMB")
+#' # from ?glmmTMB
+#' (m1 <- glmmTMB(count ~ mined + (1|site),
+#'                zi=~mined,
+#'                family=poisson, data=Salamanders))
+#' cv(m1, seed=97816, k=5) # 5-fold CV of clusters
+#' cv(m1, seed=34506, k=5) # 5-fold CV of cases
 #' @describeIn cvMixed not to be called directly
 #' @export
 cvMixed <- function(model,
+                    fun,
                     data=insight::get_data(model),
                     criterion=mse,
                     k,
@@ -84,18 +93,41 @@ cvMixed <- function(model,
                     predict.cases.args=list(object=model, newdata=data),
                     ...){
 
-  f.clusters <- function(i){
+  # f.clusters <- function(i){
+  #   indices.i <- indices[starts[i]:ends[i]]
+  #   index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
+  #   predict.clusters.args$object <- update(model, data=data[index, ], ...)
+  #   fit.all.i <- do.call(predict, predict.clusters.args)
+  #   fit.i <- fit.all.i[!index]
+  #   c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
+  # }
+
+  f.clusters <- function(i, predict.clusters.args, predict.cases.args, ...){
     indices.i <- indices[starts[i]:ends[i]]
     index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
-    predict.clusters.args$object <- update(model, data=data[index, ], ...)
+    update.args <- list(...)
+    update.args$object <- model
+    update.args$data <- data[index, ]
+    predict.clusters.args$object <- do.call(update, update.args, envir=environment(fun))
     fit.all.i <- do.call(predict, predict.clusters.args)
     fit.i <- fit.all.i[!index]
     c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
   }
 
-  f.cases <- function(i){
+  # f.cases <- function(i){
+  #   indices.i <- indices[starts[i]:ends[i]]
+  #   predict.cases.args$object <- update(model, data=data[ - indices.i, ], ...)
+  #   fit.all.i <- do.call(predict, predict.cases.args)
+  #   fit.i <- fit.all.i[indices.i]
+  #   c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
+  # }
+
+  f.cases <- function(i, predict.clusters.args, predict.cases.args, ...){
     indices.i <- indices[starts[i]:ends[i]]
-    predict.cases.args$object <- update(model, data=data[ - indices.i, ], ...)
+    update.args <- list(...)
+    update.args$object <- model
+    update.args$data <- data[ - indices.i, ]
+    predict.cases.args$object <- do.call(update, update.args, envir=environment(fun))
     fit.all.i <- do.call(predict, predict.cases.args)
     fit.i <- fit.all.i[indices.i]
     c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
@@ -112,12 +144,12 @@ cvMixed <- function(model,
         k <- n
       }
     }
-    f <- f.cases
+    f <- f.cases # if (ncores > 1) f.cases.parallel else f.cases
   } else {
     clusters <- defineClusters(clusterVariables, data)
     n <- nrow(clusters)
     if (missing(k)) k <- nrow(clusters)
-    f <- f.clusters
+    f <- f.clusters # if (ncores > 1) f.clusters.parallel else f.clusters
   }
 
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
@@ -146,13 +178,13 @@ cvMixed <- function(model,
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
-      f(i)
+      f(i, predict.clusters.args, predict.cases.args, ...)
     }
     stopCluster(cl)
   } else {
     result <- matrix(0, k, 2L)
     for (i in 1L:k){
-      result[i, ] <- f(i)
+      result[i, ] <- f(i, predict.clusters.args, predict.cases.args, ...) # f(i)
     }
   }
   cv <- weighted.mean(result[, 1L], folds)
@@ -202,6 +234,7 @@ cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
                       k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
+    fun=lme4::lmer, # works for glmer() too
     data=data,
     criterion=criterion,
     k=k,
@@ -227,6 +260,7 @@ cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
                    k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
+    fun=nlme::lme,
     data=data,
     criterion=criterion,
     k=k,
@@ -249,6 +283,7 @@ cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
                        k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
+    fun=glmmTMB::glmmTMB,
     data=data,
     criterion=criterion,
     k=k,

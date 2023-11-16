@@ -9,6 +9,7 @@
 \usage{
 cvMixed(
   model,
+  fun,
   data = insight::get_data(model),
   criterion = mse,
   k,
@@ -59,6 +60,8 @@ cvMixed(
 }
 \arguments{
 \item{model}{a mixed-effects model object for which a \code{cv()} method is available.}
+
+\item{fun}{the mixed-modeling function employed.}
 
 \item{data}{data frame to which the model was fit (not usually necessary)}
 
@@ -152,6 +155,13 @@ library(nlme)
 cv(fm2) # LOO CV of cases
 cv(fm2, clusterVariables="Subject", k=5, seed=321) # 5-fold CV of clusters
 
+library("glmmTMB")
+# from ?glmmTMB
+(m1 <- glmmTMB(count ~ mined + (1|site),
+               zi=~mined,
+               family=poisson, data=Salamanders))
+cv(m1, seed=97816, k=5) # 5-fold CV of clusters
+cv(m1, seed=34506, k=5) # 5-gold CV of cases
 }
 \seealso{
 \code{\link{cv}}, \code{\link[lme4]{lmer}}, \code{\link[lme4]{glmer}},
