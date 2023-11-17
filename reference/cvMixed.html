@@ -89,7 +89,7 @@ It can be used to extend <code><a href="cv.html">cv()</a></code> to other classe
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cvMixed</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
-<span>  <span class="va">fun</span>,</span>
+<span>  <span class="va">package</span>,</span>
 <span>  data <span class="op">=</span> <span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">get_data</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>,</span>
 <span>  criterion <span class="op">=</span> <span class="va">mse</span>,</span>
 <span>  <span class="va">k</span>,</span>
@@ -148,8 +148,9 @@ It can be used to extend <code><a href="cv.html">cv()</a></code> to other classe
 <dd><p>a mixed-effects model object for which a <code><a href="cv.html">cv()</a></code> method is available.</p></dd>
 
 
-<dt>fun</dt>
-<dd><p>the mixed-modeling function employed.</p></dd>
+<dt>package</dt>
+<dd><p>the name of the package in which mixed-modeling function (or functions) employed resides;
+used to get the namespace of the package.</p></dd>
 
 
 <dt>data</dt>
