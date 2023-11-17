@@ -9,7 +9,7 @@
 \usage{
 cvMixed(
   model,
-  fun,
+  package,
   data = insight::get_data(model),
   criterion = mse,
   k,
@@ -61,7 +61,8 @@ cvMixed(
 \arguments{
 \item{model}{a mixed-effects model object for which a \code{cv()} method is available.}
 
-\item{fun}{the mixed-modeling function employed.}
+\item{package}{the name of the package in which mixed-modeling function (or functions) employed resides;
+used to get the namespace of the package.}
 
 \item{data}{data frame to which the model was fit (not usually necessary)}
 

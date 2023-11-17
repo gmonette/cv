@@ -117,7 +117,7 @@ cv.glmmPQL <- function(model, data = model$data, criterion = mse,
                      k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
-    fun=MASS::glmmPQL,
+    package="MASS",
     data=data,
     criterion=criterion,
     k=k,

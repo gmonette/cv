@@ -175,7 +175,7 @@ Most of the arguments of `cvMixed()` are familiar:
 
 * `model` is the mixed-model object, here of class `"lme"`.
 
-* `fun` is the mixed-modeling function used to fit the model, here  `nlme::lme`; `cvMixed()` uses this argument to infer the package namespace in which the modeling function lives.
+* `package` is the name of the package in which the mixed-modeling function used to fit the model, here  `lme()`, resides---i.e., `"nlme"`; `cvMixed()` uses this argument to retrieve the package namespace.
 
 * `data` is the data set to which the model is fit, by default extracted by the `get_data()` function in the **insight** package.
 
@@ -223,7 +223,7 @@ cv.glmmPQL <- function(model, data = model$data, criterion = mse,
                      k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
-    fun=MASS::glmmPQL,
+    package="MASS",
     data=data,
     criterion=criterion,
     k=k,

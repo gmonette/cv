@@ -12,7 +12,8 @@
 #' It can be used to extend \code{cv()} to other classes of mixed-effects models.
 #'
 #' @param model a mixed-effects model object for which a \code{cv()} method is available.
-#' @param fun the mixed-modeling function employed.
+#' @param package the name of the package in which mixed-modeling function (or functions) employed resides;
+#' used to get the namespace of the package.
 #' @param data data frame to which the model was fit (not usually necessary)
 #' @param criterion cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
@@ -81,7 +82,7 @@
 #' @describeIn cvMixed not to be called directly
 #' @export
 cvMixed <- function(model,
-                    fun,
+                    package,
                     data=insight::get_data(model),
                     criterion=mse,
                     k,
@@ -93,13 +94,15 @@ cvMixed <- function(model,
                     predict.cases.args=list(object=model, newdata=data),
                     ...){
 
+  pkg.env <- getNamespace(package)
+
   f.clusters <- function(i, predict.clusters.args, predict.cases.args, ...){
     indices.i <- indices[starts[i]:ends[i]]
     index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
     update.args <- list(...)
     update.args$object <- model
     update.args$data <- data[index, ]
-    predict.clusters.args$object <- do.call(update, update.args, envir=environment(fun))
+    predict.clusters.args$object <- do.call(update, update.args, envir=pkg.env)
     fit.all.i <- do.call(predict, predict.clusters.args)
     fit.i <- fit.all.i[!index]
     c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
@@ -110,12 +113,11 @@ cvMixed <- function(model,
     update.args <- list(...)
     update.args$object <- model
     update.args$data <- data[ - indices.i, ]
-    predict.cases.args$object <- do.call(update, update.args, envir=environment(fun))
+    predict.cases.args$object <- do.call(update, update.args, envir=pkg.env)
     fit.all.i <- do.call(predict, predict.cases.args)
     fit.i <- fit.all.i[indices.i]
     c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
   }
-
   y <- getResponse(model)
 
   if (missing(clusterVariables)) clusterVariables <- NULL
@@ -217,7 +219,7 @@ cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
                       k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
-    fun=lme4::lmer, # works for glmer() too
+    package="lme4",
     data=data,
     criterion=criterion,
     k=k,
@@ -243,7 +245,7 @@ cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
                    k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
-    fun=nlme::lme,
+    package="nlme",
     data=data,
     criterion=criterion,
     k=k,
@@ -266,7 +268,7 @@ cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
                        k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
-    fun=glmmTMB::glmmTMB,
+    package="glmmTMB",
     data=data,
     criterion=criterion,
     k=k,

@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-11-16" />
+<meta name="date" content="2023-11-17" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-11-16</h4>
+<h4 class="date">2023-11-17</h4>
 
 
 
@@ -654,7 +654,7 @@ facilitate this process, and to see how that works, consider the
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt;                    k, reps = 1, seed, ncores = 1, clusterVariables, ...){</span></span>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt;   cvMixed(</span></span>
 <span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt;     model,</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt;     fun=nlme::lme,</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt;     package=&quot;nlme&quot;,</span></span>
 <span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt;     data=data,</span></span>
 <span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt;     criterion=criterion,</span></span>
 <span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt;     k=k,</span></span>
@@ -677,10 +677,10 @@ facilitate this process, and to see how that works, consider the
 <ul>
 <li><p><code>model</code> is the mixed-model object, here of class
 <code>&quot;lme&quot;</code>.</p></li>
-<li><p><code>fun</code> is the mixed-modeling function used to fit the
-model, here <code>nlme::lme</code>; <code>cvMixed()</code> uses this
-argument to infer the package namespace in which the modeling function
-lives.</p></li>
+<li><p><code>package</code> is the name of the package in which the
+mixed-modeling function used to fit the model, here <code>lme()</code>,
+resides—i.e., <code>&quot;nlme&quot;</code>; <code>cvMixed()</code> uses this
+argument to retrieve the package namespace.</p></li>
 <li><p><code>data</code> is the data set to which the model is fit, by
 default extracted by the <code>get_data()</code> function in the
 <strong>insight</strong> package.</p></li>
@@ -750,7 +750,7 @@ suppress warning messages about non-convergence:</p>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>                     k, <span class="at">reps =</span> <span class="dv">1</span>, seed, <span class="at">ncores =</span> <span class="dv">1</span>, clusterVariables, ...){</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="fu">cvMixed</span>(</span>
 <span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>    model,</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>    <span class="at">fun=</span>MASS<span class="sc">::</span>glmmPQL,</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>    <span class="at">package=</span><span class="st">&quot;MASS&quot;</span>,</span>
 <span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>    <span class="at">data=</span>data,</span>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>    <span class="at">criterion=</span>criterion,</span>
 <span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>    <span class="at">k=</span>k,</span>
