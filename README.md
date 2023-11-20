@@ -1,6 +1,6 @@
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) [![Last Commit](https://img.shields.io/github/last-commit/gmonette/cv)](https://github.com/gmonette/cv) [![CRAN](https://www.r-pkg.org/badges/version/cv)](https://cran.r-project.org/package=cv)
+[![R-CMD-check](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gmonette/cv/actions/workflows/R-CMD-check.yaml) [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable) [![Last Commit](https://img.shields.io/github/last-commit/gmonette/cv)](https://github.com/gmonette/cv) [![CRAN](https://www.r-pkg.org/badges/version/cv)](https://cran.r-project.org/package=cv)
 [![metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/cv)](https://cran.r-project.org/package=cv)
 [![](https://img.shields.io/badge/pkgdown%20site-brightgreen)](https://gmonette.github.io/cv/) 
 
@@ -10,7 +10,7 @@
 
 Some of the functions supplied by the package:
 
--   `cv()` is a generic function with a default method and computationally efficient `"lm"` and `"glm"` methods, along with a method for a list of competing models. There are also experimental `"merMod"`, `"lme"`, and `"glmmTMB"` methods for mixed-effects models. `cv()` supports parallel computations.
+-   `cv()` is a generic function with a default method and computationally efficient `"lm"` and `"glm"` methods, along with a method for a list of competing models. There are also `"merMod"`, `"lme"`, and `"glmmTMB"` methods for mixed-effects models. `cv()` supports parallel computations.
 
 -   `mse()` (mean-squared error), `medAbsErr()` (median absolute error), and `BayesRule()` are cross-validation criteria ("cost functions"), suitable for use with `cv()`.
 

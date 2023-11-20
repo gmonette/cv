@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-11-15" />
+<meta name="date" content="2023-11-19" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-11-15</h4>
+<h4 class="date">2023-11-19</h4>
 
 
 
@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 35038</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 398475</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.212</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.2</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.238</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.224</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -617,11 +617,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = &quot;loo&quot;), :</span></span>
 <span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
 <span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;       expr    min       lq   mean   median       uq      max neval cld</span></span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues    884   1033.6   1074   1092.3   1105.6   1192.5    10 a  </span></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10146  10435.0  10929  10631.6  10809.6  13211.0    10 a  </span></span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 212751 215380.1 217664 216756.3 221281.7 222645.0    10  b </span></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 373426 384555.5 415581 433767.2 440424.8 445023.7    10   c</span></span></code></pre></div>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq     mean   median       uq      max neval cld</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues    964.69    967.64   1129.8   1160.3   1196.3   1340.6    10 a  </span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10483.78  10762.46  11264.0  10867.0  11363.8  14419.1    10 a  </span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 215370.33 216389.64 229553.3 218345.7 220837.6 276001.9    10  b </span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 377467.48 380847.03 405010.5 383950.0 437946.5 495947.4    10   c</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
@@ -791,34 +791,30 @@ regression to the <code>Mroz</code> data:</p>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
 <span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; glm(formula = lfp ~ ., family = binomial, data = Mroz)</span></span>
 <span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; Deviance Residuals: </span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; -2.106  -1.090   0.598   0.971   2.189  </span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt; (Intercept)  3.18214    0.64438    4.94  7.9e-07 ***</span></span>
-<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co">#&gt; k5          -1.46291    0.19700   -7.43  1.1e-13 ***</span></span>
-<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co">#&gt; k618        -0.06457    0.06800   -0.95  0.34234    </span></span>
-<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="co">#&gt; age         -0.06287    0.01278   -4.92  8.7e-07 ***</span></span>
-<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a><span class="co">#&gt; wcyes        0.80727    0.22998    3.51  0.00045 ***</span></span>
-<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a><span class="co">#&gt; hcyes        0.11173    0.20604    0.54  0.58762    </span></span>
-<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a><span class="co">#&gt; lwg          0.60469    0.15082    4.01  6.1e-05 ***</span></span>
-<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a><span class="co">#&gt; inc         -0.03445    0.00821   -4.20  2.7e-05 ***</span></span>
-<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; (Intercept)  3.18214    0.64438    4.94  7.9e-07 ***</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt; k5          -1.46291    0.19700   -7.43  1.1e-13 ***</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; k618        -0.06457    0.06800   -0.95  0.34234    </span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt; age         -0.06287    0.01278   -4.92  8.7e-07 ***</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt; wcyes        0.80727    0.22998    3.51  0.00045 ***</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co">#&gt; hcyes        0.11173    0.20604    0.54  0.58762    </span></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co">#&gt; lwg          0.60469    0.15082    4.01  6.1e-05 ***</span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="co">#&gt; inc         -0.03445    0.00821   -4.20  2.7e-05 ***</span></span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a><span class="co">#&gt; Residual deviance:  905.27  on 745  degrees of freedom</span></span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a><span class="co">#&gt; AIC: 921.3</span></span>
 <span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
-<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a><span class="co">#&gt; Residual deviance:  905.27  on 745  degrees of freedom</span></span>
-<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="co">#&gt; AIC: 921.3</span></span>
-<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span>
-<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a></span>
-<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a><span class="fu">BayesRule</span>(<span class="fu">ifelse</span>(Mroz<span class="sc">$</span>lfp <span class="sc">==</span> <span class="st">&quot;yes&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>), </span>
-<span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a>          <span class="fu">fitted</span>(m.mroz, <span class="at">type=</span><span class="st">&quot;response&quot;</span>))</span>
-<span id="cb14-34"><a href="#cb14-34" tabindex="-1"></a><span class="co">#&gt; [1] 0.30677</span></span></code></pre></div>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="fu">BayesRule</span>(<span class="fu">ifelse</span>(Mroz<span class="sc">$</span>lfp <span class="sc">==</span> <span class="st">&quot;yes&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>), </span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a>          <span class="fu">fitted</span>(m.mroz, <span class="at">type=</span><span class="st">&quot;response&quot;</span>))</span>
+<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a><span class="co">#&gt; [1] 0.30677</span></span></code></pre></div>
 <p>In addition to the usually summary output for a GLM, we show the
 result of applying the <code>BayesRule()</code> function from the
 <strong>cv</strong> package to predictions derived from the fitted
@@ -902,15 +898,15 @@ comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
 <span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span>)</span>
 <span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.1736    1.1976    1.2255    1.2156    1.2437    1.3337    10</span></span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   37.9966   39.4514   40.0701   40.2656   40.6487   41.2851    10</span></span>
-<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co">#&gt;      exact 1703.0245 1752.7911 1789.9906 1786.5208 1819.8420 1905.8555    10</span></span>
-<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 1985.7134 2034.1117 2099.6893 2059.0228 2168.9571 2268.2589    10</span></span>
-<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt;  cld</span></span>
-<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
-<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
-<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a><span class="co">#&gt;   b </span></span>
-<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a><span class="co">#&gt;    c</span></span></code></pre></div>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2892    1.3212    1.3524    1.3414    1.3998    1.4421    10</span></span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   39.0116   40.4098   41.0037   40.9399   41.5998   44.2752    10</span></span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co">#&gt;      exact 1750.1111 1753.7966 1778.0720 1757.7403 1802.9704 1855.2706    10</span></span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2008.0623 2038.1417 2081.1113 2090.7808 2106.6058 2137.6914    10</span></span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt;   cld</span></span>
+<span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co">#&gt;  a   </span></span>
+<span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a><span class="co">#&gt;   b  </span></span>
+<span id="cb17-17"><a href="#cb17-17" tabindex="-1"></a><span class="co">#&gt;    c </span></span>
+<span id="cb17-18"><a href="#cb17-18" tabindex="-1"></a><span class="co">#&gt;     d</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -931,7 +927,7 @@ clusters comprise higher-level units (e.g., students clustered in
 schools), or longitudinal data, where the clusters are individuals and
 the cases repeated observations on the individuals over time.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a></p>
 <p>We can think of two approaches to applying cross-validation to
-clustered data:</p>
+clustered data:<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a></p>
 <ol style="list-style-type: decimal">
 <li><p>Treat CV as analogous to predicting the response for one or more
 cases in a <em>newly observed cluster</em>. In this instance, the folds
@@ -1162,7 +1158,7 @@ illustrate with the mixed model fit to the HSB data:</p>
 <span id="cb23-65"><a href="#cb23-65" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 36.147</span></span></code></pre></div>
 <p>We used the same random-number generator seeds as in the previous
 example cross-validating the model fit by <code>lmer()</code>, and so
-the same folds are employed in both cases.<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a> The estimated
+the same folds are employed in both cases.<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a> The estimated
 covariance components and fixed effects in the summary output differ
 slightly between the <code>lmer()</code> and <code>lme()</code>
 solutions, although both functions seek to maximize the REML criterion.
@@ -1200,7 +1196,7 @@ should be used to account for clustering due to the expected similarity
 of measurements taken from each student.</p>
 <p>We start by generating the data, using parameters consistent with the
 description above and meant to highlight the issues that arise in
-cross-validating mixed-effects models:<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
+cross-validating mixed-effects models:<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># Parameters:</span></span>
 <span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">9693</span>) </span>
 <span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>Nb <span class="ot">&lt;-</span> <span class="dv">100</span>     <span class="co"># number of groups</span></span>
@@ -1229,7 +1225,7 @@ cross-validating mixed-effects models:<a href="#fn7" class="footnote-ref" id="fn
 <span id="cb24-26"><a href="#cb24-26" tabindex="-1"></a>  )</span></code></pre></div>
 <p>Here is a scatterplot of the data for a representative group of 10
 (without loss of generality, the first 10) of 100 students, showing the
-95% concentration ellipse for each cluster:<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a></p>
+95% concentration ellipse for each cluster:<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a></p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;lattice&quot;</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;latticeExtra&quot;</span>)</span>
 <span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">xyplot</span>(y <span class="sc">~</span> x, <span class="at">data=</span>Data[<span class="dv">1</span><span class="sc">:</span>Nx, ], <span class="at">group=</span>group,</span>
@@ -1675,7 +1671,7 @@ variation across repetitions, increasing our confidence in the
 reliability of the results.</p>
 <p>Notice that the seed that’s set in the <code>cv()</code> command
 pertains to the first repetition and the seeds for the remaining
-repetitions are then selected pseudo-randomly.<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a> Setting the first
+repetitions are then selected pseudo-randomly.<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a> Setting the first
 seed, however, makes the entire process easily replicable, and the seed
 for each repetition is stored in the corresponding element of the
 <code>&quot;cvList&quot;</code> object (which isn’t, however, saved in the
@@ -1784,7 +1780,7 @@ associated with a large <span class="math inline">\(p\)</span>-value:</p>
 Ripley, 2002)</span>, let us perform a forward stepwise regression to
 select a “best” model, starting with the null model, and using AIC as
 the model-selection criterion (see the help page for
-<code>stepAIC()</code> for details):<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a></p>
+<code>stepAIC()</code> for details):<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a></p>
 <div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;MASS&quot;</span>)  <span class="co"># for stepAIC()</span></span>
 <span id="cb44-2"><a href="#cb44-2" tabindex="-1"></a>m.select <span class="ot">&lt;-</span> <span class="fu">stepAIC</span>(m.null,</span>
 <span id="cb44-3"><a href="#cb44-3" tabindex="-1"></a>                    <span class="at">direction=</span><span class="st">&quot;forward&quot;</span>, <span class="at">trace=</span><span class="cn">FALSE</span>,</span>
@@ -1945,30 +1941,26 @@ data:</p>
 <span id="cb48-3"><a href="#cb48-3" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
 <span id="cb48-4"><a href="#cb48-4" tabindex="-1"></a><span class="co">#&gt; glm(formula = lfp ~ ., family = binomial, data = Mroz)</span></span>
 <span id="cb48-5"><a href="#cb48-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb48-6"><a href="#cb48-6" tabindex="-1"></a><span class="co">#&gt; Deviance Residuals: </span></span>
-<span id="cb48-7"><a href="#cb48-7" tabindex="-1"></a><span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span></span>
-<span id="cb48-8"><a href="#cb48-8" tabindex="-1"></a><span class="co">#&gt; -2.106  -1.090   0.598   0.971   2.189  </span></span>
-<span id="cb48-9"><a href="#cb48-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb48-10"><a href="#cb48-10" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb48-11"><a href="#cb48-11" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span id="cb48-12"><a href="#cb48-12" tabindex="-1"></a><span class="co">#&gt; (Intercept)  3.18214    0.64438    4.94  7.9e-07 ***</span></span>
-<span id="cb48-13"><a href="#cb48-13" tabindex="-1"></a><span class="co">#&gt; k5          -1.46291    0.19700   -7.43  1.1e-13 ***</span></span>
-<span id="cb48-14"><a href="#cb48-14" tabindex="-1"></a><span class="co">#&gt; k618        -0.06457    0.06800   -0.95  0.34234    </span></span>
-<span id="cb48-15"><a href="#cb48-15" tabindex="-1"></a><span class="co">#&gt; age         -0.06287    0.01278   -4.92  8.7e-07 ***</span></span>
-<span id="cb48-16"><a href="#cb48-16" tabindex="-1"></a><span class="co">#&gt; wcyes        0.80727    0.22998    3.51  0.00045 ***</span></span>
-<span id="cb48-17"><a href="#cb48-17" tabindex="-1"></a><span class="co">#&gt; hcyes        0.11173    0.20604    0.54  0.58762    </span></span>
-<span id="cb48-18"><a href="#cb48-18" tabindex="-1"></a><span class="co">#&gt; lwg          0.60469    0.15082    4.01  6.1e-05 ***</span></span>
-<span id="cb48-19"><a href="#cb48-19" tabindex="-1"></a><span class="co">#&gt; inc         -0.03445    0.00821   -4.20  2.7e-05 ***</span></span>
-<span id="cb48-20"><a href="#cb48-20" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb48-21"><a href="#cb48-21" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb48-22"><a href="#cb48-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb48-23"><a href="#cb48-23" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb48-6"><a href="#cb48-6" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb48-7"><a href="#cb48-7" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span id="cb48-8"><a href="#cb48-8" tabindex="-1"></a><span class="co">#&gt; (Intercept)  3.18214    0.64438    4.94  7.9e-07 ***</span></span>
+<span id="cb48-9"><a href="#cb48-9" tabindex="-1"></a><span class="co">#&gt; k5          -1.46291    0.19700   -7.43  1.1e-13 ***</span></span>
+<span id="cb48-10"><a href="#cb48-10" tabindex="-1"></a><span class="co">#&gt; k618        -0.06457    0.06800   -0.95  0.34234    </span></span>
+<span id="cb48-11"><a href="#cb48-11" tabindex="-1"></a><span class="co">#&gt; age         -0.06287    0.01278   -4.92  8.7e-07 ***</span></span>
+<span id="cb48-12"><a href="#cb48-12" tabindex="-1"></a><span class="co">#&gt; wcyes        0.80727    0.22998    3.51  0.00045 ***</span></span>
+<span id="cb48-13"><a href="#cb48-13" tabindex="-1"></a><span class="co">#&gt; hcyes        0.11173    0.20604    0.54  0.58762    </span></span>
+<span id="cb48-14"><a href="#cb48-14" tabindex="-1"></a><span class="co">#&gt; lwg          0.60469    0.15082    4.01  6.1e-05 ***</span></span>
+<span id="cb48-15"><a href="#cb48-15" tabindex="-1"></a><span class="co">#&gt; inc         -0.03445    0.00821   -4.20  2.7e-05 ***</span></span>
+<span id="cb48-16"><a href="#cb48-16" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb48-17"><a href="#cb48-17" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb48-18"><a href="#cb48-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb48-19"><a href="#cb48-19" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb48-20"><a href="#cb48-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb48-21"><a href="#cb48-21" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
+<span id="cb48-22"><a href="#cb48-22" tabindex="-1"></a><span class="co">#&gt; Residual deviance:  905.27  on 745  degrees of freedom</span></span>
+<span id="cb48-23"><a href="#cb48-23" tabindex="-1"></a><span class="co">#&gt; AIC: 921.3</span></span>
 <span id="cb48-24"><a href="#cb48-24" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb48-25"><a href="#cb48-25" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
-<span id="cb48-26"><a href="#cb48-26" tabindex="-1"></a><span class="co">#&gt; Residual deviance:  905.27  on 745  degrees of freedom</span></span>
-<span id="cb48-27"><a href="#cb48-27" tabindex="-1"></a><span class="co">#&gt; AIC: 921.3</span></span>
-<span id="cb48-28"><a href="#cb48-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb48-29"><a href="#cb48-29" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code></pre></div>
+<span id="cb48-25"><a href="#cb48-25" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code></pre></div>
 <p>Applying stepwise model selection Mroz’s logistic regression, using
 BIC as the model-selection criterion (via the argument
 <code>k=log(nrow(Mroz))</code> to <code>stepAIC()</code>) selects 5 of
@@ -1981,31 +1973,27 @@ the 7 original predictors:</p>
 <span id="cb49-6"><a href="#cb49-6" tabindex="-1"></a><span class="co">#&gt; glm(formula = lfp ~ k5 + age + wc + lwg + inc, family = binomial, </span></span>
 <span id="cb49-7"><a href="#cb49-7" tabindex="-1"></a><span class="co">#&gt;     data = Mroz)</span></span>
 <span id="cb49-8"><a href="#cb49-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb49-9"><a href="#cb49-9" tabindex="-1"></a><span class="co">#&gt; Deviance Residuals: </span></span>
-<span id="cb49-10"><a href="#cb49-10" tabindex="-1"></a><span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span></span>
-<span id="cb49-11"><a href="#cb49-11" tabindex="-1"></a><span class="co">#&gt; -2.043  -1.085   0.602   0.970   2.180  </span></span>
-<span id="cb49-12"><a href="#cb49-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb49-13"><a href="#cb49-13" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb49-14"><a href="#cb49-14" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span id="cb49-15"><a href="#cb49-15" tabindex="-1"></a><span class="co">#&gt; (Intercept)   2.9019     0.5429    5.35  9.0e-08 ***</span></span>
-<span id="cb49-16"><a href="#cb49-16" tabindex="-1"></a><span class="co">#&gt; k5           -1.4318     0.1932   -7.41  1.3e-13 ***</span></span>
-<span id="cb49-17"><a href="#cb49-17" tabindex="-1"></a><span class="co">#&gt; age          -0.0585     0.0114   -5.13  2.9e-07 ***</span></span>
-<span id="cb49-18"><a href="#cb49-18" tabindex="-1"></a><span class="co">#&gt; wcyes         0.8724     0.2064    4.23  2.4e-05 ***</span></span>
-<span id="cb49-19"><a href="#cb49-19" tabindex="-1"></a><span class="co">#&gt; lwg           0.6157     0.1501    4.10  4.1e-05 ***</span></span>
-<span id="cb49-20"><a href="#cb49-20" tabindex="-1"></a><span class="co">#&gt; inc          -0.0337     0.0078   -4.32  1.6e-05 ***</span></span>
-<span id="cb49-21"><a href="#cb49-21" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb49-22"><a href="#cb49-22" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb49-23"><a href="#cb49-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb49-24"><a href="#cb49-24" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb49-9"><a href="#cb49-9" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb49-10"><a href="#cb49-10" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span id="cb49-11"><a href="#cb49-11" tabindex="-1"></a><span class="co">#&gt; (Intercept)   2.9019     0.5429    5.35  9.0e-08 ***</span></span>
+<span id="cb49-12"><a href="#cb49-12" tabindex="-1"></a><span class="co">#&gt; k5           -1.4318     0.1932   -7.41  1.3e-13 ***</span></span>
+<span id="cb49-13"><a href="#cb49-13" tabindex="-1"></a><span class="co">#&gt; age          -0.0585     0.0114   -5.13  2.9e-07 ***</span></span>
+<span id="cb49-14"><a href="#cb49-14" tabindex="-1"></a><span class="co">#&gt; wcyes         0.8724     0.2064    4.23  2.4e-05 ***</span></span>
+<span id="cb49-15"><a href="#cb49-15" tabindex="-1"></a><span class="co">#&gt; lwg           0.6157     0.1501    4.10  4.1e-05 ***</span></span>
+<span id="cb49-16"><a href="#cb49-16" tabindex="-1"></a><span class="co">#&gt; inc          -0.0337     0.0078   -4.32  1.6e-05 ***</span></span>
+<span id="cb49-17"><a href="#cb49-17" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb49-18"><a href="#cb49-18" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb49-19"><a href="#cb49-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb49-20"><a href="#cb49-20" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb49-21"><a href="#cb49-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb49-22"><a href="#cb49-22" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
+<span id="cb49-23"><a href="#cb49-23" tabindex="-1"></a><span class="co">#&gt; Residual deviance:  906.46  on 747  degrees of freedom</span></span>
+<span id="cb49-24"><a href="#cb49-24" tabindex="-1"></a><span class="co">#&gt; AIC: 918.5</span></span>
 <span id="cb49-25"><a href="#cb49-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb49-26"><a href="#cb49-26" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
-<span id="cb49-27"><a href="#cb49-27" tabindex="-1"></a><span class="co">#&gt; Residual deviance:  906.46  on 747  degrees of freedom</span></span>
-<span id="cb49-28"><a href="#cb49-28" tabindex="-1"></a><span class="co">#&gt; AIC: 918.5</span></span>
-<span id="cb49-29"><a href="#cb49-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb49-30"><a href="#cb49-30" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 3</span></span>
-<span id="cb49-31"><a href="#cb49-31" tabindex="-1"></a><span class="fu">BayesRule</span>(Mroz<span class="sc">$</span>lfp <span class="sc">==</span> <span class="st">&quot;yes&quot;</span>,</span>
-<span id="cb49-32"><a href="#cb49-32" tabindex="-1"></a>          <span class="fu">predict</span>(m.mroz.sel, <span class="at">type=</span><span class="st">&quot;response&quot;</span>))</span>
-<span id="cb49-33"><a href="#cb49-33" tabindex="-1"></a><span class="co">#&gt; [1] 0.31873</span></span></code></pre></div>
+<span id="cb49-26"><a href="#cb49-26" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 3</span></span>
+<span id="cb49-27"><a href="#cb49-27" tabindex="-1"></a><span class="fu">BayesRule</span>(Mroz<span class="sc">$</span>lfp <span class="sc">==</span> <span class="st">&quot;yes&quot;</span>,</span>
+<span id="cb49-28"><a href="#cb49-28" tabindex="-1"></a>          <span class="fu">predict</span>(m.mroz.sel, <span class="at">type=</span><span class="st">&quot;response&quot;</span>))</span>
+<span id="cb49-29"><a href="#cb49-29" tabindex="-1"></a><span class="co">#&gt; [1] 0.31873</span></span></code></pre></div>
 <p>The Bayes rule applied to the selected model misclassifies 32% of the
 cases in the <code>Mroz</code> data.</p>
 <p>Cross-validating the selected model produces a similar, slightly
@@ -2309,7 +2297,7 @@ the folds between the <span class="math inline">\(0\)</span>th power
 (i.e., log) and the <span class="math inline">\(1/3\)</span> power.</p>
 </div>
 <div id="selecting-both-transformations-and-predictorsvenables" class="section level3">
-<h3>Selecting both transformations and predictors<a href="#fn11" class="footnote-ref" id="fnref11"><sup>11</sup></a></h3>
+<h3>Selecting both transformations and predictors<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a></h3>
 <p>As we mentioned, <span class="citation">Hastie et al. (2009, sec.
 7.10.2: “The Wrong and Right Way to Do Cross-validation”)</span> explain
 that honest cross-validation has to take account of model specification
@@ -2394,7 +2382,7 @@ predictors. There are, however, only 5 distinct values of
 cylinders are rare. and none of the cars has 7 cylinders. There are
 similarly only 13 distinct years between 1970 and 1982 in the data, and
 the relationship between <code>mpg</code> and <code>year</code> is
-difficult to characterize.<a href="#fn12" class="footnote-ref" id="fnref12"><sup>12</sup></a> It’s apparent that most these variables
+difficult to characterize.<a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a> It’s apparent that most these variables
 are positively skewed and that many of the pairwise relationships among
 them are nonlinear.</p>
 <p>We begin with a “working model” that specifies linear partial
@@ -2805,7 +2793,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb76-5"><a href="#cb76-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb76-6"><a href="#cb76-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb76-7"><a href="#cb76-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb76-8"><a href="#cb76-8" tabindex="-1"></a><span class="co">#&gt;   0.313   0.003   0.316</span></span>
+<span id="cb76-8"><a href="#cb76-8" tabindex="-1"></a><span class="co">#&gt;   0.239   0.001   0.242</span></span>
 <span id="cb76-9"><a href="#cb76-9" tabindex="-1"></a></span>
 <span id="cb76-10"><a href="#cb76-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb76-11"><a href="#cb76-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -2815,7 +2803,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb76-15"><a href="#cb76-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb76-16"><a href="#cb76-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb76-17"><a href="#cb76-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb76-18"><a href="#cb76-18" tabindex="-1"></a><span class="co">#&gt;   0.032   0.006   1.372</span></span>
+<span id="cb76-18"><a href="#cb76-18" tabindex="-1"></a><span class="co">#&gt;   0.034   0.007   1.492</span></span>
 <span id="cb76-19"><a href="#cb76-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb76-20"><a href="#cb76-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -2852,7 +2840,7 @@ weights. For the linear model with constant error variance, the weight
 matrix is taken to be <span class="math inline">\(\mathbf{W} =
 \mathbf{I}_n\)</span>, the order-<span class="math inline">\(n\)</span>
 identity matrix.</p>
-<p>The weighted-least-squares (WLS) estimator of <span class="math inline">\(\boldsymbol{\beta}\)</span> is <span class="citation">(see, e.g., Fox, 2016, sec. 12.2.2)</span> <a href="#fn13" class="footnote-ref" id="fnref13"><sup>13</sup></a> <span class="math display">\[
+<p>The weighted-least-squares (WLS) estimator of <span class="math inline">\(\boldsymbol{\beta}\)</span> is <span class="citation">(see, e.g., Fox, 2016, sec. 12.2.2)</span> <a href="#fn14" class="footnote-ref" id="fnref14"><sup>14</sup></a> <span class="math display">\[
 \mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X}
 \right)^{-1}
   \mathbf{X}^T \mathbf{W} \mathbf{y}
@@ -3014,6 +3002,10 @@ Sarkar, D. (2008). <em>Lattice: Multivariate data visualization with
 Sarkar, D., &amp; Andrews, F. (2022). <em><span class="nocase">latticeExtra</span>: Extra graphical utilities based on
 <span class="nocase">lattice</span></em>. Retrieved from <a href="https://CRAN.R-project.org/package=latticeExtra">https://CRAN.R-project.org/package=latticeExtra</a>
 </div>
+<div id="ref-Vehtari:2023" class="csl-entry">
+Vehtari, A. (2023). Cross-validation <span>FAQ</span>. Retrieved October
+15, 2023, from <a href="https://users.aalto.fi/~ave/CV-FAQ.html">https://users.aalto.fi/~ave/CV-FAQ.html</a>
+</div>
 <div id="ref-VenablesRipley:2002" class="csl-entry">
 Venables, W. N., &amp; Ripley, B. D. (2002). <em>Modern applied
 statistics with <span>S</span></em> (Fourth edition). New York:
@@ -3076,47 +3068,48 @@ capable of modeling both nested and crossed random effects, the
 package pertain only to nested random effects. It may be possible to
 cross-validate mixed models with crossed random effects, but we don’t
 know how to do it.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>The observant reader will notice that we set the
+<li id="fn6"><p>We subsequently discovered that <span class="citation">Vehtari (2023, sec. 8)</span> makes similar points.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
+<li id="fn7"><p>The observant reader will notice that we set the
 argument <code>control=list(opt=&quot;optim&quot;)</code> in the call to
 <code>lme()</code>, changing the optimizer employed from the default
 <code>&quot;nlminb&quot;</code>. We did this because with the default optimizer,
 <code>lme()</code> encountered the same convergence issue as
 <code>lmer()</code>, but rather than issuing a warning,
 <code>lme()</code> failed, reporting an error. As it turns out, setting
-the optimizer to <code>&quot;optim&quot;</code> avoids this problem.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>We invite the interested reader to experiment with
-varying the parameters of our example.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p>We find it convenient to use the
+the optimizer to <code>&quot;optim&quot;</code> avoids this problem.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
+<li id="fn8"><p>We invite the interested reader to experiment with
+varying the parameters of our example.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
+<li id="fn9"><p>We find it convenient to use the
 <strong>lattice</strong> <span class="citation">(Sarkar, 2008)</span>
 and <strong>latticeExtra</strong> <span class="citation">(Sarkar &amp;
 Andrews, 2022)</span> packages for this and other graphs in this
-section.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p>Because of the manner in which the computation is
+section.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
+<li id="fn10"><p>Because of the manner in which the computation is
 performed, the order of the replicates in the <code>&quot;cvList&quot;</code>
 object returned by <code>cv()</code> isn’t the same as the order in
 which the replicates are computed. Each element of the result, however,
 is a <code>&quot;cv&quot;</code> object with the correct random-number seed saved,
 and so this technical detail can be safely ignored. The individual
 <code>&quot;cv&quot;</code> objects are printed in the order in which they are
-stored rather than the order in which they are computed.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p>It’s generally advantageous to start with the largest
+stored rather than the order in which they are computed.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
+<li id="fn11"><p>It’s generally advantageous to start with the largest
 model, here the one with 100 predictors, and proceed by backward
 elimination. In this demonstration, however, where all of the <span class="math inline">\(\beta\)</span>s are really 0, the selected model
 will be small, and so we proceed by forward selection from the null
-model to save computing time.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
-<li id="fn11"><p>The presentation in the section benefits from an email
+model to save computing time.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
+<li id="fn12"><p>The presentation in the section benefits from an email
 conversation with Bill Venables, who of course isn’t responsible for the
-use to which we’ve put his insightful remarks.<a href="#fnref11" class="footnote-back">↩︎</a></p></li>
-<li id="fn12"><p>Of course, making the decision to treat
+use to which we’ve put his insightful remarks.<a href="#fnref12" class="footnote-back">↩︎</a></p></li>
+<li id="fn13"><p>Of course, making the decision to treat
 <code>year</code> as a factor on this basis could be construed as
 cheating in the current context, which illustrates the difficulty of
-automating the whole model-selection process.<a href="#fnref12" class="footnote-back">↩︎</a></p></li>
-<li id="fn13"><p>This is a definitional formula, which assumes that the
+automating the whole model-selection process.<a href="#fnref13" class="footnote-back">↩︎</a></p></li>
+<li id="fn14"><p>This is a definitional formula, which assumes that the
 model matrix <span class="math inline">\(\mathbf{X}\)</span> is of full
 column rank, and which can be subject to numerical instability when
 <span class="math inline">\(\mathbf{X}\)</span> is ill-conditioned.
 <code>lm()</code> uses the singular-value decomposition of the model
-matrix to obtain computationally more stable results.<a href="#fnref13" class="footnote-back">↩︎</a></p></li>
+matrix to obtain computationally more stable results.<a href="#fnref14" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 

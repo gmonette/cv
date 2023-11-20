@@ -16,6 +16,8 @@
 
 - Improvements to documentation and expanded cv.Rmd vignette.
 
+- Mixed-models methods no longer flagged as "experimental."
+
 # cv 1.0.1
 
 - Initial CRAN version.

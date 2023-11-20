@@ -301,7 +301,9 @@ In contrast, mixed-effects models are fit to *dependent* data, in which cases as
 
 [^crossed-effects]: There are, however, more complex situations that give rise to so-called *crossed* (rather than *nested*) random effects. For example, consider students within classes within schools. In primary schools, students typically are in a single class, and so classes are nested within schools. In secondary schools, however, students typically take several classes and students who are together in a particular class may not be together in other classes; consequently, random effects based on classes within schools are crossed. Although the `lmer()` function in the **lme4** package is capable of modeling both nested and crossed random effects, the `cv()` methods for mixed models in the **cv** package pertain only to nested random effects. It may be possible to cross-validate mixed models with crossed random effects, but we don't know how to do it.
 
-We can think of two approaches to applying cross-validation to clustered data:
+We can think of two approaches to applying cross-validation to clustered data:[^cv-faq]
+
+[^cv-faq]: We subsequently discovered that @Vehtari:2023 [Section 8] makes similar points.
 
 1. Treat CV as analogous to predicting the response for one or more cases in a *newly observed cluster*. In this instance, the folds comprise one or more whole clusters; we refit the model with all of the cases in clusters in the current fold removed; and then we predict the response for the cases in clusters in the current fold. These predictions are based only on fixed effects because the random effects for the omitted clusters are presumably unknown, as they would be for data on cases in newly observed clusters.
 

@@ -117,8 +117,7 @@ in the \pkg{lme4} package; for models of class \code{"lme"}
 fit by the \code{\link[nlme]{lme}()} function in the \pkg{nlme}
 package; and for models of class \code{"glmmTMB"} fit by the
 \code{\link[glmmTMB]{glmmTMB}()} function in the \pkg{glmmTMB} package.
-The implementations here should be regarded
-as experimental. The \code{cvMixed()} function is meant to be called by
+The \code{cvMixed()} function is meant to be called by
 \code{cv()} methods for mixed-effect models and not directly by the user.
 It can be used to extend \code{cv()} to other classes of mixed-effects models.
 }
