@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-11-17</h4>
+            <h4 data-toc-skip class="date">2023-11-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -281,12 +281,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 628452</span></span>
+<span><span class="co">#&gt; R RNG seed set to 176702</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.617</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.583</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.349</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.329</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -357,11 +357,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.9189    3.1271    4.0122    3.8271    4.8344    5.347    10</span></span>
-<span><span class="co">#&gt;   Woodbury   24.6288   26.4583   30.8193   28.6493   35.0892   42.542    10</span></span>
-<span><span class="co">#&gt;      naive  686.5008  715.2575  876.2204  760.9853 1081.8274 1389.200    10</span></span>
-<span><span class="co">#&gt;     cv.glm 1138.7811 1142.9119 1376.2906 1222.8595 1714.3130 2041.836    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues   2.0147   2.0801   2.3048   2.3147   2.4644   2.6134    10</span></span>
+<span><span class="co">#&gt;   Woodbury  23.0690  23.1583  23.6426  23.5309  24.0190  25.0418    10</span></span>
+<span><span class="co">#&gt;      naive 472.4006 473.9680 515.6551 476.4959 597.3630 629.7607    10</span></span>
+<span><span class="co">#&gt;     cv.glm 819.7520 821.1308 852.5506 829.2911 839.6355 954.4679    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -664,11 +664,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq     mean    median         uq        max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    3.2217    3.3923    4.476    3.8787     4.4087     7.6709    10</span></span>
-<span><span class="co">#&gt;   Woodbury   84.0974   96.9981  126.091  121.8897   145.6386   177.8035    10</span></span>
-<span><span class="co">#&gt;      exact 4558.0410 5691.7958 7864.099 7650.0625  8392.1326 14701.2865    10</span></span>
-<span><span class="co">#&gt;     cv.glm 6022.9489 6599.6685 9058.142 8545.9862 11007.0604 13618.4589    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq     mean    median       uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.4741    2.5279    2.559    2.5486    2.586    2.7179    10</span></span>
+<span><span class="co">#&gt;   Woodbury   74.5035   75.5203   89.320   75.7970   78.101  205.7226    10</span></span>
+<span><span class="co">#&gt;      exact 2958.6194 2967.3465 3028.556 3030.5500 3034.396 3148.5282    10</span></span>
+<span><span class="co">#&gt;     cv.glm 3725.0412 3761.5123 3812.912 3808.6880 3887.234 3891.0604    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -703,7 +703,7 @@ package pertain only to nested random effects. It may be possible to
 cross-validate mixed models with crossed random effects, but we don’t
 know how to do it.&lt;/p&gt;'><sup>5</sup></a></p>
 <p>We can think of two approaches to applying cross-validation to
-clustered data:</p>
+clustered data:<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;We subsequently discovered that &lt;span class="citation"&gt;Vehtari (2023, sec. 8)&lt;/span&gt; makes similar points.&lt;/p&gt;'><sup>6</sup></a></p>
 <ol style="list-style-type: decimal">
 <li><p>Treat CV as analogous to predicting the response for one or more
 cases in a <em>newly observed cluster</em>. In this instance, the folds
@@ -948,7 +948,7 @@ argument &lt;code&gt;control=list(opt="optim")&lt;/code&gt; in the call to
 &lt;code&gt;&lt;a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link"&gt;lme()&lt;/a&gt;&lt;/code&gt; encountered the same convergence issue as
 &lt;code&gt;&lt;a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link"&gt;lmer()&lt;/a&gt;&lt;/code&gt;, but rather than issuing a warning,
 &lt;code&gt;&lt;a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link"&gt;lme()&lt;/a&gt;&lt;/code&gt; failed, reporting an error. As it turns out, setting
-the optimizer to &lt;code&gt;"optim"&lt;/code&gt; avoids this problem.&lt;/p&gt;'><sup>6</sup></a> The estimated
+the optimizer to &lt;code&gt;"optim"&lt;/code&gt; avoids this problem.&lt;/p&gt;'><sup>7</sup></a> The estimated
 covariance components and fixed effects in the summary output differ
 slightly between the <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer()</a></code> and <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme()</a></code>
 solutions, although both functions seek to maximize the REML criterion.
@@ -988,7 +988,7 @@ of measurements taken from each student.</p>
 <p>We start by generating the data, using parameters consistent with the
 description above and meant to highlight the issues that arise in
 cross-validating mixed-effects models:<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;We invite the interested reader to experiment with
-varying the parameters of our example.&lt;/p&gt;"><sup>7</sup></a></p>
+varying the parameters of our example.&lt;/p&gt;"><sup>8</sup></a></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Parameters:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">9693</span><span class="op">)</span> </span>
@@ -1022,7 +1022,7 @@ varying the parameters of our example.&lt;/p&gt;"><sup>7</sup></a></p>
 &lt;strong&gt;lattice&lt;/strong&gt; &lt;span class="citation"&gt;(Sarkar, 2008)&lt;/span&gt;
 and &lt;strong&gt;latticeExtra&lt;/strong&gt; &lt;span class="citation"&gt;(Sarkar &amp;amp;
 Andrews, 2022)&lt;/span&gt; packages for this and other graphs in this
-section.&lt;/p&gt;'><sup>8</sup></a></p>
+section.&lt;/p&gt;'><sup>9</sup></a></p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://lattice.r-forge.r-project.org/" class="external-link">"lattice"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://latticeextra.r-forge.r-project.org/" class="external-link">"latticeExtra"</a></span><span class="op">)</span></span>
@@ -1485,7 +1485,7 @@ which the replicates are computed. Each element of the result, however,
 is a &lt;code&gt;"cv"&lt;/code&gt; object with the correct random-number seed saved,
 and so this technical detail can be safely ignored. The individual
 &lt;code&gt;"cv"&lt;/code&gt; objects are printed in the order in which they are
-stored rather than the order in which they are computed.&lt;/p&gt;'><sup>9</sup></a> Setting the first
+stored rather than the order in which they are computed.&lt;/p&gt;'><sup>10</sup></a> Setting the first
 seed, however, makes the entire process easily replicable, and the seed
 for each repetition is stored in the corresponding element of the
 <code>"cvList"</code> object (which isn’t, however, saved in the
@@ -1602,7 +1602,7 @@ the model-selection criterion (see the help page for
 model, here the one with 100 predictors, and proceed by backward
 elimination. In this demonstration, however, where all of the &lt;span class="math inline"&gt;\(\beta\)&lt;/span&gt;s are really 0, the selected model
 will be small, and so we proceed by forward selection from the null
-model to save computing time.&lt;/p&gt;'><sup>10</sup></a></p>
+model to save computing time.&lt;/p&gt;'><sup>11</sup></a></p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">"MASS"</a></span><span class="op">)</span>  <span class="co"># for stepAIC()</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -2155,7 +2155,7 @@ the folds between the <span class="math inline">\(0\)</span>th power
 <div class="section level3">
 <h3 id="selecting-both-transformations-and-predictorsvenables">Selecting both transformations and predictors<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;The presentation in the section benefits from an email
 conversation with Bill Venables, who of course isn’t responsible for the
-use to which we’ve put his insightful remarks.&lt;/p&gt;"><sup>11</sup></a><a class="anchor" aria-label="anchor" href="#selecting-both-transformations-and-predictorsvenables"></a>
+use to which we’ve put his insightful remarks.&lt;/p&gt;"><sup>12</sup></a><a class="anchor" aria-label="anchor" href="#selecting-both-transformations-and-predictorsvenables"></a>
 </h3>
 <p>As we mentioned, <span class="citation">Hastie et al. (2009, sec.
 7.10.2: “The Wrong and Right Way to Do Cross-validation”)</span> explain
@@ -2245,7 +2245,7 @@ the relationship between <code>mpg</code> and <code>year</code> is
 difficult to characterize.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Of course, making the decision to treat
 &lt;code&gt;year&lt;/code&gt; as a factor on this basis could be construed as
 cheating in the current context, which illustrates the difficulty of
-automating the whole model-selection process.&lt;/p&gt;"><sup>12</sup></a> It’s apparent that most these variables
+automating the whole model-selection process.&lt;/p&gt;"><sup>13</sup></a> It’s apparent that most these variables
 are positively skewed and that many of the pairwise relationships among
 them are nonlinear.</p>
 <p>We begin with a “working model” that specifies linear partial
@@ -2667,7 +2667,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.504   0.034   0.547</span></span>
+<span><span class="co">#&gt;   0.508   0.001   0.509</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2677,7 +2677,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.114   0.054   5.691</span></span>
+<span><span class="co">#&gt;   0.064   0.007   1.464</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -2721,7 +2721,7 @@ model matrix &lt;span class="math inline"&gt;\(\mathbf{X}\)&lt;/span&gt; is of f
 column rank, and which can be subject to numerical instability when
 &lt;span class="math inline"&gt;\(\mathbf{X}\)&lt;/span&gt; is ill-conditioned.
 &lt;code&gt;&lt;a href="https://rdrr.io/r/stats/lm.html" class="external-link"&gt;lm()&lt;/a&gt;&lt;/code&gt; uses the singular-value decomposition of the model
-matrix to obtain computationally more stable results.&lt;/p&gt;'><sup>13</sup></a> <span class="math display">\[
+matrix to obtain computationally more stable results.&lt;/p&gt;'><sup>14</sup></a> <span class="math display">\[
 \mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X}
 \right)^{-1}
   \mathbf{X}^T \mathbf{W} \mathbf{y}
@@ -2884,6 +2884,10 @@ Sarkar, D. (2008). <em>Lattice: Multivariate data visualization with
 <div id="ref-SarkarAndrews:2022" class="csl-entry">
 Sarkar, D., &amp; Andrews, F. (2022). <em><span class="nocase">latticeExtra</span>: Extra graphical utilities based on
 <span class="nocase">lattice</span></em>. Retrieved from <a href="https://CRAN.R-project.org/package=latticeExtra" class="external-link">https://CRAN.R-project.org/package=latticeExtra</a>
+</div>
+<div id="ref-Vehtari:2023" class="csl-entry">
+Vehtari, A. (2023). Cross-validation <span>FAQ</span>. Retrieved October
+15, 2023, from <a href="https://users.aalto.fi/~ave/CV-FAQ.html" class="external-link">https://users.aalto.fi/~ave/CV-FAQ.html</a>
 </div>
 <div id="ref-VenablesRipley:2002" class="csl-entry">
 Venables, W. N., &amp; Ripley, B. D. (2002). <em>Modern applied
