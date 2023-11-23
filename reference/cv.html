@@ -115,7 +115,10 @@ more computationally efficient.</p>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"exact"</span>, <span class="st">"hatvalues"</span>, <span class="st">"Woodbury"</span><span class="op">)</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for rlm</span></span>
+<span><span class="fu">cv</span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, <span class="va">criterion</span>, <span class="va">k</span>, reps <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -219,6 +222,10 @@ and <code>method="Woodbury"</code> otherwise; <code>method="naive"</code> refits
 the model via <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> and is generally much slower. The
 default for generalized linear models is <code>method="exact"</code>,
 which employs <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>.</p>
+<p>There is also a method for robust linear models fit by the
+<code><a href="https://rdrr.io/pkg/MASS/man/rlm.html" class="external-link">rlm</a>()</code> in the <span class="pkg">MASS</span> package (to avoid
+inheriting the <code>"lm"</code> method for which the default <code>"auto"</code>
+computational method would be inappropriate).</p>
 <p>For additional details, see the "Cross-validation of regression models"
 vignette (<code><a href="../articles/cv.html">vignette("cv", package="cv")</a></code>).</p>
 <p><code>cv()</code> is designed to be extensible to other classes of regression
@@ -231,6 +238,7 @@ models; see the "Extending the cv package" vignette
 <ul><li><p><code>cv(default)</code>: <code>default</code> method</p></li>
 <li><p><code>cv(lm)</code>: <code>"lm"</code> method</p></li>
 <li><p><code>cv(glm)</code>: <code>"glm"</code> method</p></li>
+<li><p><code>cv(rlm)</code>: <code>"rlm"</code> method (to avoid inheriting (<code>"lm"</code> method)</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
@@ -311,6 +319,24 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 0.3320053</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 0.3260248</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 0.3067729 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Duncan"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m.lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m.rlm</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/rlm.html" class="external-link">rlm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>,</span></span>
+<span class="r-in"><span>                   data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">cv</span><span class="op">(</span><span class="va">m.lm</span>, k<span class="op">=</span><span class="st">"loo"</span>, method<span class="op">=</span><span class="st">"Woodbury"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 198.5274</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 198.1496</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155 </span>
+<span class="r-in"><span><span class="fu">cv</span><span class="op">(</span><span class="va">m.rlm</span>, k<span class="op">=</span><span class="st">"loo"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 193.3949</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 192.9083</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 169.7487 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
