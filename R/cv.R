@@ -68,6 +68,11 @@
 #' default for generalized linear models is \code{method="exact"},
 #' which employs \code{update()}.
 #'
+#' There is also a method for robust linear models fit by the
+#' \code{\link[MASS]{rlm}()} in the \pkg{MASS} package (to avoid
+#' inheriting the \code{"lm"} method for which the default \code{"auto"}
+#' computational method would be inappropriate).
+#'
 #' For additional details, see the "Cross-validation of regression models"
 #' vignette (\code{vignette("cv", package="cv")}).
 #'
@@ -85,6 +90,13 @@
 #' data("Mroz", package="carData")
 #' m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
 #' cv(m.mroz, criterion=BayesRule, seed=123)
+#'
+#' data("Duncan", package="carData")
+#' m.lm <- lm(prestige ~ income + education, data=Duncan)
+#' m.rlm <- MASS::rlm(prestige ~ income + education,
+#'                    data=Duncan)
+#' cv(m.lm, k="loo", method="Woodbury")
+#' cv(m.rlm, k="loo")
 #' @export
 cv <- function(model, data, criterion, k, reps=1, seed, ...){
   UseMethod("cv")
@@ -99,6 +111,7 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 #' @importFrom foreach foreach %dopar%
 #' @importFrom lme4 lmer
 #' @importFrom nlme lme
+#' @importFrom MASS rlm
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10, reps=1, seed, ncores=1,
@@ -510,6 +523,16 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     }
   }
 }
+
+#' @describeIn cv \code{"rlm"} method (to avoid inheriting the \code{"lm"} method)
+#' @export
+cv.rlm <- function(model, data, criterion, k, reps = 1, seed, ...){
+  result <- NextMethod(method="naive")
+  result$method <- NULL
+  result
+}
+
+
 
 # not exported
 

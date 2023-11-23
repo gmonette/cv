@@ -14,6 +14,8 @@
 
 - Add coef.cvSelect() method.
 
+- Add cv.rlm() method.
+
 - Improvements to documentation and expanded cv.Rmd vignette.
 
 - Mixed-models methods no longer flagged as "experimental."

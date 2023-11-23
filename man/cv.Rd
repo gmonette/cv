@@ -7,6 +7,7 @@
 \alias{print.cvList}
 \alias{cv.lm}
 \alias{cv.glm}
+\alias{cv.rlm}
 \title{Cross-Validate Regression Models}
 \usage{
 cv(model, data, criterion, k, reps = 1, seed, ...)
@@ -51,6 +52,8 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   ncores = 1,
   ...
 )
+
+\method{cv}{rlm}(model, data, criterion, k, reps = 1, seed, ...)
 }
 \arguments{
 \item{model}{a regression model object (see Details).}
@@ -135,6 +138,11 @@ the model via \code{update()} and is generally much slower. The
 default for generalized linear models is \code{method="exact"},
 which employs \code{update()}.
 
+There is also a method for robust linear models fit by the
+\code{\link[MASS]{rlm}()} in the \pkg{MASS} package (to avoid
+inheriting the \code{"lm"} method for which the default \code{"auto"}
+computational method would be inappropriate).
+
 For additional details, see the "Cross-validation of regression models"
 vignette (\code{vignette("cv", package="cv")}).
 
@@ -149,6 +157,8 @@ models; see the "Extending the cv package" vignette
 \item \code{cv(lm)}: \code{"lm"} method
 
 \item \code{cv(glm)}: \code{"glm"} method
+
+\item \code{cv(rlm)}: \code{"rlm"} method (to avoid inheriting (\code{"lm"} method)
 
 }}
 \section{Methods (by generic)}{
@@ -171,6 +181,13 @@ cv(m.auto, seed=1234, reps=3)
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
 cv(m.mroz, criterion=BayesRule, seed=123)
+
+data("Duncan", package="carData")
+m.lm <- lm(prestige ~ income + education, data=Duncan)
+m.rlm <- MASS::rlm(prestige ~ income + education,
+                   data=Duncan)
+cv(m.lm, k="loo", method="Woodbury")
+cv(m.rlm, k="loo")
 }
 \seealso{
 \code{\link{cvMixed}}, \code{\link{cvSelect}}.

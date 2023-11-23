@@ -10,7 +10,7 @@
 
 Some of the functions supplied by the package:
 
--   `cv()` is a generic function with a default method and computationally efficient `"lm"` and `"glm"` methods, along with a method for a list of competing models. There are also `"merMod"`, `"lme"`, and `"glmmTMB"` methods for mixed-effects models. `cv()` supports parallel computations.
+-   `cv()` is a generic function with a default method, computationally efficient `"lm"` and `"glm"` methods, an `"rlm"` method (for robust linear models), and a method for a list of competing models. There are also `"merMod"`, `"lme"`, and `"glmmTMB"` methods for mixed-effects models. `cv()` supports parallel computations.
 
 -   `mse()` (mean-squared error), `medAbsErr()` (median absolute error), and `BayesRule()` are cross-validation criteria ("cost functions"), suitable for use with `cv()`.
 
