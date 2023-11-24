@@ -68,7 +68,7 @@
 #' default for generalized linear models is \code{method="exact"},
 #' which employs \code{update()}.
 #'
-#' There is also a method for robust linear models fit by the
+#' There is also a method for robust linear models fit by
 #' \code{\link[MASS]{rlm}()} in the \pkg{MASS} package (to avoid
 #' inheriting the \code{"lm"} method for which the default \code{"auto"}
 #' computational method would be inappropriate).

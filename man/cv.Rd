@@ -138,7 +138,7 @@ the model via \code{update()} and is generally much slower. The
 default for generalized linear models is \code{method="exact"},
 which employs \code{update()}.
 
-There is also a method for robust linear models fit by the
+There is also a method for robust linear models fit by
 \code{\link[MASS]{rlm}()} in the \pkg{MASS} package (to avoid
 inheriting the \code{"lm"} method for which the default \code{"auto"}
 computational method would be inappropriate).
@@ -158,7 +158,7 @@ models; see the "Extending the cv package" vignette
 
 \item \code{cv(glm)}: \code{"glm"} method
 
-\item \code{cv(rlm)}: \code{"rlm"} method (to avoid inheriting (\code{"lm"} method)
+\item \code{cv(rlm)}: \code{"rlm"} method (to avoid inheriting the \code{"lm"} method)
 
 }}
 \section{Methods (by generic)}{
