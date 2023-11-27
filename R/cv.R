@@ -217,7 +217,7 @@ print.cv <- function(x, digits=getOption("digits"), ...){
   cat(x[["k"]], "-Fold Cross Validation", sep="")
   if (!is.null(x[["clusters"]])){
     cat(" based on", x[["n clusters"]],
-        paste0("{", paste(x[["clusters"]], collapse=" ,"), "}"),
+        paste0("{", paste(x[["clusters"]], collapse=", "), "}"),
         "clusters")
   }
   if (!is.null(x[["method"]])) cat("\nmethod:", x[["method"]])
