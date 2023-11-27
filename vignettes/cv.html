@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 399185</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 829368</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.266</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.252</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.346</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.327</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -2466,7 +2466,7 @@ possibly worth the effort, but it would also be difficult to realize in
 practice: After all, we can hardly erase our memory of statistical
 modeling choices between analyzing partial data sets.</p>
 <p>Alternatively, if we’re able to automate the process of model
-selection, then we can more realistically apply CV mechanically.<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a> That’s
+selection, then we can more realistically apply CV mechanically. That’s
 what we did in the preceding two sections, first for predictor selection
 and then for selection of transformations in regression. In this
 section, we consider the case where we both select variable
@@ -2540,7 +2540,7 @@ predictors. There are, however, only 5 distinct values of
 cylinders are rare. and none of the cars has 7 cylinders. There are
 similarly only 13 distinct years between 1970 and 1982 in the data, and
 the relationship between <code>mpg</code> and <code>year</code> is
-difficult to characterize.<a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a> It’s apparent that most these variables
+difficult to characterize.<a href="#fn15" class="footnote-ref" id="fnref15"><sup>15</sup></a> It’s apparent that most these variables
 are positively skewed and that many of the pairwise relationships among
 them are nonlinear.</p>
 <p>We begin with a “working model” that specifies linear partial
@@ -2951,7 +2951,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-5"><a href="#cb81-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb81-6"><a href="#cb81-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-7"><a href="#cb81-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.241   0.006   0.248</span></span>
+<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.235   0.003   0.239</span></span>
 <span id="cb81-9"><a href="#cb81-9" tabindex="-1"></a></span>
 <span id="cb81-10"><a href="#cb81-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb81-11"><a href="#cb81-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -2961,7 +2961,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-15"><a href="#cb81-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb81-16"><a href="#cb81-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-17"><a href="#cb81-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.035   0.006   1.470</span></span>
+<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.036   0.005   1.455</span></span>
 <span id="cb81-19"><a href="#cb81-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb81-20"><a href="#cb81-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -2998,7 +2998,7 @@ weights. For the linear model with constant error variance, the weight
 matrix is taken to be <span class="math inline">\(\mathbf{W} =
 \mathbf{I}_n\)</span>, the order-<span class="math inline">\(n\)</span>
 identity matrix.</p>
-<p>The weighted-least-squares (WLS) estimator of <span class="math inline">\(\boldsymbol{\beta}\)</span> is <span class="citation">(see, e.g., Fox, 2016, sec. 12.2.2)</span> <a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a> <span class="math display">\[
+<p>The weighted-least-squares (WLS) estimator of <span class="math inline">\(\boldsymbol{\beta}\)</span> is <span class="citation">(see, e.g., Fox, 2016, sec. 12.2.2)</span> <a href="#fn16" class="footnote-ref" id="fnref16"><sup>16</sup></a> <span class="math display">\[
 \mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X}
 \right)^{-1}
   \mathbf{X}^T \mathbf{W} \mathbf{y}
@@ -3282,24 +3282,20 @@ model to save computing time.<a href="#fnref13" class="footnote-back">↩︎</a>
 <li id="fn14"><p>The presentation in the section benefits from an email
 conversation with Bill Venables, who of course isn’t responsible for the
 use to which we’ve put his insightful remarks.<a href="#fnref14" class="footnote-back">↩︎</a></p></li>
-<li id="fn15"><p>To clarify, we don’t think that it’s possible, at least
-at present, to automate the model-building process fully. For example,
-in the present case, we decided to model <code>year</code> as a factor
-after graphical examination of the data. It’s rarely desirable, in our
-opinion, to forgo exploration of the data to ensure the purity of model
-validation. We believe, however, that it’s still useful to automate as
-much of the process as we can to obtain a more realistic, if still
-biased, estimate of the predictive power of a model.<a href="#fnref15" class="footnote-back">↩︎</a></p></li>
-<li id="fn16"><p>Of course, making the decision to treat
+<li id="fn15"><p>Of course, making the decision to treat
 <code>year</code> as a factor on this basis could be construed as
 cheating in the current context, which illustrates the difficulty of
-automating the whole model-selection process.<a href="#fnref16" class="footnote-back">↩︎</a></p></li>
-<li id="fn17"><p>This is a definitional formula, which assumes that the
+automating the whole model-selection process. It’s rarely desirable, in
+our opinion, to forgo exploration of the data to ensure the purity of
+model validation. We believe, however, that it’s still useful to
+automate as much of the process as we can to obtain a more realistic, if
+still biased, estimate of the predictive power of a model.<a href="#fnref15" class="footnote-back">↩︎</a></p></li>
+<li id="fn16"><p>This is a definitional formula, which assumes that the
 model matrix <span class="math inline">\(\mathbf{X}\)</span> is of full
 column rank, and which can be subject to numerical instability when
 <span class="math inline">\(\mathbf{X}\)</span> is ill-conditioned.
 <code>lm()</code> uses the singular-value decomposition of the model
-matrix to obtain computationally more stable results.<a href="#fnref17" class="footnote-back">↩︎</a></p></li>
+matrix to obtain computationally more stable results.<a href="#fnref16" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 
