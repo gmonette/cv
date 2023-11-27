@@ -1,8 +1,8 @@
 Package: cv
 Type: Package
 Title: Cross-Validation of Regression Models
-Version: 1.0.2
-Date: 2023-11-25
+Version: 1.1.0
+Date: 2023-11-26
 Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
   comment = c(ORCID = "0000-0002-1196-8012")),
 	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"))
@@ -37,6 +37,7 @@ Suggests: boot,
           rmarkdown,
           spelling,
           testthat
+LazyData: TRUE
 VignetteBuilder: 
     knitr,
     rmarkdown

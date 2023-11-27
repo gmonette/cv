@@ -29,7 +29,7 @@
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel)
 #' @param clusterVariables a character vector of names of the variables
-#' defining clusters for a mixed model with nested random effects;
+#' defining clusters for a mixed model with nested or crossed random effects;
 #' if missing, cross-validation is performed for individual cases rather than
 #' for clusters
 #' @param predict.clusters.args a list of arguments to be used to predict
@@ -51,7 +51,6 @@
 #' individual observations. If the former, predictions are based only on fixed
 #' effects; if the latter, predictions include the random effects (i.e., are the
 #' best linear unbiased predictors or "BLUPS").
-#' Only mixed models with fully nested random effects are supported.
 #'
 #' @seealso \code{\link{cv}}, \code{\link[lme4]{lmer}}, \code{\link[lme4]{glmer}},
 #' \code{\link[nlme]{lme}}, \code{\link[glmmTMB]{glmmTMB}}

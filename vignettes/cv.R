@@ -313,6 +313,37 @@ plot(cvs_clusters, main="Model Comparison, Cluster-Based CV")
 cvs_cases <- cv(modlist, data=Data, seed=9693)
 plot(cvs_cases, main="Model Comparison, Case-Based CV")
 
+## ----pigs---------------------------------------------------------------------
+head(Pigs, 9)
+head(xtabs(~ id + week, data=Pigs), 3)
+tail(xtabs(~ id + week, data=Pigs), 3)
+
+## ----pigs-graph---------------------------------------------------------------
+plot(weight ~ week, data=Pigs, type="n")
+for (i in unique(Pigs$id)){
+  with(Pigs, lines(x=1:9, y=Pigs[id == i, "weight"],
+                   col="gray"))
+}
+abline(lm(weight ~ week, data=Pigs), col="blue", lwd=2)
+lines(with(Pigs, loess.smooth(week, weight, span=0.5)),
+      col="magenta", lty=2, lwd=2)
+
+## ----pigs-lmer----------------------------------------------------------------
+m.p <- lmer(weight ~ week + (1 | id) + (1 | week),
+            data=Pigs, REML=FALSE, # i.e., ML
+            control=lmerControl(optimizer="bobyqa"))
+summary(m.p)
+
+## ----pigs-cv------------------------------------------------------------------
+cv(m.p, clusterVariables="id")
+
+cv(m.p, clusterVariables="week")
+
+cv(m.p, clusterVariables=c("id", "week"), k=10, seed=8469)
+
+## ----pigs-cv-cases------------------------------------------------------------
+cv(m.p, k=10, seed=8469)
+
 ## ----mroz-reps----------------------------------------------------------------
 cv(m.mroz, criterion=BayesRule, seed=248, reps=5, 
    method="Woodbury")

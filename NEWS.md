@@ -1,4 +1,4 @@
-# cv 1.0.2
+# cv 1.1.0
 
 - Generally suppress spurious messages about setting the seed in cv.modList() for LOO CV.
 
@@ -10,15 +10,19 @@
 
 - Add selectTransAndStepAIC() procedure for use with cvSelect().
 
-- Add medAbsErr() cost criterion.
+- Add medAbsErr() and rmse() cost criteria.
 
 - Add coef.cvSelect() method.
 
 - Add cv.rlm() method.
 
+- Add Pigs data set.
+
 - Improvements to documentation and expanded cv.Rmd vignette.
 
 - Mixed-models methods no longer flagged as "experimental."
+
+- Mixed-models CV functions no longer limited to nested random effects.
 
 # cv 1.0.1
 

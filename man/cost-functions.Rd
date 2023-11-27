@@ -3,12 +3,15 @@
 \name{mse}
 \alias{mse}
 \alias{costFunctions}
+\alias{rmse}
 \alias{medAbsErr}
 \alias{BayesRule}
 \alias{BayesRule2}
 \title{Cost Functions for Fitted Regression Models}
 \usage{
 mse(y, yhat)
+
+rmse(y, yhat)
 
 medAbsErr(y, yhat)
 
@@ -34,7 +37,9 @@ regression models.
 Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Three cost functions are provided:
 \enumerate{
 \item \code{mse()} returns the mean-squared error of prediction for
-a numeric response variable \code{y} and predictions \code{yhat}.
+a numeric response variable \code{y} and predictions \code{yhat};
+\code{rmse()} returns the root-mean-squared error and is just the
+square-root of \code{mse()}.
 \item \code{medAbsErr()} returns the median absolute error of predictor for a numeric
 response \code{y} and predictions \code{yhat}.
 \item \code{BayesRule()} and \code{BayesRule2()} report the proportion
@@ -50,6 +55,8 @@ the latter doesn't and is therefore faster.
 \section{Functions}{
 \itemize{
 \item \code{mse()}: Mean-square error
+
+\item \code{rmse()}: Root-mean-square error
 
 \item \code{medAbsErr()}: Median absolute error
 

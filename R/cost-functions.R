@@ -13,7 +13,9 @@
 #' @details
 #' Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Three cost functions are provided:
 #' 1. \code{mse()} returns the mean-squared error of prediction for
-#' a numeric response variable \code{y} and predictions \code{yhat}.
+#' a numeric response variable \code{y} and predictions \code{yhat};
+#' \code{rmse()} returns the root-mean-squared error and is just the
+#' square-root of \code{mse()}.
 #' 2. \code{medAbsErr()} returns the median absolute error of predictor for a numeric
 #' response \code{y} and predictions \code{yhat}.
 #' 3. \code{BayesRule()} and \code{BayesRule2()} report the proportion
@@ -33,6 +35,12 @@
 #' @export
 mse <- function(y, yhat){
   mean((y - yhat)^2)
+}
+
+#' @describeIn cost-functions Root-mean-square error
+#' @export
+rmse <- function(y, yhat){
+  sqrt(mean((y - yhat)^2))
 }
 
 #' @describeIn cost-functions Median absolute error

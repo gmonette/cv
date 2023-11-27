@@ -170,7 +170,7 @@ On our computer, using the hatvalues is about an order of magnitude faster than 
 
 [^microbenchmark]: Out of impatience, we asked `microbenchmark()` to execute each command only 10 times rather than the default 100. With the exception of the last columns, the output is self-explanatory. The last column shows which methods have average timings that are statistically distinguishable. Because of the small number of repetitions (i.e., 10), the `"hatvalues"` and `"Woodbury"` methods aren't distinguishable, but the difference between these methods persists when we perform more repetitions---we invite the reader to redo this computation with the default `times=100` repetitions.
 
-#### Comparing Competing Models
+#### Comparing competing models
 
 The `cv()` function also has a method that can be applied to a list of regression models for the same data, composed using the `models()` function. For $k$-fold CV, the same folds are used for the competing models, which reduces random error in their comparison. This result can also be obtained by specifying a common seed for R's random-number generator while applying `cv()` separately to each model, but employing a list of models is more convenient for both $k$-fold and LOO CV (where there is no random component to the composition of the $n$ folds).
 
@@ -299,7 +299,7 @@ The fundamental analogy for cross-validation is to the collection of new data. T
 
 In contrast, mixed-effects models are fit to *dependent* data, in which cases as clustered, such as hierarchical data, where the clusters comprise higher-level units (e.g., students clustered in schools), or longitudinal data, where the clusters are individuals and the cases repeated observations on the individuals over time.[^crossed-effects] 
 
-[^crossed-effects]: There are, however, more complex situations that give rise to so-called *crossed* (rather than *nested*) random effects. For example, consider students within classes within schools. In primary schools, students typically are in a single class, and so classes are nested within schools. In secondary schools, however, students typically take several classes and students who are together in a particular class may not be together in other classes; consequently, random effects based on classes within schools are crossed. Although the `lmer()` function in the **lme4** package is capable of modeling both nested and crossed random effects, the `cv()` methods for mixed models in the **cv** package pertain only to nested random effects. It may be possible to cross-validate mixed models with crossed random effects, but we don't know how to do it.
+[^crossed-effects]: There are, however, more complex situations that give rise to so-called *crossed* (rather than *nested*) random effects. For example, consider students within classes within schools. In primary schools, students typically are in a single class, and so classes are nested within schools. In secondary schools, however, students typically take several classes and students who are together in a particular class may not be together in other classes; consequently, random effects based on classes within schools are crossed. The `lmer()` function in the **lme4** package is capable of modeling both nested and crossed random effects, and the `cv()` methods for mixed models in the **cv** package pertain to both nested and crossed random effects. We present an example of the latter later in the vignette.
 
 We can think of two approaches to applying cross-validation to clustered data:[^cv-faq]
 
@@ -379,7 +379,7 @@ We used the same random-number generator seeds as in the previous example cross-
 
 [^optimizer]: The observant reader will notice that we set the argument `control=list(opt="optim")` in the call to `lme()`, changing the optimizer employed from the default `"nlminb"`. We did this because with the default optimizer, `lme()` encountered the same convergence issue as `lmer()`, but rather than issuing a warning, `lme()` failed, reporting an error. As it turns out, setting the optimizer to `"optim"` avoids this problem.
 
-### Example: Contrived Hierarchical Data
+### Example: Contrived hierarchical data
 
 We introduce an artificial data set that exemplifies aspects of cross-validation particular to hierarchical models. Using this data set, we show that model comparisons employing cluster-based and those employing case-based cross-validation may not agree on a "best" model. Furthermore, commonly used measures of fit, such as mean-squared error, do not necessarily become smaller as models become larger, even when the models are nested, and even when the measure of fit is computed for the whole data set.
 
@@ -626,6 +626,76 @@ plot(cvs_cases, main="Model Comparison, Case-Based CV")
 
 In summary, model `mod.1`, with $x$ alone and without the contextual mean of $x$, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. Model `mod.2`, which includes both $x$ and its contextual mean, produces better results using both cluster-based and case-based CV. The data-generating model, `mod.3`, which includes the fixed effect of `x - xm` in place of separate terms in `x` and `xm`, isn't distinguishable from model `mod.2`, which includes `x` and `xm` separately, even though `mod.2` has an unnecessary parameter (recall that the population coefficient of `xm` is 0 when `x` is expressed as deviations from the contextual mean). These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
 
+### Example: Crossed random effects
+
+Crossed random effects arise when the structure of the data aren't strictly hierarchical. Nevertheless, crossed and nested random effects can be handled in much the same manner, by refitting the mixed-effects model to the data with a fold of clusters or cases removed and using the refitted model to predict the response in the removed fold.
+
+We'll illustrate with data on pig growth, introduced by @DiggleLiangZeger:1994 [Table 3.1]. The data are in the `Pigs` data frame in the **cv** package:
+```{r pigs}
+head(Pigs, 9)
+head(xtabs(~ id + week, data=Pigs), 3)
+tail(xtabs(~ id + week, data=Pigs), 3)
+```
+Each of 48 pigs is observed weekly over a period of 9 weeks, with the weight of the pig recorded in kg. The data are in "long" format, as is appropriate for use with the `lmer()` function in the **lme4** package. The data are very regular, with no missing cases.
+
+The following graph, showing the growth trajectories of the pigs, is similar to Figure 3.1 in @DiggleLiangZeger:1994; we add an overall least-squares line and a loess smooth, which are nearly indistinguishable:
+```{r pigs-graph}
+#| out.width = "60%",
+#| fig.height = 6,
+#| fig.cap = "Growth trajectories for 48 pigs, with overall least-squares line (sold blue) and loess line (broken magenta)."
+plot(weight ~ week, data=Pigs, type="n")
+for (i in unique(Pigs$id)){
+  with(Pigs, lines(x=1:9, y=Pigs[id == i, "weight"],
+                   col="gray"))
+}
+abline(lm(weight ~ week, data=Pigs), col="blue", lwd=2)
+lines(with(Pigs, loess.smooth(week, weight, span=0.5)),
+      col="magenta", lty=2, lwd=2)
+```
+The individual "growth curves" and the overall trend are generally linear, with some tendency for variability of pig weight to increase over weeks (a feature of the data that we ignore in the mixed model that we fit to the data below). 
+
+The **Stata** mixed-effects models manual proposes a model with crossed random effects for the `Pigs` data [@Stata:2023 page 37]:
+
+> [S]uppose that we wish to fit
+$$
+\mathrm{weight}_{ij} = \beta_0 + \beta_1 \mathrm{week}_{ij} + u_i + v_j + \varepsilon_{ij} 
+$$
+for the $i = 1, \ldots, 9$ weeks and $j = 1, \dots, 48$ pigs and
+$$
+u_i \sim N(0, \sigma^2_u); v_j \sim N(0, \sigma^2_v ); \varepsilon_{ij} \sim N(0, \sigma^2_\varepsilon)
+$$
+all independently. That is, we assume an overall population-average growth curve $\beta_0 + \beta_1 \mathrm{week}$ and a random pig-specific shift. In other words, the effect due to week, $u_i$, is systematic to that week and  common to all pigs. The rationale behind [this model] could be that, assuming that the pigs were measured contemporaneously, we might be concerned that week-specific random factors such as weather and feeding patterns had significant systematic effects on all pigs.
+
+Although we might prefer an alternative model,[^pig-alternative] we think that this is a reasonable specification.
+
+[^pig-alternative]: These are repeated-measures data, which would be more conventionally modeled with autocorrelated errors within pigs. The `lme()` function in the **nlme** package, for example, is capable of fitting a mixed-model of this form.
+
+The **Stata** manual fits the mixed model by maximum likelihood (rather than REML), and we duplicate the results reported there using `lmer()`:
+```{r pigs-lmer}
+m.p <- lmer(weight ~ week + (1 | id) + (1 | week),
+            data=Pigs, REML=FALSE, # i.e., ML
+            control=lmerControl(optimizer="bobyqa"))
+summary(m.p)
+```
+We opt for the non-default `"bobyqa"` optimizer because it provides more numerically stable results for subsequent cross-validation in this example.
+
+We can then cross-validate the model by omitting folds composed of pigs, folds composed of weeks, or folds composed of pig-weeks (which in the `Pigs` data set correspond to individual cases, using only the fixed effects):
+```{r pigs-cv}
+cv(m.p, clusterVariables="id")
+
+cv(m.p, clusterVariables="week")
+
+cv(m.p, clusterVariables=c("id", "week"), k=10, seed=8469)
+```
+We can also cross-validate the individual cases taking account of the random effects (employing the same 10 folds):
+```{r pigs-cv-cases}
+cv(m.p, k=10, seed=8469)
+```
+Because these predictions are based on BLUPs, they are more accurate than the predictions based only on fixed effects.[^crossed-vs-nested] As well, the difference between the MSE computed for the model fit to the full data and the CV estimates of the MSE is greater here than for cluster-based predictions.
+
+[^crossed-vs-nested]: Even though there is only one observation per combination of pigs and weeks, we can use the BLUP for the omitted case because of the crossed structure of the random effects; that is each pig-week has a pig random effect and a week random effect. Although it probably isn't sensible, we can imagine a mixed model for the pig data that employs nested random effects, which would be specified by `lmer(weight ~ week + (1 | id/week), data=Pigs)`---that is, a random intercept that varies by combinations of `id` (pig) and `week`. This model can't be fit, however: With only one case per combination of `id` and `week`, the nested random-effect variance is indistinguishable from the case-level variance.
+
+
 ## Replicating cross-validation
 
 Assuming that the number of cases $n$ is a multiple of the number of folds $k$---a slightly simplifying assumption---the number of possible partitions of cases into folds is $\frac{n!}{[(n/k)!]^k}$, a number that grows very large very quickly. For example, for $n = 10$ and $k = 5$, so that the folds are each of size $n/k = 2$, there are $113,400$ possible partitions; for $n=100$ and $k=5$, where $n/k = 20$, still a small problem, the number of possible partitions is truly astronomical, $1.09\times 10^{66}$.
@@ -864,7 +934,9 @@ The results suggest that the predictive power of the transformed regression is r
 
 As we mentioned, @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"] explain that honest cross-validation has to take account of model specification and selection. Statistical modeling is at least partly a craft, and one could imagine applying that craft to successive partial data sets, each with a fold removed. The resulting procedure would be tedious, though possibly worth the effort, but it would also be difficult to realize in practice: After all, we can hardly erase our memory of statistical modeling choices between analyzing partial data sets.
 
-Alternatively, if we're able to automate the process of model selection, then we can more realistically apply CV mechanically. That's what we did in the preceding two sections, first for predictor selection and then for selection of transformations in regression. In this section, we consider the case where we both select variable transformations and then proceed to select predictors. It's insufficient to apply these steps sequentially, first, for example, using `cvSelect()` with `selectTrans()` and then with `selectStepAIC()`; rather we should apply the whole model-selection procedure with each fold omitted. The `selectTransAndStepAIC()` function, also supplied by the **cv** package, does exactly that.
+Alternatively, if we're able to automate the process of model selection, then we can more realistically apply CV mechanically.[^mechanical-modeling] That's what we did in the preceding two sections, first for predictor selection and then for selection of transformations in regression. In this section, we consider the case where we both select variable transformations and then proceed to select predictors. It's insufficient to apply these steps sequentially, first, for example, using `cvSelect()` with `selectTrans()` and then with `selectStepAIC()`; rather we should apply the whole model-selection procedure with each fold omitted. The `selectTransAndStepAIC()` function, also supplied by the **cv** package, does exactly that.
+
+[^mechanical-modeling]: To clarify, we don't think that it's possible, at least at present, to automate the model-building process fully. For example, in the present case, we decided to model `year` as a factor after graphical examination of the data. It's rarely desirable, in our opinion, to forgo exploration of the data to ensure the purity of model validation. We believe, however, that it's still useful to automate as much of the process as we can to obtain a more realistic, if still biased, estimate of the predictive power of a model.
 
 To illustrate this process, we return to the `Auto` data set:
 ```{r Auto-redux}

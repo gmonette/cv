@@ -86,7 +86,7 @@ for n-fold cross-validation}
 (default is \code{1}, i.e., computations aren't done in parallel)}
 
 \item{clusterVariables}{a character vector of names of the variables
-defining clusters for a mixed model with nested random effects;
+defining clusters for a mixed model with nested or crossed random effects;
 if missing, cross-validation is performed for individual cases rather than
 for clusters}
 
@@ -126,7 +126,6 @@ For mixed-effects models, cross-validation can be done by "clusters" or by
 individual observations. If the former, predictions are based only on fixed
 effects; if the latter, predictions include the random effects (i.e., are the
 best linear unbiased predictors or "BLUPS").
-Only mixed models with fully nested random effects are supported.
 }
 \section{Functions}{
 \itemize{

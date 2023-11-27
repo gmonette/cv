@@ -189,7 +189,7 @@ Most of the arguments of `cvMixed()` are familiar:
 
 * `ncores` is the number of cores to use for parallel computation; if `1`, the default, then the computation isn't parallelized.
 
-* `clusterVariables` is a character vector of the names of variables defining clusters; if missing, then CV is based on cases rather than clusters. Only nested mixed effects are supported.
+* `clusterVariables` is a character vector of the names of variables defining clusters; if missing, then CV is based on cases rather than clusters. 
 
 The remaining two arguments are unfamiliar:
 
