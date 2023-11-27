@@ -12,7 +12,7 @@ regression models."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
     
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,8 @@ regression models.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">mse</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">rmse</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">medAbsErr</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">BayesRule</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span>
@@ -93,7 +95,9 @@ value measuring lack-of-fit. <code>mse()</code> returns the mean-squared error; 
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Three cost functions are provided:</p><ol><li><p><code>mse()</code> returns the mean-squared error of prediction for
-a numeric response variable <code>y</code> and predictions <code>yhat</code>.</p></li>
+a numeric response variable <code>y</code> and predictions <code>yhat</code>;
+<code>rmse()</code> returns the root-mean-squared error and is just the
+square-root of <code>mse()</code>.</p></li>
 <li><p><code>medAbsErr()</code> returns the median absolute error of predictor for a numeric
 response <code>y</code> and predictions <code>yhat</code>.</p></li>
 <li><p><code>BayesRule()</code> and <code>BayesRule2()</code> report the proportion
@@ -109,6 +113,7 @@ the latter doesn't and is therefore faster.</p></li>
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
 <ul><li><p><code>mse()</code>: Mean-square error</p></li>
+<li><p><code>rmse()</code>: Root-mean-square error</p></li>
 <li><p><code>medAbsErr()</code>: Median absolute error</p></li>
 <li><p><code>BayesRule()</code>: Bayes Rule for a binary response</p></li>
 <li><p><code>BayesRule2()</code>: Bayes rule for a binary response (without bounds checking)</p></li>

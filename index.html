@@ -40,7 +40,7 @@
     
     <a class="navbar-brand me-2" href="index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,7 +91,7 @@
 <p>Some of the functions supplied by the package:</p>
 <ul>
 <li><p><code><a href="reference/cv.html">cv()</a></code> is a generic function with a default method, computationally efficient <code>"lm"</code> and <code>"glm"</code> methods, an <code>"rlm"</code> method (for robust linear models), and a method for a list of competing models. There are also <code>"merMod"</code>, <code>"lme"</code>, and <code>"glmmTMB"</code> methods for mixed-effects models. <code><a href="reference/cv.html">cv()</a></code> supports parallel computations.</p></li>
-<li><p><code><a href="reference/cost-functions.html">mse()</a></code> (mean-squared error), <code><a href="reference/cost-functions.html">medAbsErr()</a></code> (median absolute error), and <code><a href="reference/cost-functions.html">BayesRule()</a></code> are cross-validation criteria (“cost functions”), suitable for use with <code><a href="reference/cv.html">cv()</a></code>.</p></li>
+<li><p><code><a href="reference/cost-functions.html">mse()</a></code> (mean-squared error), <code><a href="reference/cost-functions.html">rmse()</a></code> (root-mean-squared error), <code><a href="reference/cost-functions.html">medAbsErr()</a></code> (median absolute error), and <code><a href="reference/cost-functions.html">BayesRule()</a></code> are cross-validation criteria (“cost functions”), suitable for use with <code><a href="reference/cv.html">cv()</a></code>.</p></li>
 <li><p><code><a href="reference/cvSelect.html">cvSelect()</a></code> cross-validates a selection procedure for a regression model. <code><a href="reference/cvSelect.html">cvSelect()</a></code> also supports parallel computations.</p></li>
 <li><p><code><a href="reference/cvSelect.html">selectStepAIC()</a></code> is a model-selection procedure, suitable for use with <code><a href="reference/cvSelect.html">cvSelect()</a></code>, based on the <code>stepAIC()</code> function in the <strong>MASS</strong> package.</p></li>
 <li><p><code><a href="reference/cvSelect.html">selectTrans()</a></code> is a procedure for selecting predictor and response transformations in regression, suitable for use with <code><a href="reference/cvSelect.html">cvSelect()</a></code>, based on the <code>powerTransform()</code> function in the <strong>car</strong> package.</p></li>
