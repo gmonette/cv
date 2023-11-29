@@ -59,6 +59,7 @@
 <li><p>Fix bugs in selectTrans() that caused errors when one of response and predictors arguments not specified.</p></li>
 <li><p>Fix bug in cvMixed() that prevented parallel computations (reported by Craig See).</p></li>
 <li><p>Fix small bug in cvSelect(), returning properly named “coefficients” element when save.coef is TRUE.</p></li>
+<li><p>Fix bug in cv.lm() and cv.glm() with method=“hatvalues” for cost criteria other than mse().</p></li>
 <li><p>Add selectTransAndStepAIC() procedure for use with cvSelect().</p></li>
 <li><p>Add medAbsErr() and rmse() cost criteria.</p></li>
 <li><p>Add coef.cvSelect() method.</p></li>

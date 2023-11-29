@@ -90,19 +90,22 @@ regression models.</p>
 
 <p>In general, cost functions should return a single numeric
 value measuring lack-of-fit. <code>mse()</code> returns the mean-squared error; <code>BayesRule()</code> and
-<code>BayesRule2()</code> return the proportion of misclassified cases.</p>
+<code>BayesRule2()</code> return the proportion of misclassified cases; etc.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Three cost functions are provided:</p><ol><li><p><code>mse()</code> returns the mean-squared error of prediction for
-a numeric response variable <code>y</code> and predictions <code>yhat</code>;
+    <p>Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Several cost functions are provided:</p><ol><li><p><code>mse()</code> returns the mean-squared error of prediction for
+a numeric response variable <code>y</code> and predictions <code>yhat</code>; and
 <code>rmse()</code> returns the root-mean-squared error and is just the
-square-root of <code>mse()</code>.</p></li>
-<li><p><code>medAbsErr()</code> returns the median absolute error of predictor for a numeric
+square-root of <code>mse()</code>. Note, however, that because the CV estimates
+of MSE and RMSE are (weighted) averages over folds, it is <em>not</em> true in general
+that the square-root of the CV estimate of MSE is equal to the CV estimate
+of RMSE.</p></li>
+<li><p><code>medAbsErr()</code> returns the median absolute error of prediction for a numeric
 response <code>y</code> and predictions <code>yhat</code>.</p></li>
 <li><p><code>BayesRule()</code> and <code>BayesRule2()</code> report the proportion
 of incorrect predictions for a dichotomous response variable <code>y</code>, assumed
-coded <code>0</code> and <code>1</code>. The <code>yhat</code> values are
+coded (or coercible to) <code>0</code> and <code>1</code>. The <code>yhat</code> values are
 predicted probabilities and are rounded to 0 or 1. The distinction
 between <code>BayesRule()</code> and <code>BayesRule2()</code> is that the former
 checks that the <code>y</code> values are all either <code>0</code> or <code>1</code>
@@ -123,6 +126,19 @@ the latter doesn't and is therefore faster.</p></li>
     <div class="dont-index"><p><code><a href="cv.html">cv</a></code>, <code><a href="cvSelect.html">cvSelect</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Duncan"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m.lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">mse</span><span class="op">(</span><span class="va">Duncan</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.lm</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 166.8155</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Mroz"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">m.glm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">lfp</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">Mroz</span>, family<span class="op">=</span><span class="va">binomial</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">BayesRule</span><span class="op">(</span><span class="va">Mroz</span><span class="op">$</span><span class="va">lfp</span> <span class="op">==</span> <span class="st">"yes"</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.glm</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3067729</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
