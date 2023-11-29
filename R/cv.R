@@ -328,7 +328,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model)/(1 -h)
-    cv <- criterion(y, yhat)
+    cv <- mean(mapply(criterion, y=y, yhat=yhat)) # criterion(y, yhat)
     result <- list(k="n", "CV crit" = cv, "method"=method,
                    "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
@@ -449,7 +449,7 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model, type="response")/(1 - h)
-    cv <- criterion(y, yhat)
+    cv <- mean(mapply(criterion, y=y, yhat=yhat)) # criterion(y, yhat)
     result <- list(k="n", "CV crit" = cv, method=method,
                    "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"

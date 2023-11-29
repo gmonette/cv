@@ -11,16 +11,19 @@
 #' @seealso \code{\link{cv}}, \code{\link{cvSelect}}
 #'
 #' @details
-#' Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Three cost functions are provided:
+#' Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Several cost functions are provided:
 #' 1. \code{mse()} returns the mean-squared error of prediction for
-#' a numeric response variable \code{y} and predictions \code{yhat};
+#' a numeric response variable \code{y} and predictions \code{yhat}; and
 #' \code{rmse()} returns the root-mean-squared error and is just the
-#' square-root of \code{mse()}.
-#' 2. \code{medAbsErr()} returns the median absolute error of predictor for a numeric
+#' square-root of \code{mse()}. Note, however, that because the CV estimates
+#' of MSE and RMSE are (weighted) averages over folds, it is \emph{not} true in general
+#' that the square-root of the CV estimate of MSE is equal to the CV estimate
+#' of RMSE.
+#' 2. \code{medAbsErr()} returns the median absolute error of prediction for a numeric
 #' response \code{y} and predictions \code{yhat}.
 #' 3. \code{BayesRule()} and \code{BayesRule2()} report the proportion
 #' of incorrect predictions for a dichotomous response variable \code{y}, assumed
-#' coded \code{0} and \code{1}. The \code{yhat} values are
+#' coded (or coercible to) \code{0} and \code{1}. The \code{yhat} values are
 #' predicted probabilities and are rounded to 0 or 1. The distinction
 #' between \code{BayesRule()} and \code{BayesRule2()} is that the former
 #' checks that the \code{y} values are all either \code{0} or \code{1}
@@ -29,7 +32,15 @@
 #'
 #' @returns In general, cost functions should return a single numeric
 #' value measuring lack-of-fit. `mse()` returns the mean-squared error; `BayesRule()` and
-#' `BayesRule2()` return the proportion of misclassified cases.
+#' `BayesRule2()` return the proportion of misclassified cases; etc.
+#' @examples
+#' data("Duncan", package="carData")
+#' m.lm <- lm(prestige ~ income + education, data=Duncan)
+#' mse(Duncan$prestige, fitted(m.lm))
+#'
+#' data("Mroz", package="carData")
+#' m.glm <- glm(lfp ~ ., data=Mroz, family=binomial)
+#' BayesRule(Mroz$lfp == "yes", fitted(m.glm))
 
 #' @describeIn cost-functions Mean-square error
 #' @export

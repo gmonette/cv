@@ -8,6 +8,8 @@
 
 - Fix small bug in cvSelect(), returning properly named "coefficients" element when save.coef is TRUE.
 
+- Fix bug in cv.lm() and cv.glm() with method="hatvalues" for cost criteria other than mse().
+
 - Add selectTransAndStepAIC() procedure for use with cvSelect().
 
 - Add medAbsErr() and rmse() cost criteria.
