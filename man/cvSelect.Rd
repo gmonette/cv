@@ -12,6 +12,9 @@
 cvSelect(
   procedure,
   data,
+  criterion = mse,
+  model,
+  response,
   k = 10,
   reps = 1,
   save.coef = k <= 10,
@@ -68,6 +71,13 @@ compareFolds(object, digits = 3, ...)
 
 \item{data}{full data frame for model selection.}
 
+\item{criterion}{a CV criterion ("cost" or lack-of-fit) function.}
+
+\item{model}{a regression model object fit to data.}
+
+\item{response}{name of the response variable; if missing, the response
+won't be transformed.}
+
 \item{k}{perform k-fold cross-validation (default is 10); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
@@ -87,10 +97,6 @@ for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.}
 
 \item{indices}{indices of cases in data defining the current fold.}
 
-\item{model}{a regression model object fit to data.}
-
-\item{criterion}{a CV criterion ("cost" or lack-of-fit) function.}
-
 \item{AIC}{if \code{TRUE} (the default) use the AIC as the
 model-selection criterion; if \code{FALSE}, use the BIC.
 The \code{k} argument to \code{\link[MASS]{stepAIC}()}
@@ -99,9 +105,6 @@ folds \code{k}).}
 
 \item{predictors}{character vector of names of the predictors in the model
 to transform; if missing, no predictors will be transformed.}
-
-\item{response}{name of the response variable; if missing, the response
-won't be transformed.}
 
 \item{family}{transformation family for the predictors, one of
 \code{"bcPower", "bcnPower", "yjPower", "basicPower"},

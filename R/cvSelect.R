@@ -65,10 +65,14 @@
 #' \code{\link[car]{powerTransform}}
 #'
 #' @export
-cvSelect <- function(procedure, data, k=10, reps=1,
+cvSelect <- function(procedure, data, criterion=mse,
+                     model, response,
+                     k=10, reps=1,
                      save.coef = k <= 10,
                      seed, ncores=1, ...){
   n <- nrow(data)
+  y <- if (!missing(model)) getResponse(model) else data[[response]]
+  if (missing(model)) model <- NULL
   if (is.character(k)){
     if (k == "n" || k == "loo") {
       k <- n
@@ -96,42 +100,46 @@ cvSelect <- function(procedure, data, k=10, reps=1,
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
+  yhat <- numeric(n)
+  crit.all.i <- numeric(k)
+
   if (ncores > 1){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    arglist <- c(list(data=data, indices=1, save.coef=save.coef),
+    arglist <- c(list(data=data, indices=1, save.coef=save.coef,
+                      criterion=criterion, model=model),
                  list(...))
-    selection <- foreach(i = 1L:k, .combine=c) %dopar% {
+    selection <- foreach(i = 1L:k) %dopar% {
       # the following deals with a scoping issue that can
       #   occur with args passed via ...
       arglist$indices <- indices[starts[i]:ends[i]]
-      selection <- do.call(procedure, arglist)
-    }
-    if (save.coef){
-      is <- seq(1L:(2*k))
-      # CV criteria saved in odd-numbered elements
-      #   coefficients in even-numbered elements
-      result <- do.call(rbind, selection[is %% 2 == 1])
-      coefs <- do.call(list, selection[is %% 2 == 0])
-      names(coefs) <- NULL
-    } else {
-      result <- do.call(rbind, selection)
-      coefs <- NULL
+      do.call(procedure, arglist)
     }
     stopCluster(cl)
+    for (i in 1L:k){
+      yhat[indices[starts[i]:ends[i]]] <- selection[[i]]$fit.i
+      crit.all.i[i] <- selection[[i]]$crit.all.i
+    }
+    coefs <- if (save.coef){
+      lapply(selection, function(x) x$coefficients)
+    } else {
+      NULL
+    }
   } else {
-    result <- matrix(0, k, 2L)
     coefs <- vector(k, mode="list")
     for (i in 1L:k){
-      selection <- procedure(data, indices[starts[i]:ends[i]],
-                             save.coef=save.coef, ...)
-      result[i, ] <- selection[[1]]
-      if (save.coef) coefs[[i]] <- selection[[2]]
+      indices.i <- indices[starts[i]:ends[i]]
+      selection <- procedure(data, indices.i,
+                             save.coef=save.coef,
+                             criterion=criterion, model=model, ...)
+      crit.all.i[i] <- selection$crit.all.i
+      yhat[indices.i] <- selection$fit.i
+      if (save.coef) coefs[[i]] <- selection$coefficients
     }
   }
-  cv <- weighted.mean(result[, 1L], folds)
-  cv.full <- procedure(data, ...)
-  adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
+  cv <- criterion(y, yhat)
+  cv.full <- procedure(data, model=model, criterion=criterion, ...)
+  adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  coefficients = if (save.coef) coefs else NULL)
@@ -184,8 +192,7 @@ selectStepAIC <- function(data, indices,
   model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
   fit.all.i <- predict(model.i, newdata=data, type="response")
   fit.i <- fit.all.i[indices]
-  list(criterion=c(criterion(y[indices], fit.i),
-         criterion(y, fit.all.i)),
+  list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
        coefficients=if (save.coef) coef(model.i) else NULL)
 }
 
