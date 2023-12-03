@@ -66,12 +66,16 @@
 #'
 #' @export
 cvSelect <- function(procedure, data, criterion=mse,
-                     model, response,
+                     model, response.expr,
                      k=10, reps=1,
                      save.coef = k <= 10,
                      seed, ncores=1, ...){
   n <- nrow(data)
-  y <- if (!missing(model)) getResponse(model) else data[[response]]
+  y <- if (!missing(model)) {
+    getResponse(model)
+    } else {
+      eval(response.expr, envir=data)
+    }
   if (missing(model)) model <- NULL
   if (is.character(k)){
     if (k == "n" || k == "loo") {

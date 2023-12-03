@@ -14,7 +14,7 @@ cvSelect(
   data,
   criterion = mse,
   model,
-  response,
+  response.expr,
   k = 10,
   reps = 1,
   save.coef = k <= 10,
@@ -75,9 +75,6 @@ compareFolds(object, digits = 3, ...)
 
 \item{model}{a regression model object fit to data.}
 
-\item{response}{name of the response variable; if missing, the response
-won't be transformed.}
-
 \item{k}{perform k-fold cross-validation (default is 10); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
@@ -105,6 +102,9 @@ folds \code{k}).}
 
 \item{predictors}{character vector of names of the predictors in the model
 to transform; if missing, no predictors will be transformed.}
+
+\item{response}{name of the response variable; if missing, the response
+won't be transformed.}
 
 \item{family}{transformation family for the predictors, one of
 \code{"bcPower", "bcnPower", "yjPower", "basicPower"},
