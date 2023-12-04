@@ -66,7 +66,7 @@
 #'
 #' @export
 cvSelect <- function(procedure, data, criterion=mse,
-                     model, response.expr,
+                     model, y.expression,
                      k=10, reps=1,
                      save.coef = k <= 10,
                      seed, ncores=1, ...){
@@ -74,7 +74,7 @@ cvSelect <- function(procedure, data, criterion=mse,
   y <- if (!missing(model)) {
     getResponse(model)
     } else {
-      eval(response.expr, envir=data)
+      eval(y.expression, envir=data)
     }
   if (missing(model)) model <- NULL
   if (is.character(k)){
@@ -383,9 +383,8 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
   if (full.sample) return(criterion(y, fit.o.i))
   # ... and for current fold only:
   fit.i <- fit.o.i[indices]
-  # compute and return CV criteria and transformation parameters:
-  list(criterion = c(criterion(y[indices], fit.i),
-                     criterion(y, fit.o.i)),
+  # compute and return CV info and transformation parameters:
+  list(fit.i=fit.i, crit.all.i=criterion(y, fit.o.i),
        coefficients = if (save.coef) c(lambdas, gammas, transy)
   )
 }

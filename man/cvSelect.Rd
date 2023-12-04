@@ -14,7 +14,7 @@ cvSelect(
   data,
   criterion = mse,
   model,
-  response.expr,
+  y.expression,
   k = 10,
   reps = 1,
   save.coef = k <= 10,
