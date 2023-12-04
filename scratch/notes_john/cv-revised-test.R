@@ -99,14 +99,13 @@ rownames(Auto) <- make.names(Auto$name, unique=TRUE)
 Auto$name <- NULL
 m.auto <- lm(mpg ~ . , data=Auto)
 cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
-                criterion=medAbsErr,
                 predictors=c("cylinders", "displacement", "horsepower",
                              "weight", "acceleration"),
                 response="mpg", AIC=FALSE)
 cvs
 # 10-Fold Cross Validation
-# cross-validation criterion = 1.386487
-# bias-adjusted cross-validation criterion = 1.345775
-# full-sample criterion = 1.339604
+# cross-validation criterion = 7.41764
+# bias-adjusted cross-validation criterion = 7.26465
+# full-sample criterion = 6.512144
 compareFolds(cvs)
 

@@ -563,12 +563,12 @@ selectTransStepAIC <- function(data,
     }
   }
 
+  # for full sample:
   if (missing(indices)) return(criterion(y, fit.all.i))
 
-  # list(criterion=c(criterion(y[indices], fit.all.i[indices]),
-  #                  criterion(y, fit.all.i)),
-  #      coefficients=if (save.coef) c(powers, coef(model.i)) else NULL)
-
+  # ... and for current fold only:
+  # compute and return CV info, transformation parameters,
+  #   and regression coefficients:
   list(fit.i=fit.all.i[indices], crit.all.i=criterion(y, fit.all.i),
        coefficients=if (save.coef) c(powers, coef(model.i)) else NULL
   )
