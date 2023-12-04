@@ -158,7 +158,13 @@ cvMixed <- function(model,
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute clusters/cases
-  yhat <- numeric(n)
+  yhat <- if (is.factor(y)){
+    factor(rep(NA, n), levels=levels(y))
+  } else if (is.character(y)) {
+    character(n)
+  } else {
+    numeric(n)
+  }
 
   if (ncores > 1L){
     cl <- makeCluster(ncores)

@@ -15,10 +15,7 @@
 #' 1. \code{mse()} returns the mean-squared error of prediction for
 #' a numeric response variable \code{y} and predictions \code{yhat}; and
 #' \code{rmse()} returns the root-mean-squared error and is just the
-#' square-root of \code{mse()}. Note, however, that because the CV estimates
-#' of MSE and RMSE are (weighted) averages over folds, it is \emph{not} true in general
-#' that the square-root of the CV estimate of MSE is equal to the CV estimate
-#' of RMSE.
+#' square-root of \code{mse()}.
 #' 2. \code{medAbsErr()} returns the median absolute error of prediction for a numeric
 #' response \code{y} and predictions \code{yhat}.
 #' 3. \code{BayesRule()} and \code{BayesRule2()} report the proportion

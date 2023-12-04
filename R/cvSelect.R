@@ -10,6 +10,11 @@
 #'
 #' @param procedure a model-selection procedure function (see Details).
 #' @param data full data frame for model selection.
+#' @param y.expression normally the response variable is found from the
+#' \code{model} argument; but if, for a particular selection procedure, the
+#' \code{model} argument is absent, or if the response can't be inferred from the
+#' model, the response can be specified by an expression, such as \code{expression(log(income))},
+#' to be evaluated within the data set provided by the \code{data} argument.
 #' @param k perform k-fold cross-validation (default is 10); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
@@ -44,10 +49,12 @@
 #'   \item{other arguments}{to be passed via \code{...}
 #'   from \code{cvSelect()}.}
 #' }
-#' \code{procedure()} should return a two-element vector with the result
-#' of applying a cross-validation criterion to the cases in
-#' the current fold for the model deleting that fold, and to
-#' all of the cases, again for the model deleting the current fold.
+#' \code{procedure()} should return a list with the following
+#' named elements: \code{fit.i}, the vector of predicted values for the cases in
+#' the current fold computed from the model omitting these cases;
+#' \code{crit.all.i}, the CV criterion computed for all of the cases using
+#' the model omitting the current fold; and (optionally) \code{coefficients},
+#' parameter estimates from the model computed omitting the current fold.
 #'
 #' When the \code{indices} argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
 #' the model fit to all of the cases.
@@ -104,7 +111,13 @@ cvSelect <- function(procedure, data, criterion=mse,
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
-  yhat <- numeric(n)
+  yhat <- if (is.factor(y)){
+    factor(rep(NA, n), levels=levels(y))
+  } else if (is.character(y)) {
+    character(n)
+  } else {
+    numeric(n)
+  }
   crit.all.i <- numeric(k)
 
   if (ncores > 1){
@@ -151,9 +164,11 @@ cvSelect <- function(procedure, data, criterion=mse,
   if (reps == 1) {
     return(result)
   } else {
+    if (missing(y.expression)) y.expression <- NULL
     res <- cvSelect(procedure=procedure, data=data, k=k,
                     reps = reps - 1, save.coef = save.coef,
-                    ncores=ncores, ...)
+                    ncores=ncores, model=model,
+                    y.expression=y.expression, ...)
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {

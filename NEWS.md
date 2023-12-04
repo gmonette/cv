@@ -1,5 +1,7 @@
 # cv 1.1.0
 
+- cv() et al. now work properly with "nonlinear" CV criteria such as the new rmse() and medAbsErr(), not just with "linear" fit criteria such as mse() and BayesRule().
+
 - Generally suppress spurious messages about setting the seed in cv.modList() for LOO CV.
 
 - Fix bugs in selectTrans() that caused errors when one of response and predictors arguments not specified.

@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-11-26" />
+<meta name="date" content="2023-12-04" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-11-26</h4>
+<h4 class="date">2023-12-04</h4>
 
 
 
@@ -443,8 +443,8 @@ Weisberg, 2019)</span>:</p>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; method: exact</span></span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; criterion: AUCcomp</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.27682</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.27636</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.27471</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.27426</span></span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.26362</span></span></code></pre></div>
 <p>As expected, the cross-validated complement to the AUC is somewhat
 less optimistic than the criterion computed from the model fit to the
@@ -1117,22 +1117,23 @@ model-selection process:</p>
 <span id="cb25-32"><a href="#cb25-32" tabindex="-1"></a>              <span class="co"># predict() doesn&#39;t work here:</span></span>
 <span id="cb25-33"><a href="#cb25-33" tabindex="-1"></a>  fit.all.i <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(X[, x.names.i] <span class="sc">%*%</span> <span class="fu">coef</span>(m.best.i))</span>
 <span id="cb25-34"><a href="#cb25-34" tabindex="-1"></a>  fit.i <span class="ot">&lt;-</span> fit.all.i[indices]</span>
-<span id="cb25-35"><a href="#cb25-35" tabindex="-1"></a>  <span class="co"># return the CV criteria and the regression coefficients</span></span>
-<span id="cb25-36"><a href="#cb25-36" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">criterion=</span><span class="fu">c</span>(<span class="fu">criterion</span>(y[indices], fit.i), <span class="co"># for i-th fold</span></span>
-<span id="cb25-37"><a href="#cb25-37" tabindex="-1"></a>                   <span class="fu">criterion</span>(y, fit.all.i)), <span class="co"># for all data</span></span>
-<span id="cb25-38"><a href="#cb25-38" tabindex="-1"></a>       <span class="at">coefficients =</span> <span class="cf">if</span> (save.coef){</span>
-<span id="cb25-39"><a href="#cb25-39" tabindex="-1"></a>         coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(m.best.i)</span>
-<span id="cb25-40"><a href="#cb25-40" tabindex="-1"></a>         </span>
-<span id="cb25-41"><a href="#cb25-41" tabindex="-1"></a>         <span class="co"># fix coefficient names</span></span>
-<span id="cb25-42"><a href="#cb25-42" tabindex="-1"></a>         <span class="fu">names</span>(coefs) <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">&quot;X</span><span class="sc">\\</span><span class="st">[-indices, x.names.i</span><span class="sc">\\</span><span class="st">]&quot;</span>, <span class="st">&quot;&quot;</span>,</span>
-<span id="cb25-43"><a href="#cb25-43" tabindex="-1"></a>                             <span class="fu">names</span>(coefs))</span>
-<span id="cb25-44"><a href="#cb25-44" tabindex="-1"></a>         </span>
-<span id="cb25-45"><a href="#cb25-45" tabindex="-1"></a>         coefs</span>
-<span id="cb25-46"><a href="#cb25-46" tabindex="-1"></a>       }  <span class="cf">else</span> {</span>
-<span id="cb25-47"><a href="#cb25-47" tabindex="-1"></a>         <span class="cn">NULL</span></span>
-<span id="cb25-48"><a href="#cb25-48" tabindex="-1"></a>       }</span>
-<span id="cb25-49"><a href="#cb25-49" tabindex="-1"></a>  )</span>
-<span id="cb25-50"><a href="#cb25-50" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb25-35"><a href="#cb25-35" tabindex="-1"></a>  <span class="co"># return the fitted values for i-th fold, CV criterion for all cases, </span></span>
+<span id="cb25-36"><a href="#cb25-36" tabindex="-1"></a>  <span class="co">#   and the regression coefficients</span></span>
+<span id="cb25-37"><a href="#cb25-37" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">fit.i=</span>fit.i, <span class="co"># fitted values for i-th fold</span></span>
+<span id="cb25-38"><a href="#cb25-38" tabindex="-1"></a>       <span class="at">crit.all.i=</span><span class="fu">criterion</span>(y, fit.all.i), <span class="co"># CV crit for all cases</span></span>
+<span id="cb25-39"><a href="#cb25-39" tabindex="-1"></a>       <span class="at">coefficients =</span> <span class="cf">if</span> (save.coef){ <span class="co"># regression coefficients</span></span>
+<span id="cb25-40"><a href="#cb25-40" tabindex="-1"></a>         coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(m.best.i)</span>
+<span id="cb25-41"><a href="#cb25-41" tabindex="-1"></a>         </span>
+<span id="cb25-42"><a href="#cb25-42" tabindex="-1"></a>         <span class="co"># fix coefficient names</span></span>
+<span id="cb25-43"><a href="#cb25-43" tabindex="-1"></a>         <span class="fu">names</span>(coefs) <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">&quot;X</span><span class="sc">\\</span><span class="st">[-indices, x.names.i</span><span class="sc">\\</span><span class="st">]&quot;</span>, <span class="st">&quot;&quot;</span>,</span>
+<span id="cb25-44"><a href="#cb25-44" tabindex="-1"></a>                             <span class="fu">names</span>(coefs))</span>
+<span id="cb25-45"><a href="#cb25-45" tabindex="-1"></a>         </span>
+<span id="cb25-46"><a href="#cb25-46" tabindex="-1"></a>         coefs</span>
+<span id="cb25-47"><a href="#cb25-47" tabindex="-1"></a>       }  <span class="cf">else</span> {</span>
+<span id="cb25-48"><a href="#cb25-48" tabindex="-1"></a>         <span class="cn">NULL</span></span>
+<span id="cb25-49"><a href="#cb25-49" tabindex="-1"></a>       }</span>
+<span id="cb25-50"><a href="#cb25-50" tabindex="-1"></a>  )</span>
+<span id="cb25-51"><a href="#cb25-51" tabindex="-1"></a>}</span></code></pre></div>
 <p>A slightly tricky point is that because of scoping issues,
 <code>predict()</code> doesn’t work with the model fit omitting the
 <span class="math inline">\(i\)</span>th fold, and so the fitted values
@@ -1160,14 +1161,17 @@ and fit to the cases omitting the fold; the MSE for all of the cases,
 based on the same model; and the coefficients of the selected model,
 which includes 4 or the 5 predictors (and the intercept):</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">selectSubsets</span>(<span class="at">model=</span>m.swiss, <span class="at">indices=</span><span class="fu">seq</span>(<span class="dv">5</span>, <span class="dv">45</span>, <span class="at">by=</span><span class="dv">10</span>))</span>
-<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt; $criterion</span></span>
-<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt; [1] 50.128 46.297</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt; $fit.i</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt; [1] 62.922 67.001 73.157 83.778 32.251</span></span>
 <span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="co">#&gt; $coefficients</span></span>
-<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="co">#&gt;      (Intercept)      Agriculture        Education         Catholic </span></span>
-<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a><span class="co">#&gt;         63.80452         -0.15895         -1.04218          0.13066 </span></span>
-<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a><span class="co">#&gt; Infant.Mortality </span></span>
-<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a><span class="co">#&gt;          1.01895</span></span></code></pre></div>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="co">#&gt; $crit.all.i</span></span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="co">#&gt; [1] 46.297</span></span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a><span class="co">#&gt; $coefficients</span></span>
+<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a><span class="co">#&gt;      (Intercept)      Agriculture        Education         Catholic </span></span>
+<span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a><span class="co">#&gt;         63.80452         -0.15895         -1.04218          0.13066 </span></span>
+<span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a><span class="co">#&gt; Infant.Mortality </span></span>
+<span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a><span class="co">#&gt;          1.01895</span></span></code></pre></div>
 <p>Then, using <code>selectSubsets()</code> in cross-validation, we
 get:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>(cv.swiss <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectSubsets, <span class="at">model=</span>m.swiss,</span>

@@ -109,3 +109,10 @@ cvs
 # full-sample criterion = 6.512144
 compareFolds(cvs)
 
+
+data("Auto", package="ISLR2")
+m.auto <- lm(mpg ~ . - name - origin, data=Auto)
+cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
+
+cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
+         AIC=FALSE, k=5, reps=3) # via BIC

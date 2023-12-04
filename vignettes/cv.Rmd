@@ -1132,12 +1132,9 @@ We then treat re-estimation of the model with a case or cases deleted as a WLS p
 
 Let $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ represent a cross-validation cost criterion, such as mean-squared error, computed for all of the $n$ values of the response $\mathbf{y}$ based on fitted values $\widehat{\mathbf{y}}$ from the model fit to all of the data. We divide the $n$ cases into $k$ folds of approximately $n_j \approx n/k$ cases each, where $n = \sum n_j$. As above, let $\mathbf{j}$ denote the indices of the cases in the $j$th fold.
 
-Now define $\mathrm{CV}_j = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})$ and $\mathrm{CV}_j^{(j)} = \mathrm{CV}(\mathbf{y}_{\mathbf{j}}, \widehat{\mathbf{y}}^{(j)}_{\mathbf{j}})$. The superscript $(j)$ on $\widehat{\mathbf{y}}^{(j)}$ and $\widehat{\mathbf{y}}^{(j)}_{\mathbf{j}}$ represents fitted values computed from the model with fold $j$ omitted, respectively for all of the cases (i.e., $\mathrm{CV}_j$) and for the cases only in the $j$th fold ($\mathrm{CV}_j^{(j)}$).
+Now define $\mathrm{CV}_j = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})$. The superscript $(j)$ on $\widehat{\mathbf{y}}^{(j)}$ represents fitted values computed  for all of the cases from the model with fold $j$ omitted. Let $\widehat{\mathbf{y}}^{(-i)}$ represent the vector of fitted values for all $n$ cases where the the fitted value for the $i$th case is computed from the model fit with the fold including the $i$th case omitted (i.e., fold $j$ for which $i \in \mathbf{j}$).
 
-Then the cross-validation criterion is the weighted average of the $\mathrm{CV}_j^{(j)}$
-$$
-\mathrm{CV} = \frac{1}{n} \sum_{j = 1}^{k} n_j \mathrm{CV}_j^{(j)}
-$$
+Then the cross-validation criterion is just $\mathrm{CV} = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(-i)})$.
 Following @DavisonHinkley1997[pp. 293--295], the bias-adjusted cross-validation criterion is
 $$
 \mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j

@@ -367,10 +367,11 @@ selectSubsets <- function(data=insight::get_data(model),
               # predict() doesn't work here:
   fit.all.i <- as.vector(X[, x.names.i] %*% coef(m.best.i))
   fit.i <- fit.all.i[indices]
-  # return the CV criteria and the regression coefficients
-  list(criterion=c(criterion(y[indices], fit.i), # for i-th fold
-                   criterion(y, fit.all.i)), # for all data
-       coefficients = if (save.coef){
+  # return the fitted values for i-th fold, CV criterion for all cases, 
+  #   and the regression coefficients
+  list(fit.i=fit.i, # fitted values for i-th fold
+       crit.all.i=criterion(y, fit.all.i), # CV crit for all cases
+       coefficients = if (save.coef){ # regression coefficients
          coefs <- coef(m.best.i)
          
          # fix coefficient names

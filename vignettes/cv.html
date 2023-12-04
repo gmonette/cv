@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-11-27" />
+<meta name="date" content="2023-12-04" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-11-27</h4>
+<h4 class="date">2023-12-04</h4>
 
 
 
@@ -542,12 +542,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 829368</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 889831</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.346</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.327</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.176</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.166</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -2840,8 +2840,8 @@ whole model-specification process:</p>
 <span id="cb80-6"><a href="#cb80-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 76692</span></span>
 <span id="cb80-7"><a href="#cb80-7" tabindex="-1"></a>cvs</span>
 <span id="cb80-8"><a href="#cb80-8" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb80-9"><a href="#cb80-9" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 1.3841</span></span>
-<span id="cb80-10"><a href="#cb80-10" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.3484</span></span>
+<span id="cb80-9"><a href="#cb80-9" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 1.4951</span></span>
+<span id="cb80-10"><a href="#cb80-10" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.4594</span></span>
 <span id="cb80-11"><a href="#cb80-11" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 1.3396</span></span>
 <span id="cb80-12"><a href="#cb80-12" tabindex="-1"></a></span>
 <span id="cb80-13"><a href="#cb80-13" tabindex="-1"></a><span class="fu">compareFolds</span>(cvs)</span>
@@ -2951,7 +2951,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-5"><a href="#cb81-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb81-6"><a href="#cb81-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-7"><a href="#cb81-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.235   0.003   0.239</span></span>
+<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.241   0.009   0.251</span></span>
 <span id="cb81-9"><a href="#cb81-9" tabindex="-1"></a></span>
 <span id="cb81-10"><a href="#cb81-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb81-11"><a href="#cb81-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -2961,7 +2961,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-15"><a href="#cb81-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb81-16"><a href="#cb81-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-17"><a href="#cb81-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.036   0.005   1.455</span></span>
+<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.036   0.006   1.008</span></span>
 <span id="cb81-19"><a href="#cb81-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb81-20"><a href="#cb81-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -3077,19 +3077,18 @@ cases into <span class="math inline">\(k\)</span> folds of approximately
 <span class="math inline">\(n = \sum n_j\)</span>. As above, let <span class="math inline">\(\mathbf{j}\)</span> denote the indices of the
 cases in the <span class="math inline">\(j\)</span>th fold.</p>
 <p>Now define <span class="math inline">\(\mathrm{CV}_j =
-\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})\)</span> and <span class="math inline">\(\mathrm{CV}_j^{(j)} =
-\mathrm{CV}(\mathbf{y}_{\mathbf{j}},
-\widehat{\mathbf{y}}^{(j)}_{\mathbf{j}})\)</span>. The superscript <span class="math inline">\((j)\)</span> on <span class="math inline">\(\widehat{\mathbf{y}}^{(j)}\)</span> and <span class="math inline">\(\widehat{\mathbf{y}}^{(j)}_{\mathbf{j}}\)</span>
-represents fitted values computed from the model with fold <span class="math inline">\(j\)</span> omitted, respectively for all of the
-cases (i.e., <span class="math inline">\(\mathrm{CV}_j\)</span>) and for
-the cases only in the <span class="math inline">\(j\)</span>th fold
-(<span class="math inline">\(\mathrm{CV}_j^{(j)}\)</span>).</p>
-<p>Then the cross-validation criterion is the weighted average of the
-<span class="math inline">\(\mathrm{CV}_j^{(j)}\)</span> <span class="math display">\[
-\mathrm{CV} = \frac{1}{n} \sum_{j = 1}^{k} n_j \mathrm{CV}_j^{(j)}
-\]</span> Following <span class="citation">Davison &amp; Hinkley (1997,
-pp. 293–295)</span>, the bias-adjusted cross-validation criterion is
-<span class="math display">\[
+\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})\)</span>. The
+superscript <span class="math inline">\((j)\)</span> on <span class="math inline">\(\widehat{\mathbf{y}}^{(j)}\)</span> represents
+fitted values computed for all of the cases from the model with fold
+<span class="math inline">\(j\)</span> omitted. Let <span class="math inline">\(\widehat{\mathbf{y}}^{(-i)}\)</span> represent the
+vector of fitted values for all <span class="math inline">\(n\)</span>
+cases where the the fitted value for the <span class="math inline">\(i\)</span>th case is computed from the model fit
+with the fold including the <span class="math inline">\(i\)</span>th
+case omitted (i.e., fold <span class="math inline">\(j\)</span> for
+which <span class="math inline">\(i \in \mathbf{j}\)</span>).</p>
+<p>Then the cross-validation criterion is just <span class="math inline">\(\mathrm{CV} = \mathrm{CV}(\mathbf{y},
+\widehat{\mathbf{y}}^{(-i)})\)</span>. Following <span class="citation">Davison &amp; Hinkley (1997, pp. 293–295)</span>, the
+bias-adjusted cross-validation criterion is <span class="math display">\[
 \mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y},
 \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
 \]</span></p>
