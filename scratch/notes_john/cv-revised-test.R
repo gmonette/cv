@@ -104,5 +104,9 @@ cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
                              "weight", "acceleration"),
                 response="mpg", AIC=FALSE)
 cvs
+# 10-Fold Cross Validation
+# cross-validation criterion = 1.386487
+# bias-adjusted cross-validation criterion = 1.345775
+# full-sample criterion = 1.339604
 compareFolds(cvs)
 
