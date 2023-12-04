@@ -382,9 +382,8 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
 
   if (full.sample) return(criterion(y, fit.o.i))
   # ... and for current fold only:
-  fit.i <- fit.o.i[indices]
   # compute and return CV info and transformation parameters:
-  list(fit.i=fit.i, crit.all.i=criterion(y, fit.o.i),
+  list(fit.i=fit.o.i[indices], crit.all.i=criterion(y, fit.o.i),
        coefficients = if (save.coef) c(lambdas, gammas, transy)
   )
 }
@@ -566,9 +565,13 @@ selectTransStepAIC <- function(data,
 
   if (missing(indices)) return(criterion(y, fit.all.i))
 
-  list(criterion=c(criterion(y[indices], fit.all.i[indices]),
-                   criterion(y, fit.all.i)),
-       coefficients=if (save.coef) c(powers, coef(model.i)) else NULL)
+  # list(criterion=c(criterion(y[indices], fit.all.i[indices]),
+  #                  criterion(y, fit.all.i)),
+  #      coefficients=if (save.coef) c(powers, coef(model.i)) else NULL)
+
+  list(fit.i=fit.all.i[indices], crit.all.i=criterion(y, fit.all.i),
+       coefficients=if (save.coef) c(powers, coef(model.i)) else NULL
+  )
 }
 
 

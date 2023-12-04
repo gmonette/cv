@@ -90,3 +90,19 @@ m <- lm(prestige ~ income + education, data=Prestige)
 # bias-adjusted cross-validation criterion = 54.88635
 # full-sample criterion = 50.75109
 compareFolds(res)
+
+data("Auto", package="ISLR2")
+Auto$year <- as.factor(Auto$year)
+Auto$origin <- factor(Auto$origin,
+                      labels=c("America", "Europe", "Japan"))
+rownames(Auto) <- make.names(Auto$name, unique=TRUE)
+Auto$name <- NULL
+m.auto <- lm(mpg ~ . , data=Auto)
+cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
+                criterion=medAbsErr,
+                predictors=c("cylinders", "displacement", "horsepower",
+                             "weight", "acceleration"),
+                response="mpg", AIC=FALSE)
+cvs
+compareFolds(cvs)
+
