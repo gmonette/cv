@@ -49,6 +49,13 @@ test_that("glm Woodbury vs exact k=10", {
                cv(glm.fit, k=10, method="exact", seed=123)[1:3])
 })
 
+# test that nonlinear CV criterion is computed correctly
+
+test_that("lm mse vs rmse", {
+  expect_equal(unlist(cv(lm.fit, k=5, seed=123, criterion=mse)[c(1, 3)]),
+               unlist(cv(lm.fit, k=5, seed=123, criterion=rmse)[c(1, 3)])^2)
+})
+
 # longer tests
 
 # test that parallel computations work for a linear model
