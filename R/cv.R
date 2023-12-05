@@ -9,7 +9,7 @@
 #' @param data data frame to which the model was fit (not usually necessary).
 #' @param criterion cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
-#'        \code{yhat} the predicted values; the default is \code{\link{mse}}
+#'        \code{yhat} the predicted values; the default is \code{\link{rmse}}
 #'        (the mean-squared error).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
@@ -114,7 +114,7 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 #' @importFrom MASS rlm
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
-                       criterion=mse, k=10, reps=1, seed, ncores=1,
+                       criterion=rmse, k=10, reps=1, seed, ncores=1,
                        method=NULL, type="response", ...){
 
   f <- function(i){
@@ -274,7 +274,7 @@ print.cvList <- function(x, ...){
 
 #' @describeIn cv \code{"lm"} method
 #' @export
-cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
+cv.lm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
                   reps=1, seed, method=c("auto", "hatvalues", "Woodbury", "naive"),
                   ncores=1, ...){
   UpdateLM <- function(omit){
@@ -336,7 +336,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model)/(1 -h)
-    cv <- mean(mapply(criterion, y=y, yhat=yhat)) # criterion(y, yhat)
+    cv <- criterion(y, yhat)
     result <- list(k="n", "CV crit" = cv, "method"=method,
                    "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
@@ -409,7 +409,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
 
 #' @describeIn cv \code{"glm"} method
 #' @export
-cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
+cv.glm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
                    reps=1, seed, method=c("exact", "hatvalues", "Woodbury"),
                    ncores=1,
                    ...){
@@ -465,7 +465,7 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model, type="response")/(1 - h)
-    cv <- mean(mapply(criterion, y=y, yhat=yhat)) # criterion(y, yhat)
+    cv <- criterion(y, yhat) # mean(mapply(criterion, y=y, yhat=yhat))
     result <- list(k="n", "CV crit" = cv, method=method,
                    "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"

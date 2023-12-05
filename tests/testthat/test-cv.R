@@ -99,18 +99,19 @@ if (require(boot)){
   test_that("glm method for linear model matches boot::cv.glm()", {
     skip_on_cran()
     expect_equal(boot::cv.glm(Auto, glm.fit)$delta,
-                 as.vector(unlist(cv(glm.fit, k="loo")[1:2])))
+                 as.vector(unlist(cv(glm.fit, k="loo", criterion=mse)[1:2])))
   })
 
   test_that("lm method matches boot::cv.glm()", {
     skip_on_cran()
     expect_equal(boot::cv.glm(Auto, glm.fit)$delta,
-                 as.vector(unlist(cv(lm.fit, k="loo", method="Woodbury")[1:2])))
+                 as.vector(unlist(cv(lm.fit, k="loo",
+                                     criterion=mse, method="Woodbury")[1:2])))
   })
 
   test_that("glm method for GLM matches boot::cv.glm()", {
     skip_on_cran()
     expect_equal(boot::cv.glm(Cara, m.caravan)$delta,
-                 as.vector(unlist(cv(m.caravan, k="loo")[1:2])))
+                 as.vector(unlist(cv(m.caravan, k="loo", criterion=mse)[1:2])))
   })
 }

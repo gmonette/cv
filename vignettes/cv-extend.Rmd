@@ -52,7 +52,7 @@ The **cv** package is designed to be extensible in several directions. In this v
 
 ## Adding a cost criterion
 
-A cost criterion suitable for use with `cv()` or `cvSelect()` should take two arguments, `y` (the observed response vector) and `yhat` (a vector of fitted or predicted response values), and return a numeric index of lack of fit. The **cv** package supplies two such criteria: `mse(y, yhat)`, which returns the mean-squared prediction error for a numeric response; and `BayesRule(y, yhat)` (and its non-error-checking version, `BayesRule2(y, yhat))`, suitable for use with a binary regression model, where `y` is the binary response coded `0` for a "failure" or `1` for a "success"; where `yhat` is the predicted probability of success; and where the proportion of *incorrectly* classified cases is returned.
+A cost criterion suitable for use with `cv()` or `cvSelect()` should take two arguments, `y` (the observed response vector) and `yhat` (a vector of fitted or predicted response values), and return a numeric index of lack of fit. The **cv** package supplies several such criteria: `mse(y, yhat)`, which returns the mean-squared prediction error for a numeric response; `rmse(y, yhat)`, which returns the (square-)root mean-squared error; `medAbsErr(y, yhat)`, which returns the median absolute error; and `BayesRule(y, yhat)` (and its non-error-checking version, `BayesRule2(y, yhat))`, suitable for use with a binary regression model, where `y` is the binary response coded `0` for a "failure" or `1` for a "success"; where `yhat` is the predicted probability of success; and where the proportion of *incorrectly* classified cases is returned.
 
 To illustrate using a different prediction cost criterion, we'll base a cost criterion on the area under the receiver operating characteristic ("ROC") curve for a logistic regression. The ROC curve is a graphical representation of the classification power of a binary regression model, and the area under the ROC curve ("AUC"), which varies from 0 to 1, is a common summary measure based on the ROC [see @Wikipedia-ROC:2023]. The **Metrics** package [@HamnerFrasco:2018] includes a variety of measures useful for model selection, including an `auc()` function. We convert the AUC into a cost measure by taking its complement:
 
@@ -113,7 +113,7 @@ plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
      axes=list(x=list(rug=FALSE), y=list(style="stacked")))
 ```
 
-To cross-validate this multinomial-logit model we need an appropriate cost criterion. Neither of the criteria supplied by the **cv** package---`mse()`, which is appropriate for a numeric response, nor `BayesRule()`, which is appropriate for a binary response---will do. One possibility is to adapt Bayes rule to a polytomous response:
+To cross-validate this multinomial-logit model we need an appropriate cost criterion. None of the criteria supplied by the **cv** package---for example, neither `mse()`, which is appropriate for a numeric response, nor `BayesRule()`, which is appropriate for a binary response---will do. One possibility is to adapt Bayes rule to a polytomous response:
 ```{r BayesRuleMulti}
 head(BEPS$vote)
 yhat <- predict(m.beps, type="class")
@@ -179,7 +179,7 @@ Most of the arguments of `cvMixed()` are familiar:
 
 * `data` is the data set to which the model is fit, by default extracted by the `get_data()` function in the **insight** package.
 
-* `criterion` is the CV criterion, defaulting to the `mse()` function.
+* `criterion` is the CV criterion, defaulting to the `rmse()` function.
 
 * `k` is the number of CV folds, defaulting to `"loo"` for CV by clusters and `10` for CV by cases.
 
@@ -219,7 +219,7 @@ getResponse.glmmPQL <- function(model, ...){
 
 Writing the `cv()` method is then straightforward:
 ```{r cv.glmmPQL}
-cv.glmmPQL <- function(model, data = model$data, criterion = mse,
+cv.glmmPQL <- function(model, data = model$data, criterion = rmse,
                      k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -309,7 +309,7 @@ summary(m.swiss)
 
 cv(m.swiss, seed=8433)
 ```
-Thus, the MSE for the model fit to the complete data is considerably smaller than the CV estimate of the MSE. Can we do better by selecting a subset of the predictors, taking account of the additional uncertainty induced by model selection?
+Thus, the RMSE for the model fit to the complete data is considerably smaller than the CV estimate of the RMSE. Can we do better by selecting a subset of the predictors, taking account of the additional uncertainty induced by model selection?
 
 First, let's apply best-subset selection to the complete data set:
 ```{r subset-selection}
@@ -329,14 +329,14 @@ summary(m.best)
 
 cv(m.best, seed=8433) # use same folds as before
 ```
-The MSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated MSE is a bit lower; as we explain in the main vignette, however, it isn't kosher to select and cross-validate a model on the same data.
+The RMSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated RMSE is a bit lower; as we explain in the main vignette, however, it isn't kosher to select and cross-validate a model on the same data.
 
 Here's a function named `selectSubsets()`, meant to be used with `cvSelect()`, suitable for cross-validating the model-selection process:
 ```{r selectSubsets}
 selectSubsets <- function(data=insight::get_data(model), 
                           model,
                           indices,
-                          criterion=mse,
+                          criterion=rmse,
                           save.coef=TRUE, ...){
   
   if (inherits(model, "lm", which=TRUE) != 1)
@@ -389,11 +389,11 @@ A slightly tricky point is that because of scoping issues, `predict()` doesn't w
 
 Additionally, the command `lm(y[-indices] ~ X[-indices, x.names.i] - 1)`, which is the selected model with the $i$th fold deleted, produces awkward coefficient names like `"X[-indices, x.names.i]Infant.Mortality"`. Purely for aesthetic reasons, the command `sub("X\\[-indices, x.names.i\\]", "", names(coefs))` fixes these awkward names, removing the extraneous text, `"X[-indices, x.names.i]"`.
 
-Applying `selectSubsets()` to the full data produces the full-data cross-validated MSE (which we obtained previously):
+Applying `selectSubsets()` to the full data produces the full-data cross-validated RMSE (which we obtained previously):
 ```{r test-selectSubsets}
 selectSubsets(model=m.swiss)
 ```
-Similarly, applying the function to an imaginary "fold" of 5 cases returns the MSE for the cases in the fold, based on the model selected and fit to the cases omitting the fold; the MSE for all of the cases, based on the same model; and the coefficients of the selected model, which includes 4 or the 5 predictors (and the intercept):
+Similarly, applying the function to an imaginary "fold" of 5 cases returns the RMSE for the cases in the fold, based on the model selected and fit to the cases omitting the fold; the RMSE for all of the cases, based on the same model; and the coefficients of the selected model, which includes 4 or the 5 predictors (and the intercept):
 ```{r test-selectSubsets-fold}
 selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 ```
@@ -403,7 +403,7 @@ Then, using `selectSubsets()` in cross-validation, we get:
 (cv.swiss <- cvSelect(selectSubsets, model=m.swiss,
                       data=swiss, seed=8433)) # use same folds
 ```
-Cross-validation shows that model selection exacts a penalty in MSE. Examining the models selected for the 10 folds reveals that there is some uncertainty in identifying the predictors in the "best" model, with `Agriculture` sometimes appearing and sometimes not:
+Cross-validation shows that model selection exacts a penalty in RMSE. Examining the models selected for the 10 folds reveals that there is some uncertainty in identifying the predictors in the "best" model, with `Agriculture` sometimes appearing and sometimes not:
 ```{r best-models-by-folds}
 compareFolds(cv.swiss)
 ```

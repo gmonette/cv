@@ -16,7 +16,7 @@
 #' @param data data frame to which the model was fit (not usually necessary)
 #' @param criterion cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
-#'        \code{yhat} the predicted values; the default is \code{\link{mse}}
+#'        \code{yhat} the predicted values; the default is \code{\link{rmse}}
 #'        (the mean-squared error)
 #' @param k perform k-fold cross-validation; \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
@@ -82,7 +82,7 @@
 cvMixed <- function(model,
                     package,
                     data=insight::get_data(model),
-                    criterion=mse,
+                    criterion=rmse,
                     k,
                     reps=1,
                     seed,
@@ -229,7 +229,7 @@ cvMixed <- function(model,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
+cv.merMod <- function(model, data = insight::get_data(model), criterion = rmse,
                       k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -255,7 +255,7 @@ cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
+cv.lme <- function(model, data = insight::get_data(model), criterion = rmse,
                    k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -278,7 +278,7 @@ cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
+cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = rmse,
                        k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,

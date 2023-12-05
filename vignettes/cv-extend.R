@@ -113,7 +113,7 @@ getResponse.glmmPQL <- function(model, ...){
 }
 
 ## ----cv.glmmPQL---------------------------------------------------------------
-cv.glmmPQL <- function(model, data = model$data, criterion = mse,
+cv.glmmPQL <- function(model, data = model$data, criterion = rmse,
                      k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -182,7 +182,7 @@ cv(m.best, seed=8433) # use same folds as before
 selectSubsets <- function(data=insight::get_data(model), 
                           model,
                           indices,
-                          criterion=mse,
+                          criterion=rmse,
                           save.coef=TRUE, ...){
   
   if (inherits(model, "lm", which=TRUE) != 1)

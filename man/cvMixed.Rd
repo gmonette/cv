@@ -11,7 +11,7 @@ cvMixed(
   model,
   package,
   data = insight::get_data(model),
-  criterion = mse,
+  criterion = rmse,
   k,
   reps = 1,
   seed,
@@ -25,7 +25,7 @@ cvMixed(
 \method{cv}{merMod}(
   model,
   data = insight::get_data(model),
-  criterion = mse,
+  criterion = rmse,
   k,
   reps = 1,
   seed,
@@ -37,7 +37,7 @@ cvMixed(
 \method{cv}{lme}(
   model,
   data = insight::get_data(model),
-  criterion = mse,
+  criterion = rmse,
   k,
   reps = 1,
   seed,
@@ -49,7 +49,7 @@ cvMixed(
 \method{cv}{glmmTMB}(
   model,
   data = insight::get_data(model),
-  criterion = mse,
+  criterion = rmse,
   k,
   reps = 1,
   seed,
@@ -68,7 +68,7 @@ used to get the namespace of the package.}
 
 \item{criterion}{cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 where \code{y} is the observed values of the response and
-\code{yhat} the predicted values; the default is \code{\link{mse}}
+\code{yhat} the predicted values; the default is \code{\link{rmse}}
 (the mean-squared error)}
 
 \item{k}{perform k-fold cross-validation; \code{k}

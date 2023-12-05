@@ -72,7 +72,7 @@
 #' \code{\link[car]{powerTransform}}
 #'
 #' @export
-cvSelect <- function(procedure, data, criterion=mse,
+cvSelect <- function(procedure, data, criterion=rmse,
                      model, y.expression,
                      k=10, reps=1,
                      save.coef = k <= 10,
@@ -197,7 +197,7 @@ cvSelect <- function(procedure, data, criterion=mse,
 #'          AIC=FALSE, k=5, reps=3) # via BIC
 #' @export
 selectStepAIC <- function(data, indices,
-                          model, criterion=mse, AIC=TRUE,
+                          model, criterion=rmse, AIC=TRUE,
                           save.coef=TRUE, ...){
   y <- getResponse(model)
   if (missing(indices)) {
@@ -302,7 +302,7 @@ yjPowerInverse <- function(y, lambda) {
 #' cv(m.pres, seed=123)
 #' @export
 selectTrans <- function(data, indices, save.coef=TRUE, model,
-                        criterion=mse, predictors, response,
+                        criterion=rmse, predictors, response,
                         family=c("bcPower", "bcnPower", "yjPower", "basicPower"),
                         family.y=c("bcPower", "bcnPower", "yjPower", "basicPower"),
                         rounded=TRUE,
@@ -426,7 +426,7 @@ selectTransStepAIC <- function(data,
                                indices,
                                save.coef = TRUE,
                                model,
-                               criterion = mse,
+                               criterion = rmse,
                                predictors,
                                response,
                                family = c("bcPower", "bcnPower", "yjPower", "basicPower"),

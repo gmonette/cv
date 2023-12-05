@@ -14,7 +14,7 @@
 
 - Add selectTransAndStepAIC() procedure for use with cvSelect().
 
-- Add medAbsErr() and rmse() cost criteria.
+- Add medAbsErr() and rmse() cost criteria; make rmse() the default, rather than mse().
 
 - Add coef.cvSelect() method.
 
