@@ -17,7 +17,7 @@
 #' @param criterion cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
 #'        \code{yhat} the predicted values; the default is \code{\link{rmse}}
-#'        (the mean-squared error)
+#'        (the root-mean-squared error)
 #' @param k perform k-fold cross-validation; \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation; the default is \code{10} if cross-validating individual

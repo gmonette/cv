@@ -52,7 +52,7 @@ Cross-validation (CV) is an essentially simple and intuitively reasonable approa
 
 Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit a statistical model; and then the second part is used to assess the adequacy of the model fit to the first part of the data. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, particularly in smaller samples, the results can vary substantially based on the random division of the data: See @Harrell:2015 [Sec. 5.3] for this and other remarks about data-division and cross-validation.
 
-Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the omitted fold, computing some CV criterion or "cost" measure, such as the mean-squared error of prediction. The CV criterion is then averaged over the $k$ folds. In the extreme $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
+Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the cases in the omitted fold. A CV criterion or "cost" measure, such as the mean-squared error of prediction, is then computed using these predicted values. In the extreme $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
 
 Because the $k$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of prediction error. The $n$ regression models are highly statistical dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has relatively large variance. In contrast, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) are somewhat biased but have smaller variance. It is also possible to correct $k$-fold CV for bias (see below).
 
@@ -103,7 +103,7 @@ legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
 ```
 The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ may over-fit the data by chasing one or two relatively high `mpg` values at the right (but see the CV results reported below).
 
-The following graph shows two measures of estimated squared error as a function of polynomial-regression degree: The mean-squared error (RMSE), defined as $\mathsf{RMSE} = \sqrt{\sum (y_i - \widehat{y}_i)^2/n}$, and the usual residual standard error, defined as $\widehat{\sigma} = \sqrt{\sum (y_i - \widehat{y}_i)^2/(n - p - 1)}$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
+The following graph shows two measures of estimated squared error as a function of polynomial-regression degree: The root-mean-squared error (RMSE), defined as $\mathsf{RMSE} = \sqrt{\sum (y_i - \widehat{y}_i)^2/n}$, and the usual residual standard error, defined as $\widehat{\sigma} = \sqrt{\sum (y_i - \widehat{y}_i)^2/(n - p - 1)}$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
 
 ```{r mpg-horsepower-RMSE-se}
 #| out.width = "100%",
@@ -1036,7 +1036,7 @@ This is considerably smaller than the RMSE for the original working model:
 ```{r RMSE-working-model}
 rmse(Auto$mpg, fitted(m.auto))
 ```
-A perhaps subtle point is that we compute the RMSE for the selected model on the original `mpg` response scale rather than the log scale, so as to make the selected model comparable to the working model. That's slightly uncomfortable given the skewed distribution of `mpg`. An alternative is to use the median absolute error instead of the mean-squared error, employing the `medAbsErr()` function from the **cv** package:
+A perhaps subtle point is that we compute the RMSE for the selected model on the original `mpg` response scale rather than the log scale, so as to make the selected model comparable to the working model. That's slightly uncomfortable given the skewed distribution of `mpg`. An alternative is to use the median absolute error instead of the root-mean-squared error, employing the `medAbsErr()` function from the **cv** package:
 ```{r Auto-median-absolute-error}
 medAbsErr(Auto$mpg, exp(fitted(m.step)))
 medAbsErr(Auto$mpg, fitted(m.auto))

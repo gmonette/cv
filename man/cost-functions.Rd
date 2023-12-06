@@ -26,8 +26,10 @@ BayesRule2(y, yhat)
 }
 \value{
 In general, cost functions should return a single numeric
-value measuring lack-of-fit. \code{mse()} returns the mean-squared error; \code{BayesRule()} and
-\code{BayesRule2()} return the proportion of misclassified cases; etc.
+value measuring lack-of-fit. \code{mse()} returns the mean-squared error;
+\code{rmse()} returns the root-mean-squared error;
+\code{medAbsErr()} returns the median absolute error;
+and BayesRule()\code{and}BayesRule2()` return the proportion of misclassified cases.
 }
 \description{
 Compute cost functions (cross-validation criteria) for fitted

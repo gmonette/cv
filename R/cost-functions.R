@@ -28,8 +28,11 @@
 #' the latter doesn't and is therefore faster.
 #'
 #' @returns In general, cost functions should return a single numeric
-#' value measuring lack-of-fit. `mse()` returns the mean-squared error; `BayesRule()` and
-#' `BayesRule2()` return the proportion of misclassified cases; etc.
+#' value measuring lack-of-fit. `mse()` returns the mean-squared error;
+#' `rmse()` returns the root-mean-squared error;
+#' `medAbsErr()` returns the median absolute error;
+#' and BayesRule()` and
+#' `BayesRule2()` return the proportion of misclassified cases.
 #' @examples
 #' data("Duncan", package="carData")
 #' m.lm <- lm(prestige ~ income + education, data=Duncan)

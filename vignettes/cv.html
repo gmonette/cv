@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-12-05" />
+<meta name="date" content="2023-12-06" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-12-05</h4>
+<h4 class="date">2023-12-06</h4>
 
 
 
@@ -389,13 +389,11 @@ remarks about data-division and cross-validation.</p>
 randomly divided as equally as possible into several, say <span class="math inline">\(k\)</span>, parts, called “folds.” The statistical
 model is fit <span class="math inline">\(k\)</span> times, leaving each
 fold out in turn. Each fitted model is then used to predict the response
-variable for the omitted fold, computing some CV criterion or “cost”
-measure, such as the mean-squared error of prediction. The CV criterion
-is then averaged over the <span class="math inline">\(k\)</span> folds.
-In the extreme <span class="math inline">\(k = n\)</span>, the number of
-cases in the data, thus omitting individual cases and refitting the
-model <span class="math inline">\(n\)</span> times—a procedure termed
-“leave-one-out (LOO) cross-validation.”</p>
+variable for the cases in the omitted fold. A CV criterion or “cost”
+measure, such as the mean-squared error of prediction, is then computed
+using these predicted values. In the extreme <span class="math inline">\(k = n\)</span>, the number of cases in the data,
+thus omitting individual cases and refitting the model <span class="math inline">\(n\)</span> times—a procedure termed “leave-one-out
+(LOO) cross-validation.”</p>
 <p>Because the <span class="math inline">\(k\)</span> models are each
 fit to <span class="math inline">\(n - 1\)</span> cases, LOO CV produces
 a nearly unbiased estimate of prediction error. The <span class="math inline">\(n\)</span> regression models are highly
@@ -479,7 +477,7 @@ data
 one or two relatively high <code>mpg</code> values at the right (but see
 the CV results reported below).</p>
 <p>The following graph shows two measures of estimated squared error as
-a function of polynomial-regression degree: The mean-squared error
+a function of polynomial-regression degree: The root-mean-squared error
 (RMSE), defined as <span class="math inline">\(\mathsf{RMSE} =
 \sqrt{\sum (y_i - \widehat{y}_i)^2/n}\)</span>, and the usual residual
 standard error, defined as <span class="math inline">\(\widehat{\sigma}
@@ -542,12 +540,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 450094</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 107742</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: rmse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 4.3985</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 4.3964</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 4.3794</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 4.3782</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 4.3572</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>rmse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -2822,7 +2820,7 @@ model on the original <code>mpg</code> response scale rather than the
 log scale, so as to make the selected model comparable to the working
 model. That’s slightly uncomfortable given the skewed distribution of
 <code>mpg</code>. An alternative is to use the median absolute error
-instead of the mean-squared error, employing the
+instead of the root-mean-squared error, employing the
 <code>medAbsErr()</code> function from the <strong>cv</strong>
 package:</p>
 <div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" tabindex="-1"></a><span class="fu">medAbsErr</span>(Auto<span class="sc">$</span>mpg, <span class="fu">exp</span>(<span class="fu">fitted</span>(m.step)))</span>
@@ -2951,7 +2949,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-5"><a href="#cb81-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb81-6"><a href="#cb81-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-7"><a href="#cb81-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.238   0.011   0.249</span></span>
+<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.236   0.005   0.242</span></span>
 <span id="cb81-9"><a href="#cb81-9" tabindex="-1"></a></span>
 <span id="cb81-10"><a href="#cb81-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb81-11"><a href="#cb81-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -2961,7 +2959,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-15"><a href="#cb81-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb81-16"><a href="#cb81-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-17"><a href="#cb81-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.032   0.004   0.907</span></span>
+<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.031   0.006   0.950</span></span>
 <span id="cb81-19"><a href="#cb81-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb81-20"><a href="#cb81-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -3082,7 +3080,7 @@ superscript <span class="math inline">\((j)\)</span> on <span class="math inline
 fitted values computed for all of the cases from the model with fold
 <span class="math inline">\(j\)</span> omitted. Let <span class="math inline">\(\widehat{\mathbf{y}}^{(-i)}\)</span> represent the
 vector of fitted values for all <span class="math inline">\(n\)</span>
-cases where the the fitted value for the <span class="math inline">\(i\)</span>th case is computed from the model fit
+cases where the fitted value for the <span class="math inline">\(i\)</span>th case is computed from the model fit
 with the fold including the <span class="math inline">\(i\)</span>th
 case omitted (i.e., fold <span class="math inline">\(j\)</span> for
 which <span class="math inline">\(i \in \mathbf{j}\)</span>).</p>
