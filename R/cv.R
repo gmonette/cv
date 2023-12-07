@@ -380,7 +380,6 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, fitted(model))
-  # adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
   adj.cv <- cv + cv.full -
     weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
@@ -513,7 +512,6 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
     } else {
       result <- vector(k, mode="list")
       for (i in 1L:k){
-        # result[i, ] <- f(i)
         result[[i]] <- f(i)
         yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
       }

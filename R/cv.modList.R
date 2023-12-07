@@ -184,11 +184,8 @@ plot.cvModList <- function(x, y,
     on.exit(par(save.mai))
   }
   if (inherits(x[[1L]], "cvList")){
-    # sd <- paste("SD", y)
     ynm <- paste(y, "range")
     sumry <- lapply(x, summarizeReps)
-    # min.y <- sapply(sumry, function(x) x[[y]] - x[[sd]])
-    # max.y <- sapply(sumry, function(x) x[[y]] + x[[sd]])
     min.y <- sapply(sumry, function(x) x[[ynm]][1])
     max.y <- sapply(sumry, function(x) x[[ynm]][2])
     plot(c(1L, length(x)), c(min(min.y), max(max.y)),

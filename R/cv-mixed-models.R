@@ -177,10 +177,8 @@ cvMixed <- function(model,
       yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
     }
   } else {
-    # result <- matrix(0, k, 2L)
     result <- vector(k, mode="list")
     for (i in 1L:k){
-      # result[i, ] <- f(i, predict.clusters.args, predict.cases.args, ...)
       result[[i]] <- f(i, predict.clusters.args, predict.cases.args, ...)
       yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
     }
