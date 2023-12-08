@@ -37,6 +37,9 @@
 #' @param xlab label for the x-axis (defaults to blank).
 #' @param ylab label for the y-axis (if missing, a label is constructed).
 #' @param main main title for the graph (if missing, a label is constructed).
+#' @param spread if \code{"range"}, the default, show the range of CV criteria
+#' for each model along with their average; if \code{"sd"}, show the average
+#' plus or minus 1 standard deviation.
 #' @param axis.args a list of arguments for the \code{\link{axis}()}
 #' function, used to draw the horizontal axis. In addition to
 #' the axis arguments given explicitly, \code{side=1} (the horizontal
@@ -122,7 +125,7 @@ print.cvModList <- function(x, ...){
   nms <- names(x)
   if (inherits(x[[1L]], "cvList")){
     reps <- length(x[[1L]])
-    nms <- paste0(nms, " (averaged across ", reps, " replications)")
+    nms <- paste0(nms, " averaged across ", reps, " replications (with SDs)")
   }
   for (i in seq_along(x)){
     cat(paste0("\nModel ", nms[i], ":\n"))
@@ -145,14 +148,20 @@ print.cvModList <- function(x, ...){
 #' @importFrom stats na.omit
 #' @exportS3Method
 plot.cvModList <- function(x, y,
+                           spread=c("range", "sd"),
                            xlab="",
                            ylab,
                            main,
                            axis.args = list(labels=names(x), las=3L),
                            col=palette()[2L], lwd=2, ...){
+  spread <- match.arg(spread)
   if (missing(ylab)){
     ylab <- if (inherits(x[[1L]], "cvList")){
-      "Cross-Validation Criterion (Average and Range)"
+      if (spread == "range"){
+        "Cross-Validation Criterion (Average and Range)"
+      } else {
+        expression("Cross-Validation Criterion (Average"%+-%"SD)")
+      }
     } else {
       "Cross-Validation Criterion"
     }
@@ -184,14 +193,24 @@ plot.cvModList <- function(x, y,
     on.exit(par(save.mai))
   }
   if (inherits(x[[1L]], "cvList")){
-    ynm <- paste(y, "range")
+    ynm <- if (spread == "range") {
+      paste(y, "range")
+    } else {
+      paste("SD", y)
+    }
     sumry <- lapply(x, summarizeReps)
-    min.y <- sapply(sumry, function(x) x[[ynm]][1])
-    max.y <- sapply(sumry, function(x) x[[ynm]][2])
+    crit <- sapply(sumry, function (x) x[[y]])
+    if (spread == "sd"){
+      sds <- sapply(sumry, function(x) x[[ynm]])
+      min.y <- crit - sds
+      max.y <- crit + sds
+    } else {
+      min.y <- sapply(sumry, function(x) x[[ynm]][1])
+      max.y <- sapply(sumry, function(x) x[[ynm]][2])
+    }
     plot(c(1L, length(x)), c(min(min.y), max(max.y)),
          xlab=xlab, ylab=ylab,
          main=main, axes=FALSE, type="n")
-    crit <- sapply(sumry, function (x) x[[y]])
     xs <- seq(along=x)
     points(xs, crit, type="b", col=col, lwd=lwd)
     arrows(xs, min.y, xs, max.y, length=0.125, angle=90,

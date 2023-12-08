@@ -20,6 +20,8 @@
 
 - Add cv.rlm() method.
 
+- plot.cvModList() can show averages +/- SDs as well as (the default) averages and ranges.
+
 - Add Pigs data set.
 
 - Improvements to documentation and expanded cv.Rmd vignette.

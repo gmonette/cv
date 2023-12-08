@@ -16,6 +16,7 @@ models(...)
 \method{plot}{cvModList}(
   x,
   y,
+  spread = c("range", "sd"),
   xlab = "",
   ylab,
   main,
@@ -62,6 +63,10 @@ errors, are suppressed.}
 \item{y}{the name of the element in each \code{"cv"} object to be
 plotted; defaults to \code{"adj CV crit"}, if it exists, or to
 \code{"CV crit"}.}
+
+\item{spread}{if \code{"range"}, the default, show the range of CV criteria
+for each model along with their average; if \code{"sd"}, show the average
+plus or minus 1 standard deviation.}
 
 \item{xlab}{label for the x-axis (defaults to blank).}
 
