@@ -87,6 +87,9 @@ nestedCV.default <- function(model, data=insight::get_data(model),
     }
   }
   mse <- mean(a) - mean(b)
+  adj.mse <- ((k-1)/k)*mse
+  if (adj.mse < se.cv^2) adj.mse <- se.cv^2
+  if (adj.mse > k*se.cv^2) adj.mse <- k*se.cv^2
   err.ncv <- mean(es)
   bias <- (1 + (k - 2)/k)*(err.ncv - err.cv)
   halfwidth <- qnorm(1 - (1 - level)/2)*sqrt(mse)
@@ -95,7 +98,7 @@ nestedCV.default <- function(model, data=insight::get_data(model),
   halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
   ci.lower.cv <- err.cv - halfwidth
   ci.upper.cv <- err.cv + halfwidth
-  result <- c(mse=mse, err.ncv=err.ncv, err.cv=err.cv, se.cv=se.cv,
+  result <- c(mse=mse, adj.mse=adj.mse, err.ncv=err.ncv, err.cv=err.cv, se.cv=se.cv,
     bias=bias, ci.lower.ncv=ci.lower.ncv, ci.upper.ncv=ci.upper.ncv,
     ci.lower.cv=ci.lower.cv, ci.upper.cv=ci.upper.cv, level=level,
     k=k, reps=reps)
@@ -111,6 +114,9 @@ summary.nestedCV <- function(object, digits=getOption("digits"), ...){
   cat("\n Estimated MSE of NCV estimate:",
       signif(object["mse"], digits=digits),
       paste0("(RMSE = ", signif(sqrt(object["mse"]), digits=digits), ")"))
+  cat("\n Adjusted estimated MSE of NCV estimate:",
+      signif(object["adj.mse"], digits=digits),
+      paste0("(RMSE = ", signif(sqrt(object["adj.mse"]), digits=digits), ")"))
   cat("\n CV estimate of error:",
       signif(object["err.cv"], digits=digits))
   cat("\n Std. error of CV estimate of error:",
@@ -255,15 +261,18 @@ nestedCV.lm <- function(model, data=insight::get_data(model),
     }
   }
   mse <- mean(a) - mean(b)
+  adj.mse <- ((k-1)/k)*mse
+  if (adj.mse < se.cv^2) adj.mse <- se.cv^2
+  if (adj.mse > k*se.cv^2) adj.mse <- k*se.cv^2
   err.ncv <- mean(es)
   bias <- (1 + (k - 2)/k)*(err.ncv - err.cv)
-  halfwidth <- qnorm(1 - (1 - level)/2)*sqrt(mse)
+  halfwidth <- qnorm(1 - (1 - level)/2)*sqrt(adj.mse)
   ci.lower.ncv <- err.ncv - bias - halfwidth
   ci.upper.ncv <- err.ncv - bias + halfwidth
   halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
   ci.lower.cv <- err.cv - halfwidth
   ci.upper.cv <- err.cv + halfwidth
-  result <- c(mse=mse, err.ncv=err.ncv, err.cv=err.cv, se.cv=se.cv,
+  result <- c(mse=mse, adj.mse=adj.mse, err.ncv=err.ncv, err.cv=err.cv, se.cv=se.cv,
               bias=bias, ci.lower.ncv=ci.lower.ncv, ci.upper.ncv=ci.upper.ncv,
               ci.lower.cv=ci.lower.cv, ci.upper.cv=ci.upper.cv, level=level,
               k=k, reps=reps)
