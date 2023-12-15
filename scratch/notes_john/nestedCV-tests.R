@@ -5,7 +5,18 @@ cv(m, k=5, criterion=mse, seed=123)
 
 summary(nestedCV(m, seed=123, k=5, reps=10))
 
+all.equal(
+  summary(nestedCV.default(m, seed=123, k=5, reps=10)),
+  summary(nestedCV(m, seed=123, k=5, reps=10))
+)
+
 summary(nestedCV(m, seed=123, k=10, reps=200))
+
+microbenchmark::microbenchmark(
+  update=nestedCV.default(m, seed=123, k=10, reps=200),
+  Woodbury=nestedCV(m, seed=123, k=10, reps=200),
+  times=5
+)
 
 D <- Duncan[-2, ]
 rownames(D) <- NULL
