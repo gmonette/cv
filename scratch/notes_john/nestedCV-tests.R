@@ -1,19 +1,18 @@
+library(cv)
 data("Duncan", package="carData")
 m <- lm(prestige ~ income + education, data=Duncan)
-cv(m, k=5, criterion=mse, rep=20)
+cv(m, k=5, criterion=mse, seed=123)
 
-nestedCV(m, seed=123, k=5, reps=10)
+summary(nestedCV(m, seed=123, k=5, reps=10))
 
-nestedCV(m, seed=123, k=10, reps=200)
+summary(nestedCV(m, seed=123, k=10, reps=200))
 
 D <- Duncan[-2, ]
 rownames(D) <- NULL
 mm <- lm(prestige ~ income + education, data=D)
-nestedCV(mm, seed=123, k=5, reps=10)
+summary(nestedCV(mm, seed=123, k=5, reps=10))
 
-
-# (seed <- sample(1e5, 1))
-
+# time-consuming:
 set.seed(37427)
 n <- 100
 p <- 20
