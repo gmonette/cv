@@ -11,23 +11,26 @@ nestedCV.default <- function(model, data=insight::get_data(model),
 
   innerCV <- function(j.omit){
     y <- getResponse(model)
-    folds <- (1:k)[-j.omit]
+    folds <- (1:k)[-j.omit] # omit the current fold
+    # indices of cases in the included folds:
     indices <- as.vector(unlist(mapply(function(s, e) s:e,
                                        starts[folds], ends[folds])))
-    e.in <- numeric(length(indices))
+    e.in <- numeric(length(indices)) # to accumulate result
     e.in.start <- 1
-    for (j in folds){
-      folds.j <- setdiff(folds, j)
+    for (j in folds){ # loop over included folds
+      folds.j <- setdiff(folds, j) # fold to hold out
+      # indices of cases excluding the hold-out fold
       indices.j <- as.vector(unlist(mapply(function(s, e) s:e,
                                            starts[folds.j], ends[folds.j])))
+      # refit with omitted and hold-out folds removed
       model.j <- update(model, data=data[indices.j, ])
-      indices.j <- starts[j]:ends[j]
-      yhat <- predict(model.j, newdata=data[indices.j, ])
+      indices.j <- starts[j]:ends[j] # indices of cases in hold0-out fold
+      yhat <- predict(model.j, newdata=data[indices.j, ]) # for hold-out fold
       e.in.end <- e.in.start + length(yhat) - 1
-      e.in[e.in.start:e.in.end] <- loss(y[names(yhat)], yhat)
+      e.in[e.in.start:e.in.end] <- loss(y[names(yhat)], yhat) # for hold-out fold
       e.in.start <- e.in.end + 1
     }
-    e.in
+    e.in # return
   }
 
   n <- nrow(data)
@@ -44,6 +47,7 @@ nestedCV.default <- function(model, data=insight::get_data(model),
   message("R RNG seed set to ", seed)
   nk <-  n %/% k # number of cases in each fold
   rem <- n %% k  # remainder
+  # folds holds *number* of cases in each fold
   folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
@@ -51,33 +55,34 @@ nestedCV.default <- function(model, data=insight::get_data(model),
 
   # ordinary cv:
   data <- data[sample(n, n), ] # permute cases
-  e <- numeric(n)
+  e <- numeric(n) # to accumulate cv components
   for(j in 1:k){
+    # indices of cases not in jth fold
     indices.j <- as.vector(unlist(mapply(function(s, e) s:e,
                                          starts[-j], ends[-j])))
-    mod <- update(model, data=data[indices.j, ])
-    yhat <- predict(mod, data[-indices.j, ])
-    # browser()
-    e[-indices.j] <- loss(y[names(yhat)], yhat)
+    mod <- update(model, data=data[indices.j, ]) # omitting cases in jth fold
+    yhat <- predict(mod, data[-indices.j, ]) # for cases in jth fold
+    e[-indices.j] <- loss(y[names(yhat)], yhat) # for cases in jth fold
   }
   err.cv <- mean(e)
   se.cv <- sd(e)/sqrt(n)
 
-  es <- numeric(sum(rep(n, k) - folds)*reps) # numeric()
-  a <- numeric(reps*k)
-  b <- numeric(reps*k)
+  es <- numeric(sum(rep(n, k) - folds)*reps) # to accumulate cv components
+  a <- numeric(reps*k) # to accumulate components for MSE calculation
+  b <- numeric(reps*k) # to accumulate components for MSE calculation
   i.es.start <- 1
   i.ab <- 0
   for (r in 1:reps){
-    data <- data[sample(n, n), ]
-    for (j in 1:k){
+    data <- data[sample(n, n), ] # (re-)permute data
+    for (j in 1:k){ # loops over folds
       e.in <- innerCV(j)
+      # indices of cases omitting the jth fold
       indices.j <- as.vector(unlist(mapply(function(s, e) s:e,
                                            starts[-j], ends[-j])))
-      mod <- update(model, data[indices.j, ])
-      indices.j <- starts[j]:ends[j]
-      yhat <- predict(mod, newdata=data[indices.j, ])
-      e.out <- loss(y[names(yhat)], yhat)
+      mod <- update(model, data[indices.j, ]) # omitting jth fold
+      indices.j <- starts[j]:ends[j] # indices of cases in jth fold
+      yhat <- predict(mod, newdata=data[indices.j, ]) # for cases in jth fold
+      e.out <- loss(y[names(yhat)], yhat) # for cases in jth fold
       i.ab <- i.ab + 1
       a[i.ab] <- (mean(e.in) - mean(e.out))^2
       b[i.ab] <-  var(e.out)/length(indices.j)
@@ -87,15 +92,15 @@ nestedCV.default <- function(model, data=insight::get_data(model),
     }
   }
   mse <- mean(a) - mean(b)
-  adj.mse <- ((k-1)/k)*mse
+  adj.mse <- ((k - 1)/k)*mse
   if (adj.mse < se.cv^2) adj.mse <- se.cv^2
   if (adj.mse > k*se.cv^2) adj.mse <- k*se.cv^2
   err.ncv <- mean(es)
   bias <- (1 + (k - 2)/k)*(err.ncv - err.cv)
-  halfwidth <- qnorm(1 - (1 - level)/2)*sqrt(mse)
+  halfwidth <- qnorm(1 - (1 - level)/2)*sqrt(mse) # for NCV CI
   ci.lower.ncv <- err.ncv - bias - halfwidth
   ci.upper.ncv <- err.ncv - bias + halfwidth
-  halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
+  halfwidth <- qnorm(1 - (1 - level)/2)*se.cv # for naive CI
   ci.lower.cv <- err.cv - halfwidth
   ci.upper.cv <- err.cv + halfwidth
   result <- c(mse=mse, adj.mse=adj.mse, err.ncv=err.ncv, err.cv=err.cv, se.cv=se.cv,
