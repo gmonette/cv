@@ -47,6 +47,7 @@ nestedCV.default <- function(model, data=insight::get_data(model),
   y <- getResponse(model)
 
   # ordinary cv:
+  data <- data[sample(n, n), ] # permute cases
   e <- numeric(n)
   for(j in 1:k){
     indices.j <- as.vector(unlist(mapply(function(s, e) s:e,
