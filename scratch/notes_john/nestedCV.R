@@ -1,0 +1,132 @@
+nestedCV <- function(model, data, loss, k=10, reps=200,
+                     seed, level=0.90, ...){
+  UseMethod("nestedCV")
+}
+
+squaredErrorLoss <- function(y, yhat) (y - yhat)^2
+
+nestedCV.default <- function(model, data=insight::get_data(model),
+                             loss=squaredErrorLoss, k=10, reps=200,
+                             seed, level=0.90, ...){
+
+  innerCV <- function(j.omit){
+    y <- getResponse(model)
+    folds <- (1:k)[-j.omit]
+    indices <- as.vector(unlist(mapply(function(s, e) s:e,
+                                       starts[folds], ends[folds])))
+    e.in <- numeric()
+    for (j in folds){
+      folds.j <- setdiff(folds, j)
+      indices.j <- as.vector(unlist(mapply(function(s, e) s:e,
+                                           starts[folds.j], ends[folds.j])))
+      model.j <- update(model, data=data[indices.j, ])
+      indices.j <- starts[j]:ends[j]
+      yhat <- predict(model.j, newdata=data[indices.j, ])
+      e.in <- c(e.in, loss(y[names(yhat)], yhat))
+    }
+    e.in
+  }
+
+  n <- nrow(data)
+  if (is.character(k)){
+    if (k == "n" || k == "loo") {
+      k <- n
+    }
+  }
+  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+    stop('k must be an integer between 2 and n or "n" or "loo"')
+  }
+  if (missing(seed)) seed <- sample(1e6, 1L)
+  set.seed(seed)
+  message("R RNG seed set to ", seed)
+  nk <-  n %/% k # number of cases in each fold
+  rem <- n %% k  # remainder
+  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
+  ends <- cumsum(folds) # end of each fold
+  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+  y <- getResponse(model)
+
+  # ordinary cv:
+  e <- numeric(n)
+  for(j in 1:k){
+    indices.j <- as.vector(unlist(mapply(function(s, e) s:e,
+                                         starts[-j], ends[-j])))
+    mod <- update(model, data=data[indices.j, ])
+    yhat <- predict(mod, data[-indices.j, ])
+    e[-indices.j] <- loss(y[names(yhat)], yhat)
+  }
+  err.cv <- mean(e)
+  se.cv <- sd(e)/sqrt(n)
+
+  es <- numeric(sum(rep(n, k) - folds)*reps) # numeric()
+  a <- numeric(reps*k)
+  b <- numeric(reps*k)
+  i.es.start <- 1
+  i.ab <- 0
+  for (r in 1:reps){
+    data <- data[sample(n, n), ]
+    for (j in 1:k){
+      e.in <- innerCV(j)
+      indices.j <- as.vector(unlist(mapply(function(s, e) s:e,
+                                           starts[-j], ends[-j])))
+      mod <- update(model, data[indices.j, ])
+      indices.j <- starts[j]:ends[j]
+      yhat <- predict(mod, newdata=data[indices.j, ])
+      e.out <- loss(y[names(yhat)], yhat)
+      i.ab <- i.ab + 1
+      a[i.ab] <- (mean(e.in) - mean(e.out))^2
+      b[i.ab] <-  var(e.out)/length(indices.j)
+      i.es.end <- (i.es.start + length(e.in)) - 1
+      es[i.es.start:i.es.end] <- e.in
+      i.es.start <- i.es.end + 1
+    }
+  }
+  mse <- mean(a) - mean(b)
+  err.ncv <- mean(es)
+  bias <- (1 + (k - 2)/k)*(err.ncv - err.cv)
+  halfwidth <- qnorm(1 - (1 - level)/2)*sqrt(mse)
+  ci.lower.ncv <- err.ncv - bias - halfwidth
+  ci.upper.ncv <- err.ncv - bias + halfwidth
+  halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
+  ci.lower.cv <- err.cv - halfwidth
+  ci.upper.cv <- err.cv + halfwidth
+  result <- c(mse=mse, err.ncv=err.ncv, err.cv=err.cv, se.cv=se.cv,
+    bias=bias, ci.lower.ncv=ci.lower.ncv, ci.upper.ncv=ci.upper.ncv,
+    ci.lower.cv=ci.lower.cv, ci.upper.cv=ci.upper.cv, level=level,
+    k=k, reps=reps)
+  class(result) <- "nestedCV"
+  result
+}
+
+summary.nestedCV <- function(object, digits=getOption("digits"), ...){
+  cat("", paste0(object["k"], "-fold Nested Cross Validation with"),
+      object["reps"], "Replications")
+  cat("\n Nested CV estimate of error:",
+      signif(object["err.ncv"], digits=digits))
+  cat("\n Estimated MSE of NCV estimate:",
+      signif(object["mse"], digits=digits),
+      paste0("(RMSE = ", signif(sqrt(object["mse"]), digits=digits), ")"))
+  cat("\n CV estimate of error:",
+      signif(object["err.cv"], digits=digits))
+  cat("\n Std. error of CV estimate of error:",
+      signif(object["se.cv"], digits=digits))
+  cat("\n Estimated bias of NCV estimate of error:",
+      signif(object["bias"], digits=digits))
+  cat(" \n", paste0(round(100*object["level"]), "%"),
+      "conf. int. for NCV estimate:",
+      paste0("(", signif(object["ci.lower.ncv"], digits=digits),
+             ", ", signif(object["ci.upper.ncv"], digits=digits), ")"))
+  cat(" \n", paste0(round(100*object["level"]), "%"),
+      "conf. int. for CV estimate:",
+      paste0("(", signif(object["ci.lower.cv"], digits=digits),
+             ", ", signif(object["ci.upper.cv"], digits=digits), ")\n"))
+}
+
+print.nestedCV <- function(x, digits=getOption("digits"), ...){
+  cat("", paste0(x["k"], "-fold Nested Cross Validation with"),
+      x["reps"], "Replications")
+  cat("\n Nested CV estimate of error:",
+      signif(x["err.ncv"], digits=digits))
+  invisible(x)
+}
+
