@@ -116,6 +116,8 @@ summary.nestedCV <- function(object, digits=getOption("digits"), ...){
       object["reps"], "Replications")
   cat("\n Nested CV estimate of error:",
       signif(object["err.ncv"], digits=digits))
+  cat("\n SD of nested CV errors:",
+      signif(object["err.ncv.sd"], digits=digits))
   cat("\n Estimated MSE of NCV estimate:",
       signif(object["mse"], digits=digits),
       paste0("(RMSE = ", signif(sqrt(object["mse"]), digits=digits), ")"))
@@ -147,8 +149,9 @@ print.nestedCV <- function(x, digits=getOption("digits"), ...){
 }
 
 nestedCV.lm <- function(model, data=insight::get_data(model),
-                             loss=squaredErrorLoss, k=10, reps=200,
-                             seed, level=0.90, ...){
+                        loss=squaredErrorLoss, k=10, reps=200,
+                        reps.cv=round(reps/5),
+                        seed, level=0.90, ...){
 
   UpdateLM <- function(omit){
     # compute coefficients with omit cases deleted
@@ -201,34 +204,41 @@ nestedCV.lm <- function(model, data=insight::get_data(model),
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
 
   # ordinary cv:
-  data <- data[order <- sample(n, n), ] # permute cases
-  model <- update(model, data=data)
-  b <- coef(model)
-  p <- length(b)
-  if (p > model$rank) {
-    message(paste0("The model has ", if (sum(is.na(b)) == 1L) "an ",
-                   "aliased coefficient", if (sum(is.na(b)) > 1L) "s", ":"))
-    print(b[is.na(b)])
-    message("Aliased coefficients removed from the model")
-    X <- X[, !is.na(b)]
-    p <- ncol(X)
-    model <- lm.wfit(X, y, w)
+  e <- matrix(0, n, reps.cv)
+  for (r in 1:reps.cv){
+    data <- data[order <- sample(n, n), ] # permute cases
+    model <- update(model, data=data)
+    b <- coef(model)
+    p <- length(b)
+    if (p > model$rank) {
+      message(paste0("The model has ", if (sum(is.na(b)) == 1L) "an ",
+                     "aliased coefficient", if (sum(is.na(b)) > 1L) "s", ":"))
+      print(b[is.na(b)])
+      message("Aliased coefficients removed from the model")
+      X <- X[, !is.na(b)]
+      p <- ncol(X)
+      model <- lm.wfit(X, y, w)
+    }
+
+    X <- model.matrix(model)
+    y <- getResponse(model)
+    w <- weights(model)
+    if (is.null(w)) w <- rep(1, length(y))
+    XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
+    Xy <- t(X) %*% (w * y)
+
+    # e <- numeric(n)
+    for(j in 1:k){
+      indices.j <- starts[j]:ends[j]
+      b.j <- UpdateLM(indices.j)
+      yhat <- (X[indices.j, ] %*% b.j)[, 1]
+      e[indices.j, r] <- loss(y[names(yhat)], yhat)
+    }
   }
 
-  X <- model.matrix(model)
-  y <- getResponse(model)
-  w <- weights(model)
-  if (is.null(w)) w <- rep(1, length(y))
-  XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
-  Xy <- t(X) %*% (w * y)
+  # browser()
 
-  e <- numeric(n)
-  for(j in 1:k){
-    indices.j <- starts[j]:ends[j]
-    b.j <- UpdateLM(indices.j)
-    yhat <- (X[indices.j, ] %*% b.j)[, 1]
-    e[indices.j] <- loss(y[names(yhat)], yhat)
-  }
+  e <- as.vector(e)
   err.cv <- mean(e)
   se.cv <- sd(e)/sqrt(n)
 
@@ -265,11 +275,13 @@ nestedCV.lm <- function(model, data=insight::get_data(model),
       i.es.start <- i.es.end + 1
     }
   }
+  assign("ab1", cbind(a, b), envir=.GlobalEnv)
   mse <- mean(a) - mean(b)
   adj.mse <- ((k-1)/k)*mse
   if (adj.mse < se.cv^2) adj.mse <- se.cv^2
   if (adj.mse > k*se.cv^2) adj.mse <- k*se.cv^2
   err.ncv <- mean(es)
+  err.ncv.sd <- sd(es)
   bias <- (1 + (k - 2)/k)*(err.ncv - err.cv)
   halfwidth <- qnorm(1 - (1 - level)/2)*sqrt(adj.mse)
   ci.lower.ncv <- err.ncv - bias - halfwidth
@@ -277,7 +289,8 @@ nestedCV.lm <- function(model, data=insight::get_data(model),
   halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
   ci.lower.cv <- err.cv - halfwidth
   ci.upper.cv <- err.cv + halfwidth
-  result <- c(mse=mse, adj.mse=adj.mse, err.ncv=err.ncv, err.cv=err.cv, se.cv=se.cv,
+  result <- c(mse=mse, adj.mse=adj.mse, err.ncv=err.ncv, err.ncv.sd=err.ncv.sd,
+              err.cv=err.cv, se.cv=se.cv,
               bias=bias, ci.lower.ncv=ci.lower.ncv, ci.upper.ncv=ci.upper.ncv,
               ci.lower.cv=ci.lower.cv, ci.upper.cv=ci.upper.cv, level=level,
               k=k, reps=reps)
