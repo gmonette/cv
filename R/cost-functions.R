@@ -45,7 +45,9 @@
 #' @describeIn cost-functions Mean-square error
 #' @export
 mse <- function(y, yhat){
-  mean((y - yhat)^2)
+  result <- mean((y - yhat)^2)
+  attr(result, "linear") <- TRUE
+  result
 }
 
 #' @describeIn cost-functions Root-mean-square error
@@ -67,12 +69,16 @@ BayesRule <- function(y, yhat){
   if (!all(y %in% c(0, 1))) stop("response values not all 0 or 1")
   if (any(yhat < 0) || any(yhat > 1)) stop("fitted values outside of interval [0, 1]")
   yhat <- round(yhat)
-  mean(y != yhat) # proportion in error
+  result <- mean(y != yhat) # proportion in error
+  attr(result, "linear") <- TRUE
+  result
 }
 
 #' @describeIn cost-functions Bayes rule for a binary response (without bounds checking)
 #' @export
 BayesRule2 <- function(y, yhat){
   yhat <- round(yhat)
-  mean(y != yhat) # proportion in error
+  result <- mean(y != yhat) # proportion in error
+  attr(result, "linear") <- TRUE
+  result
 }

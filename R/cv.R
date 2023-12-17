@@ -191,8 +191,13 @@ cv.default <- function(model, data=insight::get_data(model),
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, predict(model, type=type, ...))
-  adj.cv <- cv + cv.full -
-    weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+  linear <- attr(cv, "linear")
+  adj.cv <-if (!is.null(linear) && linear) {
+    cv + cv.full -
+      weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+  } else {
+    NULL
+  }
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  "method"=method,
@@ -380,8 +385,13 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, fitted(model))
-  adj.cv <- cv + cv.full -
-    weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+  linear <- attr(cv, "linear")
+  adj.cv <-if (!is.null(linear) && linear) {
+    cv + cv.full -
+      weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+  } else {
+    NULL
+  }
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  "method"=method,
@@ -518,8 +528,13 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
     }
     cv <- criterion(y, yhat)
     cv.full <- criterion(y, fitted(model))
-    adj.cv <- cv + cv.full -
-      weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+    linear <- attr(cv, "linear")
+    adj.cv <-if (!is.null(linear) && linear) {
+      cv + cv.full -
+        weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+    } else {
+      NULL
+    }
     result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                    "k" = if (k == n) "n" else k, "seed" = seed,
                    "method"=method,
