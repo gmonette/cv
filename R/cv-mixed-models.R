@@ -16,8 +16,8 @@
 #' @param data data frame to which the model was fit (not usually necessary)
 #' @param criterion cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
-#'        \code{yhat} the predicted values; the default is \code{\link{mse}}
-#'        (the mean-squared error)
+#'        \code{yhat} the predicted values; the default is \code{\link{rmse}}
+#'        (the root-mean-squared error)
 #' @param k perform k-fold cross-validation; \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation; the default is \code{10} if cross-validating individual
@@ -82,7 +82,7 @@
 cvMixed <- function(model,
                     package,
                     data=insight::get_data(model),
-                    criterion=mse,
+                    criterion=rmse,
                     k,
                     reps=1,
                     seed,
@@ -102,8 +102,9 @@ cvMixed <- function(model,
     update.args$data <- data[index, ]
     predict.clusters.args$object <- do.call(update, update.args, envir=pkg.env)
     fit.all.i <- do.call(predict, predict.clusters.args)
-    fit.i <- fit.all.i[!index]
-    c(criterion(y[!index], fit.i), criterion(y, fit.all.i))
+    fit.i <- fit.all.i[index <- !index]
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+         indices.i=index)
   }
 
   f.cases <- function(i, predict.clusters.args, predict.cases.args, ...){
@@ -114,7 +115,8 @@ cvMixed <- function(model,
     predict.cases.args$object <- do.call(update, update.args, envir=pkg.env)
     fit.all.i <- do.call(predict, predict.cases.args)
     fit.i <- fit.all.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+         indices.i=indices.i)
   }
   y <- getResponse(model)
 
@@ -156,21 +158,32 @@ cvMixed <- function(model,
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute clusters/cases
+  yhat <- if (is.factor(y)){
+    factor(rep(NA, n), levels=levels(y))
+  } else if (is.character(y)) {
+    character(n)
+  } else {
+    numeric(n)
+  }
 
   if (ncores > 1L){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
+    result <- foreach(i = 1L:k) %dopar% {
       f(i, predict.clusters.args, predict.cases.args, ...)
     }
     stopCluster(cl)
-  } else {
-    result <- matrix(0, k, 2L)
     for (i in 1L:k){
-      result[i, ] <- f(i, predict.clusters.args, predict.cases.args, ...)
+      yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
+    }
+  } else {
+    result <- vector(k, mode="list")
+    for (i in 1L:k){
+      result[[i]] <- f(i, predict.clusters.args, predict.cases.args, ...)
+      yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
     }
   }
-  cv <- weighted.mean(result[, 1L], folds)
+  cv <- criterion(y, yhat)
   args <-
     cv.full <- criterion(y,
                          do.call(predict,
@@ -180,7 +193,8 @@ cvMixed <- function(model,
                                    }
                          )
     )
-  adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
+  adj.cv <- cv + cv.full -
+    weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  clusters = clusterVariables,
@@ -213,7 +227,7 @@ cvMixed <- function(model,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
+cv.merMod <- function(model, data = insight::get_data(model), criterion = rmse,
                       k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -239,7 +253,7 @@ cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
+cv.lme <- function(model, data = insight::get_data(model), criterion = rmse,
                    k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -262,7 +276,7 @@ cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
+cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = rmse,
                        k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,

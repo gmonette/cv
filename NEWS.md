@@ -1,5 +1,7 @@
 # cv 1.1.0
 
+- cv() et al. now work properly with "nonlinear" CV criteria such as the new rmse() and medAbsErr(), not just with "linear" fit criteria such as mse() and BayesRule().
+
 - Generally suppress spurious messages about setting the seed in cv.modList() for LOO CV.
 
 - Fix bugs in selectTrans() that caused errors when one of response and predictors arguments not specified.
@@ -12,11 +14,13 @@
 
 - Add selectTransAndStepAIC() procedure for use with cvSelect().
 
-- Add medAbsErr() and rmse() cost criteria.
+- Add medAbsErr() and rmse() cost criteria; make rmse() the default, rather than mse().
 
 - Add coef.cvSelect() method.
 
 - Add cv.rlm() method.
+
+- plot.cvModList() can show averages +/- SDs as well as (the default) averages and ranges.
 
 - Add Pigs data set.
 

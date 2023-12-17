@@ -26,8 +26,10 @@ BayesRule2(y, yhat)
 }
 \value{
 In general, cost functions should return a single numeric
-value measuring lack-of-fit. \code{mse()} returns the mean-squared error; \code{BayesRule()} and
-\code{BayesRule2()} return the proportion of misclassified cases; etc.
+value measuring lack-of-fit. \code{mse()} returns the mean-squared error;
+\code{rmse()} returns the root-mean-squared error;
+\code{medAbsErr()} returns the median absolute error;
+and BayesRule()\code{and}BayesRule2()` return the proportion of misclassified cases.
 }
 \description{
 Compute cost functions (cross-validation criteria) for fitted
@@ -39,10 +41,7 @@ Cost functions (cross-validation criteria) are meant to measure lack-of-fit. Sev
 \item \code{mse()} returns the mean-squared error of prediction for
 a numeric response variable \code{y} and predictions \code{yhat}; and
 \code{rmse()} returns the root-mean-squared error and is just the
-square-root of \code{mse()}. Note, however, that because the CV estimates
-of MSE and RMSE are (weighted) averages over folds, it is \emph{not} true in general
-that the square-root of the CV estimate of MSE is equal to the CV estimate
-of RMSE.
+square-root of \code{mse()}.
 \item \code{medAbsErr()} returns the median absolute error of prediction for a numeric
 response \code{y} and predictions \code{yhat}.
 \item \code{BayesRule()} and \code{BayesRule2()} report the proportion

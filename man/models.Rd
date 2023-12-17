@@ -9,13 +9,14 @@
 \usage{
 models(...)
 
-\method{cv}{modList}(model, data, criterion = mse, k, reps = 1, seed, quietly = TRUE, ...)
+\method{cv}{modList}(model, data, criterion = rmse, k, reps = 1, seed, quietly = TRUE, ...)
 
 \method{print}{cvModList}(x, ...)
 
 \method{plot}{cvModList}(
   x,
   y,
+  spread = c("range", "sd"),
   xlab = "",
   ylab,
   main,
@@ -41,7 +42,7 @@ created by \code{models()}.}
 \item{data}{(required) the data set to which the models were fit.}
 
 \item{criterion}{the CV criterion ("cost" or lack-of-fit) function, defaults to
-\code{\link{mse}}.}
+\code{\link{rmse}}.}
 
 \item{k}{the number of CV folds; may be omitted, in which case the value
 will depend on the default for the \code{cv()} method invoked for the
@@ -62,6 +63,10 @@ errors, are suppressed.}
 \item{y}{the name of the element in each \code{"cv"} object to be
 plotted; defaults to \code{"adj CV crit"}, if it exists, or to
 \code{"CV crit"}.}
+
+\item{spread}{if \code{"range"}, the default, show the range of CV criteria
+for each model along with their average; if \code{"sd"}, show the average
+plus or minus 1 standard deviation.}
 
 \item{xlab}{label for the x-axis (defaults to blank).}
 

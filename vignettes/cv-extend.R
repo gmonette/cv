@@ -113,7 +113,7 @@ getResponse.glmmPQL <- function(model, ...){
 }
 
 ## ----cv.glmmPQL---------------------------------------------------------------
-cv.glmmPQL <- function(model, data = model$data, criterion = mse,
+cv.glmmPQL <- function(model, data = model$data, criterion = rmse,
                      k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -182,7 +182,7 @@ cv(m.best, seed=8433) # use same folds as before
 selectSubsets <- function(data=insight::get_data(model), 
                           model,
                           indices,
-                          criterion=mse,
+                          criterion=rmse,
                           save.coef=TRUE, ...){
   
   if (inherits(model, "lm", which=TRUE) != 1)
@@ -213,10 +213,11 @@ selectSubsets <- function(data=insight::get_data(model),
               # predict() doesn't work here:
   fit.all.i <- as.vector(X[, x.names.i] %*% coef(m.best.i))
   fit.i <- fit.all.i[indices]
-  # return the CV criteria and the regression coefficients
-  list(criterion=c(criterion(y[indices], fit.i), # for i-th fold
-                   criterion(y, fit.all.i)), # for all data
-       coefficients = if (save.coef){
+  # return the fitted values for i-th fold, CV criterion for all cases, 
+  #   and the regression coefficients
+  list(fit.i=fit.i, # fitted values for i-th fold
+       crit.all.i=criterion(y, fit.all.i), # CV crit for all cases
+       coefficients = if (save.coef){ # regression coefficients
          coefs <- coef(m.best.i)
          
          # fix coefficient names

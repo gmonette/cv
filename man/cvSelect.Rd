@@ -12,6 +12,9 @@
 cvSelect(
   procedure,
   data,
+  criterion = rmse,
+  model,
+  y.expression,
   k = 10,
   reps = 1,
   save.coef = k <= 10,
@@ -24,7 +27,7 @@ selectStepAIC(
   data,
   indices,
   model,
-  criterion = mse,
+  criterion = rmse,
   AIC = TRUE,
   save.coef = TRUE,
   ...
@@ -35,7 +38,7 @@ selectTrans(
   indices,
   save.coef = TRUE,
   model,
-  criterion = mse,
+  criterion = rmse,
   predictors,
   response,
   family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
@@ -49,7 +52,7 @@ selectTransStepAIC(
   indices,
   save.coef = TRUE,
   model,
-  criterion = mse,
+  criterion = rmse,
   predictors,
   response,
   family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
@@ -67,6 +70,16 @@ compareFolds(object, digits = 3, ...)
 \item{procedure}{a model-selection procedure function (see Details).}
 
 \item{data}{full data frame for model selection.}
+
+\item{criterion}{a CV criterion ("cost" or lack-of-fit) function.}
+
+\item{model}{a regression model object fit to data.}
+
+\item{y.expression}{normally the response variable is found from the
+\code{model} argument; but if, for a particular selection procedure, the
+\code{model} argument is absent, or if the response can't be inferred from the
+model, the response can be specified by an expression, such as \code{expression(log(income))},
+to be evaluated within the data set provided by the \code{data} argument.}
 
 \item{k}{perform k-fold cross-validation (default is 10); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
@@ -86,10 +99,6 @@ cross-validation.}
 for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.}
 
 \item{indices}{indices of cases in data defining the current fold.}
-
-\item{model}{a regression model object fit to data.}
-
-\item{criterion}{a CV criterion ("cost" or lack-of-fit) function.}
 
 \item{AIC}{if \code{TRUE} (the default) use the AIC as the
 model-selection criterion; if \code{FALSE}, use the BIC.
@@ -160,10 +169,12 @@ the model-selection procedure is applied to the full \code{data}.}
 \item{other arguments}{to be passed via \code{...}
 from \code{cvSelect()}.}
 }
-\code{procedure()} should return a two-element vector with the result
-of applying a cross-validation criterion to the cases in
-the current fold for the model deleting that fold, and to
-all of the cases, again for the model deleting the current fold.
+\code{procedure()} should return a list with the following
+named elements: \code{fit.i}, the vector of predicted values for the cases in
+the current fold computed from the model omitting these cases;
+\code{crit.all.i}, the CV criterion computed for all of the cases using
+the model omitting the current fold; and (optionally) \code{coefficients},
+parameter estimates from the model computed omitting the current fold.
 
 When the \code{indices} argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
 the model fit to all of the cases.

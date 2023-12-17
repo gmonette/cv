@@ -9,8 +9,8 @@
 #' @param data data frame to which the model was fit (not usually necessary).
 #' @param criterion cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
-#'        \code{yhat} the predicted values; the default is \code{\link{mse}}
-#'        (the mean-squared error).
+#'        \code{yhat} the predicted values; the default is \code{\link{rmse}}
+#'        (the root-mean-squared error).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
@@ -114,7 +114,7 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 #' @importFrom MASS rlm
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
-                       criterion=mse, k=10, reps=1, seed, ncores=1,
+                       criterion=rmse, k=10, reps=1, seed, ncores=1,
                        method=NULL, type="response", ...){
 
   f <- function(i){
@@ -123,7 +123,7 @@ cv.default <- function(model, data=insight::get_data(model),
     model.i <- update(model, data=data[ - indices.i, ])
     fit.all.i <- predict(model.i, newdata=data, type=type, ...)
     fit.i <- fit.all.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
   }
 
   fPara <- function(i){
@@ -136,7 +136,7 @@ cv.default <- function(model, data=insight::get_data(model),
       newdata=data, type=type), dots)
     fit.all.i <- do.call(predict, predict.args)
     fit.i <- fit.all.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
   }
 
   y <- getResponse(model)
@@ -164,23 +164,40 @@ cv.default <- function(model, data=insight::get_data(model),
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
+  yhat <- if (is.factor(y)){
+    factor(rep(NA, n), levels=levels(y))
+  } else if (is.character(y)) {
+    character(n)
+  } else {
+    numeric(n)
+  }
   if (ncores > 1){
     dots <- list(...)
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
+    result <- foreach(i = 1L:k) %dopar% {
       fPara(i)
     }
     stopCluster(cl)
-  } else {
-    result <- matrix(0, k, 2L)
     for (i in 1L:k){
-      result[i, ] <- f(i)
+      yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+    }
+  } else {
+    result <- vector(k, mode="list")
+    for (i in 1L:k){
+      result[[i]] <- f(i)
+      yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
     }
   }
-  cv <- weighted.mean(result[, 1L], folds)
+  cv <- criterion(y, yhat)
   cv.full <- criterion(y, predict(model, type=type, ...))
-  adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
+  linear <- attr(cv, "linear")
+  adj.cv <-if (!is.null(linear) && linear) {
+    cv + cv.full -
+      weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+  } else {
+    NULL
+  }
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  "method"=method,
@@ -247,10 +264,6 @@ print.cv <- function(x, digits=getOption("digits"), ...){
 print.cvList <- function(x, ...){
   reps <- length(x)
   names(x) <- paste("Replicate", 1L:reps)
-  # CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
-  # CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
-  # adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
-  # adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
   x$Average <- x[[1L]]
   sumry <-   summarizeReps(x)
   x$Average[["CV crit"]] <- sumry[["CV crit"]]
@@ -266,7 +279,7 @@ print.cvList <- function(x, ...){
 
 #' @describeIn cv \code{"lm"} method
 #' @export
-cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
+cv.lm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
                   reps=1, seed, method=c("auto", "hatvalues", "Woodbury", "naive"),
                   ncores=1, ...){
   UpdateLM <- function(omit){
@@ -285,7 +298,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     b.i <- UpdateLM(indices.i)
     fit.all.i <- X %*% b.i
     fit.i <- fit.all.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
   }
   X <- model.matrix(model)
   y <- getResponse(model)
@@ -328,7 +341,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model)/(1 -h)
-    cv <- mean(mapply(criterion, y=y, yhat=yhat)) # criterion(y, yhat)
+    cv <- criterion(y, yhat)
     result <- list(k="n", "CV crit" = cv, "method"=method,
                    "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
@@ -352,22 +365,33 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
+  yhat <- numeric(n)
   if (ncores > 1L){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
+    result <- foreach(i = 1L:k) %dopar% {
       f(i)
     }
     stopCluster(cl)
-  } else {
-    result <- matrix(0, k, 2L)
     for (i in 1L:k){
-      result[i, ] <- f(i)
+      yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+    }
+  } else {
+    result <- vector(k, mode="list")
+    for (i in 1L:k){
+      result[[i]] <- f(i)
+      yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
     }
   }
-  cv <- weighted.mean(result[, 1L], folds)
+  cv <- criterion(y, yhat)
   cv.full <- criterion(y, fitted(model))
-  adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
+  linear <- attr(cv, "linear")
+  adj.cv <-if (!is.null(linear) && linear) {
+    cv + cv.full -
+      weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+  } else {
+    NULL
+  }
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  "method"=method,
@@ -393,7 +417,7 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
 
 #' @describeIn cv \code{"glm"} method
 #' @export
-cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
+cv.glm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
                    reps=1, seed, method=c("exact", "hatvalues", "Woodbury"),
                    ncores=1,
                    ...){
@@ -413,7 +437,7 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     b.i <- UpdateIWLS(indices.i)
     fit.all.i <- linkinv(X %*% b.i)
     fit.i <- fit.all.i[indices.i]
-    c(criterion(y[indices.i], fit.i), criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
   }
   n <- nrow(data)
   if (is.character(k)){
@@ -449,7 +473,7 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
       stop("there are hatvalues numerically equal to 1")
     yhat <- y - residuals(model, type="response")/(1 - h)
-    cv <- mean(mapply(criterion, y=y, yhat=yhat)) # criterion(y, yhat)
+    cv <- criterion(y, yhat) # mean(mapply(criterion, y=y, yhat=yhat))
     result <- list(k="n", "CV crit" = cv, method=method,
                    "criterion" = deparse(substitute(criterion)))
     class(result) <- "cv"
@@ -484,22 +508,33 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=mse, k=10,
     ends <- cumsum(folds) # end of each fold
     starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
     indices <- if (n > k) sample(n, n)  else 1:n # permute cases
+    yhat <- numeric(n)
     if (ncores > 1L){
       cl <- makeCluster(ncores)
       registerDoParallel(cl)
-      result <- foreach(i = 1L:k, .combine=rbind) %dopar% {
+      result <- foreach(i = 1L:k) %dopar% {
         f(i)
       }
       stopCluster(cl)
-    } else {
-      result <- matrix(0, k, 2L)
       for (i in 1L:k){
-        result[i, ] <- f(i)
+        yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      }
+    } else {
+      result <- vector(k, mode="list")
+      for (i in 1L:k){
+        result[[i]] <- f(i)
+        yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
       }
     }
-    cv <- weighted.mean(result[, 1L], folds)
+    cv <- criterion(y, yhat)
     cv.full <- criterion(y, fitted(model))
-    adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
+    linear <- attr(cv, "linear")
+    adj.cv <-if (!is.null(linear) && linear) {
+      cv + cv.full -
+        weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+    } else {
+      NULL
+    }
     result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                    "k" = if (k == n) "n" else k, "seed" = seed,
                    "method"=method,

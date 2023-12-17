@@ -10,6 +10,11 @@
 #'
 #' @param procedure a model-selection procedure function (see Details).
 #' @param data full data frame for model selection.
+#' @param y.expression normally the response variable is found from the
+#' \code{model} argument; but if, for a particular selection procedure, the
+#' \code{model} argument is absent, or if the response can't be inferred from the
+#' model, the response can be specified by an expression, such as \code{expression(log(income))},
+#' to be evaluated within the data set provided by the \code{data} argument.
 #' @param k perform k-fold cross-validation (default is 10); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
@@ -44,10 +49,12 @@
 #'   \item{other arguments}{to be passed via \code{...}
 #'   from \code{cvSelect()}.}
 #' }
-#' \code{procedure()} should return a two-element vector with the result
-#' of applying a cross-validation criterion to the cases in
-#' the current fold for the model deleting that fold, and to
-#' all of the cases, again for the model deleting the current fold.
+#' \code{procedure()} should return a list with the following
+#' named elements: \code{fit.i}, the vector of predicted values for the cases in
+#' the current fold computed from the model omitting these cases;
+#' \code{crit.all.i}, the CV criterion computed for all of the cases using
+#' the model omitting the current fold; and (optionally) \code{coefficients},
+#' parameter estimates from the model computed omitting the current fold.
 #'
 #' When the \code{indices} argument is missing, \code{procedure()} returns the cross-validation criterion for all of the cases based on
 #' the model fit to all of the cases.
@@ -65,10 +72,18 @@
 #' \code{\link[car]{powerTransform}}
 #'
 #' @export
-cvSelect <- function(procedure, data, k=10, reps=1,
+cvSelect <- function(procedure, data, criterion=rmse,
+                     model, y.expression,
+                     k=10, reps=1,
                      save.coef = k <= 10,
                      seed, ncores=1, ...){
   n <- nrow(data)
+  y <- if (!missing(model)) {
+    getResponse(model)
+    } else {
+      eval(y.expression, envir=data)
+    }
+  if (missing(model)) model <- NULL
   if (is.character(k)){
     if (k == "n" || k == "loo") {
       k <- n
@@ -96,42 +111,52 @@ cvSelect <- function(procedure, data, k=10, reps=1,
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
+  yhat <- if (is.factor(y)){
+    factor(rep(NA, n), levels=levels(y))
+  } else if (is.character(y)) {
+    character(n)
+  } else {
+    numeric(n)
+  }
+  crit.all.i <- numeric(k)
+
   if (ncores > 1){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    arglist <- c(list(data=data, indices=1, save.coef=save.coef),
+    arglist <- c(list(data=data, indices=1, save.coef=save.coef,
+                      criterion=criterion, model=model),
                  list(...))
-    selection <- foreach(i = 1L:k, .combine=c) %dopar% {
+    selection <- foreach(i = 1L:k) %dopar% {
       # the following deals with a scoping issue that can
       #   occur with args passed via ...
       arglist$indices <- indices[starts[i]:ends[i]]
-      selection <- do.call(procedure, arglist)
-    }
-    if (save.coef){
-      is <- seq(1L:(2*k))
-      # CV criteria saved in odd-numbered elements
-      #   coefficients in even-numbered elements
-      result <- do.call(rbind, selection[is %% 2 == 1])
-      coefs <- do.call(list, selection[is %% 2 == 0])
-      names(coefs) <- NULL
-    } else {
-      result <- do.call(rbind, selection)
-      coefs <- NULL
+      do.call(procedure, arglist)
     }
     stopCluster(cl)
+    for (i in 1L:k){
+      yhat[indices[starts[i]:ends[i]]] <- selection[[i]]$fit.i
+      crit.all.i[i] <- selection[[i]]$crit.all.i
+    }
+    coefs <- if (save.coef){
+      lapply(selection, function(x) x$coefficients)
+    } else {
+      NULL
+    }
   } else {
-    result <- matrix(0, k, 2L)
     coefs <- vector(k, mode="list")
     for (i in 1L:k){
-      selection <- procedure(data, indices[starts[i]:ends[i]],
-                             save.coef=save.coef, ...)
-      result[i, ] <- selection[[1]]
-      if (save.coef) coefs[[i]] <- selection[[2]]
+      indices.i <- indices[starts[i]:ends[i]]
+      selection <- procedure(data, indices.i,
+                             save.coef=save.coef,
+                             criterion=criterion, model=model, ...)
+      crit.all.i[i] <- selection$crit.all.i
+      yhat[indices.i] <- selection$fit.i
+      if (save.coef) coefs[[i]] <- selection$coefficients
     }
   }
-  cv <- weighted.mean(result[, 1L], folds)
-  cv.full <- procedure(data, ...)
-  adj.cv <- cv + cv.full - weighted.mean(result[, 2L], folds)
+  cv <- criterion(y, yhat)
+  cv.full <- procedure(data, model=model, criterion=criterion, ...)
+  adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  coefficients = if (save.coef) coefs else NULL)
@@ -139,9 +164,11 @@ cvSelect <- function(procedure, data, k=10, reps=1,
   if (reps == 1) {
     return(result)
   } else {
+    if (missing(y.expression)) y.expression <- NULL
     res <- cvSelect(procedure=procedure, data=data, k=k,
                     reps = reps - 1, save.coef = save.coef,
-                    ncores=ncores, ...)
+                    ncores=ncores, model=model,
+                    y.expression=y.expression, ...)
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {
@@ -170,7 +197,7 @@ cvSelect <- function(procedure, data, k=10, reps=1,
 #'          AIC=FALSE, k=5, reps=3) # via BIC
 #' @export
 selectStepAIC <- function(data, indices,
-                          model, criterion=mse, AIC=TRUE,
+                          model, criterion=rmse, AIC=TRUE,
                           save.coef=TRUE, ...){
   y <- getResponse(model)
   if (missing(indices)) {
@@ -184,8 +211,7 @@ selectStepAIC <- function(data, indices,
   model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
   fit.all.i <- predict(model.i, newdata=data, type="response")
   fit.i <- fit.all.i[indices]
-  list(criterion=c(criterion(y[indices], fit.i),
-         criterion(y, fit.all.i)),
+  list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
        coefficients=if (save.coef) coef(model.i) else NULL)
 }
 
@@ -276,7 +302,7 @@ yjPowerInverse <- function(y, lambda) {
 #' cv(m.pres, seed=123)
 #' @export
 selectTrans <- function(data, indices, save.coef=TRUE, model,
-                        criterion=mse, predictors, response,
+                        criterion=rmse, predictors, response,
                         family=c("bcPower", "bcnPower", "yjPower", "basicPower"),
                         family.y=c("bcPower", "bcnPower", "yjPower", "basicPower"),
                         rounded=TRUE,
@@ -371,10 +397,8 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
 
   if (full.sample) return(criterion(y, fit.o.i))
   # ... and for current fold only:
-  fit.i <- fit.o.i[indices]
-  # compute and return CV criteria and transformation parameters:
-  list(criterion = c(criterion(y[indices], fit.i),
-                     criterion(y, fit.o.i)),
+  # compute and return CV info and transformation parameters:
+  list(fit.i=fit.o.i[indices], crit.all.i=criterion(y, fit.o.i),
        coefficients = if (save.coef) c(lambdas, gammas, transy)
   )
 }
@@ -402,7 +426,7 @@ selectTransStepAIC <- function(data,
                                indices,
                                save.coef = TRUE,
                                model,
-                               criterion = mse,
+                               criterion = rmse,
                                predictors,
                                response,
                                family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
@@ -554,11 +578,15 @@ selectTransStepAIC <- function(data,
     }
   }
 
+  # for full sample:
   if (missing(indices)) return(criterion(y, fit.all.i))
 
-  list(criterion=c(criterion(y[indices], fit.all.i[indices]),
-                   criterion(y, fit.all.i)),
-       coefficients=if (save.coef) c(powers, coef(model.i)) else NULL)
+  # ... and for current fold only:
+  # compute and return CV info, transformation parameters,
+  #   and regression coefficients:
+  list(fit.i=fit.all.i[indices], crit.all.i=criterion(y, fit.all.i),
+       coefficients=if (save.coef) c(powers, coef(model.i)) else NULL
+  )
 }
 
 

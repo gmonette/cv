@@ -15,10 +15,7 @@
 #' 1. \code{mse()} returns the mean-squared error of prediction for
 #' a numeric response variable \code{y} and predictions \code{yhat}; and
 #' \code{rmse()} returns the root-mean-squared error and is just the
-#' square-root of \code{mse()}. Note, however, that because the CV estimates
-#' of MSE and RMSE are (weighted) averages over folds, it is \emph{not} true in general
-#' that the square-root of the CV estimate of MSE is equal to the CV estimate
-#' of RMSE.
+#' square-root of \code{mse()}.
 #' 2. \code{medAbsErr()} returns the median absolute error of prediction for a numeric
 #' response \code{y} and predictions \code{yhat}.
 #' 3. \code{BayesRule()} and \code{BayesRule2()} report the proportion
@@ -31,8 +28,11 @@
 #' the latter doesn't and is therefore faster.
 #'
 #' @returns In general, cost functions should return a single numeric
-#' value measuring lack-of-fit. `mse()` returns the mean-squared error; `BayesRule()` and
-#' `BayesRule2()` return the proportion of misclassified cases; etc.
+#' value measuring lack-of-fit. `mse()` returns the mean-squared error;
+#' `rmse()` returns the root-mean-squared error;
+#' `medAbsErr()` returns the median absolute error;
+#' and BayesRule()` and
+#' `BayesRule2()` return the proportion of misclassified cases.
 #' @examples
 #' data("Duncan", package="carData")
 #' m.lm <- lm(prestige ~ income + education, data=Duncan)
@@ -45,7 +45,9 @@
 #' @describeIn cost-functions Mean-square error
 #' @export
 mse <- function(y, yhat){
-  mean((y - yhat)^2)
+  result <- mean((y - yhat)^2)
+  attr(result, "linear") <- TRUE
+  result
 }
 
 #' @describeIn cost-functions Root-mean-square error
@@ -67,12 +69,16 @@ BayesRule <- function(y, yhat){
   if (!all(y %in% c(0, 1))) stop("response values not all 0 or 1")
   if (any(yhat < 0) || any(yhat > 1)) stop("fitted values outside of interval [0, 1]")
   yhat <- round(yhat)
-  mean(y != yhat) # proportion in error
+  result <- mean(y != yhat) # proportion in error
+  attr(result, "linear") <- TRUE
+  result
 }
 
 #' @describeIn cost-functions Bayes rule for a binary response (without bounds checking)
 #' @export
 BayesRule2 <- function(y, yhat){
   yhat <- round(yhat)
-  mean(y != yhat) # proportion in error
+  result <- mean(y != yhat) # proportion in error
+  attr(result, "linear") <- TRUE
+  result
 }

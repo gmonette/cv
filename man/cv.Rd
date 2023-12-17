@@ -15,7 +15,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \method{cv}{default}(
   model,
   data = insight::get_data(model),
-  criterion = mse,
+  criterion = rmse,
   k = 10,
   reps = 1,
   seed,
@@ -32,7 +32,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \method{cv}{lm}(
   model,
   data = insight::get_data(model),
-  criterion = mse,
+  criterion = rmse,
   k = 10,
   reps = 1,
   seed,
@@ -44,7 +44,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \method{cv}{glm}(
   model,
   data = insight::get_data(model),
-  criterion = mse,
+  criterion = rmse,
   k = 10,
   reps = 1,
   seed,
@@ -62,8 +62,8 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 
 \item{criterion}{cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 where \code{y} is the observed values of the response and
-\code{yhat} the predicted values; the default is \code{\link{mse}}
-(the mean-squared error).}
+\code{yhat} the predicted values; the default is \code{\link{rmse}}
+(the root-mean-squared error).}
 
 \item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)

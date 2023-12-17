@@ -49,6 +49,13 @@ test_that("glm Woodbury vs exact k=10", {
                cv(glm.fit, k=10, method="exact", seed=123)[1:3])
 })
 
+# test that nonlinear CV criterion is computed correctly
+
+test_that("lm mse vs rmse", {
+  expect_equal(unlist(cv(lm.fit, k=5, seed=123, criterion=mse)[c(1, 3)]),
+               unlist(cv(lm.fit, k=5, seed=123, criterion=rmse)[c(1, 3)])^2)
+})
+
 # longer tests
 
 # test that parallel computations work for a linear model
@@ -92,18 +99,19 @@ if (require(boot)){
   test_that("glm method for linear model matches boot::cv.glm()", {
     skip_on_cran()
     expect_equal(boot::cv.glm(Auto, glm.fit)$delta,
-                 as.vector(unlist(cv(glm.fit, k="loo")[1:2])))
+                 as.vector(unlist(cv(glm.fit, k="loo", criterion=mse)[1:2])))
   })
 
   test_that("lm method matches boot::cv.glm()", {
     skip_on_cran()
     expect_equal(boot::cv.glm(Auto, glm.fit)$delta,
-                 as.vector(unlist(cv(lm.fit, k="loo", method="Woodbury")[1:2])))
+                 as.vector(unlist(cv(lm.fit, k="loo",
+                                     criterion=mse, method="Woodbury")[1:2])))
   })
 
   test_that("glm method for GLM matches boot::cv.glm()", {
     skip_on_cran()
     expect_equal(boot::cv.glm(Cara, m.caravan)$delta,
-                 as.vector(unlist(cv(m.caravan, k="loo")[1:2])))
+                 as.vector(unlist(cv(m.caravan, k="loo", criterion=mse)[1:2])))
   })
 }
