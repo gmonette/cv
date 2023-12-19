@@ -11,7 +11,7 @@
 #' created by \code{models()}.
 #' @param data (required) the data set to which the models were fit.
 #' @param criterion the CV criterion ("cost" or lack-of-fit) function, defaults to
-#' \code{\link{rmse}}.
+#' \code{\link{mse}}.
 #' @param k the number of CV folds; may be omitted, in which case the value
 #' will depend on the default for the \code{cv()} method invoked for the
 #' individual models.
@@ -91,7 +91,7 @@ models <- function(...){
 
 #' @describeIn models \code{cv()} method for \code{"modList"} objects
 #' @exportS3Method
-cv.modList <- function(model, data, criterion=rmse, k, reps=1, seed, quietly=TRUE, ...){
+cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE, ...){
   n.models <- length(model)
   if (missing(seed)) seed <- sample(1e6, 1L)
   result <- vector(n.models, mode="list")

@@ -50,23 +50,23 @@ for (p in 1:5){
 legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
        title="Degree", inset=0.02)
 
-## ----mpg-horsepower-RMSE-se---------------------------------------------------
-library("cv") # for rmse() and other functions
+## ----mpg-horsepower-MSE-se----------------------------------------------------
+library("cv") # for mse() and other functions
 
-se <- rmse <- numeric(10)
+var <- mse <- numeric(10)
 for (p in 1:10){
   m <- lm(mpg ~ poly(horsepower, p), data=Auto)
-  rmse[p] <- rmse(Auto$mpg, fitted(m))
-  se[p] <- summary(m)$sigma
+  mse[p] <- mse(Auto$mpg, fitted(m))
+  var[p] <- summary(m)$sigma^2
 }
 
-plot(c(1, 10), range(rmse, se), type="n",
+plot(c(1, 10), range(mse, var), type="n",
      xlab="Degree of polynomial, p",
-     ylab="Estimated Error")
-lines(1:10, rmse, lwd=2, lty=1, col=2, pch=16, type="b")
-lines(1:10, se, lwd=2, lty=2, col=3, pch=17, type="b")
+     ylab="Estimated Squared Error")
+lines(1:10, mse, lwd=2, lty=1, col=2, pch=16, type="b")
+lines(1:10, var, lwd=2, lty=2, col=3, pch=17, type="b")
 legend("topright", inset=0.02,
-       legend=c(expression(hat(sigma)), "RMSE"),
+       legend=c(expression(hat(sigma)^2), "MSE"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 
 ## ----cv-lm-1------------------------------------------------------------------
@@ -105,13 +105,13 @@ cv.auto.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
 cv.auto.loo[1:2] # linear and quadratic models
 
 ## ----polynomial-regression-CV-graph-------------------------------------------
-cv.rmse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
-cv.rmse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
-plot(c(1, 10), range(cv.rmse.10, cv.rmse.loo), type="n",
+cv.mse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
+cv.mse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
+plot(c(1, 10), range(cv.mse.10, cv.mse.loo), type="n",
      xlab="Degree of polynomial, p",
-     ylab="Cross-Validated RMSE")
-lines(1:10, cv.rmse.10, lwd=2, lty=1, col=2, pch=16, type="b")
-lines(1:10, cv.rmse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
+     ylab="Cross-Validated MSE")
+lines(1:10, cv.mse.10, lwd=2, lty=1, col=2, pch=16, type="b")
+lines(1:10, cv.mse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
 legend("topright", inset=0.02,
        legend=c("10-Fold CV", "LOO CV"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
@@ -375,7 +375,7 @@ m.select <- stepAIC(m.null,
                     direction="forward", trace=FALSE,
                     scope=list(lower=~1, upper=formula(m.full)))
 summary(m.select)
-rmse(D$y, fitted(m.select))
+mse(D$y, fitted(m.select))
 
 ## ----cv-selectedModel---------------------------------------------------------
 cv(m.select, seed=2529)
@@ -437,8 +437,8 @@ scatterplotMatrix(~ prestige + income + education + women,
 ## ----prestige-regressions-----------------------------------------------------
 m.pres <- lm(prestige ~ income + education + women, data=Prestige)
 m.pres.trans <- lm(prestige ~ income + education + women, data=P)
-rmse(Prestige$prestige, fitted(m.pres))
-rmse(P$prestige, fitted(m.pres.trans))
+mse(Prestige$prestige, fitted(m.pres))
+mse(P$prestige, fitted(m.pres.trans))
 
 ## ----CR-plots-untransformed---------------------------------------------------
 crPlots(m.pres)
@@ -528,11 +528,11 @@ summary(m.step)
 
 Anova(m.step)
 
-## ----RMSE-whole-selected-model------------------------------------------------
-rmse(Auto$mpg, exp(fitted(m.step)))
+## ----MSE-whole-selected-model-------------------------------------------------
+mse(Auto$mpg, exp(fitted(m.step)))
 
-## ----RMSE-working-model-------------------------------------------------------
-rmse(Auto$mpg, fitted(m.auto))
+## ----MSE-working-model--------------------------------------------------------
+mse(Auto$mpg, fitted(m.auto))
 
 ## ----Auto-median-absolute-error-----------------------------------------------
 medAbsErr(Auto$mpg, exp(fitted(m.step)))

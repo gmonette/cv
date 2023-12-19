@@ -12,10 +12,12 @@
 cvSelect(
   procedure,
   data,
-  criterion = rmse,
+  criterion = mse,
   model,
   y.expression,
   k = 10,
+  confint = n >= 400,
+  level = 0.95,
   reps = 1,
   save.coef = k <= 10,
   seed,
@@ -27,7 +29,7 @@ selectStepAIC(
   data,
   indices,
   model,
-  criterion = rmse,
+  criterion = mse,
   AIC = TRUE,
   save.coef = TRUE,
   ...
@@ -38,7 +40,7 @@ selectTrans(
   indices,
   save.coef = TRUE,
   model,
-  criterion = rmse,
+  criterion = mse,
   predictors,
   response,
   family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
@@ -52,7 +54,7 @@ selectTransStepAIC(
   indices,
   save.coef = TRUE,
   model,
-  criterion = rmse,
+  criterion = mse,
   predictors,
   response,
   family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
@@ -84,6 +86,12 @@ to be evaluated within the data set provided by the \code{data} argument.}
 \item{k}{perform k-fold cross-validation (default is 10); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
+
+\item{confint}{if \code{TRUE} (the default if the number of cases is 400
+or greater), compute a confidence interval for the bias-corrected CV
+criterion, if the criterion is the average of casewise components.}
+
+\item{level}{confidence level (default \code{0.95}).}
 
 \item{reps}{number of times to replicate k-fold CV (default is \code{1})}
 

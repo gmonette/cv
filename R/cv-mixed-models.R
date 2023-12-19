@@ -16,13 +16,17 @@
 #' @param data data frame to which the model was fit (not usually necessary)
 #' @param criterion cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
-#'        \code{yhat} the predicted values; the default is \code{\link{rmse}}
-#'        (the root-mean-squared error)
+#'        \code{yhat} the predicted values; the default is \code{\link{mse}}
+#'        (the mean-squared error)
 #' @param k perform k-fold cross-validation; \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation; the default is \code{10} if cross-validating individual
 #' cases and \code{"loo"} if cross-validating clusters.
-#' @param reps number of times to replicate k-fold CV (default is \code{1})
+#' @param reps number of times to replicate k-fold CV (default is \code{1}),
+#' @param confint if \code{TRUE} (the default if the number of cases is 400
+#' or greater), compute a confidence interval for the bias-corrected CV
+#' criterion, if the criterion is the average of casewise components.
+#' @param level confidence level (default \code{0.95}).
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
 #' for n-fold cross-validation
@@ -75,16 +79,17 @@
 #' (m1 <- glmmTMB(count ~ mined + (1|site),
 #'                zi=~mined,
 #'                family=poisson, data=Salamanders))
-#' cv(m1, seed=97816, k=5) # 5-fold CV of clusters
+#' cv(m1, seed=97816, k=5, clusterVariables="site") # 5-fold CV of clusters
 #' cv(m1, seed=34506, k=5) # 5-fold CV of cases
 #' @describeIn cvMixed not to be called directly
 #' @export
 cvMixed <- function(model,
                     package,
                     data=insight::get_data(model),
-                    criterion=rmse,
+                    criterion=mse,
                     k,
                     reps=1,
+                    confint, level=0.95,
                     seed,
                     ncores=1,
                     clusterVariables,
@@ -184,7 +189,7 @@ cvMixed <- function(model,
     }
   }
   cv <- criterion(y, yhat)
-  args <-
+ # args <-
     cv.full <- criterion(y,
                          do.call(predict,
                                  if (is.null(clusterVariables)) {
@@ -193,9 +198,27 @@ cvMixed <- function(model,
                                    }
                          )
     )
-  adj.cv <- cv + cv.full -
-    weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
-  result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
+
+    casewise.average <- attr(cv, "casewise average")
+    if (missing(confint)) confint <- length(y) >= 400
+    if (!is.null(casewise.average) && casewise.average) {
+      loss <- getLossFn(criterion) # casewise loss function
+      adj.cv <- cv + cv.full -
+        weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+      se.cv <- sd(loss(y, yhat))/sqrt(length(y))
+      halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
+      ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
+                           level=round(level*100)) else NULL
+    } else {
+      adj.cv <- NULL
+      ci <- NULL
+    }
+
+  # adj.cv <- cv + cv.full -
+  #   weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+
+  result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
+                 "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  clusters = clusterVariables,
                  "n clusters" = if (!is.null(clusterVariables)) n else NULL
@@ -227,7 +250,7 @@ cvMixed <- function(model,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.merMod <- function(model, data = insight::get_data(model), criterion = rmse,
+cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
                       k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -253,7 +276,7 @@ cv.merMod <- function(model, data = insight::get_data(model), criterion = rmse,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.lme <- function(model, data = insight::get_data(model), criterion = rmse,
+cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
                    k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -276,7 +299,7 @@ cv.lme <- function(model, data = insight::get_data(model), criterion = rmse,
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
-cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = rmse,
+cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
                        k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,

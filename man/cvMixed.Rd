@@ -11,9 +11,11 @@ cvMixed(
   model,
   package,
   data = insight::get_data(model),
-  criterion = rmse,
+  criterion = mse,
   k,
   reps = 1,
+  confint,
+  level = 0.95,
   seed,
   ncores = 1,
   clusterVariables,
@@ -25,7 +27,7 @@ cvMixed(
 \method{cv}{merMod}(
   model,
   data = insight::get_data(model),
-  criterion = rmse,
+  criterion = mse,
   k,
   reps = 1,
   seed,
@@ -37,7 +39,7 @@ cvMixed(
 \method{cv}{lme}(
   model,
   data = insight::get_data(model),
-  criterion = rmse,
+  criterion = mse,
   k,
   reps = 1,
   seed,
@@ -49,7 +51,7 @@ cvMixed(
 \method{cv}{glmmTMB}(
   model,
   data = insight::get_data(model),
-  criterion = rmse,
+  criterion = mse,
   k,
   reps = 1,
   seed,
@@ -68,15 +70,21 @@ used to get the namespace of the package.}
 
 \item{criterion}{cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 where \code{y} is the observed values of the response and
-\code{yhat} the predicted values; the default is \code{\link{rmse}}
-(the root-mean-squared error)}
+\code{yhat} the predicted values; the default is \code{\link{mse}}
+(the mean-squared error)}
 
 \item{k}{perform k-fold cross-validation; \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation; the default is \code{10} if cross-validating individual
 cases and \code{"loo"} if cross-validating clusters.}
 
-\item{reps}{number of times to replicate k-fold CV (default is \code{1})}
+\item{reps}{number of times to replicate k-fold CV (default is \code{1}),}
+
+\item{confint}{if \code{TRUE} (the default if the number of cases is 400
+or greater), compute a confidence interval for the bias-corrected CV
+criterion, if the criterion is the average of casewise components.}
+
+\item{level}{confidence level (default \code{0.95}).}
 
 \item{seed}{for R's random number generator; optional, if not
 supplied a random seed will be selected and saved; not needed
@@ -159,7 +167,7 @@ library("glmmTMB")
 (m1 <- glmmTMB(count ~ mined + (1|site),
                zi=~mined,
                family=poisson, data=Salamanders))
-cv(m1, seed=97816, k=5) # 5-fold CV of clusters
+cv(m1, seed=97816, k=5, clusterVariables="site") # 5-fold CV of clusters
 cv(m1, seed=34506, k=5) # 5-fold CV of cases
 }
 \seealso{

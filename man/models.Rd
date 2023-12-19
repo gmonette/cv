@@ -9,7 +9,7 @@
 \usage{
 models(...)
 
-\method{cv}{modList}(model, data, criterion = rmse, k, reps = 1, seed, quietly = TRUE, ...)
+\method{cv}{modList}(model, data, criterion = mse, k, reps = 1, seed, quietly = TRUE, ...)
 
 \method{print}{cvModList}(x, ...)
 
@@ -42,7 +42,7 @@ created by \code{models()}.}
 \item{data}{(required) the data set to which the models were fit.}
 
 \item{criterion}{the CV criterion ("cost" or lack-of-fit) function, defaults to
-\code{\link{rmse}}.}
+\code{\link{mse}}.}
 
 \item{k}{the number of CV folds; may be omitted, in which case the value
 will depend on the default for the \code{cv()} method invoked for the

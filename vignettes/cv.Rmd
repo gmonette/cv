@@ -54,7 +54,7 @@ Validating research by replication on independently collected data is a common s
 
 Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the cases in the omitted fold. A CV criterion or "cost" measure, such as the mean-squared error ("MSE") of prediction, is then computed using these predicted values. In the extreme $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
 
-Because the $k$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of prediction error. The $n$ regression models are highly statistical dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has relatively large variance. In contrast, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) are somewhat biased but have smaller variance. It is also possible to correct $k$-fold CV for bias (see below).
+Because the $n$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of prediction error. The $n$ regression models are highly statistical dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has relatively large variance. In contrast, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) are somewhat biased but have smaller variance. It is also possible to correct $k$-fold CV for bias (see below).
 
 ## Examples
 
@@ -103,33 +103,31 @@ legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
 ```
 The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ may over-fit the data by chasing one or two relatively high `mpg` values at the right (but see the CV results reported below).
 
-The following graph shows two measures of estimated error as a function of polynomial-regression degree: The root-mean-squared error ("RMSE"),[^RMSE-vs-MSE] defined as $\mathsf{RMSE} = \sqrt{\sum (y_i - \widehat{y}_i)^2/n}$, and the usual residual standard error, defined as $\widehat{\sigma} = \sqrt{\sum (y_i - \widehat{y}_i)^2/(n - p - 1)}$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
+The following graph shows two measures of estimated (squared) error as a function of polynomial-regression degree: The mean-squared error ("MSE"), defined as $\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$, and the usual residual variance, defined as $\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
 
-[^RMSE-vs-MSE]: Although one is just the square-root of the other, we prefer the RMSE to the MSE because the former is measured in the units of the response variable rather than in squared units.
-
-```{r mpg-horsepower-RMSE-se}
+```{r mpg-horsepower-MSE-se}
 #| out.width = "100%",
 #| fig.height = 5,
 #| fig.cap = "Estimated squared error as a function of polynomial degree, $p$"
-library("cv") # for rmse() and other functions
+library("cv") # for mse() and other functions
 
-se <- rmse <- numeric(10)
+var <- mse <- numeric(10)
 for (p in 1:10){
   m <- lm(mpg ~ poly(horsepower, p), data=Auto)
-  rmse[p] <- rmse(Auto$mpg, fitted(m))
-  se[p] <- summary(m)$sigma
+  mse[p] <- mse(Auto$mpg, fitted(m))
+  var[p] <- summary(m)$sigma^2
 }
 
-plot(c(1, 10), range(rmse, se), type="n",
+plot(c(1, 10), range(mse, var), type="n",
      xlab="Degree of polynomial, p",
-     ylab="Estimated Error")
-lines(1:10, rmse, lwd=2, lty=1, col=2, pch=16, type="b")
-lines(1:10, se, lwd=2, lty=2, col=3, pch=17, type="b")
+     ylab="Estimated Squared Error")
+lines(1:10, mse, lwd=2, lty=1, col=2, pch=16, type="b")
+lines(1:10, var, lwd=2, lty=2, col=3, pch=17, type="b")
 legend("topright", inset=0.02,
-       legend=c(expression(hat(sigma)), "RMSE"),
+       legend=c(expression(hat(sigma)^2), "MSE"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 ```
-The code for this graph uses the `rmse()` function from the **cv** package to compute the RMSE for each fit.
+The code for this graph uses the `mse()` function from the **cv** package to compute the MSE for each fit.
 
 #### Using `cv()`
 
@@ -140,20 +138,20 @@ summary(m.auto)
 
 cv(m.auto)
 ```
-The `"lm"` method by default uses `rmse()` as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of RMSE, a biased-adjusted estimate of the RMSE (the bias adjustment is explained in the final section), and the RMSE is also computed for the original, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
+The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the original, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
 
 To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases in the data, here `k=392`, or, more conveniently, to `k="loo"` or `k="n"`:
 
 ```{r cv.lm-2`}
 cv(m.auto, k="loo")
 ```
-For LOO CV of a linear model, `cv()` by default uses the hatvalues from the model fit to the full data for the LOO updates, and reports only the CV estimate of RMSE. Alternative methods are to use the Woodbury matrix identity or the "naive" approach of literally refitting the model with each case omitted. All three methods produce exact results for a linear model (within the precision of floating-point computations):
+For LOO CV of a linear model, `cv()` by default uses the hatvalues from the model fit to the full data for the LOO updates, and reports only the CV estimate of MSE. Alternative methods are to use the Woodbury matrix identity or the "naive" approach of literally refitting the model with each case omitted. All three methods produce exact results for a linear model (within the precision of floating-point computations):
 ```{r cv.lm-3}
 cv(m.auto, k="loo", method="naive")
 
 cv(m.auto, k="loo", method="Woodbury")
 ```
-The `"naive"` and `"Woodbury"` methods also return the bias-adjusted estimate of RMSE and the full-sample RMSE, but bias isn't an issue for LOO CV.
+The `"naive"` and `"Woodbury"` methods also return the bias-adjusted estimate of MSE and the full-sample MSE, but bias isn't an issue for LOO CV.
 
 This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In this comparison, we include the `cv.glm()` function from the **boot** package, which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the `microbenchmark()` function from the package of the same name for the timings [@Mersmann:2023]:
 ```{r cv.lm.timings, cache=TRUE}
@@ -201,18 +199,18 @@ cv.auto.loo[1:2] # linear and quadratic models
 ```
 Because we didn't supply names for the models in the calls to the `models()` function, the names `model.1`, `model.2`, etc., are supplied by the function.
 
-Finally, we extract and graph the adjusted RMSEs for $10$-fold CV and the RMSEs for LOO CV:
+Finally, we extract and graph the adjusted MSEs for $10$-fold CV and the MSEs for LOO CV:
 ```{r polynomial-regression-CV-graph}
 #| out.width = "100%",
 #| fig.height = 5,
-#| fig.cap = "Cross-validated 10-fold and LOO RMSE as a function of polynomial degree, $p$"
-cv.rmse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
-cv.rmse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
-plot(c(1, 10), range(cv.rmse.10, cv.rmse.loo), type="n",
+#| fig.cap = "Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$"
+cv.mse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
+cv.mse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
+plot(c(1, 10), range(cv.mse.10, cv.mse.loo), type="n",
      xlab="Degree of polynomial, p",
-     ylab="Cross-Validated RMSE")
-lines(1:10, cv.rmse.10, lwd=2, lty=1, col=2, pch=16, type="b")
-lines(1:10, cv.rmse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
+     ylab="Cross-Validated MSE")
+lines(1:10, cv.mse.10, lwd=2, lty=1, col=2, pch=16, type="b")
+lines(1:10, cv.mse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
 legend("topright", inset=0.02,
        legend=c("10-Fold CV", "LOO CV"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
@@ -223,7 +221,7 @@ Alternatively, we can use the `plot()` method for `"cvModList"` objects to compa
 ```{r, polynomial-regression-CV-graph-2, fig.show="hold"}
 #| out.width = "45%",
 #| fig.height = 6,
-#| fig.cap = "Cross-validated 10-fold and LOO RMSE as a function of polynomial degree, $p$"
+#| fig.cap = "Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$"
 plot(cv.auto.10, main="Polynomial Regressions, 10-Fold CV",
      axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
 plot(cv.auto.loo, main="Polynomial Regressions, LOO CV",
@@ -693,7 +691,7 @@ We can also cross-validate the individual cases taking account of the random eff
 ```{r pigs-cv-cases}
 cv(m.p, k=10, seed=8469)
 ```
-Because these predictions are based on BLUPs, they are more accurate than the predictions based only on fixed effects.[^crossed-vs-nested] As well, the difference between the RMSE computed for the model fit to the full data and the CV estimates of the RMSE is greater here than for cluster-based predictions.
+Because these predictions are based on BLUPs, they are more accurate than the predictions based only on fixed effects.[^crossed-vs-nested] As well, the difference between the MSE computed for the model fit to the full data and the CV estimates of the MSE is greater here than for cluster-based predictions.
 
 [^crossed-vs-nested]: Even though there is only one observation per combination of pigs and weeks, we can use the BLUP for the omitted case because of the crossed structure of the random effects; that is each pig-week has a pig random effect and a week random effect. Although it probably isn't sensible, we can imagine a mixed model for the pig data that employs nested random effects, which would be specified by `lmer(weight ~ week + (1 | id/week), data=Pigs)`---that is, a random intercept that varies by combinations of `id` (pig) and `week`. This model can't be fit, however: With only one case per combination of `id` and `week`, the nested random-effect variance is indistinguishable from the case-level variance.
 
@@ -762,9 +760,9 @@ m.select <- stepAIC(m.null,
                     direction="forward", trace=FALSE,
                     scope=list(lower=~1, upper=formula(m.full)))
 summary(m.select)
-rmse(D$y, fitted(m.select))
+mse(D$y, fitted(m.select))
 ```
-The resulting model has 15 predictors, a very modest $R^2 = .044$, but a small $p$-value for its omnibus $F$-test (which, of course, is entirely spurious because the same data were used to select and test the model). The RMSE for the selected model is smaller than the true error variance $\sigma^2 = 1$, as is the estimated error variance for the selected model, $\widehat{\sigma}^2 = 0.973^2 = 0.947$.
+The resulting model has 15 predictors, a very modest $R^2 = .044$, but a small $p$-value for its omnibus $F$-test (which, of course, is entirely spurious because the same data were used to select and test the model). The MSE for the selected model is smaller than the true error variance $\sigma^2 = 1$, as is the estimated error variance for the selected model, $\widehat{\sigma}^2 = 0.973^2 = 0.947$.
 
 If we cross-validate the selected model, we also obtain an optimistic estimate of its predictive power:
 ```{r cv-selectedModel}
@@ -787,7 +785,7 @@ The other arguments to `cvSelect()` are:
 * additional arguments required by the model-selection function, here the starting `model` argument, the `direction` of model selection, and the `scope` of models considered (from the model with only a regression constant to the model with all 100 predictors).
 
 
-By default, `cvSelect()` performs 10-fold CV, and produces an estimate of RMSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
+By default, `cvSelect()` performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
 
 Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves the coefficients of the selected models. In this example, the `compareFolds()` function reveals that the variables retained by the model-selection process in the several folds are quite different:
 ```{r compare-selected-models}
@@ -886,12 +884,12 @@ summary(P)
 scatterplotMatrix(~ prestige + income + education + women,
                   data=P, smooth=list(spread=FALSE))
 ```
-Comparing the RMSE for the regressions with the original and transformed predictors shows a advantage to the latter:
+Comparing the MSE for the regressions with the original and transformed predictors shows a advantage to the latter:
 ```{r prestige-regressions}
 m.pres <- lm(prestige ~ income + education + women, data=Prestige)
 m.pres.trans <- lm(prestige ~ income + education + women, data=P)
-rmse(Prestige$prestige, fitted(m.pres))
-rmse(P$prestige, fitted(m.pres.trans))
+mse(Prestige$prestige, fitted(m.pres))
+mse(P$prestige, fitted(m.pres.trans))
 ```
 Similarly, component+residual plots for the two regressions, produced by the `crPlots()` function in the **car** package, suggest that the partial relationship of `prestige` to `income` is more nearly linear in the transformed data, but the transformation of `women` fails to capture what appears to be a slight quadratic partial relationship; the partial relationship of `prestige` to `education` is close to linear in both regressions:
 ```{r CR-plots-untransformed}
@@ -908,7 +906,7 @@ Having transformed the predictors towards multinormality, we now consider whethe
 summary(powerTransform(m.pres.trans))
 ```
 
-The `selectTrans()` function in the **cv** package automates the process of selecting predictor and response transformations. The function takes a `data` set and "working" `model` as arguments, along with the candidate `predictors` and `response` for transformation, and the transformation `family` to employ. If the `predictors` argument is missing then only the response is transformed, and if the `response` argument is missing, only the supplied predictors are transformed. The default `family` for transforming the predictors is `"bcPower"`---the original Box-Cox family---as is the default `family.y` for transforming the response; here we specify `family="yjPower` because of the zeros in `women`. `selectTrans()` returns the result of applying a lack-of-fit criterion to the model after the selected transformation is applied, with the default `criterion=rmse`:
+The `selectTrans()` function in the **cv** package automates the process of selecting predictor and response transformations. The function takes a `data` set and "working" `model` as arguments, along with the candidate `predictors` and `response` for transformation, and the transformation `family` to employ. If the `predictors` argument is missing then only the response is transformed, and if the `response` argument is missing, only the supplied predictors are transformed. The default `family` for transforming the predictors is `"bcPower"`---the original Box-Cox family---as is the default `family.y` for transforming the response; here we specify `family="yjPower` because of the zeros in `women`. `selectTrans()` returns the result of applying a lack-of-fit criterion to the model after the selected transformation is applied, with the default `criterion=mse`:
 ```{r selectTrans}
 selectTrans(data=Prestige, model=m.pres,
             predictors=c("income", "education", "women"),
@@ -927,7 +925,7 @@ cv(m.pres, seed=1463) # untransformed model with same folds
 
 compareFolds(cvs)
 ```
-The results suggest that the predictive power of the transformed regression is reliably greater than that of the untransformed regression (though in both case, the cross-validated RMSE is considerably higher than the RMSE computed for the whole data). Examining the selected transformations for each fold reveals that the predictor `education` and the response `prestige` are never transformed; that the $1/3$ power is selected for `income` in all of the folds; and that the transformation selected for `women` varies narrowly across the folds between the $0$th power (i.e., log) and the $1/3$ power.
+The results suggest that the predictive power of the transformed regression is reliably greater than that of the untransformed regression (though in both case, the cross-validated MSE is considerably higher than the MSE computed for the whole data). Examining the selected transformations for each fold reveals that the predictor `education` and the response `prestige` are never transformed; that the $1/3$ power is selected for `income` in all of the folds; and that the transformation selected for `women` varies narrowly across the folds between the $0$th power (i.e., log) and the $1/3$ power.
 
 
 ### Selecting both transformations and predictors[^Venables]
@@ -1030,15 +1028,15 @@ summary(m.step)
 
 Anova(m.step)
 ```
-The selected model includes three of the numeric predictors, `horsepower`, `weight`, and `acceleration`, along with the factors `year` and `origin`. We can calculate the RMSE for this model, but we expect that the result will be optimistic because we used the whole data to help specify the model
-```{r RMSE-whole-selected-model}
-rmse(Auto$mpg, exp(fitted(m.step)))
+The selected model includes three of the numeric predictors, `horsepower`, `weight`, and `acceleration`, along with the factors `year` and `origin`. We can calculate the MSE for this model, but we expect that the result will be optimistic because we used the whole data to help specify the model
+```{r MSE-whole-selected-model}
+mse(Auto$mpg, exp(fitted(m.step)))
 ```
-This is considerably smaller than the RMSE for the original working model:
-```{r RMSE-working-model}
-rmse(Auto$mpg, fitted(m.auto))
+This is considerably smaller than the MSE for the original working model:
+```{r MSE-working-model}
+mse(Auto$mpg, fitted(m.auto))
 ```
-A perhaps subtle point is that we compute the RMSE for the selected model on the original `mpg` response scale rather than the log scale, so as to make the selected model comparable to the working model. That's slightly uncomfortable given the skewed distribution of `mpg`. An alternative is to use the median absolute error instead of the root-mean-squared error, employing the `medAbsErr()` function from the **cv** package:
+A perhaps subtle point is that we compute the MSE for the selected model on the original `mpg` response scale rather than the log scale, so as to make the selected model comparable to the working model. That's slightly uncomfortable given the skewed distribution of `mpg`. An alternative is to use the median absolute error instead of the root-mean-squared error, employing the `medAbsErr()` function from the **cv** package:
 ```{r Auto-median-absolute-error}
 medAbsErr(Auto$mpg, exp(fitted(m.step)))
 medAbsErr(Auto$mpg, fitted(m.auto))

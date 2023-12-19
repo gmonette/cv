@@ -15,10 +15,12 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \method{cv}{default}(
   model,
   data = insight::get_data(model),
-  criterion = rmse,
+  criterion = mse,
   k = 10,
   reps = 1,
   seed,
+  confint = n >= 400,
+  level = 0.95,
   ncores = 1,
   method = NULL,
   type = "response",
@@ -32,10 +34,12 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \method{cv}{lm}(
   model,
   data = insight::get_data(model),
-  criterion = rmse,
+  criterion = mse,
   k = 10,
   reps = 1,
   seed,
+  confint = n >= 400,
+  level = 0.95,
   method = c("auto", "hatvalues", "Woodbury", "naive"),
   ncores = 1,
   ...
@@ -44,10 +48,12 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \method{cv}{glm}(
   model,
   data = insight::get_data(model),
-  criterion = rmse,
+  criterion = mse,
   k = 10,
   reps = 1,
   seed,
+  confint = n >= 400,
+  level = 0.95,
   method = c("exact", "hatvalues", "Woodbury"),
   ncores = 1,
   ...
@@ -62,8 +68,8 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 
 \item{criterion}{cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 where \code{y} is the observed values of the response and
-\code{yhat} the predicted values; the default is \code{\link{rmse}}
-(the root-mean-squared error).}
+\code{yhat} the predicted values; the default is \code{\link{mse}}
+(the mean-squared error).}
 
 \item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
@@ -76,6 +82,12 @@ supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation}
 
 \item{...}{to match generic; passed to \code{predict()} for the default method.}
+
+\item{confint}{if \code{TRUE} (the default if the number of cases is 400
+or greater), compute a confidence interval for the bias-corrected CV
+criterion, if the criterion is the average of casewise components.}
+
+\item{level}{confidence level (default \code{0.95}).}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}

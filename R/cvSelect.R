@@ -18,6 +18,10 @@
 #' @param k perform k-fold cross-validation (default is 10); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
+#' @param confint if \code{TRUE} (the default if the number of cases is 400
+#' or greater), compute a confidence interval for the bias-corrected CV
+#' criterion, if the criterion is the average of casewise components.
+#' @param level confidence level (default \code{0.95}).
 #' @param save.coef save the coefficients from the selected models? (default is \code{TRUE} if
 #' \code{k} is 10 or smaller, \code{FALSE} otherwise)
 #' @param reps number of times to replicate k-fold CV (default is \code{1})
@@ -72,9 +76,10 @@
 #' \code{\link[car]{powerTransform}}
 #'
 #' @export
-cvSelect <- function(procedure, data, criterion=rmse,
+cvSelect <- function(procedure, data, criterion=mse,
                      model, y.expression,
-                     k=10, reps=1,
+                     k=10, confint = n >= 400, level=0.95,
+                     reps=1,
                      save.coef = k <= 10,
                      seed, ncores=1, ...){
   n <- nrow(data)
@@ -156,8 +161,24 @@ cvSelect <- function(procedure, data, criterion=rmse,
   }
   cv <- criterion(y, yhat)
   cv.full <- procedure(data, model=model, criterion=criterion, ...)
-  adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
+
+  casewise.average <- attr(cv, "casewise average")
+  if (!is.null(casewise.average) && casewise.average) {
+    loss <- getLossFn(criterion) # casewise loss function
+    adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
+    se.cv <- sd(loss(y, yhat))/sqrt(n)
+    halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
+    ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
+                         level=round(level*100)) else NULL
+  } else {
+    adj.cv <- NULL
+    ci <- NULL
+  }
+
+  # adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
+
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
+                 "confint" = ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  coefficients = if (save.coef) coefs else NULL)
   class(result) <- c("cvSelect", "cv")
@@ -197,7 +218,7 @@ cvSelect <- function(procedure, data, criterion=rmse,
 #'          AIC=FALSE, k=5, reps=3) # via BIC
 #' @export
 selectStepAIC <- function(data, indices,
-                          model, criterion=rmse, AIC=TRUE,
+                          model, criterion=mse, AIC=TRUE,
                           save.coef=TRUE, ...){
   y <- getResponse(model)
   if (missing(indices)) {
@@ -302,7 +323,7 @@ yjPowerInverse <- function(y, lambda) {
 #' cv(m.pres, seed=123)
 #' @export
 selectTrans <- function(data, indices, save.coef=TRUE, model,
-                        criterion=rmse, predictors, response,
+                        criterion=mse, predictors, response,
                         family=c("bcPower", "bcnPower", "yjPower", "basicPower"),
                         family.y=c("bcPower", "bcnPower", "yjPower", "basicPower"),
                         rounded=TRUE,
@@ -426,7 +447,7 @@ selectTransStepAIC <- function(data,
                                indices,
                                save.coef = TRUE,
                                model,
-                               criterion = rmse,
+                               criterion = mse,
                                predictors,
                                response,
                                family = c("bcPower", "bcnPower", "yjPower", "basicPower"),

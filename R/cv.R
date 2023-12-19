@@ -9,12 +9,16 @@
 #' @param data data frame to which the model was fit (not usually necessary).
 #' @param criterion cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
-#'        \code{yhat} the predicted values; the default is \code{\link{rmse}}
-#'        (the root-mean-squared error).
+#'        \code{yhat} the predicted values; the default is \code{\link{mse}}
+#'        (the mean-squared error).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
 #' @param reps number of times to replicate k-fold CV (default is \code{1})
+#' @param confint if \code{TRUE} (the default if the number of cases is 400
+#' or greater), compute a confidence interval for the bias-corrected CV
+#' criterion, if the criterion is the average of casewise components.
+#' @param level confidence level (default \code{0.95}).
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
 #' for n-fold cross-validation
@@ -104,7 +108,8 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 
 #' @describeIn cv \code{default} method
 #' @importFrom stats coef family fitted lm.wfit model.frame
-#' model.matrix model.response predict update weighted.mean weights
+#' model.matrix model.response predict qnorm
+#' update weighted.mean weights
 #' residuals hatvalues printCoefmat sd
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
@@ -112,9 +117,12 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 #' @importFrom lme4 lmer
 #' @importFrom nlme lme
 #' @importFrom MASS rlm
+#' @importFrom methods functionBody
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
-                       criterion=rmse, k=10, reps=1, seed, ncores=1,
+                       criterion=mse, k=10, reps=1, seed,
+                       confint = n >= 400, level=0.95,
+                       ncores=1,
                        method=NULL, type="response", ...){
 
   f <- function(i){
@@ -191,14 +199,21 @@ cv.default <- function(model, data=insight::get_data(model),
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, predict(model, type=type, ...))
-  linear <- attr(cv, "linear")
-  adj.cv <-if (!is.null(linear) && linear) {
-    cv + cv.full -
+  casewise.average <- attr(cv, "casewise average")
+  if (!is.null(casewise.average) && casewise.average) {
+    loss <- getLossFn(criterion) # casewise loss function
+    adj.cv <- cv + cv.full -
       weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+    se.cv <- sd(loss(y, yhat))/sqrt(n)
+    halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
+    ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
+            level=round(level*100)) else NULL
   } else {
-    NULL
+    adj.cv <- NULL
+    ci <- NULL
   }
-  result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
+  result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
+                 "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  "method"=method,
                  "criterion" = deparse(substitute(criterion)))
@@ -254,6 +269,12 @@ print.cv <- function(x, digits=getOption("digits"), ...){
           rnd(x[["adj CV crit"]]), " (", rnd(x[["SD adj CV crit"]]), ")", sep="")
     }
   }
+  if (!is.null(x$confint)){
+    cat(paste0("\n", x$confint["level"],
+        "% CI for bias-adjusted CV criterion = (",
+        rnd(x$confint["lower"]), ", ", rnd(x$confint["upper"]), ")")
+    )
+  }
   if (!is.null(x[["full crit"]]))
     cat("\nfull-sample criterion =", rnd(x[["full crit"]]), "\n")
   invisible(x)
@@ -262,25 +283,29 @@ print.cv <- function(x, digits=getOption("digits"), ...){
 #' @describeIn cv \code{print()} method
 #' @export
 print.cvList <- function(x, ...){
-  reps <- length(x)
-  names(x) <- paste("Replicate", 1L:reps)
-  x$Average <- x[[1L]]
-  sumry <-   summarizeReps(x)
-  x$Average[["CV crit"]] <- sumry[["CV crit"]]
-  x$Average[["adj CV crit"]] <- sumry[["adj CV crit"]]
-  x$Average[["SD CV crit"]] <- sumry[["SD CV crit"]]
-  x$Average[["SD adj CV crit"]] <- sumry[["SD adj CV crit"]]
-  for (rep in seq_along(x)){
-    cat("\n", names(x)[rep], ":\n", sep="")
-    print(x[[rep]])
+  xx <- x
+  reps <- length(xx)
+  names(xx) <- paste("Replicate", 1L:reps)
+  xx$Average <- xx[[1L]]
+  sumry <-   summarizeReps(xx)
+  xx$Average[["CV crit"]] <- sumry[["CV crit"]]
+  xx$Average[["adj CV crit"]] <- sumry[["adj CV crit"]]
+  xx$Average[["SD CV crit"]] <- sumry[["SD CV crit"]]
+  xx$Average[["SD adj CV crit"]] <- sumry[["SD adj CV crit"]]
+  xx$Average$confint <- NULL
+  for (rep in seq_along(xx)){
+    cat("\n", names(xx)[rep], ":\n", sep="")
+    print(xx[[rep]])
   }
   return(invisible(x))
 }
 
 #' @describeIn cv \code{"lm"} method
 #' @export
-cv.lm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
-                  reps=1, seed, method=c("auto", "hatvalues", "Woodbury", "naive"),
+cv.lm <- function(model, data=insight::get_data(model),
+                  criterion=mse, k=10, reps=1, seed,
+                  confint = n >= 400, level=0.95,
+                  method=c("auto", "hatvalues", "Woodbury", "naive"),
                   ncores=1, ...){
   UpdateLM <- function(omit){
     # compute coefficients with omit cases deleted
@@ -385,14 +410,21 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, fitted(model))
-  linear <- attr(cv, "linear")
-  adj.cv <-if (!is.null(linear) && linear) {
-    cv + cv.full -
+  casewise.average <- attr(cv, "casewise average")
+  if (!is.null(casewise.average) && casewise.average) {
+    loss <- getLossFn(criterion) # casewise loss function
+    adj.cv <- cv + cv.full -
       weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+    se.cv <- sd(loss(y, yhat))/sqrt(n)
+    halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
+    ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
+                         level=round(level*100)) else NULL
   } else {
-    NULL
+    adj.cv <- NULL
+    ci <- NULL
   }
-  result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
+  result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
+                 "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  "method"=method,
                  "criterion" = deparse(substitute(criterion)))
@@ -417,8 +449,10 @@ cv.lm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
 
 #' @describeIn cv \code{"glm"} method
 #' @export
-cv.glm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
-                   reps=1, seed, method=c("exact", "hatvalues", "Woodbury"),
+cv.glm <- function(model, data=insight::get_data(model),
+                   criterion=mse, k=10, reps=1, seed,
+                   confint = n >= 400, level=0.95,
+                   method=c("exact", "hatvalues", "Woodbury"),
                    ncores=1,
                    ...){
   UpdateIWLS <- function(omit){
@@ -528,14 +562,21 @@ cv.glm <- function(model, data=insight::get_data(model), criterion=rmse, k=10,
     }
     cv <- criterion(y, yhat)
     cv.full <- criterion(y, fitted(model))
-    linear <- attr(cv, "linear")
-    adj.cv <-if (!is.null(linear) && linear) {
-      cv + cv.full -
+    casewise.average <- attr(cv, "casewise average")
+    if (!is.null(casewise.average) && casewise.average) {
+      loss <- getLossFn(criterion) # casewise loss function
+      adj.cv <- cv + cv.full -
         weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+      se.cv <- sd(loss(y, yhat))/sqrt(n)
+      halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
+      ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
+                           level=round(level*100)) else NULL
     } else {
-      NULL
+      adj.cv <- NULL
+      ci <- NULL
     }
-    result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
+    result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
+                   "full crit" = cv.full, confint=ci,
                    "k" = if (k == n) "n" else k, "seed" = seed,
                    "method"=method,
                    "criterion" = deparse(substitute(criterion)))
@@ -575,11 +616,30 @@ summarizeReps <- function(x){
   CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
   CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
   CVcritRange <- range(sapply(x, function(x) x[["CV crit"]]))
-  adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
-  adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
-  adjCVcritRange<- range(sapply(x, function(x) x[["adj CV crit"]]))
+  if (!is.null(x[[1]][["adj CV crit"]])) {
+    adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
+    adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
+    adjCVcritRange <- range(sapply(x, function(x) x[["adj CV crit"]]))
+  } else {
+    adjCVcrit <- adjCVcritSD <- adjCVcritRange <- NULL
+  }
   list("CV crit" = CVcrit, "adj CV crit" = adjCVcrit,
        "CV crit range" = CVcritRange,
        "SD CV crit" = CVcritSD, "SD adj CV crit" = adjCVcritSD,
        "adj CV crit range" = adjCVcritRange)
+}
+
+getLossFn <- function(criterion){
+  expressions <- as.vector(as.character(functionBody(criterion)))
+  which <- grepl("result <- mean\\(", expressions)
+  if (!(any(which))) stop(deparse(substitute(criterion)),
+                          " does not set 'result <- mean(. . .)'")
+  expression <- sub(")$" , "",
+                    sub("result <- mean\\(", "result <- ",
+                        expressions[which][sum(which)])
+  )
+  expressions[which] <- expression
+  eval(parse(text=paste0("function(y, yhat) ",
+                         paste(expressions, collapse="\n"),
+                         "}")))
 }
