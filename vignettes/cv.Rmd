@@ -613,7 +613,7 @@ We next carry out case-based cross-validation, which, as we have explained, is b
 ```{r cross-validation-clusters}
 #| out.width = "100%",
 #| fig.height = 6,
-#| fig.cap = "10-fold cluster-based cross-validation comparing random intercept models with varying fixed effects."
+#| fig.cap = "10-fold cluster-based cross-validation comparing random intercept models with varying fixed effects. The error bars show the 95% confidence interval around the CV estimate of the MSE for each model."
 modlist <- models("~ 1"=mod.0, "~ 1 + x"=mod.1, 
                   "~ 1 + x + xm"=mod.2, "~ 1 + I(x - xm)"=mod.3)
 cvs_clusters <- cv(modlist, data=Data, cluster="group", k=10, seed=6449)

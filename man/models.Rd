@@ -17,6 +17,7 @@ models(...)
   x,
   y,
   spread = c("range", "sd"),
+  confint = TRUE,
   xlab = "",
   ylab,
   main,
@@ -68,6 +69,10 @@ plotted; defaults to \code{"adj CV crit"}, if it exists, or to
 for each model along with their average; if \code{"sd"}, show the average
 plus or minus 1 standard deviation.}
 
+\item{confint}{if \code{TRUE} (the default) and if confidence intervals are
+in any of the \code{"cv"} objects, then plot the confidence intervals around the
+CV criteria.}
+
 \item{xlab}{label for the x-axis (defaults to blank).}
 
 \item{ylab}{label for the y-axis (if missing, a label is constructed).}
@@ -117,6 +122,10 @@ m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
 (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
                  data=Duncan, seed=7949, reps=5))
 plot(cv.models)
+(cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
+                    data=Duncan, seed=5962, confint=TRUE, level=0.50))
+                 # nb: n too small for accurate CIs
+plot(cv.models.ci)
 }
 \seealso{
 \code{\link{cv}}, \code{\link{cvMixed}}.

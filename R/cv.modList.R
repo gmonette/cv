@@ -40,6 +40,9 @@
 #' @param spread if \code{"range"}, the default, show the range of CV criteria
 #' for each model along with their average; if \code{"sd"}, show the average
 #' plus or minus 1 standard deviation.
+#' @param confint if \code{TRUE} (the default) and if confidence intervals are
+#' in any of the \code{"cv"} objects, then plot the confidence intervals around the
+#' CV criteria.
 #' @param axis.args a list of arguments for the \code{\link{axis}()}
 #' function, used to draw the horizontal axis. In addition to
 #' the axis arguments given explicitly, \code{side=1} (the horizontal
@@ -59,6 +62,10 @@
 #' (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
 #'                  data=Duncan, seed=7949, reps=5))
 #' plot(cv.models)
+#' (cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
+#'                     data=Duncan, seed=5962, confint=TRUE, level=0.50))
+#'                  # nb: n too small for accurate CIs
+#' plot(cv.models.ci)
 #' @describeIn models create a list of models
 #' @export
 models <- function(...){
@@ -149,6 +156,7 @@ print.cvModList <- function(x, ...){
 #' @exportS3Method
 plot.cvModList <- function(x, y,
                            spread=c("range", "sd"),
+                           confint=TRUE,
                            xlab="",
                            ylab,
                            main,
@@ -166,7 +174,7 @@ plot.cvModList <- function(x, y,
       "Cross-Validation Criterion"
     }
   }
-  if (missing(main)){
+  if (miss.main <- missing(main)){
     main <- "Model Comparison"
     if (inherits(x[[1L]], "cvList")){
       main <- paste(main, "\nAveraged Across",
@@ -217,8 +225,42 @@ plot.cvModList <- function(x, y,
            col=col, code=3, lty=1, lwd=1)
   } else {
     crit <- sapply(x, function (x) x[[y]])
+    if (y == "adj CV crit"){
+      cis <- lapply(x, function(x) x[["confint"]])
+      if (confint && !all(sapply(cis, function(ci) is.null(ci)))){
+        plot.cis <- TRUE
+        if (miss.main){
+          main <- "Model Comparison\nwith Confidence Intervals"
+        }
+        lowers <- sapply(cis, function(ci) {
+          low <- ci["lower"]
+          if (is.null(low)) NA else low
+        })
+        uppers <- sapply(cis, function(ci) {
+          up <- ci["upper"]
+          if (is.null(up)) NA else up
+        })
+        min.y <- min(lowers, na.rm=TRUE)
+        max.y <- max(uppers, na.rm=TRUE)
+      }
+      else {
+        plot.cis <- FALSE
+        min.y <- min(crit)
+        max.y <- max(crit)
+      }
+    } else {
+      plot.cis <- FALSE
+      min.y <- min(crit)
+      max.y <- max(crit)
+    }
     plot(seq(along=crit), crit, xlab=xlab, ylab=ylab, main=main,
-         axes=FALSE, type="b", col=col, lwd=lwd, ...)
+         axes=FALSE, type="b", col=col, lwd=lwd,
+         ylim=c(min.y, max.y), ...)
+    if (plot.cis){
+      xs <- seq_along(cis)
+      arrows(xs, lowers, xs, uppers, length=0.125, angle=90,
+             col=col, code=3, lty=1, lwd=1)
+    }
   }
   abline(h=min(crit), lty=2L, col=col)
   box()
