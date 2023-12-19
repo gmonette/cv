@@ -394,7 +394,7 @@ measure, such as the mean-squared error (“MSE”) of prediction, is then
 computed using these predicted values. In the extreme <span class="math inline">\(k = n\)</span>, the number of cases in the data,
 thus omitting individual cases and refitting the model <span class="math inline">\(n\)</span> times—a procedure termed “leave-one-out
 (LOO) cross-validation.”</p>
-<p>Because the <span class="math inline">\(k\)</span> models are each
+<p>Because the <span class="math inline">\(n\)</span> models are each
 fit to <span class="math inline">\(n - 1\)</span> cases, LOO CV produces
 a nearly unbiased estimate of prediction error. The <span class="math inline">\(n\)</span> regression models are highly
 statistical dependent, however, based as they are on nearly the same
@@ -539,12 +539,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 882003</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 189639</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.353</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.333</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.501</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.473</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -615,10 +615,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
 <span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval cld</span></span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues   1.1754   1.2199   1.3384   1.3015   1.4437   1.6323    10 a  </span></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  11.0016  11.0527  11.2649  11.1749  11.3250  12.1447    10 a  </span></span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 215.6577 218.7636 245.3082 229.9855 275.8157 292.8326    10  b </span></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 375.3712 384.7160 449.8776 395.4330 461.0626 651.6763    10   c</span></span></code></pre></div>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues   1.0041   1.1921   1.1771   1.2066   1.2404   1.2494    10 a  </span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10.1490  10.2184  10.5245  10.3655  10.6547  11.6459    10 a  </span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 209.0588 210.5513 217.0681 219.4219 221.6367 222.4562    10  b </span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 378.0125 381.4340 394.2817 382.1090 386.1483 447.8899    10   c</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
@@ -701,7 +701,7 @@ fitting and saving the 10 models:</p>
 <span id="cb10-34"><a href="#cb10-34" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span></code></pre></div>
 <p>Because we didn’t supply names for the models in the calls to the
 <code>models()</code> function, the names <code>model.1</code>,
-<code>model.2</code>, etc., are supplied by the function.</p>
+<code>model.2</code>, etc., are generated by the function.</p>
 <p>Finally, we extract and graph the adjusted MSEs for <span class="math inline">\(10\)</span>-fold CV and the MSEs for LOO CV:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>cv.mse<span class="fl">.10</span> <span class="ot">&lt;-</span> <span class="fu">sapply</span>(cv.auto<span class="fl">.10</span>, <span class="cf">function</span>(x) x[[<span class="st">&quot;adj CV crit&quot;</span>]])</span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>cv.mse.loo <span class="ot">&lt;-</span> <span class="fu">sapply</span>(cv.auto.loo, <span class="cf">function</span>(x) x[[<span class="st">&quot;CV crit&quot;</span>]])</span>
@@ -824,6 +824,21 @@ argument to <code>BayesRule()</code> is the binary {0, 1} response, and
 the second argument is the predicted probability of success.
 <code>BayesRule()</code> returns the proportion of predictions that are
 <em>in error</em>, as appropriate for a “cost” function.</p>
+<p>The value returned by <code>BayesRule()</code> is associated with an
+“attribute” named <code>&quot;casewise average&quot;</code> set to
+<code>TRUE</code>, signifying that the Bayes rule CV criterion is
+computed as the mean of casewise values, here 0 if the prediction for a
+case matches the observed value and 1 if it does not (signifying a
+prediction error). The <code>mse()</code> function for numeric responses
+is also calculated as a casewise average. Some other criteria, such as
+the median absolute error, computed by the <code>medAbsErr()</code>
+function in the <strong>cv</strong> package, aren’t averages of casewise
+components. The distinction is important because, to our knowledge, the
+statistical theory of cross-validation, for example, in <span class="citation">Davison &amp; Hinkley (1997)</span> and <span class="citation">S. Bates, Hastie, &amp; Tibshirani (2023)</span>, is
+developed for CV criteria like MSE that are means of casewise
+components. As a consequence, we limit computation of bias adjustment
+and confidence intervals (see below) to criteria that are casewise
+averages.</p>
 <p>In this example, the fitted logistic regression incorrectly predicts
 31% of the responses; we expect this estimate to be optimistic given
 that the model is used to “predict” the data to which it is fit.</p>
@@ -860,6 +875,14 @@ in our experience, the <code>&quot;exact&quot;</code> and <code>&quot;Woodbury&q
 algorithms produce nearly identical results. The CV estimates of
 prediction error are slightly higher than the estimate based on all of
 the cases.</p>
+<p>The printed output includes a 95% confidence interval for the
+bias-adjusted Bayes rule CV criterion. <span class="citation">S. Bates
+et al. (2023)</span> show that these confidence intervals are unreliable
+for models fit to small samples, and by default <code>cv()</code>
+computes them only when the sample size is 400 or larger and when the CV
+criterion employed is an average of casewise components, as is the case
+for Bayes rule. See the final section of the vignette for details of the
+computation of confidence intervals for bias-adjusted CV criteria.</p>
 <p>Here are results of applying LOO CV to the Mroz model, using both the
 exact and the approximate methods:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="at">k=</span><span class="st">&quot;loo&quot;</span>, <span class="at">criterion=</span>BayesRule)</span>
@@ -901,10 +924,10 @@ comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
 <span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span>)</span>
 <span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.3053    1.3152    1.3557    1.3305    1.3549    1.4934    10</span></span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   36.8670   38.3064   39.1492   38.9054   39.7108   42.4206    10</span></span>
-<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co">#&gt;      exact 1733.3083 1743.9088 1775.3158 1777.8561 1797.6404 1826.4675    10</span></span>
-<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 1992.3264 2032.4505 2068.5396 2055.1332 2120.4594 2145.6931    10</span></span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2585    1.3257    1.3453    1.3364    1.3815    1.4527    10</span></span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   37.8938   38.0025   45.0848   39.2315   40.1564  100.2408    10</span></span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co">#&gt;      exact 1738.5528 1755.2252 1797.4857 1816.8919 1827.8825 1835.8108    10</span></span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2022.5381 2035.5832 2074.4328 2074.7739 2102.5704 2156.1237    10</span></span>
 <span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt;   cld</span></span>
 <span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co">#&gt;  a   </span></span>
 <span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a><span class="co">#&gt;   b  </span></span>
@@ -1022,8 +1045,8 @@ school; and <code>cses</code>, which is school-average SES centered at
 its mean. For details, see <span class="citation">Fox &amp; Weisberg
 (2019, sec. 7.2.2)</span>.</p>
 <p>Still following Fox and Weisberg, we proceed to use the
-<code>lmer()</code> function in the <strong>lme4</strong> package <span class="citation">(Bates, Mächler, Bolker, &amp; Walker, 2015)</span> to
-fit a mixed model for math achievement to the HSB data:</p>
+<code>lmer()</code> function in the <strong>lme4</strong> package <span class="citation">(D. Bates, Mächler, Bolker, &amp; Walker, 2015)</span>
+to fit a mixed model for math achievement to the HSB data:</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;lme4&quot;</span>)</span>
 <span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="co">#&gt; Loading required package: Matrix</span></span>
 <span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>hsb.lmer <span class="ot">&lt;-</span> <span class="fu">lmer</span>(mathach <span class="sc">~</span> mean.ses<span class="sc">*</span>cses <span class="sc">+</span> sector<span class="sc">*</span>cses</span>
@@ -2003,7 +2026,8 @@ The MSE for the selected model is smaller than the true error variance
 <span class="math inline">\(\sigma^2 = 1\)</span>, as is the estimated
 error variance for the selected model, <span class="math inline">\(\widehat{\sigma}^2 = 0.973^2 = 0.947\)</span>.</p>
 <p>If we cross-validate the selected model, we also obtain an optimistic
-estimate of its predictive power:</p>
+estimate of its predictive power (although the confidence interval for
+the bias-adjusted MSE includes 1):</p>
 <div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="fu">cv</span>(m.select, <span class="at">seed=</span><span class="dv">2529</span>)</span>
 <span id="cb50-2"><a href="#cb50-2" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 2529</span></span>
 <span id="cb50-3"><a href="#cb50-3" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -2174,7 +2198,7 @@ the 7 original predictors:</p>
 <span id="cb54-29"><a href="#cb54-29" tabindex="-1"></a><span class="co">#&gt; [1] 0.31873</span></span>
 <span id="cb54-30"><a href="#cb54-30" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
 <span id="cb54-31"><a href="#cb54-31" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p>The Bayes rule applied to the selected model misclassifies 32% of the
+<p>Bayes rule applied to the selected model misclassifies 32% of the
 cases in the <code>Mroz</code> data.</p>
 <p>Cross-validating the selected model produces a similar, slightly
 larger, estimate of misclassification, about 33%:</p>
@@ -2856,7 +2880,7 @@ model on the original <code>mpg</code> response scale rather than the
 log scale, so as to make the selected model comparable to the working
 model. That’s slightly uncomfortable given the skewed distribution of
 <code>mpg</code>. An alternative is to use the median absolute error
-instead of the root-mean-squared error, employing the
+instead of the mean-squared error, employing the
 <code>medAbsErr()</code> function from the <strong>cv</strong>
 package:</p>
 <div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" tabindex="-1"></a><span class="fu">medAbsErr</span>(Auto<span class="sc">$</span>mpg, <span class="fu">exp</span>(<span class="fu">fitted</span>(m.step)))</span>
@@ -2935,20 +2959,22 @@ whole model-specification process:</p>
 <span id="cb80-67"><a href="#cb80-67" tabindex="-1"></a><span class="co">#&gt; Fold 10</span></span></code></pre></div>
 <p>Here, as for <code>selectTrans()</code>, the <code>predictors</code>
 and <code>response</code> arguments specify candidate variables for
-transformation, and <code>AIC=FALSE</code> use the BIC for model
-selection. The starting model <code>model=m.auto</code> is the working
-model fit to the <code>Auto</code> data.</p>
+transformation, and <code>AIC=FALSE</code> uses the BIC for model
+selection. The starting model, <code>m.auto</code>, is the working model
+fit to the <code>Auto</code> data. The CV criterion isn’t bias-adjusted
+because median absolute error isn’t a mean of casewise error
+components.</p>
 <p>Some noteworthy points:</p>
 <ul>
 <li><code>selectTransStepAIC()</code> automatically computes CV cost
 criteria, here the median absolute error, on the untransformed response
 scale.</li>
-<li>The unbiased estimate of the median absolute error that we obtain by
-cross-validating the whole model-specification process is in this case
-only a little larger than the median absolute error computed for the
-model we fit to the <code>Auto</code> data separately selecting
-transformations of the predictors and the response and then selecting
-predictors for the whole data set.</li>
+<li>The estimate of the median absolute error that we obtain by
+cross-validating the whole model-specification process is a little
+larger than the median absolute error computed for the model we fit to
+the <code>Auto</code> data separately selecting transformations of the
+predictors and the response and then selecting predictors for the whole
+data set.</li>
 <li>When we look at the transformations and predictors selected with
 each of the 10 folds omitted (i.e., the output of
 <code>compareFolds()</code>), we see that there is little uncertainty in
@@ -2984,7 +3010,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-5"><a href="#cb81-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb81-6"><a href="#cb81-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-7"><a href="#cb81-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.241   0.010   0.251</span></span>
+<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.238   0.002   0.240</span></span>
 <span id="cb81-9"><a href="#cb81-9" tabindex="-1"></a></span>
 <span id="cb81-10"><a href="#cb81-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb81-11"><a href="#cb81-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -2994,7 +3020,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-15"><a href="#cb81-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb81-16"><a href="#cb81-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-17"><a href="#cb81-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.034   0.005   0.942</span></span>
+<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.033   0.005   0.959</span></span>
 <span id="cb81-19"><a href="#cb81-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb81-20"><a href="#cb81-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -3099,15 +3125,19 @@ results are approximate, the default for the <code>&quot;glm&quot;</code>
 <code>cv()</code> method is to perform the exact computation, which
 entails refitting the model with each fold omitted.</p>
 </div>
-<div id="computation-of-the-bias-corrected-cv-criterion" class="section level3">
-<h3>Computation of the bias-corrected CV criterion</h3>
+<div id="computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals" class="section level3">
+<h3>Computation of the bias-corrected CV criterion and confidence
+intervals</h3>
 <p>Let <span class="math inline">\(\mathrm{CV}(\mathbf{y},
 \widehat{\mathbf{y}})\)</span> represent a cross-validation cost
 criterion, such as mean-squared error, computed for all of the <span class="math inline">\(n\)</span> values of the response <span class="math inline">\(\mathbf{y}\)</span> based on fitted values <span class="math inline">\(\widehat{\mathbf{y}}\)</span> from the model fit
-to all of the data. We divide the <span class="math inline">\(n\)</span>
-cases into <span class="math inline">\(k\)</span> folds of approximately
-<span class="math inline">\(n_j \approx n/k\)</span> cases each, where
-<span class="math inline">\(n = \sum n_j\)</span>. As above, let <span class="math inline">\(\mathbf{j}\)</span> denote the indices of the
+to all of the data. We require that <span class="math inline">\(\mathrm{CV}(\mathbf{y},
+\widehat{\mathbf{y}})\)</span> is the mean of casewise components, that
+is, <span class="math inline">\(\mathrm{CV}(\mathbf{y},
+\widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i,
+\widehat{y}_i)\)</span>. For example, <span class="math inline">\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) =
+\frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\)</span>.</p>
+<p>We divide the <span class="math inline">\(n\)</span> cases into <span class="math inline">\(k\)</span> folds of approximately <span class="math inline">\(n_j \approx n/k\)</span> cases each, where <span class="math inline">\(n = \sum n_j\)</span>. As above, let <span class="math inline">\(\mathbf{j}\)</span> denote the indices of the
 cases in the <span class="math inline">\(j\)</span>th fold.</p>
 <p>Now define <span class="math inline">\(\mathrm{CV}_j =
 \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})\)</span>. The
@@ -3125,6 +3155,31 @@ bias-adjusted cross-validation criterion is <span class="math display">\[
 \mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y},
 \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
 \]</span></p>
+<p>We compute the standard error of CV as <span class="math display">\[
+\mathrm{SE}(\mathrm{CV}) = \frac{1}{\sqrt n} \sqrt{ \frac{\sum_{i=1}^n
+\left[ \mathrm{cv}(y_i, \widehat{y}_i^{(-i)} ) - \mathrm{CV} \right]^2
+}{n - 1} }
+\]</span> that is, as the standard deviation of the casewise components
+of CV divided by the square-root of the number of cases.</p>
+<p>We then use <span class="math inline">\(\mathrm{SE}(\mathrm{CV})\)</span> to construct a
+<span class="math inline">\(100 \times (1 - \alpha)\)</span>% confidence
+interval around the <em>adjusted</em> CV estimate of error: <span class="math display">\[
+\left[ \mathrm{CV}_{\mathrm{adj}} - z_{1 -
+\alpha/2}\mathrm{SE}(\mathrm{CV}), \mathrm{CV}_{\mathrm{adj}} + z_{1 -
+\alpha/2}\mathrm{SE}(\mathrm{CV})  \right]
+\]</span> where <span class="math inline">\(z_{1 - \alpha/2}\)</span> is
+the <span class="math inline">\(1 - \alpha/2\)</span> quantile of the
+standard-normal distribution (e.g, <span class="math inline">\(z \approx
+1.96\)</span> for a 95% confidence interval, for which <span class="math inline">\(1 - \alpha/2 = .975\)</span>).</p>
+<p><span class="citation">S. Bates et al. (2023)</span> show that the
+coverage of this confidence interval is poor for small samples, and they
+suggest a much more computationally intensive procedure, called
+<em>nested cross-validation</em>, to compute better estimates of error
+and confidence intervals with better coverage for small samples. We may
+implement Bates et al.’s approach in a later release of the
+<strong>cv</strong> package. At present we use the confidence interval
+above for sufficiently large <span class="math inline">\(n\)</span>,
+which, based on Bates et al.’s results, we take by default to be <span class="math inline">\(n \ge 400\)</span>.</p>
 </div>
 </div>
 <div id="references" class="section level2 unnumbered">
@@ -3135,6 +3190,12 @@ Bates, D., Mächler, M., Bolker, B., &amp; Walker, S. (2015). Fitting
 linear mixed-effects models using <span class="nocase">lme4</span>.
 <em>Journal of Statistical Software</em>, <em>67</em>(1), 1–48.
 </div>
+<div id="ref-BatesHastieTibshirani:2023" class="csl-entry">
+Bates, S., Hastie, T., &amp; Tibshirani, R. (2023). Cross-validation:
+What does it estimate and how well does it do it? <em>Journal of the
+American Statistical Association</em>, <em>in press</em>. Retrieved from
+<a href="https://doi.org/10.1080/01621459.2023.2197686">https://doi.org/10.1080/01621459.2023.2197686</a>
+</div>
 <div id="ref-BoxCox:1964" class="csl-entry">
 Box, G. E. P., &amp; Cox, D. R. (1964). An analysis of transformations.
 <em>Journal of the Royal Statistical Society, Series
@@ -3144,7 +3205,7 @@ Box, G. E. P., &amp; Cox, D. R. (1964). An analysis of transformations.
 Canty, A., &amp; Ripley, B. D. (2022). <em>Boot: Bootstrap
 <span>R</span> (<span>S</span>-plus) functions</em>.
 </div>
-<div id="ref-DavisonHinkley1997" class="csl-entry">
+<div id="ref-DavisonHinkley:1997" class="csl-entry">
 Davison, A. C., &amp; Hinkley, D. V. (1997). <em>Bootstrap methods and
 their applications</em>. Cambridge: Cambridge University Press.
 </div>
