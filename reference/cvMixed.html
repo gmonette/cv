@@ -91,6 +91,8 @@ It can be used to extend <code><a href="cv.html">cv()</a></code> to other classe
 <span>  criterion <span class="op">=</span> <span class="va">mse</span>,</span>
 <span>  <span class="va">k</span>,</span>
 <span>  reps <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  <span class="va">confint</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  <span class="va">seed</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">clusterVariables</span>,</span>
@@ -169,7 +171,17 @@ cases and <code>"loo"</code> if cross-validating clusters.</p></dd>
 
 
 <dt>reps</dt>
-<dd><p>number of times to replicate k-fold CV (default is <code>1</code>)</p></dd>
+<dd><p>number of times to replicate k-fold CV (default is <code>1</code>),</p></dd>
+
+
+<dt>confint</dt>
+<dd><p>if <code>TRUE</code> (the default if the number of cases is 400
+or greater), compute a confidence interval for the bias-corrected CV
+criterion, if the criterion is the average of casewise components.</p></dd>
+
+
+<dt>level</dt>
+<dd><p>confidence level (default <code>0.95</code>).</p></dd>
 
 
 <dt>seed</dt>
@@ -365,17 +377,19 @@ best linear unbiased predictors or "BLUPS").</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Zero-inflation model:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)      minedno  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       1.139       -1.736  </span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">m1</span>, seed<span class="op">=</span><span class="fl">97816</span>, k<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="co"># 5-fold CV of clusters</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">m1</span>, seed<span class="op">=</span><span class="fl">97816</span>, k<span class="op">=</span><span class="fl">5</span>, clusterVariables<span class="op">=</span><span class="st">"site"</span><span class="op">)</span> <span class="co"># 5-fold CV of clusters</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 97816</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 6.110784</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 6.075783</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 5.79783 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation based on 23 {site} clusters</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 6.006117</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 6.002191</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI for bias-adjusted CV criterion = (2.385452, 9.61893)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 5.970489 </span>
 <span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">m1</span>, seed<span class="op">=</span><span class="fl">34506</span>, k<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="co"># 5-fold CV of cases</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 34506</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 6.058988</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 6.032337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI for bias-adjusted CV criterion = (2.483579, 9.581094)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 5.79783 </span>
 </code></pre></div>
     </div>

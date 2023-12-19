@@ -81,7 +81,12 @@ transformation with predictor selection.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cvSelect</span><span class="op">(</span></span>
 <span>  <span class="va">procedure</span>,</span>
 <span>  <span class="va">data</span>,</span>
+<span>  criterion <span class="op">=</span> <span class="va">mse</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  <span class="va">y.expression</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  confint <span class="op">=</span> <span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">400</span>,</span>
+<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  reps <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  save.coef <span class="op">=</span> <span class="va">k</span> <span class="op">&lt;=</span> <span class="fl">10</span>,</span>
 <span>  <span class="va">seed</span>,</span>
@@ -144,10 +149,36 @@ transformation with predictor selection.</p>
 <dd><p>full data frame for model selection.</p></dd>
 
 
+<dt>criterion</dt>
+<dd><p>a CV criterion ("cost" or lack-of-fit) function.</p></dd>
+
+
+<dt>model</dt>
+<dd><p>a regression model object fit to data.</p></dd>
+
+
+<dt>y.expression</dt>
+<dd><p>normally the response variable is found from the
+<code>model</code> argument; but if, for a particular selection procedure, the
+<code>model</code> argument is absent, or if the response can't be inferred from the
+model, the response can be specified by an expression, such as <code>expression(log(income))</code>,
+to be evaluated within the data set provided by the <code>data</code> argument.</p></dd>
+
+
 <dt>k</dt>
 <dd><p>perform k-fold cross-validation (default is 10); <code>k</code>
 may be a number or <code>"loo"</code> or <code>"n"</code> for n-fold (leave-one-out)
 cross-validation.</p></dd>
+
+
+<dt>confint</dt>
+<dd><p>if <code>TRUE</code> (the default if the number of cases is 400
+or greater), compute a confidence interval for the bias-corrected CV
+criterion, if the criterion is the average of casewise components.</p></dd>
+
+
+<dt>level</dt>
+<dd><p>confidence level (default <code>0.95</code>).</p></dd>
 
 
 <dt>reps</dt>
@@ -175,14 +206,6 @@ for <code>selectStepAIC()</code>, arguments to be passed to <code>stepAIC()</cod
 
 <dt>indices</dt>
 <dd><p>indices of cases in data defining the current fold.</p></dd>
-
-
-<dt>model</dt>
-<dd><p>a regression model object fit to data.</p></dd>
-
-
-<dt>criterion</dt>
-<dd><p>a CV criterion ("cost" or lack-of-fit) function.</p></dd>
 
 
 <dt>AIC</dt>
@@ -273,10 +296,12 @@ the model-selection procedure is applied to the full <code>data</code>.</p></dd>
 from <code>cvSelect()</code>.</p></dd>
 
 
-</dl><p><code>procedure()</code> should return a two-element vector with the result
-of applying a cross-validation criterion to the cases in
-the current fold for the model deleting that fold, and to
-all of the cases, again for the model deleting the current fold.</p>
+</dl><p><code>procedure()</code> should return a list with the following
+named elements: <code>fit.i</code>, the vector of predicted values for the cases in
+the current fold computed from the model omitting these cases;
+<code>crit.all.i</code>, the CV criterion computed for all of the cases using
+the model omitting the current fold; and (optionally) <code>coefficients</code>,
+parameter estimates from the model computed omitting the current fold.</p>
 <p>When the <code>indices</code> argument is missing, <code>procedure()</code> returns the cross-validation criterion for all of the cases based on
 the model fit to all of the cases.</p>
 <p>For examples of model-selection functions for the <code>procedure</code>
@@ -401,8 +426,7 @@ for the several folds.</p></li>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 76692</span>
 <span class="r-in"><span><span class="va">cvs</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 1.386487</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 1.345775</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 1.476272</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 1.339604 </span>
 <span class="r-in"><span><span class="fu">compareFolds</span><span class="op">(</span><span class="va">cvs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         (Intercept) horsepower lam.acceleration lam.cylinders lam.displacement</span>

@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-12-17</h4>
+            <h4 data-toc-skip class="date">2023-12-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -110,14 +110,12 @@ remarks about data-division and cross-validation.</p>
 randomly divided as equally as possible into several, say <span class="math inline">\(k\)</span>, parts, called “folds.” The statistical
 model is fit <span class="math inline">\(k\)</span> times, leaving each
 fold out in turn. Each fitted model is then used to predict the response
-variable for the omitted fold, computing some CV criterion or “cost”
-measure, such as the mean-squared error of prediction. The CV criterion
-is then averaged over the <span class="math inline">\(k\)</span> folds.
-In the extreme <span class="math inline">\(k = n\)</span>, the number of
-cases in the data, thus omitting individual cases and refitting the
-model <span class="math inline">\(n\)</span> times—a procedure termed
-“leave-one-out (LOO) cross-validation.”</p>
-<p>Because the <span class="math inline">\(k\)</span> models are each
+variable for the cases in the omitted fold. A CV criterion or “cost”
+measure, such as the mean-squared error (“MSE”) of prediction, is then
+computed using these predicted values. In the extreme <span class="math inline">\(k = n\)</span>, the number of cases in the data,
+thus omitting individual cases and refitting the model <span class="math inline">\(n\)</span> times—a procedure termed “leave-one-out
+(LOO) cross-validation.”</p>
+<p>Because the <span class="math inline">\(n\)</span> models are each
 fit to <span class="math inline">\(n - 1\)</span> cases, LOO CV produces
 a nearly unbiased estimate of prediction error. The <span class="math inline">\(n\)</span> regression models are highly
 statistical dependent, however, based as they are on nearly the same
@@ -211,17 +209,16 @@ data
 <p>The linear fit is clearly inappropriate; the fits for <span class="math inline">\(p = 2\)</span> (quadratic) through <span class="math inline">\(4\)</span> are very similar; and the fit for <span class="math inline">\(p = 5\)</span> may over-fit the data by chasing
 one or two relatively high <code>mpg</code> values at the right (but see
 the CV results reported below).</p>
-<p>The following graph shows two measures of estimated squared error as
-a function of polynomial-regression degree: The mean-squared error
-(MSE), defined as <span class="math inline">\(\mathsf{MSE} = \sum (y_i -
-\widehat{y}_i)^2/n\)</span>, and the usual unbiased estimated error
-variance, defined as <span class="math inline">\(\widehat{\sigma}^2 =
-\sum (y_i - \widehat{y}_i)^2/(n - p - 1)\)</span>. The former
-necessarily declines with <span class="math inline">\(p\)</span> (or,
-more strictly, can’t increase with <span class="math inline">\(p\)</span>), while the latter gets slightly larger
-for the largest values of <span class="math inline">\(p\)</span>, with
-the “best” value, by a small margin, for <span class="math inline">\(p =
-7\)</span>.</p>
+<p>The following graph shows two measures of estimated (squared) error
+as a function of polynomial-regression degree: The mean-squared error
+(“MSE”), defined as <span class="math inline">\(\mathsf{MSE} =
+\frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\)</span>, and the usual
+residual variance, defined as <span class="math inline">\(\widehat{\sigma}^2 = \frac{1}{n - p - 1}
+\sum_{i=1}^n (y_i - \widehat{y}_i)^2\)</span>. The former necessarily
+declines with <span class="math inline">\(p\)</span> (or, more strictly,
+can’t increase with <span class="math inline">\(p\)</span>), while the
+latter gets slightly larger for the largest values of <span class="math inline">\(p\)</span>, with the “best” value, by a small
+margin, for <span class="math inline">\(p = 7\)</span>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gmonette.github.io/cv/">"cv"</a></span><span class="op">)</span> <span class="co"># for mse() and other functions</span></span>
 <span><span class="co">#&gt; Loading required package: doParallel</span></span>
@@ -229,23 +226,23 @@ the “best” value, by a small margin, for <span class="math inline">\(p =
 <span><span class="co">#&gt; Loading required package: iterators</span></span>
 <span><span class="co">#&gt; Loading required package: parallel</span></span>
 <span></span>
-<span><span class="va">se</span> <span class="op">&lt;-</span> <span class="va">mse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">var</span> <span class="op">&lt;-</span> <span class="va">mse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">p</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">horsepower</span>, <span class="va">p</span><span class="op">)</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span></span>
 <span>  <span class="va">mse</span><span class="op">[</span><span class="va">p</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">se</span><span class="op">[</span><span class="va">p</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">$</span><span class="va">sigma</span></span>
+<span>  <span class="va">var</span><span class="op">[</span><span class="va">p</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">$</span><span class="va">sigma</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">mse</span>, <span class="va">se</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, type<span class="op">=</span><span class="st">"n"</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">mse</span>, <span class="va">var</span><span class="op">)</span>, type<span class="op">=</span><span class="st">"n"</span>,</span>
 <span>     xlab<span class="op">=</span><span class="st">"Degree of polynomial, p"</span>,</span>
 <span>     ylab<span class="op">=</span><span class="st">"Estimated Squared Error"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="va">mse</span>, lwd<span class="op">=</span><span class="fl">2</span>, lty<span class="op">=</span><span class="fl">1</span>, col<span class="op">=</span><span class="fl">2</span>, pch<span class="op">=</span><span class="fl">16</span>, type<span class="op">=</span><span class="st">"b"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="va">se</span><span class="op">^</span><span class="fl">2</span>, lwd<span class="op">=</span><span class="fl">2</span>, lty<span class="op">=</span><span class="fl">2</span>, col<span class="op">=</span><span class="fl">3</span>, pch<span class="op">=</span><span class="fl">17</span>, type<span class="op">=</span><span class="st">"b"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="va">var</span>, lwd<span class="op">=</span><span class="fl">2</span>, lty<span class="op">=</span><span class="fl">2</span>, col<span class="op">=</span><span class="fl">3</span>, pch<span class="op">=</span><span class="fl">17</span>, type<span class="op">=</span><span class="st">"b"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, inset<span class="op">=</span><span class="fl">0.02</span>,</span>
 <span>       legend<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/influence.measures.html" class="external-link">hat</a></span><span class="op">(</span><span class="va">sigma</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, <span class="st">"MSE"</span><span class="op">)</span>,</span>
 <span>       lwd<span class="op">=</span><span class="fl">2</span>, lty<span class="op">=</span><span class="fl">2</span><span class="op">:</span><span class="fl">1</span>, col<span class="op">=</span><span class="fl">3</span><span class="op">:</span><span class="fl">2</span>, pch<span class="op">=</span><span class="fl">17</span><span class="op">:</span><span class="fl">16</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/mpg-horsepower-MSE-se2-1.png" alt="Estimated squared error as a function of polynomial degree, $p$" width="100%"><p class="caption">
+<img src="fig/mpg-horsepower-MSE-se-1.png" alt="Estimated squared error as a function of polynomial degree, $p$" width="100%"><p class="caption">
 Estimated squared error as a function of polynomial degree, <span class="math inline">\(p\)</span>
 </p>
 </div>
@@ -281,12 +278,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 956746</span></span>
+<span><span class="co">#&gt; R RNG seed set to 414181</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.262</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.247</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.298</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.281</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -357,11 +354,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   4.0095   4.0569   4.1734   4.2315   4.2568   4.2862    10</span></span>
-<span><span class="co">#&gt;   Woodbury  23.7035  23.9885  24.9977  24.1033  24.6606  29.0196    10</span></span>
-<span><span class="co">#&gt;      naive 483.2360 487.3420 515.3773 490.6270 495.9459 620.1259    10</span></span>
-<span><span class="co">#&gt;     cv.glm 838.0055 841.3022 868.7457 845.0557 850.4696 971.2378    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min       lq     mean   median       uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues   2.1862   2.2882   2.4741   2.4566   2.5371    3.1361    10</span></span>
+<span><span class="co">#&gt;   Woodbury  22.1167  22.3486  22.5347  22.5560  22.7662   22.9277    10</span></span>
+<span><span class="co">#&gt;      naive 480.3538 481.6442 497.7013 483.9582 487.4615  614.0369    10</span></span>
+<span><span class="co">#&gt;     cv.glm 825.4193 830.2907 871.3990 834.1288 841.2493 1086.1476    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -576,7 +573,9 @@ regression to the <code>Mroz</code> data:</p>
 <span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">BayesRule</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">$</span><span class="va">lfp</span> <span class="op">==</span> <span class="st">"yes"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, </span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.mroz</span>, type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.30677</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.30677</span></span>
+<span><span class="co">#&gt; attr(,"casewise average")</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In addition to the usually summary output for a GLM, we show the
 result of applying the <code><a href="../reference/cost-functions.html">BayesRule()</a></code> function from the
 <strong>cv</strong> package to predictions derived from the fitted
@@ -608,6 +607,7 @@ last section of the vignette for details):</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31952</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28607, 0.35297)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">248</span>, method<span class="op">=</span><span class="st">"Woodbury"</span><span class="op">)</span></span>
@@ -617,6 +617,7 @@ last section of the vignette for details):</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31926</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28581, 0.35271)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
 <p>To ensure that the two methods use the same 10 folds, we specify the
 seed for R’s random-number generator explicitly; here, and as is common
@@ -633,6 +634,7 @@ exact and the approximate methods:</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, k<span class="op">=</span><span class="st">"loo"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, method<span class="op">=</span><span class="st">"Woodbury"</span><span class="op">)</span></span>
@@ -641,6 +643,7 @@ exact and the approximate methods:</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, k<span class="op">=</span><span class="st">"loo"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, method<span class="op">=</span><span class="st">"hatvalues"</span><span class="op">)</span></span>
@@ -664,11 +667,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    7.0226    7.0826    7.8277    7.3288    7.7834   11.459    10</span></span>
-<span><span class="co">#&gt;   Woodbury   75.0334   75.6929   78.2776   77.2862   78.5111   89.277    10</span></span>
-<span><span class="co">#&gt;      exact 3049.0508 3104.0638 3231.3003 3220.9484 3316.9783 3554.610    10</span></span>
-<span><span class="co">#&gt;     cv.glm 3773.8796 3779.7233 3860.4367 3849.7439 3919.0595 3979.350    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.3624    2.5033    2.5585    2.5328    2.5727    2.9869    10</span></span>
+<span><span class="co">#&gt;   Woodbury   69.3237   70.0926   71.2914   71.0998   72.0737   74.6118    10</span></span>
+<span><span class="co">#&gt;      exact 2972.3093 2992.3172 3052.8831 3026.1264 3145.3036 3174.9726    10</span></span>
+<span><span class="co">#&gt;     cv.glm 3662.1273 3730.8100 3806.4010 3805.1934 3902.2090 3982.3125    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -835,8 +838,9 @@ fit a mixed model for math achievement to the HSB data:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, k<span class="op">=</span><span class="fl">10</span>, clusterVariables<span class="op">=</span><span class="st">"school"</span>, seed<span class="op">=</span><span class="fl">5240</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 5240</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation based on 160 {school} clusters</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 39.133</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.125</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 39.157</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.148</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (38.066, 40.231)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 39.006</span></span></code></pre></div>
 <p>or at the case (i.e., student) level,</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
@@ -848,6 +852,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 37.445</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 37.338</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (36.288, 38.388)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 36.068</span></span></code></pre></div>
 <p>For cluster-level CV, the <code>clusterVariables</code> argument
 tells <code><a href="../reference/cv.html">cv()</a></code> how the clusters are defined. Were there more
@@ -928,8 +933,9 @@ illustrate with the mixed model fit to the HSB data:</p>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lme</span>, k<span class="op">=</span><span class="fl">10</span>, clusterVariables<span class="op">=</span><span class="st">"school"</span>, seed<span class="op">=</span><span class="fl">5240</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 5240</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation based on 160 {school} clusters</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 39.133</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.125</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 39.157</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.149</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (38.066, 40.232)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 39.006</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lme</span>, seed<span class="op">=</span><span class="fl">1575</span><span class="op">)</span></span>
@@ -937,6 +943,7 @@ illustrate with the mixed model fit to the HSB data:</p>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 37.442</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 37.402</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (36.351, 38.453)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 36.147</span></span></code></pre></div>
 <p>We used the same random-number generator seeds as in the previous
 example cross-validating the model fit by <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer()</a></code>, and so
@@ -1525,6 +1532,7 @@ only the fixed effects):</p>
 <span><span class="co">#&gt; n-Fold Cross Validation based on 48 {id} clusters</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.973</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.965</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (17.125, 22.805)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 19.201</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.p</span>, clusterVariables<span class="op">=</span><span class="st">"week"</span><span class="op">)</span></span>
@@ -1532,6 +1540,7 @@ only the fixed effects):</p>
 <span><span class="co">#&gt; n-Fold Cross Validation based on 9 {week} clusters</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.312</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.305</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (16.566, 22.044)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 19.201</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.p</span>, clusterVariables<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"week"</span><span class="op">)</span>, k<span class="op">=</span><span class="fl">10</span>, seed<span class="op">=</span><span class="fl">8469</span><span class="op">)</span></span>
@@ -1539,6 +1548,7 @@ only the fixed effects):</p>
 <span><span class="co">#&gt; 10-Fold Cross Validation based on 432 {id, week} clusters</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.235</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.233</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (16.493, 21.973)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 19.201</span></span></code></pre></div>
 <p>We can also cross-validate the individual cases taking account of the
 random effects (employing the same 10 folds):</p>
@@ -1548,6 +1558,7 @@ random effects (employing the same 10 folds):</p>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 5.1583</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 5.0729</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (4.123, 6.0229)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 3.796</span></span></code></pre></div>
 <p>Because these predictions are based on BLUPs, they are more accurate
 than the predictions based only on fixed effects.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Even though there is only one observation per
@@ -1603,6 +1614,7 @@ repeated 5 times:</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31301</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.27967, 0.34635)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Replicate 2:</span></span>
@@ -1611,6 +1623,7 @@ repeated 5 times:</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.31607</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3117</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.27847, 0.34493)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Replicate 3:</span></span>
@@ -1619,6 +1632,7 @@ repeated 5 times:</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.31474</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.30862</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.27543, 0.34181)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Replicate 4:</span></span>
@@ -1627,6 +1641,7 @@ repeated 5 times:</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31807</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28462, 0.35152)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Replicate 5:</span></span>
@@ -1635,6 +1650,7 @@ repeated 5 times:</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31926</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28581, 0.35271)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.30677 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Average:</span></span>
@@ -1824,7 +1840,9 @@ model to save computing time.&lt;/p&gt;'><sup>13</sup></a></p>
 <span><span class="co">#&gt; Multiple R-squared:  0.0442, Adjusted R-squared:  0.0296 </span></span>
 <span><span class="co">#&gt; F-statistic: 3.03 on 15 and 984 DF,  p-value: 8.34e-05</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">D</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.select</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.93063</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.93063</span></span>
+<span><span class="co">#&gt; attr(,"casewise average")</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>The resulting model has 15 predictors, a very modest <span class="math inline">\(R^2 = .044\)</span>, but a small <span class="math inline">\(p\)</span>-value for its omnibus <span class="math inline">\(F\)</span>-test (which, of course, is entirely
 spurious because the same data were used to select and test the model).
 The MSE for the selected model is smaller than the true error variance
@@ -1840,6 +1858,7 @@ estimate of its predictive power:</p>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.95937</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.95785</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.87661, 1.0391)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
 <p>The <code><a href="../reference/cvSelect.html">cvSelect()</a></code> function in the <strong>cv</strong>
 package allows us to cross-validate the whole model-selection procedure.
@@ -1858,6 +1877,7 @@ suitable for use with <code><a href="../reference/cvSelect.html">cvSelect()</a><
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 1.0687</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.0612</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.97172, 1.1506)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
 <p>The other arguments to <code><a href="../reference/cvSelect.html">cvSelect()</a></code> are:</p>
 <ul>
@@ -2005,7 +2025,9 @@ the 7 original predictors:</p>
 <span><span class="co">#&gt; Number of Fisher Scoring iterations: 3</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">BayesRule</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">$</span><span class="va">lfp</span> <span class="op">==</span> <span class="st">"yes"</span>,</span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.mroz.sel</span>, type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.31873</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.31873</span></span>
+<span><span class="co">#&gt; attr(,"casewise average")</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>The Bayes rule applied to the selected model misclassifies 32% of the
 cases in the <code>Mroz</code> data.</p>
 <p>Cross-validating the selected model produces a similar, slightly
@@ -2018,6 +2040,7 @@ larger, estimate of misclassification, about 33%:</p>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.33068</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.33332</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.2997, 0.36695)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.31873</span></span></code></pre></div>
 <p>Is this estimate of predictive performance optimistic?</p>
 <p>We proceed to apply the model-selection procedure by
@@ -2033,6 +2056,7 @@ cross-validation, producing more or less the same result:</p>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.33068</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.33452</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.3009, 0.36815)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.31873</span></span></code></pre></div>
 <p>Setting <code>AIC=FALSE</code> in the call to <code><a href="../reference/cvSelect.html">cvSelect()</a></code>
 uses the BIC rather than the AIC as the model-selection criterion. As it
@@ -2214,8 +2238,12 @@ transformed predictors shows a advantage to the latter:</p>
 <span><span class="va">m.pres.trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data<span class="op">=</span><span class="va">P</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 59.153</span></span>
+<span><span class="co">#&gt; attr(,"casewise average")</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">P</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 50.6</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 50.6</span></span>
+<span><span class="co">#&gt; attr(,"casewise average")</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>Similarly, component+residual plots for the two regressions, produced
 by the <code><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots()</a></code> function in the <strong>car</strong>
 package, suggest that the partial relationship of <code>prestige</code>
@@ -2278,7 +2306,9 @@ selected transformation is applied, with the default
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">selectTrans</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">Prestige</span>, model<span class="op">=</span><span class="va">m.pres</span>,</span>
 <span>            predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span>
 <span>            response<span class="op">=</span><span class="st">"prestige"</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 50.6</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 50.6</span></span>
+<span><span class="co">#&gt; attr(,"casewise average")</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p><code><a href="../reference/cvSelect.html">selectTrans()</a></code> also takes an optional
 <code>indices</code> argument, making it suitable for doing computations
 on a subset of the data (i.e., a CV fold), and hence for use with
@@ -2702,18 +2732,22 @@ expect that the result will be optimistic because we used the whole data
 to help specify the model</p>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 6.5121</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 6.5121</span></span>
+<span><span class="co">#&gt; attr(,"casewise average")</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>This is considerably smaller than the MSE for the original working
 model:</p>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 8.0932</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 8.0932</span></span>
+<span><span class="co">#&gt; attr(,"casewise average")</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>A perhaps subtle point is that we compute the MSE for the selected
 model on the original <code>mpg</code> response scale rather than the
 log scale, so as to make the selected model comparable to the working
 model. That’s slightly uncomfortable given the skewed distribution of
 <code>mpg</code>. An alternative is to use the median absolute error
-instead of the mean-squared error, employing the
+instead of the root-mean-squared error, employing the
 <code><a href="../reference/cost-functions.html">medAbsErr()</a></code> function from the <strong>cv</strong>
 package:</p>
 <div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
@@ -2733,8 +2767,7 @@ whole model-specification process:</p>
 <span><span class="co">#&gt; R RNG seed set to 76692</span></span>
 <span><span class="va">cvs</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 1.3841</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.3484</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 1.4951</span></span>
 <span><span class="co">#&gt; full-sample criterion = 1.3396</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cvs</span><span class="op">)</span></span>
@@ -2847,7 +2880,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.516   0.000   0.516</span></span>
+<span><span class="co">#&gt;   0.502   0.000   0.502</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2857,7 +2890,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.075   0.000   1.548</span></span>
+<span><span class="co">#&gt;   0.062   0.004   1.516</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -2981,19 +3014,18 @@ cases into <span class="math inline">\(k\)</span> folds of approximately
 <span class="math inline">\(n = \sum n_j\)</span>. As above, let <span class="math inline">\(\mathbf{j}\)</span> denote the indices of the
 cases in the <span class="math inline">\(j\)</span>th fold.</p>
 <p>Now define <span class="math inline">\(\mathrm{CV}_j =
-\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})\)</span> and <span class="math inline">\(\mathrm{CV}_j^{(j)} =
-\mathrm{CV}(\mathbf{y}_{\mathbf{j}},
-\widehat{\mathbf{y}}^{(j)}_{\mathbf{j}})\)</span>. The superscript <span class="math inline">\((j)\)</span> on <span class="math inline">\(\widehat{\mathbf{y}}^{(j)}\)</span> and <span class="math inline">\(\widehat{\mathbf{y}}^{(j)}_{\mathbf{j}}\)</span>
-represents fitted values computed from the model with fold <span class="math inline">\(j\)</span> omitted, respectively for all of the
-cases (i.e., <span class="math inline">\(\mathrm{CV}_j\)</span>) and for
-the cases only in the <span class="math inline">\(j\)</span>th fold
-(<span class="math inline">\(\mathrm{CV}_j^{(j)}\)</span>).</p>
-<p>Then the cross-validation criterion is the weighted average of the
-<span class="math inline">\(\mathrm{CV}_j^{(j)}\)</span> <span class="math display">\[
-\mathrm{CV} = \frac{1}{n} \sum_{j = 1}^{k} n_j \mathrm{CV}_j^{(j)}
-\]</span> Following <span class="citation">Davison &amp; Hinkley (1997,
-pp. 293–295)</span>, the bias-adjusted cross-validation criterion is
-<span class="math display">\[
+\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})\)</span>. The
+superscript <span class="math inline">\((j)\)</span> on <span class="math inline">\(\widehat{\mathbf{y}}^{(j)}\)</span> represents
+fitted values computed for all of the cases from the model with fold
+<span class="math inline">\(j\)</span> omitted. Let <span class="math inline">\(\widehat{\mathbf{y}}^{(-i)}\)</span> represent the
+vector of fitted values for all <span class="math inline">\(n\)</span>
+cases where the fitted value for the <span class="math inline">\(i\)</span>th case is computed from the model fit
+with the fold including the <span class="math inline">\(i\)</span>th
+case omitted (i.e., fold <span class="math inline">\(j\)</span> for
+which <span class="math inline">\(i \in \mathbf{j}\)</span>).</p>
+<p>Then the cross-validation criterion is just <span class="math inline">\(\mathrm{CV} = \mathrm{CV}(\mathbf{y},
+\widehat{\mathbf{y}}^{(-i)})\)</span>. Following <span class="citation">Davison &amp; Hinkley (1997, pp. 293–295)</span>, the
+bias-adjusted cross-validation criterion is <span class="math display">\[
 \mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y},
 \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
 \]</span></p>
