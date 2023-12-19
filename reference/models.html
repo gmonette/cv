@@ -91,6 +91,7 @@ different response variables.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
 <span>  spread <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"range"</span>, <span class="st">"sd"</span><span class="op">)</span>,</span>
+<span>  confint <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  <span class="va">ylab</span>,</span>
 <span>  <span class="va">main</span>,</span>
@@ -164,6 +165,12 @@ plotted; defaults to <code>"adj CV crit"</code>, if it exists, or to
 <dd><p>if <code>"range"</code>, the default, show the range of CV criteria
 for each model along with their average; if <code>"sd"</code>, show the average
 plus or minus 1 standard deviation.</p></dd>
+
+
+<dt>confint</dt>
+<dd><p>if <code>TRUE</code> (the default) and if confidence intervals are
+in any of the <code>"cv"</code> objects, then plot the confidence intervals around the
+CV criteria.</p></dd>
 
 
 <dt>xlab</dt>
@@ -246,6 +253,35 @@ element of the color palette; see <code><a href="https://rdrr.io/r/grDevices/pal
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 74.45878 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.models</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="models-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">cv.models.ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="fu">models</span><span class="op">(</span>m1<span class="op">=</span><span class="va">m1</span>, m2<span class="op">=</span><span class="va">m2</span>, m3<span class="op">=</span><span class="va">m3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                    data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5962</span>, confint<span class="op">=</span><span class="cn">TRUE</span>, level<span class="op">=</span><span class="fl">0.50</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model m1:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 196.953</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 195.2606</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50% CI for bias-adjusted CV criterion = (162.0119, 228.5093)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model m2:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 107.3751</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 106.081</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50% CI for bias-adjusted CV criterion = (84.96181, 127.2003)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 84.39899 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Model m3:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 141.2562</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 137.0925</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50% CI for bias-adjusted CV criterion = (108.4551, 165.7299)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 74.45878 </span>
+<span class="r-in"><span>                 <span class="co"># nb: n too small for accurate CIs</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.models.ci</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="models-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
