@@ -204,7 +204,7 @@ that returns the casewise components of the criterion.</p>
 <span><span class="co">#&gt;     attr(result, "casewise average") &lt;- TRUE</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x564c8f0d8f20&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5594c370f080&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span>
 <span></span>
 <span><span class="fu">cv</span><span class="fu">:::</span><span class="fu">getLossFn</span><span class="op">(</span><span class="va">mse</span><span class="op">)</span></span>
@@ -213,7 +213,7 @@ that returns the casewise components of the criterion.</p>
 <span><span class="co">#&gt;     result &lt;- (y - yhat)^2</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x564c8f015940&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x5594c364be80&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the criterion function must assign its value
 to the local variable <code>result</code> (here,
 <code>result &lt;- mean((y - yhat)^2</code>) and attach the
@@ -450,7 +450,7 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
 <span><span class="co">#&gt;             newdata = data, level = 1), ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x564c9608e268&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5594ca6c5e68&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
