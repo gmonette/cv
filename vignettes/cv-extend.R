@@ -44,6 +44,11 @@ AUCcomp(with(Mroz, as.numeric(lfp == "yes")), fitted(m.mroz))
 library("cv")
 cv(m.mroz, criterion=AUCcomp, seed=3639)
 
+## -----------------------------------------------------------------------------
+mse
+
+cv:::getLossFn(mse)
+
 ## ----BEPS-data----------------------------------------------------------------
 data("BEPS", package="carData")
 head(BEPS)
@@ -113,7 +118,7 @@ getResponse.glmmPQL <- function(model, ...){
 }
 
 ## ----cv.glmmPQL---------------------------------------------------------------
-cv.glmmPQL <- function(model, data = model$data, criterion = rmse,
+cv.glmmPQL <- function(model, data = model$data, criterion = mse,
                      k, reps = 1, seed, ncores = 1, clusterVariables, ...){
   cvMixed(
     model,
@@ -182,7 +187,7 @@ cv(m.best, seed=8433) # use same folds as before
 selectSubsets <- function(data=insight::get_data(model), 
                           model,
                           indices,
-                          criterion=rmse,
+                          criterion=mse,
                           save.coef=TRUE, ...){
   
   if (inherits(model, "lm", which=TRUE) != 1)

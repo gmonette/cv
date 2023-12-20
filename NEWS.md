@@ -1,6 +1,8 @@
 # cv 1.1.0
 
-- cv() et al. now work properly with "nonlinear" CV criteria such as the new rmse() and medAbsErr(), not just with "linear" fit criteria such as mse() and BayesRule().
+- cv() et al. now work properly with "non-casewise average" CV criteria such as the new rmse() and medAbsErr(), not just with "casewise-average" fit criteria such as mse() and BayesRule().
+
+- Bias adjustment and confidence intervals (which are new) are computed only for casewise-average CV criteria.
 
 - Generally suppress spurious messages about setting the seed in cv.modList() for LOO CV.
 
