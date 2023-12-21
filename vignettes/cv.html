@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-12-19" />
+<meta name="date" content="2023-12-21" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-12-19</h4>
+<h4 class="date">2023-12-21</h4>
 
 
 
@@ -539,12 +539,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 623158</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 398475</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.077</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.072</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.238</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.224</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -613,12 +613,12 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>)</span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = &quot;loo&quot;), :</span></span>
 <span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval cld</span></span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues   1.0041   1.1921   1.1771   1.2066   1.2404   1.2494    10 a  </span></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10.1490  10.2184  10.5245  10.3655  10.6547  11.6459    10 a  </span></span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 209.0588 210.5513 217.0681 219.4219 221.6367 222.4562    10  b </span></span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 378.0125 381.4340 394.2817 382.1090 386.1483 447.8899    10   c</span></span></code></pre></div>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;       expr       min       lq     mean   median       uq      max neval cld</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues    984.12   1007.2   1137.3   1180.1   1198.6   1263.9    10 a  </span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  10163.78  10338.6  10668.2  10489.0  10853.5  11556.6    10 a  </span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt;      naive 212441.46 215529.3 244447.9 215996.5 275930.8 332341.3    10  b </span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 377949.56 380481.0 387874.5 382854.3 384354.3 439413.8    10   c</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></p>
@@ -812,8 +812,8 @@ regression to the <code>Mroz</code> data:</p>
 <span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a><span class="fu">BayesRule</span>(<span class="fu">ifelse</span>(Mroz<span class="sc">$</span>lfp <span class="sc">==</span> <span class="st">&quot;yes&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>), </span>
 <span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a>          <span class="fu">fitted</span>(m.mroz, <span class="at">type=</span><span class="st">&quot;response&quot;</span>))</span>
 <span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a><span class="co">#&gt; [1] 0.30677</span></span>
-<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a><span class="co">#&gt; [1] &quot;y != round(yhat)&quot;</span></span></code></pre></div>
 <p>In addition to the usually summary output for a GLM, we show the
 result of applying the <code>BayesRule()</code> function from the
 <strong>cv</strong> package to predictions derived from the fitted
@@ -825,20 +825,22 @@ the second argument is the predicted probability of success.
 <code>BayesRule()</code> returns the proportion of predictions that are
 <em>in error</em>, as appropriate for a “cost” function.</p>
 <p>The value returned by <code>BayesRule()</code> is associated with an
-“attribute” named <code>&quot;casewise average&quot;</code> set to
-<code>TRUE</code>, signifying that the Bayes rule CV criterion is
-computed as the mean of casewise values, here 0 if the prediction for a
-case matches the observed value and 1 if it does not (signifying a
-prediction error). The <code>mse()</code> function for numeric responses
-is also calculated as a casewise average. Some other criteria, such as
-the median absolute error, computed by the <code>medAbsErr()</code>
-function in the <strong>cv</strong> package, aren’t averages of casewise
-components. The distinction is important because, to our knowledge, the
-statistical theory of cross-validation, for example, in <span class="citation">Davison &amp; Hinkley (1997)</span> and <span class="citation">S. Bates, Hastie, &amp; Tibshirani (2023)</span>, is
-developed for CV criteria like MSE that are means of casewise
-components. As a consequence, we limit computation of bias adjustment
-and confidence intervals (see below) to criteria that are casewise
-averages.</p>
+“attribute” named <code>&quot;casewise loss&quot;</code> and set to
+<code>&quot;y != round(yhat)&quot;</code>, signifying that the Bayes rule CV
+criterion is computed as the mean of casewise values, here 0 if the
+prediction for a case matches the observed value and 1 if it does not
+(signifying a prediction error). The <code>mse()</code> function for
+numeric responses is also calculated as a casewise average. Some other
+criteria, such as the median absolute error, computed by the
+<code>medAbsErr()</code> function in the <strong>cv</strong> package,
+aren’t averages of casewise components. The distinction is important
+because, to our knowledge, the statistical theory of cross-validation,
+for example, in <span class="citation">Davison &amp; Hinkley
+(1997)</span> and <span class="citation">S. Bates, Hastie, &amp;
+Tibshirani (2023)</span>, is developed for CV criteria like MSE that are
+means of casewise components. As a consequence, we limit computation of
+bias adjustment and confidence intervals (see below) to criteria that
+are casewise averages.</p>
 <p>In this example, the fitted logistic regression incorrectly predicts
 31% of the responses; we expect this estimate to be optimistic given
 that the model is used to “predict” the data to which it is fit.</p>
@@ -924,10 +926,10 @@ comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
 <span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="at">times=</span><span class="dv">10</span>)</span>
 <span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
 <span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.2585    1.3257    1.3453    1.3364    1.3815    1.4527    10</span></span>
-<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   37.8938   38.0025   45.0848   39.2315   40.1564  100.2408    10</span></span>
-<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co">#&gt;      exact 1738.5528 1755.2252 1797.4857 1816.8919 1827.8825 1835.8108    10</span></span>
-<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2022.5381 2035.5832 2074.4328 2074.7739 2102.5704 2156.1237    10</span></span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.3162    1.3225    1.3642    1.3628    1.3949    1.4245    10</span></span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a><span class="co">#&gt;   Woodbury   36.4895   39.5385   39.9967   39.9215   40.8494   42.5555    10</span></span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a><span class="co">#&gt;      exact 1745.5973 1788.3366 1804.1526 1803.5052 1825.1950 1841.3132    10</span></span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2035.6361 2090.7018 2108.1829 2105.4351 2126.8714 2185.7436    10</span></span>
 <span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a><span class="co">#&gt;   cld</span></span>
 <span id="cb17-15"><a href="#cb17-15" tabindex="-1"></a><span class="co">#&gt;  a   </span></span>
 <span id="cb17-16"><a href="#cb17-16" tabindex="-1"></a><span class="co">#&gt;   b  </span></span>
@@ -2019,8 +2021,8 @@ the model-selection criterion (see the help page for
 <span id="cb49-38"><a href="#cb49-38" tabindex="-1"></a><span class="co">#&gt; F-statistic: 3.03 on 15 and 984 DF,  p-value: 8.34e-05</span></span>
 <span id="cb49-39"><a href="#cb49-39" tabindex="-1"></a><span class="fu">mse</span>(D<span class="sc">$</span>y, <span class="fu">fitted</span>(m.select))</span>
 <span id="cb49-40"><a href="#cb49-40" tabindex="-1"></a><span class="co">#&gt; [1] 0.93063</span></span>
-<span id="cb49-41"><a href="#cb49-41" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb49-42"><a href="#cb49-42" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span id="cb49-41"><a href="#cb49-41" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb49-42"><a href="#cb49-42" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span></code></pre></div>
 <p>The resulting model has 15 predictors, a very modest <span class="math inline">\(R^2 = .044\)</span>, but a small <span class="math inline">\(p\)</span>-value for its omnibus <span class="math inline">\(F\)</span>-test (which, of course, is entirely
 spurious because the same data were used to select and test the model).
 The MSE for the selected model is smaller than the true error variance
@@ -2197,8 +2199,8 @@ the 7 original predictors:</p>
 <span id="cb54-27"><a href="#cb54-27" tabindex="-1"></a><span class="fu">BayesRule</span>(Mroz<span class="sc">$</span>lfp <span class="sc">==</span> <span class="st">&quot;yes&quot;</span>,</span>
 <span id="cb54-28"><a href="#cb54-28" tabindex="-1"></a>          <span class="fu">predict</span>(m.mroz.sel, <span class="at">type=</span><span class="st">&quot;response&quot;</span>))</span>
 <span id="cb54-29"><a href="#cb54-29" tabindex="-1"></a><span class="co">#&gt; [1] 0.31873</span></span>
-<span id="cb54-30"><a href="#cb54-30" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb54-31"><a href="#cb54-31" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span id="cb54-30"><a href="#cb54-30" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb54-31"><a href="#cb54-31" tabindex="-1"></a><span class="co">#&gt; [1] &quot;y != round(yhat)&quot;</span></span></code></pre></div>
 <p>Bayes rule applied to the selected model misclassifies 32% of the
 cases in the <code>Mroz</code> data.</p>
 <p>Cross-validating the selected model produces a similar, slightly
@@ -2392,12 +2394,12 @@ transformed predictors shows a advantage to the latter:</p>
 <span id="cb62-2"><a href="#cb62-2" tabindex="-1"></a>m.pres.trans <span class="ot">&lt;-</span> <span class="fu">lm</span>(prestige <span class="sc">~</span> income <span class="sc">+</span> education <span class="sc">+</span> women, <span class="at">data=</span>P)</span>
 <span id="cb62-3"><a href="#cb62-3" tabindex="-1"></a><span class="fu">mse</span>(Prestige<span class="sc">$</span>prestige, <span class="fu">fitted</span>(m.pres))</span>
 <span id="cb62-4"><a href="#cb62-4" tabindex="-1"></a><span class="co">#&gt; [1] 59.153</span></span>
-<span id="cb62-5"><a href="#cb62-5" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb62-6"><a href="#cb62-6" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb62-5"><a href="#cb62-5" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb62-6"><a href="#cb62-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span>
 <span id="cb62-7"><a href="#cb62-7" tabindex="-1"></a><span class="fu">mse</span>(P<span class="sc">$</span>prestige, <span class="fu">fitted</span>(m.pres.trans))</span>
 <span id="cb62-8"><a href="#cb62-8" tabindex="-1"></a><span class="co">#&gt; [1] 50.6</span></span>
-<span id="cb62-9"><a href="#cb62-9" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb62-10"><a href="#cb62-10" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span id="cb62-9"><a href="#cb62-9" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb62-10"><a href="#cb62-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span></code></pre></div>
 <p>Similarly, component+residual plots for the two regressions, produced
 by the <code>crPlots()</code> function in the <strong>car</strong>
 package, suggest that the partial relationship of <code>prestige</code>
@@ -2459,8 +2461,8 @@ selected transformation is applied, with the default
 <span id="cb66-2"><a href="#cb66-2" tabindex="-1"></a>            <span class="at">predictors=</span><span class="fu">c</span>(<span class="st">&quot;income&quot;</span>, <span class="st">&quot;education&quot;</span>, <span class="st">&quot;women&quot;</span>),</span>
 <span id="cb66-3"><a href="#cb66-3" tabindex="-1"></a>            <span class="at">response=</span><span class="st">&quot;prestige&quot;</span>, <span class="at">family=</span><span class="st">&quot;yjPower&quot;</span>)</span>
 <span id="cb66-4"><a href="#cb66-4" tabindex="-1"></a><span class="co">#&gt; [1] 50.6</span></span>
-<span id="cb66-5"><a href="#cb66-5" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb66-6"><a href="#cb66-6" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span id="cb66-5"><a href="#cb66-5" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb66-6"><a href="#cb66-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span></code></pre></div>
 <p><code>selectTrans()</code> also takes an optional
 <code>indices</code> argument, making it suitable for doing computations
 on a subset of the data (i.e., a CV fold), and hence for use with
@@ -2868,14 +2870,14 @@ expect that the result will be optimistic because we used the whole data
 to help specify the model</p>
 <div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" tabindex="-1"></a><span class="fu">mse</span>(Auto<span class="sc">$</span>mpg, <span class="fu">exp</span>(<span class="fu">fitted</span>(m.step)))</span>
 <span id="cb77-2"><a href="#cb77-2" tabindex="-1"></a><span class="co">#&gt; [1] 6.5121</span></span>
-<span id="cb77-3"><a href="#cb77-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb77-4"><a href="#cb77-4" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span id="cb77-3"><a href="#cb77-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb77-4"><a href="#cb77-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span></code></pre></div>
 <p>This is considerably smaller than the MSE for the original working
 model:</p>
 <div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" tabindex="-1"></a><span class="fu">mse</span>(Auto<span class="sc">$</span>mpg, <span class="fu">fitted</span>(m.auto))</span>
 <span id="cb78-2"><a href="#cb78-2" tabindex="-1"></a><span class="co">#&gt; [1] 8.0932</span></span>
-<span id="cb78-3"><a href="#cb78-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb78-4"><a href="#cb78-4" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span id="cb78-3"><a href="#cb78-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb78-4"><a href="#cb78-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span></code></pre></div>
 <p>A perhaps subtle point is that we compute the MSE for the selected
 model on the original <code>mpg</code> response scale rather than the
 log scale, so as to make the selected model comparable to the working
@@ -3011,7 +3013,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-5"><a href="#cb81-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb81-6"><a href="#cb81-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-7"><a href="#cb81-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.241   0.015   0.257</span></span>
+<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.241   0.002   0.244</span></span>
 <span id="cb81-9"><a href="#cb81-9" tabindex="-1"></a></span>
 <span id="cb81-10"><a href="#cb81-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb81-11"><a href="#cb81-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -3021,7 +3023,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-15"><a href="#cb81-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb81-16"><a href="#cb81-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-17"><a href="#cb81-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.034   0.005   0.949</span></span>
+<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.033   0.006   0.978</span></span>
 <span id="cb81-19"><a href="#cb81-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb81-20"><a href="#cb81-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually

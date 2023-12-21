@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-12-20" />
+<meta name="date" content="2023-12-21" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-12-20</h4>
+<h4 class="date">2023-12-21</h4>
 
 
 
@@ -459,37 +459,32 @@ can’t be expressed as the mean of casewise components, and certainly the
 <code>auc()</code> function in the <strong>Metrics</strong> package, on
 which our <code>AUCcomp()</code> is based, isn’t written in this
 manner.</p>
-<p><code>cv()</code> looks for a <code>&quot;casewise average&quot;</code>
-attribute of the value returned by a CV criterion function. If this
-attribute exists and is <code>TRUE</code>, then the criterion is treated
-as the mean of casewise components; if the attribute is absent or
-<code>FALSE</code>, then it is not. If the <code>casewise average</code>
-attribute is <code>TRUE</code>, then <code>cv()</code> uses the
-unexported function <code>getLossFn()</code> to construct a function
-that returns the casewise components of the criterion.</p>
+<p><code>cv()</code> looks for a <code>&quot;casewise loss&quot;</code> attribute
+of the value returned by a CV criterion function. If this attribute
+exists, then the criterion is treated as the mean of casewise
+components, and <code>cv()</code> uses the unexported function
+<code>getLossFn()</code> to construct a function that returns the
+casewise components of the criterion.</p>
 <p>We illustrate with the <code>mse()</code>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>mse</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; function(y, yhat){</span></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt;   result &lt;- mean((y - yhat)^2)</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;   attr(result, &quot;casewise average&quot;) &lt;- TRUE</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;   attr(result, &quot;casewise loss&quot;) &lt;- &quot;(y - yhat)^2&quot;</span></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;   result</span></span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; }</span></span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>cv<span class="sc">:::</span><span class="fu">getLossFn</span>(mse)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>cv<span class="sc">:::</span><span class="fu">getLossFn</span>(<span class="fu">mse</span>(<span class="fu">rnorm</span>(<span class="dv">100</span>), <span class="fu">rnorm</span>(<span class="dv">100</span>)))</span>
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; function (y, yhat) </span></span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     result &lt;- (y - yhat)^2</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;     result</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x1171f9270&gt;</span></span></code></pre></div>
-<p>For this scheme to work, the criterion function must assign its value
-to the local variable <code>result</code> (here,
-<code>result &lt;- mean((y - yhat)^2</code>) and attach the
-<code>&quot;casewise average&quot;</code> attribute, set to <code>TRUE</code>, to
-<code>result</code>. <code>getLossFn()</code> returns a version of the
-criterion with the call to <code>mean()</code> and the attribute
-removed.</p>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x12e66b9a8&gt;</span></span></code></pre></div>
+<p>For this scheme to work, the “casewise loss” attribute must be a
+character string, here <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an
+expression that is a function of <code>y</code> and <code>yhat</code>,
+and that computes the vector of casewise components of the CV
+criterion.</p>
 </div>
 <div id="adding-a-model-class-not-covered-by-the-default-cv-method" class="section level2">
 <h2>Adding a model class not covered by the default <code>cv()</code>
@@ -1195,8 +1190,8 @@ these awkward names, removing the extraneous text,
 full-data cross-validated RMSE (which we obtained previously):</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">selectSubsets</span>(<span class="at">model=</span>m.swiss)</span>
 <span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt; [1] 45.916</span></span>
-<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span></code></pre></div>
 <p>Similarly, applying the function to an imaginary “fold” of 5 cases
 returns the RMSE for the cases in the fold, based on the model selected
 and fit to the cases omitting the fold; the RMSE for all of the cases,
@@ -1208,8 +1203,8 @@ which includes 4 or the 5 predictors (and the intercept):</p>
 <span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a><span class="co">#&gt; $crit.all.i</span></span>
 <span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a><span class="co">#&gt; [1] 46.297</span></span>
-<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise average&quot;)</span></span>
-<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span>
 <span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a><span class="co">#&gt; $coefficients</span></span>
 <span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a><span class="co">#&gt;      (Intercept)      Agriculture        Education         Catholic </span></span>

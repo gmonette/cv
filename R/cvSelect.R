@@ -32,9 +32,11 @@
 #' for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.
 #' @importFrom MASS stepAIC
 #' @describeIn cvSelect apply cross-validation to a model-selection procedure.
-#' @returns An object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
-#' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
+#' @returns An object of class \code{"cvSelect"},
+#' inheriting from class \code{"cv"}, with the CV criterion
+#' (\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
+#' the confidence interval and level for the bias-adjusted CV criterion (\code{"confint"}),
 #' the number of folds (\code{"k"}), the seed for R's random-number
 #' generator (\code{"seed"}), and (optionally) a list of coefficients
 #' (or, in the case of \code{selectTrans()}, estimated transformation
@@ -73,7 +75,7 @@
 #' (\code{vignette("cv-extend", package="cv")}).
 #'
 #' @seealso \code{\link[MASS]{stepAIC}}, \code{\link[car]{bcPower}},
-#' \code{\link[car]{powerTransform}}
+#' \code{\link[car]{powerTransform}}, \code{\link{cv}}.
 #'
 #' @export
 cvSelect <- function(procedure, data, criterion=mse,

@@ -47,7 +47,7 @@ cv(m.mroz, criterion=AUCcomp, seed=3639)
 ## -----------------------------------------------------------------------------
 mse
 
-cv:::getLossFn(mse)
+cv:::getLossFn(mse(rnorm(100), rnorm(100)))
 
 ## ----BEPS-data----------------------------------------------------------------
 data("BEPS", package="carData")

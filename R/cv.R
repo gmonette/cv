@@ -33,9 +33,10 @@
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
 #'
-#' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the averaged CV criterion
-#' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
+#' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
+#' (\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
+#' the confidence interval and level for the bias-adjusted CV criterion (\code{"confint"}),
 #' the number of folds (\code{"k"}), and the seed for R's random-number
 #' generator (\code{"seed"}). Some methods may return a
 #' subset of these components and may add additional information.
@@ -631,6 +632,7 @@ summarizeReps <- function(x){
 
 getLossFn <- function(cv){
   eval(parse(text=paste0("function(y, yhat) {",
-                         attr(cv, "casewise loss"),
+                         paste(attr(cv, "casewise loss"), collapse="\n"),
                          "}")))
 }
+

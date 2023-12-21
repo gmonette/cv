@@ -85,7 +85,7 @@ mse
 
 cv:::getLossFn(mse(rnorm(100), rnorm(100)))
 ```
-For this scheme to work, the "casewise loss" attribute must be a character string, here `"(y - yhat)^2"`, that evaluates to an expression that is a function of `y` and `yhat`, and that computes the vector of casewise components of the CV criterion.
+For this scheme to work, the "casewise loss" attribute must be a character string (or vector of character strings), here `"(y - yhat)^2"`, that evaluates to an expression that is a function of `y` and `yhat`, and that computes the vector of casewise components of the CV criterion.
 
 ## Adding a model class not covered by the default `cv()` method
 
