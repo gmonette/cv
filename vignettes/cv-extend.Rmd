@@ -77,15 +77,15 @@ As expected, the cross-validated complement to the AUC is somewhat less optimist
 
 As we explain in the vignette "Cross-validation of regression models," the `cv()` function differentiates between CV criteria that are averages of casewise components and criteria that are not. Computation of bias corrections and confidence intervals is limited to the former. As far as we know, the AUC, and hence its complement, can't be expressed as the mean of casewise components, and certainly the `auc()` function in the **Metrics** package, on which our `AUCcomp()` is based, isn't written in this manner.
 
-`cv()` looks for a `"casewise average"` attribute of the value returned by a CV criterion function. If this attribute exists and is `TRUE`, then the criterion is treated as the mean of casewise components; if the attribute is absent or `FALSE`, then it is not. If the `casewise average` attribute is `TRUE`, then `cv()` uses the unexported function `getLossFn()` to construct a function that returns the casewise components of the criterion.
+`cv()` looks for a `"casewise loss"` attribute of the value returned by a CV criterion function. If this attribute exists, then the criterion is treated as the mean of casewise components, and `cv()` uses the unexported function `getLossFn()` to construct a function that returns the casewise components of the criterion.
 
 We illustrate with the `mse()`:
 ```{r}
 mse
 
-cv:::getLossFn(mse)
+cv:::getLossFn(mse(rnorm(100), rnorm(100)))
 ```
-For this scheme to work, the criterion function must assign its value to the local variable `result` (here, `result <- mean((y - yhat)^2`) and attach the `"casewise average"` attribute, set to `TRUE`, to `result`. `getLossFn()` returns a version of the criterion with the call to `mean()` and the attribute removed.
+For this scheme to work, the "casewise loss" attribute must be a character string, here `"(y - yhat)^2"`, that evaluates to an expression that is a function of `y` and `yhat`, and that computes the vector of casewise components of the CV criterion.
 
 ## Adding a model class not covered by the default `cv()` method
 

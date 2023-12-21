@@ -162,9 +162,9 @@ cvSelect <- function(procedure, data, criterion=mse,
   cv <- criterion(y, yhat)
   cv.full <- procedure(data, model=model, criterion=criterion, ...)
 
-  casewise.average <- attr(cv, "casewise average")
-  if (!is.null(casewise.average) && casewise.average) {
-    loss <- getLossFn(criterion) # casewise loss function
+  casewise.loss <- attr(cv, "casewise loss")
+  if (!is.null(casewise.loss)) {
+    loss <- getLossFn(cv) # casewise loss function
     adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
     halfwidth <- qnorm(1 - (1 - level)/2)*se.cv

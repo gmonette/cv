@@ -199,9 +199,9 @@ cv.default <- function(model, data=insight::get_data(model),
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, predict(model, type=type, ...))
-  casewise.average <- attr(cv, "casewise average")
-  if (!is.null(casewise.average) && casewise.average) {
-    loss <- getLossFn(criterion) # casewise loss function
+  casewise.loss <- attr(cv, "casewise loss")
+  if (!is.null(casewise.loss)) {
+    loss <- getLossFn(cv) # casewise loss function
     adj.cv <- cv + cv.full -
       weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
@@ -410,9 +410,9 @@ cv.lm <- function(model, data=insight::get_data(model),
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, fitted(model))
-  casewise.average <- attr(cv, "casewise average")
-  if (!is.null(casewise.average) && casewise.average) {
-    loss <- getLossFn(criterion) # casewise loss function
+  casewise.loss <- attr(cv, "casewise loss")
+  if (!is.null(casewise.loss)) {
+    loss <- getLossFn(cv) # casewise loss function
     adj.cv <- cv + cv.full -
       weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
@@ -562,9 +562,9 @@ cv.glm <- function(model, data=insight::get_data(model),
     }
     cv <- criterion(y, yhat)
     cv.full <- criterion(y, fitted(model))
-    casewise.average <- attr(cv, "casewise average")
-    if (!is.null(casewise.average) && casewise.average) {
-      loss <- getLossFn(criterion) # casewise loss function
+    casewise.loss <- attr(cv, "casewise loss")
+    if (!is.null(casewise.loss)) {
+      loss <- getLossFn(cv) # casewise loss function
       adj.cv <- cv + cv.full -
         weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
       se.cv <- sd(loss(y, yhat))/sqrt(n)
@@ -629,19 +629,8 @@ summarizeReps <- function(x){
        "adj CV crit range" = adjCVcritRange)
 }
 
-getLossFn <- function(criterion){
-  expressions <- as.vector(as.character(functionBody(criterion)))
-  which <- grepl("result <- mean\\(", expressions)
-  if (!(any(which))) stop(deparse(substitute(criterion)),
-                          " does not set 'result <- mean(. . .)'")
-  expression <- sub("\\)[:space:]*$", "",
-                    sub("result <- mean\\(", "result <- ",
-                        expressions[which][sum(which)])
-  )
-  expressions[which] <- expression
-  which <- grepl("attr\\(", expressions)
-  expressions <- expressions[!which]
-  eval(parse(text=paste0("function(y, yhat) ",
-                         paste(expressions, collapse="\n"),
+getLossFn <- function(cv){
+  eval(parse(text=paste0("function(y, yhat) {",
+                         attr(cv, "casewise loss"),
                          "}")))
 }
