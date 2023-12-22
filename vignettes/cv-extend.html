@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-12-21" />
+<meta name="date" content="2023-12-22" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-12-21</h4>
+<h4 class="date">2023-12-22</h4>
 
 
 
@@ -479,12 +479,12 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x12e66b9a8&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x11cb64cc0&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
-character string, here <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an
-expression that is a function of <code>y</code> and <code>yhat</code>,
-and that computes the vector of casewise components of the CV
-criterion.</p>
+character string (or vector of character strings), here
+<code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
+function of <code>y</code> and <code>yhat</code>, and that computes the
+vector of casewise components of the CV criterion.</p>
 </div>
 <div id="adding-a-model-class-not-covered-by-the-default-cv-method" class="section level2">
 <h2>Adding a model class not covered by the default <code>cv()</code>

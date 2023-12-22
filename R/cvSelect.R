@@ -164,9 +164,8 @@ cvSelect <- function(procedure, data, criterion=mse,
   cv <- criterion(y, yhat)
   cv.full <- procedure(data, model=model, criterion=criterion, ...)
 
-  casewise.loss <- attr(cv, "casewise loss")
-  if (!is.null(casewise.loss)) {
-    loss <- getLossFn(cv) # casewise loss function
+  loss <- getLossFn(cv) # casewise loss function
+  if (!is.null(loss)) {
     adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
     halfwidth <- qnorm(1 - (1 - level)/2)*se.cv

@@ -200,15 +200,14 @@ cv.default <- function(model, data=insight::get_data(model),
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, predict(model, type=type, ...))
-  casewise.loss <- attr(cv, "casewise loss")
-  if (!is.null(casewise.loss)) {
-    loss <- getLossFn(cv) # casewise loss function
+  loss <- getLossFn(cv) # casewise loss function
+  if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
       weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
     halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
     ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
-            level=round(level*100)) else NULL
+                         level=round(level*100)) else NULL
   } else {
     adj.cv <- NULL
     ci <- NULL
@@ -411,9 +410,8 @@ cv.lm <- function(model, data=insight::get_data(model),
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, fitted(model))
-  casewise.loss <- attr(cv, "casewise loss")
-  if (!is.null(casewise.loss)) {
-    loss <- getLossFn(cv) # casewise loss function
+  loss <- getLossFn(cv) # casewise loss function
+  if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
       weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
@@ -563,9 +561,8 @@ cv.glm <- function(model, data=insight::get_data(model),
     }
     cv <- criterion(y, yhat)
     cv.full <- criterion(y, fitted(model))
-    casewise.loss <- attr(cv, "casewise loss")
-    if (!is.null(casewise.loss)) {
-      loss <- getLossFn(cv) # casewise loss function
+    loss <- getLossFn(cv) # casewise loss function
+    if (!is.null(loss)) {
       adj.cv <- cv + cv.full -
         weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
       se.cv <- sd(loss(y, yhat))/sqrt(n)
@@ -631,8 +628,10 @@ summarizeReps <- function(x){
 }
 
 getLossFn <- function(cv){
+  fn.body <- attr(cv, "casewise loss")
+  if (is.null(fn.body)) return(NULL)
   eval(parse(text=paste0("function(y, yhat) {",
-                         paste(attr(cv, "casewise loss"), collapse="\n"),
+                         paste(fn.body, collapse="\n"),
                          "}")))
 }
 
