@@ -630,8 +630,8 @@ summarizeReps <- function(x){
 getLossFn <- function(cv){
   fn.body <- attr(cv, "casewise loss")
   if (is.null(fn.body)) return(NULL)
-  eval(parse(text=paste0("function(y, yhat) {",
+  eval(parse(text=paste0("function(y, yhat) {\n",
                          paste(fn.body, collapse="\n"),
-                         "}")))
+                         "\n}")))
 }
 
