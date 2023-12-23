@@ -16,17 +16,17 @@
 
 - Add selectTransAndStepAIC() procedure for use with cvSelect().
 
-- Add medAbsErr() and rmse() cost criteria; make rmse() the default, rather than mse().
+- Add medAbsErr() and rmse() cost criteria.
 
 - Add coef.cvSelect() method.
 
 - Add cv.rlm() method.
 
-- plot.cvModList() can show averages +/- SDs as well as (the default) averages and ranges.
+- plot.cvModList() can show averages +/- SDs, and averages and CIs, as well as averages and ranges.
 
 - Add Pigs data set.
 
-- Improvements to documentation and expanded cv.Rmd vignette.
+- Improvements and updates to documentation, and expanded cv.Rmd vignette.
 
 - Mixed-models methods no longer flagged as "experimental."
 

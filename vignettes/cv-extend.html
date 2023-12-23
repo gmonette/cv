@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-12-22" />
+<meta name="date" content="2023-12-23" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-12-22</h4>
+<h4 class="date">2023-12-23</h4>
 
 
 
@@ -454,8 +454,8 @@ whole data set.</p>
 models,” the <code>cv()</code> function differentiates between CV
 criteria that are averages of casewise components and criteria that are
 not. Computation of bias corrections and confidence intervals is limited
-to the former. As far as we know, the AUC, and hence its complement,
-can’t be expressed as the mean of casewise components, and certainly the
+to the former. We don’t know whether the AUC, and hence its complement,
+can be expressed as the mean of casewise components, and certainly the
 <code>auc()</code> function in the <strong>Metrics</strong> package, on
 which our <code>AUCcomp()</code> is based, isn’t written in this
 manner.</p>
@@ -479,7 +479,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x11cb64cc0&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x140911270&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -595,17 +595,24 @@ Bayes rule to a polytomous response:</p>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; Levels: Conservative Labour Liberal Democrat</span></span>
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a></span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>BayesRuleMulti <span class="ot">&lt;-</span> <span class="cf">function</span>(y, yhat){</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  <span class="fu">mean</span>(y <span class="sc">!=</span> yhat)</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>}</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a></span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="fu">BayesRuleMulti</span>(BEPS<span class="sc">$</span>vote, yhat)</span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt; [1] 0.31869</span></span></code></pre></div>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">mean</span>(y <span class="sc">!=</span> yhat)</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  <span class="fu">attr</span>(result, <span class="st">&quot;casewise loss&quot;</span>) <span class="ot">&lt;-</span> <span class="st">&quot;y != yhat&quot;</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  result</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>}</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="fu">BayesRuleMulti</span>(BEPS<span class="sc">$</span>vote, yhat)</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt; [1] 0.31869</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;y != yhat&quot;</span></span></code></pre></div>
 <p>The <code>predict()</code> method for <code>&quot;multinom&quot;</code> models
 called with argument <code>type=&quot;class&quot;</code> reports the Bayes-rule
 prediction for each case—that is, the response category with the highest
-predicted probability. Our <code>BayesRuleMulti()</code> function just
-reports the proportion of misclassified cases. The marginal proportions
-for the response categories are</p>
+predicted probability. Our <code>BayesRuleMulti()</code> function
+calculates the proportion of misclassified cases. Because this value is
+the mean of casewise components, we attach a
+<code>&quot;casewise loss&quot;</code> attribute to the result (as explained in
+the preceding section).</p>
+<p>The marginal proportions for the response categories are</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">xtabs</span>(<span class="sc">~</span> vote, <span class="at">data=</span>BEPS)<span class="sc">/</span><span class="fu">nrow</span>(BEPS)</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; vote</span></span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt;     Conservative           Labour Liberal Democrat </span></span>
@@ -669,7 +676,9 @@ correct <code>type</code> argument, our method sets the default
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3465</span></span>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
 <p>Prior to invoking <code>cv()</code>, we called <code>update()</code>
 with <code>trace=FALSE</code> to suppress the iteration history reported
 by default by <code>multinom()</code>—it would be tedious to see the

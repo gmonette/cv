@@ -74,7 +74,9 @@ yhat <- predict(m.beps, type="class")
 head(yhat)
 
 BayesRuleMulti <- function(y, yhat){
-  mean(y != yhat)
+  result <- mean(y != yhat)
+  attr(result, "casewise loss") <- "y != yhat"
+  result
 }
 
 BayesRuleMulti(BEPS$vote, yhat)
