@@ -46,7 +46,7 @@
 #' @export
 mse <- function(y, yhat){
   result <- mean((y - yhat)^2)
-  attr(result, "casewise average") <- TRUE
+  attr(result, "casewise loss") <- "(y - yhat)^2"
   result
 }
 
@@ -70,7 +70,7 @@ BayesRule <- function(y, yhat){
   if (any(yhat < 0) || any(yhat > 1)) stop("fitted values outside of interval [0, 1]")
   yhat <- round(yhat)
   result <- mean(y != yhat) # proportion in error
-  attr(result, "casewise average") <- TRUE
+  attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
 
@@ -79,6 +79,6 @@ BayesRule <- function(y, yhat){
 BayesRule2 <- function(y, yhat){
   yhat <- round(yhat)
   result <- mean(y != yhat) # proportion in error
-  attr(result, "casewise average") <- TRUE
+  attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }

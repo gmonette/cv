@@ -146,9 +146,11 @@ for regression coefficients; the value \code{1} might be appropriate
 for power-transformation estimates.}
 }
 \value{
-An object of class \code{"cvSelect"}, inheriting from class \code{"cv"}, with the averaged CV criterion
-(\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
+An object of class \code{"cvSelect"},
+inheriting from class \code{"cv"}, with the CV criterion
+(\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
 the criterion for the model applied to the full data (\code{"full crit"}),
+the confidence interval and level for the bias-adjusted CV criterion (\code{"confint"}),
 the number of folds (\code{"k"}), the seed for R's random-number
 generator (\code{"seed"}), and (optionally) a list of coefficients
 (or, in the case of \code{selectTrans()}, estimated transformation
@@ -252,5 +254,5 @@ compareFolds(cvs)
 }
 \seealso{
 \code{\link[MASS]{stepAIC}}, \code{\link[car]{bcPower}},
-\code{\link[car]{powerTransform}}
+\code{\link[car]{powerTransform}}, \code{\link{cv}}.
 }

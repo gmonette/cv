@@ -6,7 +6,9 @@
 
 <!-- badges: end -->
 
-# cv package for R: Various Functions for Cross-Validation of Regression Models <img src="man/figures/cv-hex.png" style="float:right; height:200px;"/>
+# cv package for R: Various Functions for Cross-Validation of Regression Models 
+
+<img src="man/figures/cv-hex.png" style="float:right; height:200px;"/>
 
 Some of the functions supplied by the package:
 

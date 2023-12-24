@@ -33,9 +33,10 @@
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
 #'
-#' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the averaged CV criterion
-#' (\code{"CV crit"}), the adjusted average CV criterion (\code{"adj CV crit"}),
+#' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
+#' (\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
 #' the criterion for the model applied to the full data (\code{"full crit"}),
+#' the confidence interval and level for the bias-adjusted CV criterion (\code{"confint"}),
 #' the number of folds (\code{"k"}), and the seed for R's random-number
 #' generator (\code{"seed"}). Some methods may return a
 #' subset of these components and may add additional information.
@@ -199,15 +200,14 @@ cv.default <- function(model, data=insight::get_data(model),
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, predict(model, type=type, ...))
-  casewise.average <- attr(cv, "casewise average")
-  if (!is.null(casewise.average) && casewise.average) {
-    loss <- getLossFn(criterion) # casewise loss function
+  loss <- getLossFn(cv) # casewise loss function
+  if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
       weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
     halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
     ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
-            level=round(level*100)) else NULL
+                         level=round(level*100)) else NULL
   } else {
     adj.cv <- NULL
     ci <- NULL
@@ -410,9 +410,8 @@ cv.lm <- function(model, data=insight::get_data(model),
   }
   cv <- criterion(y, yhat)
   cv.full <- criterion(y, fitted(model))
-  casewise.average <- attr(cv, "casewise average")
-  if (!is.null(casewise.average) && casewise.average) {
-    loss <- getLossFn(criterion) # casewise loss function
+  loss <- getLossFn(cv) # casewise loss function
+  if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
       weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
@@ -562,9 +561,8 @@ cv.glm <- function(model, data=insight::get_data(model),
     }
     cv <- criterion(y, yhat)
     cv.full <- criterion(y, fitted(model))
-    casewise.average <- attr(cv, "casewise average")
-    if (!is.null(casewise.average) && casewise.average) {
-      loss <- getLossFn(criterion) # casewise loss function
+    loss <- getLossFn(cv) # casewise loss function
+    if (!is.null(loss)) {
       adj.cv <- cv + cv.full -
         weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
       se.cv <- sd(loss(y, yhat))/sqrt(n)
@@ -629,19 +627,11 @@ summarizeReps <- function(x){
        "adj CV crit range" = adjCVcritRange)
 }
 
-getLossFn <- function(criterion){
-  expressions <- as.vector(as.character(functionBody(criterion)))
-  which <- grepl("result <- mean\\(", expressions)
-  if (!(any(which))) stop(deparse(substitute(criterion)),
-                          " does not set 'result <- mean(. . .)'")
-  expression <- sub("\\)[:space:]*$", "",
-                    sub("result <- mean\\(", "result <- ",
-                        expressions[which][sum(which)])
-  )
-  expressions[which] <- expression
-  which <- grepl("attr\\(", expressions)
-  expressions <- expressions[!which]
-  eval(parse(text=paste0("function(y, yhat) ",
-                         paste(expressions, collapse="\n"),
-                         "}")))
+getLossFn <- function(cv){
+  fn.body <- attr(cv, "casewise loss")
+  if (is.null(fn.body)) return(NULL)
+  eval(parse(text=paste0("function(y, yhat) {\n",
+                         paste(fn.body, collapse="\n"),
+                         "\n}")))
 }
+

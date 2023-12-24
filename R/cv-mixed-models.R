@@ -199,10 +199,9 @@ cvMixed <- function(model,
                          )
     )
 
-    casewise.average <- attr(cv, "casewise average")
     if (missing(confint)) confint <- length(y) >= 400
-    if (!is.null(casewise.average) && casewise.average) {
-      loss <- getLossFn(criterion) # casewise loss function
+    loss <- getLossFn(cv) # casewise loss function
+    if (!is.null(loss)) {
       adj.cv <- cv + cv.full -
         weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
       se.cv <- sd(loss(y, yhat))/sqrt(length(y))
