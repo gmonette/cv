@@ -278,12 +278,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 156253</span></span>
+<span><span class="co">#&gt; R RNG seed set to 264036</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.344</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.325</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.152</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.143</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -355,10 +355,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   2.1275   2.3898   2.4104   2.4456   2.5446   2.5791    10</span></span>
-<span><span class="co">#&gt;   Woodbury  22.2172  22.5238  23.0995  22.6267  22.7438  27.7762    10</span></span>
-<span><span class="co">#&gt;      naive 481.4493 483.4285 501.0265 485.3809 492.5408 609.0358    10</span></span>
-<span><span class="co">#&gt;     cv.glm 831.2048 835.5331 857.3368 838.8124 848.1848 967.9675    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues   2.0816   2.4082   2.4211   2.4637   2.5288   2.5512    10</span></span>
+<span><span class="co">#&gt;   Woodbury  22.3431  22.4497  22.7223  22.7184  22.7790  23.2853    10</span></span>
+<span><span class="co">#&gt;      naive 473.6794 475.6370 500.8919 477.1283 483.8857 596.5170    10</span></span>
+<span><span class="co">#&gt;     cv.glm 822.1721 823.9304 850.4305 828.4190 833.2251 946.7328    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -574,8 +574,8 @@ regression to the <code>Mroz</code> data:</p>
 <span><span class="fu"><a href="../reference/cost-functions.html">BayesRule</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">$</span><span class="va">lfp</span> <span class="op">==</span> <span class="st">"yes"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>, </span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.mroz</span>, type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.30677</span></span>
-<span><span class="co">#&gt; attr(,"casewise average")</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; attr(,"casewise loss")</span></span>
+<span><span class="co">#&gt; [1] "y != round(yhat)"</span></span></code></pre></div>
 <p>In addition to the usually summary output for a GLM, we show the
 result of applying the <code><a href="../reference/cost-functions.html">BayesRule()</a></code> function from the
 <strong>cv</strong> package to predictions derived from the fitted
@@ -589,20 +589,22 @@ the second argument is the predicted probability of success.
 <code><a href="../reference/cost-functions.html">BayesRule()</a></code> returns the proportion of predictions that are
 <em>in error</em>, as appropriate for a “cost” function.</p>
 <p>The value returned by <code><a href="../reference/cost-functions.html">BayesRule()</a></code> is associated with an
-“attribute” named <code>"casewise average"</code> set to
-<code>TRUE</code>, signifying that the Bayes rule CV criterion is
-computed as the mean of casewise values, here 0 if the prediction for a
-case matches the observed value and 1 if it does not (signifying a
-prediction error). The <code><a href="../reference/cost-functions.html">mse()</a></code> function for numeric responses
-is also calculated as a casewise average. Some other criteria, such as
-the median absolute error, computed by the <code><a href="../reference/cost-functions.html">medAbsErr()</a></code>
-function in the <strong>cv</strong> package, aren’t averages of casewise
-components. The distinction is important because, to our knowledge, the
-statistical theory of cross-validation, for example, in <span class="citation">Davison &amp; Hinkley (1997)</span> and <span class="citation">S. Bates, Hastie, &amp; Tibshirani (2023)</span>, is
-developed for CV criteria like MSE that are means of casewise
-components. As a consequence, we limit computation of bias adjustment
-and confidence intervals (see below) to criteria that are casewise
-averages.</p>
+“attribute” named <code>"casewise loss"</code> and set to
+<code>"y != round(yhat)"</code>, signifying that the Bayes rule CV
+criterion is computed as the mean of casewise values, here 0 if the
+prediction for a case matches the observed value and 1 if it does not
+(signifying a prediction error). The <code><a href="../reference/cost-functions.html">mse()</a></code> function for
+numeric responses is also calculated as a casewise average. Some other
+criteria, such as the median absolute error, computed by the
+<code><a href="../reference/cost-functions.html">medAbsErr()</a></code> function in the <strong>cv</strong> package,
+aren’t averages of casewise components. The distinction is important
+because, to our knowledge, the statistical theory of cross-validation,
+for example, in <span class="citation">Davison &amp; Hinkley
+(1997)</span> and <span class="citation">S. Bates, Hastie, &amp;
+Tibshirani (2023)</span>, is developed for CV criteria like MSE that are
+means of casewise components. As a consequence, we limit computation of
+bias adjustment and confidence intervals (see below) to criteria that
+are casewise averages.</p>
 <p>In this example, the fitted logistic regression incorrectly predicts
 31% of the responses; we expect this estimate to be optimistic given
 that the model is used to “predict” the data to which it is fit.</p>
@@ -690,11 +692,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq     mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.4389    2.5193    2.688    2.5587    2.9029    3.1422    10</span></span>
-<span><span class="co">#&gt;   Woodbury   70.8517   71.1013   72.572   72.3196   73.3915   75.9117    10</span></span>
-<span><span class="co">#&gt;      exact 3047.4381 3063.3937 3129.205 3115.6182 3201.1141 3242.2030    10</span></span>
-<span><span class="co">#&gt;     cv.glm 3689.8928 3770.7415 3837.516 3837.1415 3893.5898 4005.2855    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.4621    2.4993    2.6369    2.5221    2.9017    3.0238    10</span></span>
+<span><span class="co">#&gt;   Woodbury   70.3452   71.0829   72.3650   71.8074   73.1072   77.5178    10</span></span>
+<span><span class="co">#&gt;      exact 2956.7456 2986.1580 3060.0479 3038.8437 3140.2102 3227.0298    10</span></span>
+<span><span class="co">#&gt;     cv.glm 3634.8332 3698.2195 3750.1087 3764.2524 3793.7180 3847.9418    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -1865,8 +1867,8 @@ model to save computing time.&lt;/p&gt;'><sup>13</sup></a></p>
 <span><span class="co">#&gt; F-statistic: 3.03 on 15 and 984 DF,  p-value: 8.34e-05</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">D</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.select</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.93063</span></span>
-<span><span class="co">#&gt; attr(,"casewise average")</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; attr(,"casewise loss")</span></span>
+<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
 <p>The resulting model has 15 predictors, a very modest <span class="math inline">\(R^2 = .044\)</span>, but a small <span class="math inline">\(p\)</span>-value for its omnibus <span class="math inline">\(F\)</span>-test (which, of course, is entirely
 spurious because the same data were used to select and test the model).
 The MSE for the selected model is smaller than the true error variance
@@ -2051,8 +2053,8 @@ the 7 original predictors:</p>
 <span><span class="fu"><a href="../reference/cost-functions.html">BayesRule</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">$</span><span class="va">lfp</span> <span class="op">==</span> <span class="st">"yes"</span>,</span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.mroz.sel</span>, type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.31873</span></span>
-<span><span class="co">#&gt; attr(,"casewise average")</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; attr(,"casewise loss")</span></span>
+<span><span class="co">#&gt; [1] "y != round(yhat)"</span></span></code></pre></div>
 <p>Bayes rule applied to the selected model misclassifies 32% of the
 cases in the <code>Mroz</code> data.</p>
 <p>Cross-validating the selected model produces a similar, slightly
@@ -2263,12 +2265,12 @@ transformed predictors shows a advantage to the latter:</p>
 <span><span class="va">m.pres.trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data<span class="op">=</span><span class="va">P</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 59.153</span></span>
-<span><span class="co">#&gt; attr(,"casewise average")</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="co">#&gt; attr(,"casewise loss")</span></span>
+<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">P</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 50.6</span></span>
-<span><span class="co">#&gt; attr(,"casewise average")</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; attr(,"casewise loss")</span></span>
+<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
 <p>Similarly, component+residual plots for the two regressions, produced
 by the <code><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots()</a></code> function in the <strong>car</strong>
 package, suggest that the partial relationship of <code>prestige</code>
@@ -2332,8 +2334,8 @@ selected transformation is applied, with the default
 <span>            predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span>,</span>
 <span>            response<span class="op">=</span><span class="st">"prestige"</span>, family<span class="op">=</span><span class="st">"yjPower"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 50.6</span></span>
-<span><span class="co">#&gt; attr(,"casewise average")</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; attr(,"casewise loss")</span></span>
+<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
 <p><code><a href="../reference/cvSelect.html">selectTrans()</a></code> also takes an optional
 <code>indices</code> argument, making it suitable for doing computations
 on a subset of the data (i.e., a CV fold), and hence for use with
@@ -2758,15 +2760,15 @@ to help specify the model</p>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 6.5121</span></span>
-<span><span class="co">#&gt; attr(,"casewise average")</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; attr(,"casewise loss")</span></span>
+<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
 <p>This is considerably smaller than the MSE for the original working
 model:</p>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 8.0932</span></span>
-<span><span class="co">#&gt; attr(,"casewise average")</span></span>
-<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; attr(,"casewise loss")</span></span>
+<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
 <p>A perhaps subtle point is that we compute the MSE for the selected
 model on the original <code>mpg</code> response scale rather than the
 log scale, so as to make the selected model comparable to the working
@@ -2907,7 +2909,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.361   0.004   0.365</span></span>
+<span><span class="co">#&gt;   0.346   0.000   0.347</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2917,7 +2919,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.063   0.005   1.468</span></span>
+<span><span class="co">#&gt;   0.058   0.007   1.451</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually

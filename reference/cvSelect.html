@@ -269,9 +269,11 @@ for power-transformation estimates.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An object of class <code>"cvSelect"</code>, inheriting from class <code>"cv"</code>, with the averaged CV criterion
-(<code>"CV crit"</code>), the adjusted average CV criterion (<code>"adj CV crit"</code>),
+<p>An object of class <code>"cvSelect"</code>,
+inheriting from class <code>"cv"</code>, with the CV criterion
+(<code>"CV crit"</code>), the bias-adjusted CV criterion (<code>"adj CV crit"</code>),
 the criterion for the model applied to the full data (<code>"full crit"</code>),
+the confidence interval and level for the bias-adjusted CV criterion (<code>"confint"</code>),
 the number of folds (<code>"k"</code>), the seed for R's random-number
 generator (<code>"seed"</code>), and (optionally) a list of coefficients
 (or, in the case of <code>selectTrans()</code>, estimated transformation
@@ -333,7 +335,7 @@ for the several folds.</p></li>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></code>, <code><a href="https://rdrr.io/pkg/car/man/bcPower.html" class="external-link">bcPower</a></code>,
-<code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></code></p></div>
+<code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></code>, <code><a href="cv.html">cv</a></code>.</p></div>
     </div>
 
     <div class="section level2">

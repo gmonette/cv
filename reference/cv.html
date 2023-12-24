@@ -205,9 +205,10 @@ default taken from the <code>"digits"</code> option</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>The <code>cv()</code> methods return an object of class <code>"cv"</code>, with the averaged CV criterion
-(<code>"CV crit"</code>), the adjusted average CV criterion (<code>"adj CV crit"</code>),
+<p>The <code>cv()</code> methods return an object of class <code>"cv"</code>, with the CV criterion
+(<code>"CV crit"</code>), the bias-adjusted CV criterion (<code>"adj CV crit"</code>),
 the criterion for the model applied to the full data (<code>"full crit"</code>),
+the confidence interval and level for the bias-adjusted CV criterion (<code>"confint"</code>),
 the number of folds (<code>"k"</code>), and the seed for R's random-number
 generator (<code>"seed"</code>). Some methods may return a
 subset of these components and may add additional information.
