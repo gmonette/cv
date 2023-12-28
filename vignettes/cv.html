@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-12-21" />
+<meta name="date" content="2023-12-28" />
 
 <title>Cross-validation of regression models</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-12-21</h4>
+<h4 class="date">2023-12-28</h4>
 
 
 
@@ -373,7 +373,9 @@ reasonable approach to estimating the predictive accuracy of regression
 models. CV is developed in many standard sources on regression modeling
 and “machine learning”—we particularly recommend <span class="citation">James, Witten, Hastie, &amp; Tibshirani (2021, secs.
 5.1, 5.3)</span>—and so we will describe the method only briefly here
-before taking up computational issues and some examples.</p>
+before taking up computational issues and some examples. See <span class="citation">Arlot &amp; Celisse (2010)</span> for a wide-ranging,
+if technical, survey of cross-validation and related methods that
+emphasizes the statistical properties of CV.</p>
 <p>Validating research by replication on independently collected data is
 a common scientific norm. Emulating this process in a single study by
 data-division is less common: The data are randomly divided into two,
@@ -539,12 +541,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 398475</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 224030</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.238</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.224</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.166</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.157</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -836,11 +838,12 @@ criteria, such as the median absolute error, computed by the
 aren’t averages of casewise components. The distinction is important
 because, to our knowledge, the statistical theory of cross-validation,
 for example, in <span class="citation">Davison &amp; Hinkley
-(1997)</span> and <span class="citation">S. Bates, Hastie, &amp;
-Tibshirani (2023)</span>, is developed for CV criteria like MSE that are
-means of casewise components. As a consequence, we limit computation of
-bias adjustment and confidence intervals (see below) to criteria that
-are casewise averages.</p>
+(1997)</span>, <span class="citation">S. Bates, Hastie, &amp; Tibshirani
+(2023)</span>, and <span class="citation">Arlot &amp; Celisse
+(2010)</span>, is developed for CV criteria like MSE that are means of
+casewise components. As a consequence, we limit computation of bias
+adjustment and confidence intervals (see below) to criteria that are
+casewise averages.</p>
 <p>In this example, the fitted logistic regression incorrectly predicts
 31% of the responses; we expect this estimate to be optimistic given
 that the model is used to “predict” the data to which it is fit.</p>
@@ -3013,7 +3016,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-5"><a href="#cb81-5" tabindex="-1"></a>                          <span class="at">AIC=</span><span class="cn">FALSE</span>))</span>
 <span id="cb81-6"><a href="#cb81-6" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-7"><a href="#cb81-7" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.241   0.002   0.244</span></span>
+<span id="cb81-8"><a href="#cb81-8" tabindex="-1"></a><span class="co">#&gt;   0.240   0.006   0.246</span></span>
 <span id="cb81-9"><a href="#cb81-9" tabindex="-1"></a></span>
 <span id="cb81-10"><a href="#cb81-10" tabindex="-1"></a><span class="fu">system.time</span>(m.mroz.sel.cv.p <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(selectStepAIC, Mroz,</span>
 <span id="cb81-11"><a href="#cb81-11" tabindex="-1"></a>                          <span class="at">seed=</span><span class="dv">6681</span>,</span>
@@ -3023,7 +3026,7 @@ doing it in parallel using 2 cores:</p>
 <span id="cb81-15"><a href="#cb81-15" tabindex="-1"></a>                          <span class="at">ncores=</span><span class="dv">2</span>))</span>
 <span id="cb81-16"><a href="#cb81-16" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span id="cb81-17"><a href="#cb81-17" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.033   0.006   0.978</span></span>
+<span id="cb81-18"><a href="#cb81-18" tabindex="-1"></a><span class="co">#&gt;   0.031   0.006   0.939</span></span>
 <span id="cb81-19"><a href="#cb81-19" tabindex="-1"></a><span class="fu">all.equal</span>(m.mroz.sel.cv, m.mroz.sel.cv.p)</span>
 <span id="cb81-20"><a href="#cb81-20" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -3138,7 +3141,7 @@ to all of the data. We require that <span class="math inline">\(\mathrm{CV}(\mat
 \widehat{\mathbf{y}})\)</span> is the mean of casewise components, that
 is, <span class="math inline">\(\mathrm{CV}(\mathbf{y},
 \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i,
-\widehat{y}_i)\)</span>. For example, <span class="math inline">\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) =
+\widehat{y}_i)\)</span>.<a href="#fn17" class="footnote-ref" id="fnref17"><sup>17</sup></a> For example, <span class="math inline">\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) =
 \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\)</span>.</p>
 <p>We divide the <span class="math inline">\(n\)</span> cases into <span class="math inline">\(k\)</span> folds of approximately <span class="math inline">\(n_j \approx n/k\)</span> cases each, where <span class="math inline">\(n = \sum n_j\)</span>. As above, let <span class="math inline">\(\mathbf{j}\)</span> denote the indices of the
 cases in the <span class="math inline">\(j\)</span>th fold.</p>
@@ -3188,6 +3191,11 @@ which, based on Bates et al.’s results, we take by default to be <span class="
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="ref-ArlotCelisse:2010" class="csl-entry">
+Arlot, S., &amp; Celisse, A. (2010). <span class="nocase">A survey of
+cross-validation procedures for model selection</span>. <em>Statistics
+Surveys</em>, <em>4</em>, 40–79. Retrieved from <a href="https://doi.org/10.1214/09-SS054">https://doi.org/10.1214/09-SS054</a>
+</div>
 <div id="ref-BatesEtAl:2015" class="csl-entry">
 Bates, D., Mächler, M., Bolker, B., &amp; Walker, S. (2015). Fitting
 linear mixed-effects models using <span class="nocase">lme4</span>.
@@ -3392,6 +3400,9 @@ column rank, and which can be subject to numerical instability when
 <span class="math inline">\(\mathbf{X}\)</span> is ill-conditioned.
 <code>lm()</code> uses the singular-value decomposition of the model
 matrix to obtain computationally more stable results.<a href="#fnref16" class="footnote-back">↩︎</a></p></li>
+<li id="fn17"><p><span class="citation">Arlot &amp; Celisse
+(2010)</span> term the casewise loss, <span class="math inline">\(\mathrm{cv}(y_i, \widehat{y}_i)\)</span>, the
+“contrast function.”<a href="#fnref17" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 
