@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-12-24</h4>
+            <h4 data-toc-skip class="date">2023-12-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -94,7 +94,9 @@ reasonable approach to estimating the predictive accuracy of regression
 models. CV is developed in many standard sources on regression modeling
 and “machine learning”—we particularly recommend <span class="citation">James, Witten, Hastie, &amp; Tibshirani (2021, secs.
 5.1, 5.3)</span>—and so we will describe the method only briefly here
-before taking up computational issues and some examples.</p>
+before taking up computational issues and some examples. See <span class="citation">Arlot &amp; Celisse (2010)</span> for a wide-ranging,
+if technical, survey of cross-validation and related methods that
+emphasizes the statistical properties of CV.</p>
 <p>Validating research by replication on independently collected data is
 a common scientific norm. Emulating this process in a single study by
 data-division is less common: The data are randomly divided into two,
@@ -278,12 +280,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 264036</span></span>
+<span><span class="co">#&gt; R RNG seed set to 413693</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.152</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.143</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.191</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.18</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -354,11 +356,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   2.0816   2.4082   2.4211   2.4637   2.5288   2.5512    10</span></span>
-<span><span class="co">#&gt;   Woodbury  22.3431  22.4497  22.7223  22.7184  22.7790  23.2853    10</span></span>
-<span><span class="co">#&gt;      naive 473.6794 475.6370 500.8919 477.1283 483.8857 596.5170    10</span></span>
-<span><span class="co">#&gt;     cv.glm 822.1721 823.9304 850.4305 828.4190 833.2251 946.7328    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min       lq    mean   median       uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues   2.0854   2.3391   2.424   2.4812   2.5528   2.6179    10</span></span>
+<span><span class="co">#&gt;   Woodbury  22.2286  22.3748  23.391  22.6707  22.9009  26.7937    10</span></span>
+<span><span class="co">#&gt;      naive 476.2246 482.7907 496.492 483.4874 485.8424 618.6500    10</span></span>
+<span><span class="co">#&gt;     cv.glm 825.9324 832.0361 886.448 839.7304 958.5793 974.9762    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -600,11 +602,12 @@ criteria, such as the median absolute error, computed by the
 aren’t averages of casewise components. The distinction is important
 because, to our knowledge, the statistical theory of cross-validation,
 for example, in <span class="citation">Davison &amp; Hinkley
-(1997)</span> and <span class="citation">S. Bates, Hastie, &amp;
-Tibshirani (2023)</span>, is developed for CV criteria like MSE that are
-means of casewise components. As a consequence, we limit computation of
-bias adjustment and confidence intervals (see below) to criteria that
-are casewise averages.</p>
+(1997)</span>, <span class="citation">S. Bates, Hastie, &amp; Tibshirani
+(2023)</span>, and <span class="citation">Arlot &amp; Celisse
+(2010)</span>, is developed for CV criteria like MSE that are means of
+casewise components. As a consequence, we limit computation of bias
+adjustment and confidence intervals (see below) to criteria that are
+casewise averages.</p>
 <p>In this example, the fitted logistic regression incorrectly predicts
 31% of the responses; we expect this estimate to be optimistic given
 that the model is used to “predict” the data to which it is fit.</p>
@@ -692,11 +695,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.4621    2.4993    2.6369    2.5221    2.9017    3.0238    10</span></span>
-<span><span class="co">#&gt;   Woodbury   70.3452   71.0829   72.3650   71.8074   73.1072   77.5178    10</span></span>
-<span><span class="co">#&gt;      exact 2956.7456 2986.1580 3060.0479 3038.8437 3140.2102 3227.0298    10</span></span>
-<span><span class="co">#&gt;     cv.glm 3634.8332 3698.2195 3750.1087 3764.2524 3793.7180 3847.9418    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq     mean    median       uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.5148    2.5486    2.678    2.6142    2.807    3.1031    10</span></span>
+<span><span class="co">#&gt;   Woodbury   70.4322   71.5248   73.122   72.2244   73.326   77.8853    10</span></span>
+<span><span class="co">#&gt;      exact 3012.6665 3095.2944 3154.493 3127.9864 3167.493 3383.9151    10</span></span>
+<span><span class="co">#&gt;     cv.glm 3726.4129 3814.1892 3859.327 3849.6603 3904.218 4043.5482    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -2909,7 +2912,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.346   0.000   0.347</span></span>
+<span><span class="co">#&gt;   0.352   0.000   0.352</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2919,7 +2922,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.058   0.007   1.451</span></span>
+<span><span class="co">#&gt;   0.064   0.002   1.477</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
@@ -3042,7 +3045,9 @@ to all of the data. We require that <span class="math inline">\(\mathrm{CV}(\mat
 \widehat{\mathbf{y}})\)</span> is the mean of casewise components, that
 is, <span class="math inline">\(\mathrm{CV}(\mathbf{y},
 \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i,
-\widehat{y}_i)\)</span>. For example, <span class="math inline">\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) =
+\widehat{y}_i)\)</span>.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;&lt;span class="citation"&gt;Arlot &amp;amp; Celisse
+(2010)&lt;/span&gt; term the casewise loss, &lt;span class="math inline"&gt;\(\mathrm{cv}(y_i, \widehat{y}_i)\)&lt;/span&gt;, the
+“contrast function.”&lt;/p&gt;'><sup>17</sup></a> For example, <span class="math inline">\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) =
 \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\)</span>.</p>
 <p>We divide the <span class="math inline">\(n\)</span> cases into <span class="math inline">\(k\)</span> folds of approximately <span class="math inline">\(n_j \approx n/k\)</span> cases each, where <span class="math inline">\(n = \sum n_j\)</span>. As above, let <span class="math inline">\(\mathbf{j}\)</span> denote the indices of the
 cases in the <span class="math inline">\(j\)</span>th fold.</p>
@@ -3093,6 +3098,11 @@ which, based on Bates et al.’s results, we take by default to be <span class="
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="ref-ArlotCelisse:2010" class="csl-entry">
+Arlot, S., &amp; Celisse, A. (2010). <span class="nocase">A survey of
+cross-validation procedures for model selection</span>. <em>Statistics
+Surveys</em>, <em>4</em>, 40–79. Retrieved from <a href="https://doi.org/10.1214/09-SS054" class="external-link">https://doi.org/10.1214/09-SS054</a>
+</div>
 <div id="ref-BatesEtAl:2015" class="csl-entry">
 Bates, D., Mächler, M., Bolker, B., &amp; Walker, S. (2015). Fitting
 linear mixed-effects models using <span class="nocase">lme4</span>.
