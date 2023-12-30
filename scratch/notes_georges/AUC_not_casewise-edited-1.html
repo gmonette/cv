@@ -396,20 +396,13 @@ solution if we include all possibilities for <span class="math inline">\(\mathbf
 where all <span class="math inline">\(y\)</span>s have the same value.
 If <span class="math inline">\(n_v=4\)</span>, we show that there no
 consistent solutions in either case.</p>
-<p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}\)</span> and <span class="math inline">\(\mathbf{y}\)</span>:</p>
+<p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}\)</span> and <span class="math inline">\(\mathbf{y}\)</span>, accommodating the cases where
+<span class="math inline">\(\mathbf{y}\)</span> is all 0s or all 1s:</p>
 <pre class="r"><code>AUC &lt;- function(y, yhat = seq_along(y)) {
-  # AUC:
-  # y is a vector of 0s and 1s
-  # yhat is a predictor of y, only used for its order
-  #    i.e. the result is invariant under monotonic transformations of yhat
-  #    If there are ties in yhat, this function splits the ties
   s &lt;- sum(y)
-  n_v &lt;- length(y)
   if (s == 0) return(0)
-  if (s == n_v) return(1)
-  a &lt;- sum(outer(yhat[y == 0], yhat[y == 1], `&lt;`)) + 
-    sum(outer(yhat[y == 0], yhat[y == 1], `==`))/2
-  a/(s*(n_v - s))
+  if (s == length(y)) return(1)
+  Metrics::auc(y, yhat)
 }</code></pre>
 <p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}\)</span>:</p>
 <pre class="r"><code>Ymat &lt;- function(n_v, exclude_identical = FALSE) {
@@ -475,10 +468,10 @@ with <span class="math inline">\(\mathbf{Y}\)</span>; <span class="math inline">
 matrices; and <span class="math inline">\(\mathbf{\widehat{Y}}\)</span>
 is a matrix each of whose rows consists of the integers 1 to <span class="math inline">\(n_v\)</span>.</p>
 <p>We can test whether equation (<span class="math inline">\(\ref{eq:lin}\)</span>) has a solution for any
-given <span class="math inline">\(n_v\)</span> by considering whether
-the residuals of the associated linear model are all 0, using the
-“design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y},
-\mathbf{Y}]\)</span> to predict the outcome <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})\)</span>.</p>
+given <span class="math inline">\(n_v\)</span> by trying to solve it as
+a least-squares problem, considering whether the residuals of the
+associated linear model are all 0, using the “design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> to
+predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})\)</span>:</p>
 <pre class="r"><code>resids &lt;- function(n_v, exclude_identical = FALSE, 
                    tol = sqrt(.Machine$double.eps)) {
   Y &lt;- Ymat(n_v, exclude_identical = exclude_identical)
