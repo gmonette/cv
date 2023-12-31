@@ -3,7 +3,7 @@ title: "Appendix: Why the complement of AUC isn't a casewise CV criterion"
 output: html_document
 ---
 
-Consider calculating AUC for folds in which a validation set contains $n_v$ observations. To calculate AUC in the validation set, we need the vector of prediction criteria, $\widehat{\mathbf{y}} = (\widehat{y}_1, ..., \widehat{y}_{n_v})^T$, and the vector of observed responses in the validation set, $\mathbf{y} = (y_1, \ldots, y_{n_v})^T$ with $y_i \in \{0,1\}, \; i = 1, \ldots, n_v$.
+Consider calculating AUC for folds in which a validation set contains $n_v$ observations. To calculate AUC in the validation set, we need the vector of prediction criteria, $\widehat{\mathbf{y}}_{(n_v \times 1)} = (\widehat{y}_1, ..., \widehat{y}_{n_v})^T$, and the vector of observed responses in the validation set, $\mathbf{y}_{(n_v \times 1)} = (y_1, \ldots, y_{n_v})^T$ with $y_i \in \{0,1\}, \; i = 1, \ldots, n_v$.
 
 To construct the ROC curve, only the ordering of the values in 
 $\mathbf{\widehat{y}}$ is relevant. Thus, assuming that there are no ties, and reordering observations if necessary, we can set 
@@ -32,7 +32,7 @@ AUC <- function(y, yhat = seq_along(y)) {
 }
 ```
 
-We then define a function to generate all possible $\mathbf{y}$s of length $n_v$ as rows of the matrix $\mathbf{Y}$:
+We then define a function to generate all possible $\mathbf{y}$s of length $n_v$ as rows of the matrix $\mathbf{Y}_{(2^{n_v} \times n_v)}$:
 
 ```{r}
 Ymat <- function(n_v, exclude_identical = FALSE) {
@@ -75,15 +75,15 @@ The values of $\mathrm{cv}(\widehat{y}_i, y_i)$ that express AUC as a sum of cas
 \end{bmatrix}
 = \mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})
 \end{equation}
-where $\mathbf{U}$ is a matrix of 1s conformable with $\mathbf{Y}$; $\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ..., \mathrm{cv}(n_v,0)]^T$; $\mathbf{c}_1 = [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T$; $[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]$ and
+where $\mathbf{U}_{(2^{n_v} \times n_v)}$ is a matrix of 1s conformable with $\mathbf{Y}$; $\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ..., \mathrm{cv}(n_v,0)]^T$; $\mathbf{c}_1 = [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T$; $[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v} \times 2n_v)}$ and
 $\begin{bmatrix}\begin{aligned}
 \mathbf{c}_0 \\ \mathbf{c}_1
 \end{aligned}
-\end{bmatrix}$ 
-are partitioned matrices; and $\mathbf{\widehat{Y}}$ is a matrix each of whose rows consists of the integers 1 to $n_v$.
+\end{bmatrix}_{(2n_v \times 1)}$ 
+are partitioned matrices; and $\mathbf{\widehat{Y}}_{(2^{n_v} \times n_v)}$ is a matrix each of whose rows consists of the integers 1 to $n_v$.
 
 We can test whether equation (\ref{eq:lin}) has a solution for any given $n_v$ by trying to solve it as a least-squares problem, considering whether the residuals of the associated linear model are all 0, using the "design matrix" $[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]$ to predict the "outcome"
-$\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})$:
+$\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2n_v \times 1)}$:
 
 ```{r}
 resids <- function(n_v, exclude_identical = FALSE, 

@@ -356,11 +356,11 @@ casewise CV criterion</h1>
 
 <p>Consider calculating AUC for folds in which a validation set contains
 <span class="math inline">\(n_v\)</span> observations. To calculate AUC
-in the validation set, we need the vector of prediction criteria, <span class="math inline">\(\widehat{\mathbf{y}} = (\widehat{y}_1, ...,
-\widehat{y}_{n_v})^T\)</span>, and the vector of observed responses in
-the validation set, <span class="math inline">\(\mathbf{y} = (y_1,
-\ldots, y_{n_v})^T\)</span> with <span class="math inline">\(y_i \in
-\{0,1\}, \; i = 1, \ldots, n_v\)</span>.</p>
+in the validation set, we need the vector of prediction criteria, <span class="math inline">\(\widehat{\mathbf{y}}_{(n_v \times 1)} =
+(\widehat{y}_1, ..., \widehat{y}_{n_v})^T\)</span>, and the vector of
+observed responses in the validation set, <span class="math inline">\(\mathbf{y}_{(n_v \times 1)} = (y_1, \ldots,
+y_{n_v})^T\)</span> with <span class="math inline">\(y_i \in \{0,1\}, \;
+i = 1, \ldots, n_v\)</span>.</p>
 <p>To construct the ROC curve, only the ordering of the values in <span class="math inline">\(\mathbf{\widehat{y}}\)</span> is relevant. Thus,
 assuming that there are no ties, and reordering observations if
 necessary, we can set <span class="math inline">\(\mathbf{\widehat{y}} =
@@ -404,7 +404,7 @@ consistent solutions in either case.</p>
   if (s == length(y)) return(1)
   Metrics::auc(y, yhat)
 }</code></pre>
-<p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}\)</span>:</p>
+<p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
 <pre class="r"><code>Ymat &lt;- function(n_v, exclude_identical = FALSE) {
   stopifnot(n_v &gt; 0 &amp;&amp; round(n_v) == n_v)    # n_v must be a positive integer
   ret &lt;- sapply(0:(2^n_v - 1),
@@ -459,19 +459,21 @@ can be written as solutions of the following linear equation: <span class="math 
 \mathbf{c}_0 \\ \mathbf{c}_1
 \end{bmatrix}
 = \mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})
-\end{equation}\]</span> where <span class="math inline">\(\mathbf{U}\)</span> is a matrix of 1s conformable
-with <span class="math inline">\(\mathbf{Y}\)</span>; <span class="math inline">\(\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ...,
+\end{equation}\]</span> where <span class="math inline">\(\mathbf{U}_{(2^{n_v} \times n_v)}\)</span> is a
+matrix of 1s conformable with <span class="math inline">\(\mathbf{Y}\)</span>; <span class="math inline">\(\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ...,
 \mathrm{cv}(n_v,0)]^T\)</span>; <span class="math inline">\(\mathbf{c}_1
-= [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T\)</span>; <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> and
-<span class="math inline">\(\begin{bmatrix}\begin{aligned} \mathbf{c}_0
-\\ \mathbf{c}_1 \end{aligned} \end{bmatrix}\)</span> are partitioned
-matrices; and <span class="math inline">\(\mathbf{\widehat{Y}}\)</span>
-is a matrix each of whose rows consists of the integers 1 to <span class="math inline">\(n_v\)</span>.</p>
+= [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T\)</span>; <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v}
+\times 2n_v)}\)</span> and <span class="math inline">\(\begin{bmatrix}\begin{aligned} \mathbf{c}_0 \\
+\mathbf{c}_1 \end{aligned} \end{bmatrix}_{(2n_v \times 1)}\)</span> are
+partitioned matrices; and <span class="math inline">\(\mathbf{\widehat{Y}}_{(2^{n_v} \times
+n_v)}\)</span> is a matrix each of whose rows consists of the integers 1
+to <span class="math inline">\(n_v\)</span>.</p>
 <p>We can test whether equation (<span class="math inline">\(\ref{eq:lin}\)</span>) has a solution for any
 given <span class="math inline">\(n_v\)</span> by trying to solve it as
 a least-squares problem, considering whether the residuals of the
 associated linear model are all 0, using the “design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> to
-predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})\)</span>:</p>
+predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2n_v
+\times 1)}\)</span>:</p>
 <pre class="r"><code>resids &lt;- function(n_v, exclude_identical = FALSE, 
                    tol = sqrt(.Machine$double.eps)) {
   Y &lt;- Ymat(n_v, exclude_identical = exclude_identical)
