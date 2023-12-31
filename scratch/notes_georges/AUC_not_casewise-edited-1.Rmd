@@ -54,7 +54,7 @@ Ymat(3)
 If we exclude $\mathbf{y}$s with identical values, then
 
 ```{r}
-Ymat(3, TRUE)
+Ymat(3, exclude_identical = TRUE)
 ```
 
 Here is $\mathbf{Y}$ with corresponding values of AUC:
@@ -63,7 +63,7 @@ Here is $\mathbf{Y}$ with corresponding values of AUC:
 cbind(Ymat(3), AUC = apply(Ymat(3), 1, AUC))
 ```
 
-The values of $\mathrm{cv}(\widehat{y}_i, y_i)$ that express AUC as a sum of casewise values are solutions of equation (\ref{eq:cw}), which can be written as solutions of the following linear equation:
+The values of $\mathrm{cv}(\widehat{y}_i, y_i)$ that express AUC as a sum of casewise values are solutions of equation (\ref{eq:cw}), which can be written as solutions of the following system of $2^{n_v}$ linear simultaneous equations in $2n_v$ unknowns:
 \begin{equation}
 \label{eq:lin}
 \tag{2}

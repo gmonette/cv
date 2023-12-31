@@ -426,7 +426,7 @@ consistent solutions in either case.</p>
 ## [8,]  1  1  1</code></pre>
 <p>If we exclude <span class="math inline">\(\mathbf{y}\)</span>s with
 identical values, then</p>
-<pre class="r"><code>Ymat(3, TRUE)</code></pre>
+<pre class="r"><code>Ymat(3, exclude_identical = TRUE)</code></pre>
 <pre><code>##      y1 y2 y3
 ## [1,]  1  0  0
 ## [2,]  0  1  0
@@ -449,7 +449,8 @@ corresponding values of AUC:</p>
 <p>The values of <span class="math inline">\(\mathrm{cv}(\widehat{y}_i,
 y_i)\)</span> that express AUC as a sum of casewise values are solutions
 of equation (<span class="math inline">\(\ref{eq:cw}\)</span>), which
-can be written as solutions of the following linear equation: <span class="math display">\[\begin{equation}
+can be written as solutions of the following system of <span class="math inline">\(2^{n_v}\)</span> linear simultaneous equations in
+<span class="math inline">\(2n_v\)</span> unknowns: <span class="math display">\[\begin{equation}
 \label{eq:lin}
 \tag{2}
 (\mathbf{U} -\mathbf{Y}) \mathbf{c}_0 + \mathbf{Y} \mathbf{c}_1
