@@ -108,7 +108,7 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 }
 
 #' @describeIn cv \code{default} method
-#' @importFrom stats coef family fitted lm.wfit model.frame
+#' @importFrom stats coef family fitted lm.wfit lsfit model.frame
 #' model.matrix model.response predict qnorm
 #' update weighted.mean weights
 #' residuals hatvalues printCoefmat sd

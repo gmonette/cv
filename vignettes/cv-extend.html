@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-12-23" />
+<meta name="date" content="2023-12-31" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-12-23</h4>
+<h4 class="date">2023-12-31</h4>
 
 
 
@@ -454,11 +454,9 @@ whole data set.</p>
 models,” the <code>cv()</code> function differentiates between CV
 criteria that are averages of casewise components and criteria that are
 not. Computation of bias corrections and confidence intervals is limited
-to the former. We don’t know whether the AUC, and hence its complement,
-can be expressed as the mean of casewise components, and certainly the
-<code>auc()</code> function in the <strong>Metrics</strong> package, on
-which our <code>AUCcomp()</code> is based, isn’t written in this
-manner.</p>
+to the former. We show in the appendix to this vignette that the AUC,
+and hence its complement, cannot be expressed as averages of casewise
+components.</p>
 <p><code>cv()</code> looks for a <code>&quot;casewise loss&quot;</code> attribute
 of the value returned by a CV criterion function. If this attribute
 exists, then the criterion is treated as the mean of casewise
@@ -479,7 +477,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x140911270&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x10e58c940&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -1245,6 +1243,170 @@ some uncertainty in identifying the predictors in the “best” model, with
 <span id="cb30-10"><a href="#cb30-10" tabindex="-1"></a><span class="co">#&gt; Fold 8      46.3507   0.0776   -0.7637           1.4463            </span></span>
 <span id="cb30-11"><a href="#cb30-11" tabindex="-1"></a><span class="co">#&gt; Fold 9      62.2632   0.1230   -1.0067           1.1000       -0.17</span></span>
 <span id="cb30-12"><a href="#cb30-12" tabindex="-1"></a><span class="co">#&gt; Fold 10     52.5112   0.1005   -0.7232           1.0809</span></span></code></pre></div>
+</div>
+<div id="appendix-why-the-complement-of-auc-isnt-a-casewise-cv-criterion" class="section level2">
+<h2>Appendix: Why the complement of AUC isn’t a casewise CV
+criterion</h2>
+<p>Consider calculating AUC for folds in which a validation set contains
+<span class="math inline">\(n_v\)</span> observations. To calculate AUC
+in the validation set, we need the vector of prediction criteria, <span class="math inline">\(\widehat{\mathbf{y}}_{v_{(n_v \times 1)}} =
+(\widehat{y}_1, ..., \widehat{y}_{n_v})^T\)</span>, and the vector of
+observed responses in the validation set, <span class="math inline">\(\mathbf{y}_{v_{(n_v \times 1)}} = (y_1, \ldots,
+y_{n_v})^T\)</span> with <span class="math inline">\(y_i \in \{0,1\}, \;
+i = 1, \ldots, n_v\)</span>.</p>
+<p>To construct the ROC curve, only the ordering of the values in <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> is relevant. Thus,
+assuming that there are no ties, and reordering observations if
+necessary, we can set <span class="math inline">\(\mathbf{\widehat{y}}_v
+= (1, 2, \ldots, n_v)^T\)</span>.</p>
+<p>If the AUC can be expressed as the casewise mean or sum of a function
+<span class="math inline">\(\mathrm{cv}(\widehat{y}_i,y_i)\)</span>,
+where <span class="math inline">\(\mathrm{cv}:
+\{1,2,...,n_v\}\times\{0,1\} \rightarrow [0,1]\)</span>, then <span class="math display">\[\begin{equation}
+\label{eq:cw}
+\tag{1}
+\sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) =
+\mathrm{AUC}(\mathbf{\widehat{y}}_v,\mathbf{y}_v)
+\end{equation}\]</span> must hold for all <span class="math inline">\(2^{n_v}\)</span> possible values of <span class="math inline">\(\mathbf{y}_v = (y_1,...,y_{n_v})^T\)</span>. If
+all <span class="math inline">\(y\mathrm{s}\)</span> have the same
+value, either 1 or 0, then the definition of AUC is ambiguous. AUC could
+be considered undefined, or it could be set to 0 if all <span class="math inline">\(y\)</span>s are 0 and to 1 if all <span class="math inline">\(y\)</span>s are 1. If AUC is considered to be
+undefined in these cases, we have <span class="math inline">\(2^{n_v} -
+2\)</span> admissible values for <span class="math inline">\(\mathbf{y}_v\)</span>.</p>
+<p>Thus, equation (<span class="math inline">\(\ref{eq:cw}\)</span>)
+produces either <span class="math inline">\(2^{n_v}\)</span> or <span class="math inline">\(2^{n_v}-2\)</span> constraints. Although there are
+only <span class="math inline">\(2n_v\)</span> possible values for the
+<span class="math inline">\(\mathrm{cv(\cdot)}\)</span> function,
+equation (<span class="math inline">\(\ref{eq:cw}\)</span>) could,
+nevertheless, have consistent solutions. We therefore need to determine
+whether there is a value of <span class="math inline">\(n_v\)</span> for
+which (<span class="math inline">\(\ref{eq:cw}\)</span>) has no
+consistent solution for all admissible values of <span class="math inline">\(\mathbf{y}_v\)</span>. In that eventuality, we
+will have shown that AUC cannot, in general, be expressed through a
+casewise sum.</p>
+<p>If <span class="math inline">\(n_v=3\)</span>, we show below that
+(<span class="math inline">\(\ref{eq:cw}\)</span>) has no consistent
+solution if we include all possibilities for <span class="math inline">\(\mathbf{y}_v\)</span>, but does if we exclude
+cases where all <span class="math inline">\(y\)</span>s have the same
+value. If <span class="math inline">\(n_v=4\)</span>, we show that there
+are no consistent solutions in either case.</p>
+<p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> and <span class="math inline">\(\mathbf{y}_v\)</span>, accommodating the cases
+where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
+1s:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>AUC <span class="ot">&lt;-</span> <span class="cf">function</span>(y, <span class="at">yhat =</span> <span class="fu">seq_along</span>(y)) {</span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">sum</span>(y)</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>  <span class="cf">if</span> (s <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="dv">0</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a>  <span class="cf">if</span> (s <span class="sc">==</span> <span class="fu">length</span>(y)) <span class="fu">return</span>(<span class="dv">1</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a>  Metrics<span class="sc">::</span><span class="fu">auc</span>(y, yhat)</span>
+<span id="cb31-6"><a href="#cb31-6" tabindex="-1"></a>}</span></code></pre></div>
+<p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}_v\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>Ymat <span class="ot">&lt;-</span> <span class="cf">function</span>(n_v, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>) {</span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a>  <span class="fu">stopifnot</span>(n_v <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="fu">round</span>(n_v) <span class="sc">==</span> n_v)    <span class="co"># n_v must be a positive integer</span></span>
+<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span>(<span class="dv">2</span><span class="sc">^</span>n_v <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a>                <span class="cf">function</span>(x) <span class="fu">as.integer</span>(<span class="fu">intToBits</span>(x)) )[<span class="dv">1</span><span class="sc">:</span>n_v, ]</span>
+<span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">is.matrix</span>(ret)) <span class="fu">t</span>(ret) <span class="cf">else</span> <span class="fu">matrix</span>(ret)</span>
+<span id="cb32-6"><a href="#cb32-6" tabindex="-1"></a>  <span class="fu">colnames</span>(ret) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;y&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(ret))</span>
+<span id="cb32-7"><a href="#cb32-7" tabindex="-1"></a>  <span class="cf">if</span> (exclude_identical) ret[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(ret)), ] <span class="cf">else</span> ret</span>
+<span id="cb32-8"><a href="#cb32-8" tabindex="-1"></a>}</span></code></pre></div>
+<p>For <span class="math inline">\(n_v=3\)</span>,</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="fu">Ymat</span>(<span class="dv">3</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3</span></span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a><span class="co">#&gt; [1,]  0  0  0</span></span>
+<span id="cb33-4"><a href="#cb33-4" tabindex="-1"></a><span class="co">#&gt; [2,]  1  0  0</span></span>
+<span id="cb33-5"><a href="#cb33-5" tabindex="-1"></a><span class="co">#&gt; [3,]  0  1  0</span></span>
+<span id="cb33-6"><a href="#cb33-6" tabindex="-1"></a><span class="co">#&gt; [4,]  1  1  0</span></span>
+<span id="cb33-7"><a href="#cb33-7" tabindex="-1"></a><span class="co">#&gt; [5,]  0  0  1</span></span>
+<span id="cb33-8"><a href="#cb33-8" tabindex="-1"></a><span class="co">#&gt; [6,]  1  0  1</span></span>
+<span id="cb33-9"><a href="#cb33-9" tabindex="-1"></a><span class="co">#&gt; [7,]  0  1  1</span></span>
+<span id="cb33-10"><a href="#cb33-10" tabindex="-1"></a><span class="co">#&gt; [8,]  1  1  1</span></span></code></pre></div>
+<p>If we exclude <span class="math inline">\(\mathbf{y}_v\)</span>s with
+identical values, then</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">Ymat</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3</span></span>
+<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a><span class="co">#&gt; [1,]  1  0  0</span></span>
+<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a><span class="co">#&gt; [2,]  0  1  0</span></span>
+<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a><span class="co">#&gt; [3,]  1  1  0</span></span>
+<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a><span class="co">#&gt; [4,]  0  0  1</span></span>
+<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a><span class="co">#&gt; [5,]  1  0  1</span></span>
+<span id="cb34-8"><a href="#cb34-8" tabindex="-1"></a><span class="co">#&gt; [6,]  0  1  1</span></span></code></pre></div>
+<p>Here is <span class="math inline">\(\mathbf{Y}\)</span> with
+corresponding values of AUC:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">cbind</span>(<span class="fu">Ymat</span>(<span class="dv">3</span>), <span class="at">AUC =</span> <span class="fu">apply</span>(<span class="fu">Ymat</span>(<span class="dv">3</span>), <span class="dv">1</span>, AUC))</span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3 AUC</span></span>
+<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a><span class="co">#&gt; [1,]  0  0  0 0.0</span></span>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a><span class="co">#&gt; [2,]  1  0  0 0.0</span></span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a><span class="co">#&gt; [3,]  0  1  0 0.5</span></span>
+<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a><span class="co">#&gt; [4,]  1  1  0 0.0</span></span>
+<span id="cb35-7"><a href="#cb35-7" tabindex="-1"></a><span class="co">#&gt; [5,]  0  0  1 1.0</span></span>
+<span id="cb35-8"><a href="#cb35-8" tabindex="-1"></a><span class="co">#&gt; [6,]  1  0  1 0.5</span></span>
+<span id="cb35-9"><a href="#cb35-9" tabindex="-1"></a><span class="co">#&gt; [7,]  0  1  1 1.0</span></span>
+<span id="cb35-10"><a href="#cb35-10" tabindex="-1"></a><span class="co">#&gt; [8,]  1  1  1 1.0</span></span></code></pre></div>
+<p>The values of <span class="math inline">\(\mathrm{cv}(\widehat{y}_i,
+y_i)\)</span> that express AUC as a sum of casewise values are solutions
+of equation (<span class="math inline">\(\ref{eq:cw}\)</span>), which
+can be written as solutions of the following system of <span class="math inline">\(2^{n_v}\)</span> linear simultaneous equations in
+<span class="math inline">\(2n_v\)</span> unknowns: <span class="math display">\[\begin{equation}
+\label{eq:lin}
+\tag{2}
+(\mathbf{U} -\mathbf{Y}) \mathbf{c}_0 + \mathbf{Y} \mathbf{c}_1
+=
+[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]
+\begin{bmatrix}
+\mathbf{c}_0 \\ \mathbf{c}_1
+\end{bmatrix}
+= \mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})
+\end{equation}\]</span> where <span class="math inline">\(\mathbf{U}_{(2^{n_v} \times n_v)}\)</span> is a
+matrix of 1s conformable with <span class="math inline">\(\mathbf{Y}\)</span>; <span class="math inline">\(\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ...,
+\mathrm{cv}(n_v,0)]^T\)</span>; <span class="math inline">\(\mathbf{c}_1
+= [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T\)</span>; <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v}
+\times 2n_v)}\)</span> and <span class="math inline">\(\begin{bmatrix}\begin{aligned} \mathbf{c}_0 \\
+\mathbf{c}_1 \end{aligned} \end{bmatrix}_{(2n_v \times 1)}\)</span> are
+partitioned matrices; and <span class="math inline">\(\mathbf{\widehat{Y}}_{(2^{n_v} \times
+n_v)}\)</span> is a matrix each of whose rows consists of the integers 1
+to <span class="math inline">\(n_v\)</span>.</p>
+<p>We can test whether equation (<span class="math inline">\(\ref{eq:lin}\)</span>) has a solution for any
+given <span class="math inline">\(n_v\)</span> by trying to solve it as
+a least-squares problem, considering whether the residuals of the
+associated linear model are all 0, using the “design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> to
+predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v}
+\times 1)}\)</span>:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a>resids <span class="ot">&lt;-</span> <span class="cf">function</span>(n_v, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a>                   <span class="at">tol =</span> <span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps)) {</span>
+<span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a>  Y <span class="ot">&lt;-</span> <span class="fu">Ymat</span>(n_v, <span class="at">exclude_identical =</span> exclude_identical)</span>
+<span id="cb36-4"><a href="#cb36-4" tabindex="-1"></a>  AUC <span class="ot">&lt;-</span> <span class="fu">apply</span>(Y, <span class="dv">1</span>, AUC)</span>
+<span id="cb36-5"><a href="#cb36-5" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="dv">1</span><span class="sc">-</span>Y, Y)</span>
+<span id="cb36-6"><a href="#cb36-6" tabindex="-1"></a>  opts <span class="ot">&lt;-</span> <span class="fu">options</span>(<span class="at">warn =</span> <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb36-7"><a href="#cb36-7" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">options</span>(opts))</span>
+<span id="cb36-8"><a href="#cb36-8" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">lsfit</span>(X, AUC, <span class="at">intercept =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb36-9"><a href="#cb36-9" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">abs</span>(<span class="fu">residuals</span>(fit)))</span>
+<span id="cb36-10"><a href="#cb36-10" tabindex="-1"></a>  <span class="cf">if</span>(ret <span class="sc">&lt;</span> tol){</span>
+<span id="cb36-11"><a href="#cb36-11" tabindex="-1"></a>    ret <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb36-12"><a href="#cb36-12" tabindex="-1"></a>    solution <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
+<span id="cb36-13"><a href="#cb36-13" tabindex="-1"></a>    <span class="fu">names</span>(solution) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;c(&quot;</span>, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>n_v, <span class="dv">1</span><span class="sc">:</span>n_v), <span class="st">&quot;,&quot;</span>, </span>
+<span id="cb36-14"><a href="#cb36-14" tabindex="-1"></a>                              <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">each =</span> n_v), <span class="st">&quot;)&quot;</span>)</span>
+<span id="cb36-15"><a href="#cb36-15" tabindex="-1"></a>    <span class="fu">attr</span>(ret, <span class="st">&quot;solution&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">zapsmall</span>(solution)</span>
+<span id="cb36-16"><a href="#cb36-16" tabindex="-1"></a>  }</span>
+<span id="cb36-17"><a href="#cb36-17" tabindex="-1"></a>  ret</span>
+<span id="cb36-18"><a href="#cb36-18" tabindex="-1"></a>}</span></code></pre></div>
+<p>The case <span class="math inline">\(n_v=3\)</span>, excluding
+identical <span class="math inline">\(y\)</span>s, has a solution:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;solution&quot;)</span></span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co">#&gt; c(1,0) c(2,0) c(3,0) c(1,1) c(2,1) c(3,1) </span></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="co">#&gt;    1.0    0.0   -0.5    0.5    0.0    0.0</span></span></code></pre></div>
+<p>But, if identical <span class="math inline">\(y\)</span>s are
+included, the equation is not consistent:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.125</span></span></code></pre></div>
+<p>For <span class="math inline">\(n_v=4\)</span>, there are no
+solutions in either case:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">4</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.083333</span></span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">4</span>, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a><span class="co">#&gt; [1] 0.25</span></span></code></pre></div>
+<p>Consequently, the widely employed AUC measure of fit for binary
+regression cannot in general be used for a casewise cross-validation
+criterion.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>

@@ -2,7 +2,7 @@
 
 - cv() et al. now work properly with "non-casewise average" CV criteria such as the new rmse() and medAbsErr(), not just with "casewise-average" fit criteria such as mse() and BayesRule().
 
-- Bias adjustment and confidence intervals (which are new) are computed only for casewise-average CV criteria.
+- Bias adjustment and confidence intervals (which are new) are computed only for casewise-average CV criteria. Demonstrate that 1 - AUC isn't a casewise-average criterion.
 
 - Generally suppress spurious messages about setting the seed in cv.modList() for LOO CV.
 
