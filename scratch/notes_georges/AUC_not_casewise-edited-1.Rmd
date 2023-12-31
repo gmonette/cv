@@ -83,7 +83,7 @@ $\begin{bmatrix}\begin{aligned}
 are partitioned matrices; and $\mathbf{\widehat{Y}}_{(2^{n_v} \times n_v)}$ is a matrix each of whose rows consists of the integers 1 to $n_v$.
 
 We can test whether equation (\ref{eq:lin}) has a solution for any given $n_v$ by trying to solve it as a least-squares problem, considering whether the residuals of the associated linear model are all 0, using the "design matrix" $[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]$ to predict the "outcome"
-$\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2n_v \times 1)}$:
+$\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v} \times 1)}$:
 
 ```{r}
 resids <- function(n_v, exclude_identical = FALSE, 
