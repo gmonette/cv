@@ -3,25 +3,25 @@ title: "Appendix: Why the complement of AUC isn't a casewise CV criterion"
 output: html_document
 ---
 
-Consider calculating AUC for folds in which a validation set contains $n_v$ observations. To calculate AUC in the validation set, we need the vector of prediction criteria, $\widehat{\mathbf{y}}_{(n_v \times 1)} = (\widehat{y}_1, ..., \widehat{y}_{n_v})^T$, and the vector of observed responses in the validation set, $\mathbf{y}_{(n_v \times 1)} = (y_1, \ldots, y_{n_v})^T$ with $y_i \in \{0,1\}, \; i = 1, \ldots, n_v$.
+Consider calculating AUC for folds in which a validation set contains $n_v$ observations. To calculate AUC in the validation set, we need the vector of prediction criteria, $\widehat{\mathbf{y}}_{v_{(n_v \times 1)}} = (\widehat{y}_1, ..., \widehat{y}_{n_v})^T$, and the vector of observed responses in the validation set, $\mathbf{y}_{v_{(n_v \times 1)}} = (y_1, \ldots, y_{n_v})^T$ with $y_i \in \{0,1\}, \; i = 1, \ldots, n_v$.
 
 To construct the ROC curve, only the ordering of the values in 
-$\mathbf{\widehat{y}}$ is relevant. Thus, assuming that there are no ties, and reordering observations if necessary, we can set 
-$\mathbf{\widehat{y}} = (1, 2, \ldots, n_v)^T$.
+$\mathbf{\widehat{y}}_v$ is relevant. Thus, assuming that there are no ties, and reordering observations if necessary, we can set 
+$\mathbf{\widehat{y}}_v = (1, 2, \ldots, n_v)^T$.
 
 If the AUC can be expressed as the casewise mean or sum of a function $\mathrm{cv}(\widehat{y}_i,y_i)$, where $\mathrm{cv}: \{1,2,...,n_v\}\times\{0,1\} \rightarrow [0,1]$, then
 \begin{equation}
 \label{eq:cw}
 \tag{1}
-\sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) = \mathrm{AUC}(\mathbf{\widehat{y}},\mathbf{y})
+\sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) = \mathrm{AUC}(\mathbf{\widehat{y}}_v,\mathbf{y}_v)
 \end{equation}
-must hold for all $2^{n_v}$ possible values of $\mathbf{y} = (y_1,...,y_{n_v})^T$. If all $y\mathrm{s}$ have the same value, either 1 or 0, then the definition of AUC is ambiguous. AUC could be considered undefined, or it could be set to 0 if all $y$s are 0 and to 1 if all $y$s are 1. If AUC is considered to be undefined in these cases, we have $2^{n_v} - 2$ admissible values for $\mathbf{y}$.
+must hold for all $2^{n_v}$ possible values of $\mathbf{y}_v = (y_1,...,y_{n_v})^T$. If all $y\mathrm{s}$ have the same value, either 1 or 0, then the definition of AUC is ambiguous. AUC could be considered undefined, or it could be set to 0 if all $y$s are 0 and to 1 if all $y$s are 1. If AUC is considered to be undefined in these cases, we have $2^{n_v} - 2$ admissible values for $\mathbf{y}_v$.
 
-Thus, equation (\ref{eq:cw}) produces either $2^{n_v}$ or $2^{n_v}-2$ constraints. Although there are only $2n$ possible values for the $\mathrm{cv(\cdot)}$ function, equation (\ref{eq:cw}) could, nevertheless, have consistent solutions.  We therefore need to determine whether there is a value of $n_v$ for which (\ref{eq:cw}) has no consistent solution for all admissible values of $\mathbf{y}$. In that eventuality, we will have shown that AUC cannot, in general, be expressed through a casewise sum.
+Thus, equation (\ref{eq:cw}) produces either $2^{n_v}$ or $2^{n_v}-2$ constraints. Although there are only $2n_v$ possible values for the $\mathrm{cv(\cdot)}$ function, equation (\ref{eq:cw}) could, nevertheless, have consistent solutions.  We therefore need to determine whether there is a value of $n_v$ for which (\ref{eq:cw}) has no consistent solution for all admissible values of $\mathbf{y}_v$. In that eventuality, we will have shown that AUC cannot, in general, be expressed through a casewise sum.
 
-If $n_v=3$, we show below that (\ref{eq:cw}) has no consistent solution if we include all possibilities for $\mathbf{y}$, but does if we exclude cases where all $y$s have the same value. If $n_v=4$, we show that there no consistent solutions in either case.
+If $n_v=3$, we show below that (\ref{eq:cw}) has no consistent solution if we include all possibilities for $\mathbf{y}_v$, but does if we exclude cases where all $y$s have the same value. If $n_v=4$, we show that there are no consistent solutions in either case.
 
-The following R function computes AUC from $\mathbf{\widehat{y}}$ and $\mathbf{y}$, accommodating the cases where $\mathbf{y}$ is all 0s or all 1s:
+The following R function computes AUC from $\mathbf{\widehat{y}}_v$ and $\mathbf{y}_v$, accommodating the cases where $\mathbf{y}_v$ is all 0s or all 1s:
 
 ```{r}
 AUC <- function(y, yhat = seq_along(y)) {
@@ -32,7 +32,7 @@ AUC <- function(y, yhat = seq_along(y)) {
 }
 ```
 
-We then define a function to generate all possible $\mathbf{y}$s of length $n_v$ as rows of the matrix $\mathbf{Y}_{(2^{n_v} \times n_v)}$:
+We then define a function to generate all possible $\mathbf{y}_v$s of length $n_v$ as rows of the matrix $\mathbf{Y}_{(2^{n_v} \times n_v)}$:
 
 ```{r}
 Ymat <- function(n_v, exclude_identical = FALSE) {
@@ -51,7 +51,7 @@ For $n_v=3$,
 Ymat(3)
 ```
 
-If we exclude $\mathbf{y}$s with identical values, then
+If we exclude $\mathbf{y}_v$s with identical values, then
 
 ```{r}
 Ymat(3, exclude_identical = TRUE)

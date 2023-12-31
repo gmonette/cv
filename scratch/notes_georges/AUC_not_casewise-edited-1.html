@@ -356,15 +356,15 @@ casewise CV criterion</h1>
 
 <p>Consider calculating AUC for folds in which a validation set contains
 <span class="math inline">\(n_v\)</span> observations. To calculate AUC
-in the validation set, we need the vector of prediction criteria, <span class="math inline">\(\widehat{\mathbf{y}}_{(n_v \times 1)} =
+in the validation set, we need the vector of prediction criteria, <span class="math inline">\(\widehat{\mathbf{y}}_{v_{(n_v \times 1)}} =
 (\widehat{y}_1, ..., \widehat{y}_{n_v})^T\)</span>, and the vector of
-observed responses in the validation set, <span class="math inline">\(\mathbf{y}_{(n_v \times 1)} = (y_1, \ldots,
+observed responses in the validation set, <span class="math inline">\(\mathbf{y}_{v_{(n_v \times 1)}} = (y_1, \ldots,
 y_{n_v})^T\)</span> with <span class="math inline">\(y_i \in \{0,1\}, \;
 i = 1, \ldots, n_v\)</span>.</p>
-<p>To construct the ROC curve, only the ordering of the values in <span class="math inline">\(\mathbf{\widehat{y}}\)</span> is relevant. Thus,
+<p>To construct the ROC curve, only the ordering of the values in <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> is relevant. Thus,
 assuming that there are no ties, and reordering observations if
-necessary, we can set <span class="math inline">\(\mathbf{\widehat{y}} =
-(1, 2, \ldots, n_v)^T\)</span>.</p>
+necessary, we can set <span class="math inline">\(\mathbf{\widehat{y}}_v
+= (1, 2, \ldots, n_v)^T\)</span>.</p>
 <p>If the AUC can be expressed as the casewise mean or sum of a function
 <span class="math inline">\(\mathrm{cv}(\widehat{y}_i,y_i)\)</span>,
 where <span class="math inline">\(\mathrm{cv}:
@@ -372,39 +372,40 @@ where <span class="math inline">\(\mathrm{cv}:
 \label{eq:cw}
 \tag{1}
 \sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) =
-\mathrm{AUC}(\mathbf{\widehat{y}},\mathbf{y})
-\end{equation}\]</span> must hold for all <span class="math inline">\(2^{n_v}\)</span> possible values of <span class="math inline">\(\mathbf{y} = (y_1,...,y_{n_v})^T\)</span>. If all
-<span class="math inline">\(y\mathrm{s}\)</span> have the same value,
-either 1 or 0, then the definition of AUC is ambiguous. AUC could be
-considered undefined, or it could be set to 0 if all <span class="math inline">\(y\)</span>s are 0 and to 1 if all <span class="math inline">\(y\)</span>s are 1. If AUC is considered to be
+\mathrm{AUC}(\mathbf{\widehat{y}}_v,\mathbf{y}_v)
+\end{equation}\]</span> must hold for all <span class="math inline">\(2^{n_v}\)</span> possible values of <span class="math inline">\(\mathbf{y}_v = (y_1,...,y_{n_v})^T\)</span>. If
+all <span class="math inline">\(y\mathrm{s}\)</span> have the same
+value, either 1 or 0, then the definition of AUC is ambiguous. AUC could
+be considered undefined, or it could be set to 0 if all <span class="math inline">\(y\)</span>s are 0 and to 1 if all <span class="math inline">\(y\)</span>s are 1. If AUC is considered to be
 undefined in these cases, we have <span class="math inline">\(2^{n_v} -
-2\)</span> admissible values for <span class="math inline">\(\mathbf{y}\)</span>.</p>
+2\)</span> admissible values for <span class="math inline">\(\mathbf{y}_v\)</span>.</p>
 <p>Thus, equation (<span class="math inline">\(\ref{eq:cw}\)</span>)
 produces either <span class="math inline">\(2^{n_v}\)</span> or <span class="math inline">\(2^{n_v}-2\)</span> constraints. Although there are
-only <span class="math inline">\(2n\)</span> possible values for the
+only <span class="math inline">\(2n_v\)</span> possible values for the
 <span class="math inline">\(\mathrm{cv(\cdot)}\)</span> function,
 equation (<span class="math inline">\(\ref{eq:cw}\)</span>) could,
 nevertheless, have consistent solutions. We therefore need to determine
 whether there is a value of <span class="math inline">\(n_v\)</span> for
 which (<span class="math inline">\(\ref{eq:cw}\)</span>) has no
-consistent solution for all admissible values of <span class="math inline">\(\mathbf{y}\)</span>. In that eventuality, we will
-have shown that AUC cannot, in general, be expressed through a casewise
-sum.</p>
+consistent solution for all admissible values of <span class="math inline">\(\mathbf{y}_v\)</span>. In that eventuality, we
+will have shown that AUC cannot, in general, be expressed through a
+casewise sum.</p>
 <p>If <span class="math inline">\(n_v=3\)</span>, we show below that
 (<span class="math inline">\(\ref{eq:cw}\)</span>) has no consistent
-solution if we include all possibilities for <span class="math inline">\(\mathbf{y}\)</span>, but does if we exclude cases
-where all <span class="math inline">\(y\)</span>s have the same value.
-If <span class="math inline">\(n_v=4\)</span>, we show that there no
-consistent solutions in either case.</p>
-<p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}\)</span> and <span class="math inline">\(\mathbf{y}\)</span>, accommodating the cases where
-<span class="math inline">\(\mathbf{y}\)</span> is all 0s or all 1s:</p>
+solution if we include all possibilities for <span class="math inline">\(\mathbf{y}_v\)</span>, but does if we exclude
+cases where all <span class="math inline">\(y\)</span>s have the same
+value. If <span class="math inline">\(n_v=4\)</span>, we show that there
+are no consistent solutions in either case.</p>
+<p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> and <span class="math inline">\(\mathbf{y}_v\)</span>, accommodating the cases
+where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
+1s:</p>
 <pre class="r"><code>AUC &lt;- function(y, yhat = seq_along(y)) {
   s &lt;- sum(y)
   if (s == 0) return(0)
   if (s == length(y)) return(1)
   Metrics::auc(y, yhat)
 }</code></pre>
-<p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
+<p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}_v\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
 <pre class="r"><code>Ymat &lt;- function(n_v, exclude_identical = FALSE) {
   stopifnot(n_v &gt; 0 &amp;&amp; round(n_v) == n_v)    # n_v must be a positive integer
   ret &lt;- sapply(0:(2^n_v - 1),
@@ -424,7 +425,7 @@ consistent solutions in either case.</p>
 ## [6,]  1  0  1
 ## [7,]  0  1  1
 ## [8,]  1  1  1</code></pre>
-<p>If we exclude <span class="math inline">\(\mathbf{y}\)</span>s with
+<p>If we exclude <span class="math inline">\(\mathbf{y}_v\)</span>s with
 identical values, then</p>
 <pre class="r"><code>Ymat(3, exclude_identical = TRUE)</code></pre>
 <pre><code>##      y1 y2 y3
