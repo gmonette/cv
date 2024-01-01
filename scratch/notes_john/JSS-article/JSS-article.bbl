@@ -1,0 +1,152 @@
+\begin{thebibliography}{27}
+\newcommand{\enquote}[1]{``#1''}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Arlot and Celisse(2010)}]{ArlotCelisse:2010}
+Arlot S, Celisse A (2010).
+\newblock \enquote{{A survey of cross-validation procedures for model selection}.}
+\newblock \emph{Statistics Surveys}, \textbf{4}, 40 -- 79.
+\newblock \urlprefix\url{https://doi.org/10.1214/09-SS054}.
+
+\bibitem[{Bates \emph{et~al.}(2015)Bates, M{\"a}chler, Bolker, and Walker}]{BatesEtAl:2015}
+Bates D, M{\"a}chler M, Bolker B, Walker S (2015).
+\newblock \enquote{Fitting Linear Mixed-Effects Models Using {lme4}.}
+\newblock \emph{Journal of Statistical Software}, \textbf{67}(1), 1--48.
+
+\bibitem[{Bates \emph{et~al.}(2023)Bates, Hastie, and Tibshirani}]{BatesHastieTibshirani:2023}
+Bates S, Hastie T, Tibshirani R (2023).
+\newblock \enquote{Cross-validation: What does it estimate and how well does it do it?}
+\newblock \emph{Journal of the American Statistical Association}, \textbf{in press}.
+\newblock \urlprefix\url{https://doi.org/10.1080/01621459.2023.2197686}.
+
+\bibitem[{Box and Cox(1964)}]{BoxCox:1964}
+Box GEP, Cox DR (1964).
+\newblock \enquote{An analysis of transformations.}
+\newblock \emph{Journal of the Royal Statistical Society, Series {B}}, \textbf{26}, 211--252.
+
+\bibitem[{Canty and Ripley(2022)}]{CantyRipley2022}
+Canty A, Ripley BD (2022).
+\newblock \emph{boot: Bootstrap {R} ({S}-Plus) Functions}.
+\newblock R package version 1.3-28.1.
+
+\bibitem[{Davison and Hinkley(1997)}]{DavisonHinkley:1997}
+Davison AC, Hinkley DV (1997).
+\newblock \emph{Bootstrap Methods and Their Applications}.
+\newblock Cambridge University Press, Cambridge.
+
+\bibitem[{Diggle \emph{et~al.}(1994)Diggle, Liang, and Zeger}]{DiggleLiangZeger:1994}
+Diggle PJ, Liang KY, Zeger SL (1994).
+\newblock \emph{Analysis of longitudinal data}.
+\newblock Oxford University Press, Oxford.
+
+\bibitem[{Fox(2016)}]{Fox:2016}
+Fox J (2016).
+\newblock \emph{Applied Regression Analysis and Generalized Linear Models}.
+\newblock Second edition edition. Sage, Thousand Oaks {CA}.
+
+\bibitem[{Fox and Weisberg(2019)}]{FoxWeisberg:2019}
+Fox J, Weisberg S (2019).
+\newblock \emph{An {R} Companion to Applied Regression}.
+\newblock Third edition edition. Sage, Thousand Oaks {CA}.
+
+\bibitem[{Hamner and Frasco(2018)}]{HamnerFrasco:2018}
+Hamner B, Frasco M (2018).
+\newblock \emph{Metrics: Evaluation Metrics for Machine Learning}.
+\newblock {R} package version 0.1.4, \urlprefix\url{https://CRAN.R-project.org/package=Metrics}.
+
+\bibitem[{Harrell(2015)}]{Harrell:2015}
+Harrell Jr F (2015).
+\newblock \emph{Regression Modeling Strategies}.
+\newblock Second edition edition. Springer, New York.
+
+\bibitem[{Hastie \emph{et~al.}(2009)Hastie, Tibshirani, and Friedman}]{HastieTibshiraniFriedman:2009}
+Hastie T, Tibshirani R, Friedman J (2009).
+\newblock \emph{The Elements of Statistical Learning: Data Mining, Inference, and Prediction}.
+\newblock Second edition edition. Springer, New York.
+\newblock \urlprefix\url{https://hastie.su.domains/ElemStatLearn/printings/ESLII_print12_toc.pdf}.
+
+\bibitem[{James \emph{et~al.}(2021)James, Witten, Hastie, and Tibshirani}]{JamesEtAl:2021}
+James G, Witten D, Hastie T, Tibshirani R (2021).
+\newblock \emph{An Introduction to Statistical Learning with Applications in {R}}.
+\newblock Second edition edition. Springer, New York.
+
+\bibitem[{Lumley and Miller(2020)}]{LumleyMiller:2020}
+Lumley T, Miller A (2020).
+\newblock \emph{{leaps}: Regression Subset Selection}.
+\newblock R package version 3.1, \urlprefix\url{https://CRAN.R-project.org/package=leaps}.
+
+\bibitem[{Lüdecke \emph{et~al.}(2019)Lüdecke, Waggoner, and Makowski}]{LudeckeWaggonerMakowski:2019}
+Lüdecke D, Waggoner P, Makowski D (2019).
+\newblock \enquote{{insight}: A Unified Interface to Access Information from Model Objects in {R}.}
+\newblock \emph{Journal of Open Source Software}, \textbf{4}(38), 1412.
+
+\bibitem[{Mersmann(2023)}]{Mersmann:2023}
+Mersmann O (2023).
+\newblock \emph{microbenchmark: Accurate Timing Functions}.
+\newblock R package version 1.4.10, \urlprefix\url{https://CRAN.R-project.org/package=microbenchmark}.
+
+\bibitem[{Pinheiro and Bates(2000)}]{PinheiroBates:2000}
+Pinheiro JC, Bates DM (2000).
+\newblock \emph{Mixed-Effects Models in {S} and {S-PLUS}}.
+\newblock Springer, New York.
+
+\bibitem[{Raudenbush and Bryk(2002)}]{RaudenbushBryk:2002}
+Raudenbush SW, Bryk AS (2002).
+\newblock \emph{Hierarchical Linear Models: Applications and data analysis methods}.
+\newblock Second edition edition. Sage, Thousand Oaks {CA}.
+
+\bibitem[{{"Receiver operating characteristic"}(2023)}]{Wikipedia-ROC:2023}
+{"Receiver operating characteristic"} (2023).
+\newblock \enquote{Receiver operating characteristic---{W}ikipedia{,} The Free Encyclopedia.}
+\newblock [Online; accessed 25-August-2023], \urlprefix\url{https://en.wikipedia.org/wiki/Receiver_operating_characteristic}.
+
+\bibitem[{Sarkar(2008)}]{Sarkar:2008}
+Sarkar D (2008).
+\newblock \emph{Lattice: Multivariate Data Visualization with {R}}.
+\newblock Springer, New York.
+\newblock ISBN 978-0-387-75968-5.
+\newblock \urlprefix\url{http://lmdvr.r-forge.r-project.org}.
+
+\bibitem[{Sarkar and Andrews(2022)}]{SarkarAndrews:2022}
+Sarkar D, Andrews F (2022).
+\newblock \emph{{latticeExtra}: Extra Graphical Utilities Based on {lattice}}.
+\newblock R package version 0.6-30, \urlprefix\url{https://CRAN.R-project.org/package=latticeExtra}.
+
+\bibitem[{{StataCorp LLC}(2023)}]{Stata:2023}
+{StataCorp LLC} (2023).
+\newblock \emph{Stata multilevel mixed-effects reference manual, release 18}.
+\newblock Stata Press, College Station {TX}.
+\newblock \urlprefix\url{https://www.stata.com/manuals/me.pdf}.
+
+\bibitem[{Vehtari(2023)}]{Vehtari:2023}
+Vehtari A (2023).
+\newblock \enquote{Cross-validation {FAQ}.}
+\newblock \urlprefix\url{https://users.aalto.fi/~ave/CV-FAQ.html}.
+
+\bibitem[{Venables and Ripley(2002)}]{VenablesRipley:2002}
+Venables WN, Ripley BD (2002).
+\newblock \emph{Modern Applied Statistics with {S}}.
+\newblock Fourth edition edition. Springer, New York.
+
+\bibitem[{Weisberg(2014)}]{Weisberg:2014}
+Weisberg S (2014).
+\newblock \emph{Applied Linear Regression}.
+\newblock Second edition edition. Wiley, Hoboken {NJ}.
+
+\bibitem[{Wickham \emph{et~al.}(2023)Wickham, François, Henry, Müller, and Vaughan}]{WickhamEtAl:2023}
+Wickham H, François R, Henry L, Müller K, Vaughan D (2023).
+\newblock \emph{dplyr: A Grammar of Data Manipulation}.
+\newblock R package version 1.1.2, \urlprefix\url{https://CRAN.R-project.org/package=dplyr}.
+
+\bibitem[{{"Woodbury matrix identity"}(2023)}]{Wikipedia-Woodbury:2023}
+{"Woodbury matrix identity"} (2023).
+\newblock \enquote{Woodbury matrix identity---{W}ikipedia{,} The Free Encyclopedia.}
+\newblock [Online; accessed 15-August-2023], \urlprefix\url{https://en.wikipedia.org/wiki/Woodbury_matrix_identity}.
+
+\end{thebibliography}

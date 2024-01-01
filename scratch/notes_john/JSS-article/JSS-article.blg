@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2023)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: JSS-article.aux
+The style file: jss.bst
+Database file #1: cv.bib
+Warning--entry type for "Vehtari:2023" isn't style-file defined
+--line 201 of file cv.bib
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 27 entries,
+            3215 wiz_defined-function locations,
+            810 strings with 9572 characters,
+and the built_in function-call counts, 22427 in all, are:
+= -- 2192
+> -- 520
+< -- 20
++ -- 203
+- -- 169
+* -- 1549
+:= -- 2779
+add.period$ -- 103
+call.type$ -- 27
+change.case$ -- 179
+chr.to.int$ -- 28
+cite$ -- 27
+duplicate$ -- 2351
+empty$ -- 1832
+format.name$ -- 253
+if$ -- 4568
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 259
+newline$ -- 152
+num.names$ -- 108
+pop$ -- 1182
+preamble$ -- 1
+purify$ -- 164
+quote$ -- 0
+skip$ -- 455
+stack$ -- 0
+substring$ -- 2052
+swap$ -- 534
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 207
+warning$ -- 0
+while$ -- 144
+width$ -- 0
+write$ -- 367
+(There was 1 warning)
