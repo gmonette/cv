@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2023-12-31</h4>
+            <h4 data-toc-skip class="date">2024-01-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-extend.Rmd" class="external-link"><code>vignettes/cv-extend.Rmd</code></a></small>
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -200,7 +200,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt;     attr(result, "casewise loss") &lt;- "(y - yhat)^2"</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5559449246a8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55c0abfa6d78&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span>
 <span></span>
 <span><span class="fu">cv</span><span class="fu">:::</span><span class="fu">getLossFn</span><span class="op">(</span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -208,7 +208,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5559447cf158&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x55c0abe51898&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>"(y - yhat)^2"</code>, that evaluates to an expression that is a
@@ -368,20 +368,20 @@ cross-validation?</p>
 “out-of-the-box” for the <code>"multinom"</code> model:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span>, criterion<span class="op">=</span><span class="va">BayesRuleMulti</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in getResponse.default(model): non-vector response</span></span></code></pre></div>
-<p>The default method of <code><a href="../reference/getResponse.html">getResponse()</a></code> (a function supplied
-by the <strong>cv</strong> package—see <code><a href="../reference/getResponse.html">?getResponse</a></code>) fails
+<span><span class="co">#&gt; Error in GetResponse.default(model): non-vector response</span></span></code></pre></div>
+<p>The default method of <code><a href="../reference/getResponse.html">GetResponse()</a></code> (a function supplied
+by the <strong>cv</strong> package—see <code><a href="../reference/getResponse.html">?GetResponse</a></code>) fails
 for a <code>"multinom"</code> object. A straightforward solution is to
-supply a <code>getResponse.multinom()</code> method that returns the
+supply a <code>GetResponse.multinom()</code> method that returns the
 factor response <span class="citation">(using the
 <code>get_response()</code> function from the <strong>insight</strong>
 package, Lüdecke, Waggoner, &amp; Makowski, 2019)</span>,</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">getResponse.multinom</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">GetResponse.multinom</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/get_response.html" class="external-link">get_response</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/getResponse.html">getResponse</a></span><span class="op">(</span><span class="va">m.beps</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/getResponse.html">GetResponse</a></span><span class="op">(</span><span class="va">m.beps</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] Liberal Democrat Labour           Labour           Labour          </span></span>
 <span><span class="co">#&gt; [5] Labour           Labour          </span></span>
 <span><span class="co">#&gt; Levels: Conservative Labour Liberal Democrat</span></span></code></pre></div>
@@ -452,7 +452,7 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
 <span><span class="co">#&gt;             newdata = data, level = 1), ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55594d27d9b0&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55c0b48ffe20&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
@@ -517,7 +517,7 @@ those of <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-l
 argument), because the former iteratively invokes the latter; so
 <code>cv.glmmPQL()</code> should resemble <code><a href="../reference/cvMixed.html">cv.lme()</a></code>.</p>
 <p>As it turns out, neither the default method for
-<code><a href="../reference/getResponse.html">getResponse()</a></code> nor <code><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">insight::get_data()</a></code> work for
+<code><a href="../reference/getResponse.html">GetResponse()</a></code> nor <code><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">insight::get_data()</a></code> work for
 <code>"glmmPQL"</code> objects. These objects include a
 <code>"data"</code> element, however, and so we can simply extract this
 element as the default for the <code>data</code> argument of our
@@ -528,12 +528,12 @@ right-hand side, and extract the response from that; because all we need
 is the response variable, we limit the number of GLM iterations to 1 and
 suppress warning messages about non-convergence:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">getResponse.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">GetResponse.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span>  <span class="va">f</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># regression constant only on RHS</span></span>
 <span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">f</span>, data<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">data</span>, family<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">family</span>,</span>
 <span>                                control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu">cv</span><span class="fu">::</span><span class="fu"><a href="../reference/getResponse.html">getResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span>  <span class="fu">cv</span><span class="fu">::</span><span class="fu"><a href="../reference/getResponse.html">GetResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Writing the <code><a href="../reference/cv.html">cv()</a></code> method is then straightforward:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -903,7 +903,7 @@ model-selection process:</p>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">model</span>, <span class="st">"lm"</span>, which<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"selectSubsets is appropriate only for 'lm' models"</span><span class="op">)</span></span>
 <span>  </span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getResponse.html">getResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getResponse.html">GetResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span>  <span class="va">formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span></span>
