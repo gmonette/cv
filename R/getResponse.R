@@ -22,15 +22,15 @@
 #'
 #' @examples
 #'     fit <- lm(mpg ~ gear, mtcars)
-#'     getResponse(fit)
+#'     GetResponse(fit)
 #' @export
-getResponse <- function(model, ...){
-  UseMethod("getResponse")
+GetResponse <- function(model, ...){
+  UseMethod("GetResponse")
 }
 
-#' @describeIn getResponse \code{default} method
+#' @describeIn GetResponse \code{default} method
 #' @export
-getResponse.default <- function(model, ...){
+GetResponse.default <- function(model, ...){
   y <- if (!isS4(model)) model$y else insight::get_response(model)
   if (is.null(y)) y <- model.response(model.frame(model))
   if (!is.vector(y)) stop("non-vector response")
@@ -38,9 +38,9 @@ getResponse.default <- function(model, ...){
   y
 }
 
-#' @describeIn getResponse \code{merMod} method
+#' @describeIn GetResponse \code{merMod} method
 #' @export
-getResponse.merMod <- function(model, ...){
+GetResponse.merMod <- function(model, ...){
   y <- insight::get_response(model)
   if (is.factor(y)) {
     levels <- levels(y)
@@ -58,10 +58,10 @@ getResponse.merMod <- function(model, ...){
   y
 }
 
-#' @describeIn getResponse \code{merMod} method
+#' @describeIn GetResponse \code{merMod} method
 #' @export
-getResponse.lme <- function(model, ...) insight::get_response(model)
+GetResponse.lme <- function(model, ...) insight::get_response(model)
 
-#' @describeIn getResponse \code{glmmTMB} method
+#' @describeIn GetResponse \code{glmmTMB} method
 #' @export
-getResponse.glmmTMB <- getResponse.merMod
+GetResponse.glmmTMB <- GetResponse.merMod

@@ -151,13 +151,13 @@ We check first whether the default `cv()` method works "out-of-the-box" for the 
 ```{r BEPS-test-default, error=TRUE}
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
 ```
-The default method of `getResponse()` (a function supplied by the **cv** package---see `?getResponse`) fails for a `"multinom"` object. A straightforward solution is to supply a `getResponse.multinom()` method that returns the factor response [using the `get_response()` function from the **insight** package, @LudeckeWaggonerMakowski:2019],
-```{r getResponse.multinom}
-getResponse.multinom <- function(model, ...) {
+The default method of `GetResponse()` (a function supplied by the **cv** package---see `?GetResponse`) fails for a `"multinom"` object. A straightforward solution is to supply a `GetResponse.multinom()` method that returns the factor response [using the `get_response()` function from the **insight** package, @LudeckeWaggonerMakowski:2019],
+```{r GetResponse.multinom}
+GetResponse.multinom <- function(model, ...) {
   insight::get_response(model)
 }
 
-head(getResponse(m.beps))
+head(GetResponse(m.beps))
 ```
 and to try again:
 ```{r BEPS-test-default-2, error=TRUE}
@@ -219,17 +219,17 @@ Now imagine that we want to support a new class of mixed-effects models. To be c
 
 [^glmmPQL]: This example is somewhat artificial in that `glmmPQL()` has largely been superseded by computationally superior functions, such the `glmer()` function in the **lme4** package. There is, however, one situation in which `glmmPQL()` might prove useful: to specify serial dependency in case-level errors within clusters for longitudinal data, which is not currently supported by `glmer()`.
 
-As it turns out, neither the default method for `getResponse()` nor `insight::get_data()` work for `"glmmPQL"` objects. These objects include a `"data"` element, however, and so we can simply extract this element as the default for the `data` argument of our `cv.glmmPQL()` method. 
+As it turns out, neither the default method for `GetResponse()` nor `insight::get_data()` work for `"glmmPQL"` objects. These objects include a `"data"` element, however, and so we can simply extract this element as the default for the `data` argument of our `cv.glmmPQL()` method. 
 
 To get the response variable is more complicated: We refit the fixed part of the model as a GLM with only the regression constant on the right-hand side, and extract the response from that; because all we need is the response variable, we limit the number of GLM iterations to 1 and suppress warning messages about non-convergence:
 
-```{r getResponse.glmmPQL}
-getResponse.glmmPQL <- function(model, ...){
+```{r GetResponse.glmmPQL}
+GetResponse.glmmPQL <- function(model, ...){
   f <- formula(model)
   f[[3]] <- 1 # regression constant only on RHS
   model <- suppressWarnings(glm(f, data=model$data, family=model$family,
                                 control=list(maxit=1)))
-  cv::getResponse(model)
+  cv::GetResponse(model)
 }
 ```
 
@@ -358,7 +358,7 @@ selectSubsets <- function(data=insight::get_data(model),
   if (inherits(model, "lm", which=TRUE) != 1)
     stop("selectSubsets is appropriate only for 'lm' models")
   
-  y <- getResponse(model)
+  y <- GetResponse(model)
   formula <- formula(model)
   X <- model.matrix(model)
 

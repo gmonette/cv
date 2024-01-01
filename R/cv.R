@@ -48,8 +48,8 @@
 #' @details
 #' The default \code{cv()} method uses \code{\link{update}()} to refit the model
 #' to each fold, and should work if there are appropriate \code{update()}
-#' and \code{\link{predict}()} methods, and if the default method for \code{\link{getResponse}()}
-#' works or if a \code{getResponse()} method is supplied.
+#' and \code{\link{predict}()} methods, and if the default method for \code{\link{GetResponse}()}
+#' works or if a \code{GetResponse()} method is supplied.
 #'
 #' The \code{"lm"} and \code{"glm"} methods can use much faster computational
 #' algorithms, as selected by the \code{method} argument. The linear-model
@@ -148,7 +148,7 @@ cv.default <- function(model, data=insight::get_data(model),
     list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
   }
 
-  y <- getResponse(model)
+  y <- GetResponse(model)
   n <- nrow(data)
   if (is.character(k)){
     if (k == "n" || k == "loo") {
@@ -326,7 +326,7 @@ cv.lm <- function(model, data=insight::get_data(model),
     list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
   }
   X <- model.matrix(model)
-  y <- getResponse(model)
+  y <- GetResponse(model)
   w <- weights(model)
   if (is.null(w)) w <- rep(1, length(y))
   n <- nrow(data)
@@ -501,7 +501,7 @@ cv.glm <- function(model, data=insight::get_data(model),
     if (inherits(result, "cv")) result$"criterion" <- deparse(substitute(criterion))
     return(result)
   } else if (method == "hatvalues") {
-    y <- getResponse(model)
+    y <- GetResponse(model)
     h <- hatvalues(model)
     if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
       stop("there are hatvalues numerically equal to 1")
@@ -516,7 +516,7 @@ cv.glm <- function(model, data=insight::get_data(model),
     p <- length(b)
     w <- weights(model, type="working")
     X <- model.matrix(model)
-    y <- getResponse(model)
+    y <- GetResponse(model)
     if (p > model$rank) {
       message(paste0("The model has ", if (sum(is.na(b)) == 1L) "an ",
                      "aliased coefficient", if (sum(is.na(b)) > 1L) "s", ":"))

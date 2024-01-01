@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2023-12-31" />
+<meta name="date" content="2024-01-01" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2023-12-31</h4>
+<h4 class="date">2024-01-01</h4>
 
 
 
@@ -477,7 +477,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x10e58c940&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x14a028278&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -623,19 +623,19 @@ cross-validation?</p>
 <p>We check first whether the default <code>cv()</code> method works
 “out-of-the-box” for the <code>&quot;multinom&quot;</code> model:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">cv</span>(m.beps, <span class="at">seed=</span><span class="dv">3465</span>, <span class="at">criterion=</span>BayesRuleMulti)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; Error in getResponse.default(model): non-vector response</span></span></code></pre></div>
-<p>The default method of <code>getResponse()</code> (a function supplied
-by the <strong>cv</strong> package—see <code>?getResponse</code>) fails
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="co">#&gt; Error in GetResponse.default(model): non-vector response</span></span></code></pre></div>
+<p>The default method of <code>GetResponse()</code> (a function supplied
+by the <strong>cv</strong> package—see <code>?GetResponse</code>) fails
 for a <code>&quot;multinom&quot;</code> object. A straightforward solution is to
-supply a <code>getResponse.multinom()</code> method that returns the
+supply a <code>GetResponse.multinom()</code> method that returns the
 factor response <span class="citation">(using the
 <code>get_response()</code> function from the <strong>insight</strong>
 package, Lüdecke, Waggoner, &amp; Makowski, 2019)</span>,</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>getResponse.multinom <span class="ot">&lt;-</span> <span class="cf">function</span>(model, ...) {</span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>GetResponse.multinom <span class="ot">&lt;-</span> <span class="cf">function</span>(model, ...) {</span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  insight<span class="sc">::</span><span class="fu">get_response</span>(model)</span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>}</span>
 <span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">getResponse</span>(m.beps))</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">GetResponse</span>(m.beps))</span>
 <span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt; [1] Liberal Democrat Labour           Labour           Labour          </span></span>
 <span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; [5] Labour           Labour          </span></span>
 <span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt; Levels: Conservative Labour Liberal Democrat</span></span></code></pre></div>
@@ -770,7 +770,7 @@ those of <code>lme()</code> (with an additional <code>family</code>
 argument), because the former iteratively invokes the latter; so
 <code>cv.glmmPQL()</code> should resemble <code>cv.lme()</code>.</p>
 <p>As it turns out, neither the default method for
-<code>getResponse()</code> nor <code>insight::get_data()</code> work for
+<code>GetResponse()</code> nor <code>insight::get_data()</code> work for
 <code>&quot;glmmPQL&quot;</code> objects. These objects include a
 <code>&quot;data&quot;</code> element, however, and so we can simply extract this
 element as the default for the <code>data</code> argument of our
@@ -780,12 +780,12 @@ part of the model as a GLM with only the regression constant on the
 right-hand side, and extract the response from that; because all we need
 is the response variable, we limit the number of GLM iterations to 1 and
 suppress warning messages about non-convergence:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>getResponse.glmmPQL <span class="ot">&lt;-</span> <span class="cf">function</span>(model, ...){</span>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>GetResponse.glmmPQL <span class="ot">&lt;-</span> <span class="cf">function</span>(model, ...){</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="fu">formula</span>(model)</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  f[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co"># regression constant only on RHS</span></span>
 <span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">glm</span>(f, <span class="at">data=</span>model<span class="sc">$</span>data, <span class="at">family=</span>model<span class="sc">$</span>family,</span>
 <span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>                                <span class="at">control=</span><span class="fu">list</span>(<span class="at">maxit=</span><span class="dv">1</span>)))</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>  cv<span class="sc">::</span><span class="fu">getResponse</span>(model)</span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>  cv<span class="sc">::</span><span class="fu">GetResponse</span>(model)</span>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>}</span></code></pre></div>
 <p>Writing the <code>cv()</code> method is then straightforward:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>cv.glmmPQL <span class="ot">&lt;-</span> <span class="cf">function</span>(model, <span class="at">data =</span> model<span class="sc">$</span>data, <span class="at">criterion =</span> mse,</span>
@@ -1134,7 +1134,7 @@ model-selection process:</p>
 <span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">inherits</span>(model, <span class="st">&quot;lm&quot;</span>, <span class="at">which=</span><span class="cn">TRUE</span>) <span class="sc">!=</span> <span class="dv">1</span>)</span>
 <span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;selectSubsets is appropriate only for &#39;lm&#39; models&quot;</span>)</span>
 <span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a>  </span>
-<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">getResponse</span>(model)</span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">GetResponse</span>(model)</span>
 <span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">formula</span>(model)</span>
 <span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(model)</span>
 <span id="cb26-13"><a href="#cb26-13" tabindex="-1"></a></span>

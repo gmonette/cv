@@ -123,7 +123,7 @@ cvMixed <- function(model,
     list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
          indices.i=indices.i)
   }
-  y <- getResponse(model)
+  y <- GetResponse(model)
 
   if (missing(clusterVariables)) clusterVariables <- NULL
   if (is.null(clusterVariables)){

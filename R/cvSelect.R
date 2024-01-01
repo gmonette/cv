@@ -86,7 +86,7 @@ cvSelect <- function(procedure, data, criterion=mse,
                      seed, ncores=1, ...){
   n <- nrow(data)
   y <- if (!missing(model)) {
-    getResponse(model)
+    GetResponse(model)
     } else {
       eval(y.expression, envir=data)
     }
@@ -221,7 +221,7 @@ cvSelect <- function(procedure, data, criterion=mse,
 selectStepAIC <- function(data, indices,
                           model, criterion=mse, AIC=TRUE,
                           save.coef=TRUE, ...){
-  y <- getResponse(model)
+  y <- GetResponse(model)
   if (missing(indices)) {
     k. = if (AIC) 2 else log(nrow(data))
     model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
@@ -332,7 +332,7 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
   if (missing(predictors) && missing(response))
     stop("'predictors' and 'response' arguments both missing;",
          "\n no transformations specified")
-  y <- getResponse(model)
+  y <- GetResponse(model)
   family <- match.arg(family)
   family.y <- match.arg(family.y)
   powertrans <- switch(family,
@@ -481,7 +481,7 @@ selectTransStepAIC <- function(data,
                          basicPower = basicPowerInverse
   )
 
-  y <- getResponse(model) # untransformed response
+  y <- GetResponse(model) # untransformed response
 
   # find tranformations of predictors and/or response:
 

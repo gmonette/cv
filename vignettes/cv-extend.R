@@ -87,12 +87,12 @@ xtabs(~ vote, data=BEPS)/nrow(BEPS)
 ## ----BEPS-test-default, error=TRUE--------------------------------------------
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
 
-## ----getResponse.multinom-----------------------------------------------------
-getResponse.multinom <- function(model, ...) {
+## ----GetResponse.multinom-----------------------------------------------------
+GetResponse.multinom <- function(model, ...) {
   insight::get_response(model)
 }
 
-head(getResponse(m.beps))
+head(GetResponse(m.beps))
 
 ## ----BEPS-test-default-2, error=TRUE------------------------------------------
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
@@ -110,13 +110,13 @@ cv(m.beps, seed=3465)
 ## ----cv.lme-------------------------------------------------------------------
 cv:::cv.lme
 
-## ----getResponse.glmmPQL------------------------------------------------------
-getResponse.glmmPQL <- function(model, ...){
+## ----GetResponse.glmmPQL------------------------------------------------------
+GetResponse.glmmPQL <- function(model, ...){
   f <- formula(model)
   f[[3]] <- 1 # regression constant only on RHS
   model <- suppressWarnings(glm(f, data=model$data, family=model$family,
                                 control=list(maxit=1)))
-  cv::getResponse(model)
+  cv::GetResponse(model)
 }
 
 ## ----cv.glmmPQL---------------------------------------------------------------
@@ -195,7 +195,7 @@ selectSubsets <- function(data=insight::get_data(model),
   if (inherits(model, "lm", which=TRUE) != 1)
     stop("selectSubsets is appropriate only for 'lm' models")
   
-  y <- getResponse(model)
+  y <- GetResponse(model)
   formula <- formula(model)
   X <- model.matrix(model)
 

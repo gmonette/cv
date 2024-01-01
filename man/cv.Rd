@@ -126,8 +126,8 @@ more computationally efficient.
 \details{
 The default \code{cv()} method uses \code{\link{update}()} to refit the model
 to each fold, and should work if there are appropriate \code{update()}
-and \code{\link{predict}()} methods, and if the default method for \code{\link{getResponse}()}
-works or if a \code{getResponse()} method is supplied.
+and \code{\link{predict}()} methods, and if the default method for \code{\link{GetResponse}()}
+works or if a \code{GetResponse()} method is supplied.
 
 The \code{"lm"} and \code{"glm"} methods can use much faster computational
 algorithms, as selected by the \code{method} argument. The linear-model

@@ -26,6 +26,8 @@
 
 - Add Pigs data set.
 
+- change getResponse() and methods to GetResponse() to avoid name clash with nlme.
+
 - Improvements and updates to documentation, and expanded cv.Rmd vignette.
 
 - Mixed-models methods no longer flagged as "experimental."
