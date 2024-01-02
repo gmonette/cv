@@ -15,7 +15,7 @@ author:
     address: |
       | Toronto, Ontario, Canada
 title:
-  formatted: "\\pkg{cv}: An R Package for Cross-Validation of Regression Models"
+  formatted: "\\pkg{cv}: An \\proglang{R} Package for Cross-Validation of Regression Models"
   # If you use tex in the formatted title, also supply version without
   plain:     "cv: An R Package for Cross-Validation of Regression Models"
   # For running headers, if needed
@@ -50,9 +50,9 @@ Because the $n$ models are each fit to $n - 1$ cases, LOO CV produces a nearly u
 
 ## Polynomial regression for the Auto data
 
-The data for this example are drawn from the **ISLR2** package for R, associated with @JamesEtAl:2021. The presentation here is close (though not identical) to that in the original source [@JamesEtAl:2021 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function in the **cv** package.[^boot] 
+The data for this example are drawn from the \pkg{ISLR2} package for \proglang{R}, associated with @JamesEtAl:2021. The presentation here is close (though not identical) to that in the original source [@JamesEtAl:2021 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function in the \pkg{cv} package.[^boot] 
 
-[^boot]: @JamesEtAl:2021 use the `cv.glm()` function in the **boot** package [@CantyRipley2022; @DavisonHinkley:1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function.
+[^boot]: @JamesEtAl:2021 use the `cv.glm()` function in the \pkg{boot} package [@CantyRipley2022; @DavisonHinkley:1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function.
 
 The `Auto` dataset contains information about 392 cars:
 
@@ -117,7 +117,7 @@ legend("topright", inset=0.02,
        legend=c(expression(hat(sigma)^2), "MSE"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 ```
-The code for this graph uses the `mse()` function from the **cv** package to compute the MSE for each fit.
+The code for this graph uses the `mse()` function from the \pkg{cv} package to compute the MSE for each fit.
 
 ### Using cv()
 
@@ -128,22 +128,22 @@ summary(m.auto)
 
 cv(m.auto)
 ```
-The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the original, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
+The \code{"lm"} method by default uses \code{mse()} as the CV criterion and the Woodbury matrix identity to update the regression with each fold deleted without having literally to refit the model. Computational details are discussed in the final section of this vignette. The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the original, full-sample regression. Because the division of the data into 10 folds is random, \code{cv()} explicitly (randomly) generates and saves a seed for \proglang{R}'s pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the \code{seed} argument to \code{cv()}.
 
-To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases in the data, here `k=392`, or, more conveniently, to `k="loo"` or `k="n"`:
+To perform LOO CV, we can set the \code{k} argument to \code{cv()} to the number of cases in the data, here \code{k=392}, or, more conveniently, to \code{k="loo"} or \code{k="n"}:
 
 ```{r cv.lm-2`}
 cv(m.auto, k="loo")
 ```
-For LOO CV of a linear model, `cv()` by default uses the hatvalues from the model fit to the full data for the LOO updates, and reports only the CV estimate of MSE. Alternative methods are to use the Woodbury matrix identity or the "naive" approach of literally refitting the model with each case omitted. All three methods produce exact results for a linear model (within the precision of floating-point computations):
+For LOO CV of a linear model, \code{cv()} by default uses the hatvalues from the model fit to the full data for the LOO updates, and reports only the CV estimate of MSE. Alternative methods are to use the Woodbury matrix identity or the "naive" approach of literally refitting the model with each case omitted. All three methods produce exact results for a linear model (within the precision of floating-point computations):
 ```{r cv.lm-3}
 cv(m.auto, k="loo", method="naive")
 
 cv(m.auto, k="loo", method="Woodbury")
 ```
-The `"naive"` and `"Woodbury"` methods also return the bias-adjusted estimate of MSE and the full-sample MSE, but bias isn't an issue for LOO CV.
+The \code{"naive"} and \code{"Woodbury"} methods also return the bias-adjusted estimate of MSE and the full-sample MSE, but bias isn't an issue for LOO CV.
 
-This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In this comparison, we include the `cv.glm()` function from the **boot** package, which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the `microbenchmark()` function from the package of the same name for the timings [@Mersmann:2023]:
+This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In this comparison, we include the \code{cv.glm()} function from the \pkg{boot} package, which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the \code{microbenchmark()} function from the package of the same name for the timings [@Mersmann:2023]:
 ```{r cv.lm.timings, cache=TRUE}
 m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data=Auto)
 boot::cv.glm(Auto, m.auto.glm)$delta
@@ -158,13 +158,13 @@ microbenchmark::microbenchmark(
 ```
 On our computer, using the hatvalues is about an order of magnitude faster than employing Woodbury matrix updates, and more than two orders of magnitude faster than refitting the model.[^microbenchmark]
 
-[^microbenchmark]: Out of impatience, we asked `microbenchmark()` to execute each command only 10 times rather than the default 100. With the exception of the last columns, the output is self-explanatory. The last column shows which methods have average timings that are statistically distinguishable. Because of the small number of repetitions (i.e., 10), the `"hatvalues"` and `"Woodbury"` methods aren't distinguishable, but the difference between these methods persists when we perform more repetitions---we invite the reader to redo this computation with the default `times=100` repetitions.
+[^microbenchmark]: Out of impatience, we asked \code{microbenchmark()} to execute each command only 10 times rather than the default 100. With the exception of the last columns, the output is self-explanatory. The last column shows which methods have average timings that are statistically distinguishable. Because of the small number of repetitions (i.e., 10), the \code{"hatvalues"} and \code{"Woodbury"} methods aren't distinguishable, but the difference between these methods persists when we perform more repetitions---we invite the reader to redo this computation with the default \code{times=100} repetitions.
 
 ### Comparing competing models
 
-The `cv()` function also has a method that can be applied to a list of regression models for the same data, composed using the `models()` function. For $k$-fold CV, the same folds are used for the competing models, which reduces random error in their comparison. This result can also be obtained by specifying a common seed for R's random-number generator while applying `cv()` separately to each model, but employing a list of models is more convenient for both $k$-fold and LOO CV (where there is no random component to the composition of the $n$ folds).
+The \code{cv()} function also has a method that can be applied to a list of regression models for the same data, composed using the \code{models()} function. For $k$-fold CV, the same folds are used for the competing models, which reduces random error in their comparison. This result can also be obtained by specifying a common seed for \proglang{R}'s random-number generator while applying \code{cv()} separately to each model, but employing a list of models is more convenient for both $k$-fold and LOO CV (where there is no random component to the composition of the $n$ folds).
 
-We illustrate with the polynomial regression models of varying degree for the `Auto` data (discussed previously), beginning by fitting and saving the 10 models:
+We illustrate with the polynomial regression models of varying degree for the \code{Auto} data (discussed previously), beginning by fitting and saving the 10 models:
 ```{r polyomial-models}
 for (p in 1:10){
   assign(paste0("m.", p),
@@ -173,7 +173,7 @@ for (p in 1:10){
 objects(pattern="m\\.[0-9]")
 summary(m.2) # for example, the quadratic fit
 ```
-We then apply `cv()` to the list of 10 models (the `data` argument is required):
+We then apply \code{cv()} to the list of 10 models (the \code{data} argument is required):
 ```{r polynomial-regression-CV}
 # 10-fold CV
 cv.auto.10 <- cv(models(m.1, m.2, m.3, m.4, m.5,
@@ -187,7 +187,7 @@ cv.auto.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
                  data=Auto, k="loo")
 cv.auto.loo[1:2] # linear and quadratic models
 ```
-Because we didn't supply names for the models in the calls to the `models()` function, the names `model.1`, `model.2`, etc., are generated by the function.
+Because we didn't supply names for the models in the calls to the \code{models()} function, the names \code{model.1}, \code{model.2}, etc., are generated by the function.
 
 Finally, we extract and graph the adjusted MSEs for $10$-fold CV and the MSEs for LOO CV:
 ```{r polynomial-regression-CV-graph}
@@ -206,7 +206,7 @@ legend("topright", inset=0.02,
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 ```
 
-Alternatively, we can use the `plot()` method for `"cvModList"` objects to compare the models, though with separate graphs for 10-fold and LOO CV:
+Alternatively, we can use the \code{plot()} method for \code{"cvModList"} objects to compare the models, though with separate graphs for 10-fold and LOO CV:
 
 ```{r, polynomial-regression-CV-graph-2, fig.show="hold"}
 #| out.width = "45%",
@@ -222,23 +222,23 @@ In this example, 10-fold and LOO CV produce generally similar results, and also 
 
 ## Logistic regression for the Mroz data
 
-The `Mroz` data set from the **carData** package [associated with @FoxWeisberg:2019] has been used by several authors to illustrate binary logistic regression; see, in particular @FoxWeisberg:2019. The data were originally drawn from the U.S. Panel Study of Income Dynamics and pertain to married women. Here are a few cases in the data set:
+The \code{Mroz} data set from the \pkg{carData} package [associated with @FoxWeisberg:2019] has been used by several authors to illustrate binary logistic regression; see, in particular @FoxWeisberg:2019. The data were originally drawn from the U.S. Panel Study of Income Dynamics and pertain to married women. Here are a few cases in the data set:
 ```{r Mroz-data}
 data("Mroz", package="carData")
 head(Mroz, 3)
 tail(Mroz, 3)
 ```
-The response variable in the logistic regression is `lfp`, labor-force participation, a factor coded `"yes"` or `"no"`. The remaining variables are predictors:
+The response variable in the logistic regression is \code{lfp}, labor-force participation, a factor coded \code{"yes"} or \code{"no"}. The remaining variables are predictors:
 
-* `k5`, number of children 5 years old of younger in the woman's household;
-* `k618`, number of children between 6 and 18 years old;
-* `age`, in years;
-* `wc`, wife's college attendance, `"yes"` or `"no"`;
-* `hc`, husband's college attendance;
-* `lwg`, the woman's log wage rate if she is employed, or her *imputed* wage rate, if she is not [a variable that @FoxWeisberg:2019 show is problematically defined]; and
-* `inc`, family income, in $1000s, exclusive of wife's income.
+* \code{k5}, number of children 5 years old of younger in the woman's household;
+* \code{k618}, number of children between 6 and 18 years old;
+* \code{age}, in years;
+* \code{wc}, wife's college attendance, \code{"yes"} or \code{"no"};
+* \code{hc}, husband's college attendance;
+* \code{lwg}, the woman's log wage rate if she is employed, or her *imputed* wage rate, if she is not [a variable that @FoxWeisberg:2019 show is problematically defined]; and
+* \code{inc}, family income, in $1000s, exclusive of wife's income.
 
-We use the `glm()` function to fit a binary logistic regression to the `Mroz` data:
+We use the \code{glm()} function to fit a binary logistic regression to the \code{Mroz} data:
 ```{r Mroz-logistic-regresion}
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
 summary(m.mroz)
@@ -246,24 +246,24 @@ summary(m.mroz)
 BayesRule(ifelse(Mroz$lfp == "yes", 1, 0), 
           fitted(m.mroz, type="response"))
 ```
-In addition to the usually summary output for a GLM, we show the result of applying the `BayesRule()` function from the **cv** package to predictions derived from the fitted model. Bayes rule, which predicts a "success" in a binary regression model when the fitted probability of success [i.e., $\phi = \Pr(y = 1)$] is $\widehat{\phi} \ge .5$ and a "failure" if $\widehat{\phi} < .5$.[^BayesRule] The first argument to `BayesRule()` is the binary {0, 1} response, and the second argument is the predicted probability of success. `BayesRule()` returns the proportion of predictions that are *in error*, as appropriate for a "cost" function. 
+In addition to the usually summary output for a GLM, we show the result of applying the \code{BayesRule()} function from the \pkg{cv} package to predictions derived from the fitted model. Bayes rule, which predicts a "success" in a binary regression model when the fitted probability of success [i.e., $\phi = \Pr(y = 1)$] is $\widehat{\phi} \ge .5$ and a "failure" if $\widehat{\phi} < .5$.[^BayesRule] The first argument to \code{BayesRule()} is the binary {0, 1} response, and the second argument is the predicted probability of success. \code{BayesRule()} returns the proportion of predictions that are *in error*, as appropriate for a "cost" function. 
 
-[^BayesRule]: `BayesRule()` does some error checking; `BayesRule2()` is similar, but omits the error checking, and so can be faster for large problems.
+[^BayesRule]: \code{BayesRule()} does some error checking; \code{BayesRule2()} is similar, but omits the error checking, and so can be faster for large problems.
 
-The value returned by `BayesRule()` is associated with an "attribute" named `"casewise loss"` and set to `"y != round(yhat)"`, signifying that the Bayes rule CV criterion is computed as the mean of casewise values, here 0 if the prediction for a case matches the observed value and 1 if it does not (signifying a prediction error). The `mse()` function for numeric responses is also calculated as a casewise average. Some other criteria, such as the median absolute error, computed by the `medAbsErr()` function in the **cv** package, aren't averages of casewise components. The distinction is important because, to our knowledge, the statistical theory of cross-validation, for example, in @DavisonHinkley:1997, @BatesHastieTibshirani:2023, and @ArlotCelisse:2010, is developed for CV criteria like MSE that are means of casewise components. As a consequence, we limit computation of bias adjustment and confidence intervals (see below) to criteria that are casewise averages.
+The value returned by \code{BayesRule()} is associated with an "attribute" named \code{"casewise loss"} and set to \code{"y != round(yhat)"}, signifying that the Bayes rule CV criterion is computed as the mean of casewise values, here 0 if the prediction for a case matches the observed value and 1 if it does not (signifying a prediction error). The \code{mse()} function for numeric responses is also calculated as a casewise average. Some other criteria, such as the median absolute error, computed by the \code{medAbsErr()} function in the \pkg{cv} package, aren't averages of casewise components. The distinction is important because, to our knowledge, the statistical theory of cross-validation, for example, in @DavisonHinkley:1997, @BatesHastieTibshirani:2023, and @ArlotCelisse:2010, is developed for CV criteria like MSE that are means of casewise components. As a consequence, we limit computation of bias adjustment and confidence intervals (see below) to criteria that are casewise averages.
 
 In this example, the fitted logistic regression incorrectly predicts 31% of the responses; we expect this estimate to be optimistic given that the model is used to "predict" the data to which it is fit.
 
-The `"glm"` method for `cv()` is largely similar to the `"lm"` method, although the default algorithm, selected explicitly by `method="exact"`, refits the model with each fold removed (and is thus equivalent to `method="naive"` for `"lm"` models). For generalized linear models, `method="Woodbury"` or (for LOO CV) `method="hatvalues"` provide approximate results (see the last section of the vignette for details):
+The \code{"glm"} method for \code{cv()} is largely similar to the \code{"lm"} method, although the default algorithm, selected explicitly by \code{method="exact"}, refits the model with each fold removed (and is thus equivalent to \code{method="naive"} for \code{"lm"} models). For generalized linear models, \code{method="Woodbury"} or (for LOO CV) \code{method="hatvalues"} provide approximate results (see the last section of the vignette for details):
 
 ```{r cv-Mroz-10-fold}
 cv(m.mroz, criterion=BayesRule, seed=248)
 
 cv(m.mroz, criterion=BayesRule, seed=248, method="Woodbury")
 ```
-To ensure that the two methods use the same 10 folds, we specify the seed for R's random-number generator explicitly; here, and as is common in our experience, the `"exact"` and `"Woodbury"` algorithms produce nearly identical results. The CV estimates of prediction error are slightly higher than the estimate based on all of the cases.
+To ensure that the two methods use the same 10 folds, we specify the seed for \proglang{R}'s random-number generator explicitly; here, and as is common in our experience, the \code{"exact"} and \code{"Woodbury"} algorithms produce nearly identical results. The CV estimates of prediction error are slightly higher than the estimate based on all of the cases.
 
-The printed output includes a 95% confidence interval for the bias-adjusted Bayes rule CV criterion. @BatesHastieTibshirani:2023 show that these confidence intervals are unreliable for models fit to small samples, and by default `cv()` computes them only when the sample size is 400 or larger and when the CV criterion employed is an average of casewise components, as is the case for Bayes rule. See the final section of the vignette for details of the computation of confidence intervals for bias-adjusted CV criteria.
+The printed output includes a 95% confidence interval for the bias-adjusted Bayes rule CV criterion. @BatesHastieTibshirani:2023 show that these confidence intervals are unreliable for models fit to small samples, and by default \code{cv()} computes them only when the sample size is 400 or larger and when the CV criterion employed is an average of casewise components, as is the case for Bayes rule. See the final section of the vignette for details of the computation of confidence intervals for bias-adjusted CV criteria.
 
 Here are results of applying LOO CV to the Mroz model, using both the exact and the approximate methods:
 ```{r cv-Mroz-LOO}
@@ -275,7 +275,7 @@ cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues")
 ```
 To the number of decimal digits shown, the three methods produce identical results for this example.
 
-As for linear models, we report some timings for the various `cv()` methods of computation in LOO CV as well as for the `cv.glm()` function from the **boot** package (which, recall, refits the model with each case removed, and thus is comparable to `cv()` with `method="exact"`):
+As for linear models, we report some timings for the various \code{cv()` methods of computation in LOO CV as well as for the \code{cv.glm()} function from the \pkg{boot} package (which, recall, refits the model with each case removed, and thus is comparable to \code{cv()} with \code{method="exact"}):
 ```{r glm.timings, cache=TRUE}
 microbenchmark::microbenchmark(
   hatvalues=cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues"),
@@ -293,7 +293,7 @@ The fundamental analogy for cross-validation is to the collection of new data. T
 
 In contrast, mixed-effects models are fit to *dependent* data, in which cases as clustered, such as hierarchical data, where the clusters comprise higher-level units (e.g., students clustered in schools), or longitudinal data, where the clusters are individuals and the cases repeated observations on the individuals over time.[^crossed-effects] 
 
-[^crossed-effects]: There are, however, more complex situations that give rise to so-called *crossed* (rather than *nested*) random effects. For example, consider students within classes within schools. In primary schools, students typically are in a single class, and so classes are nested within schools. In secondary schools, however, students typically take several classes and students who are together in a particular class may not be together in other classes; consequently, random effects based on classes within schools are crossed. The `lmer()` function in the **lme4** package is capable of modeling both nested and crossed random effects, and the `cv()` methods for mixed models in the **cv** package pertain to both nested and crossed random effects. We present an example of the latter later in the vignette.
+[^crossed-effects]: There are, however, more complex situations that give rise to so-called *crossed* (rather than *nested*) random effects. For example, consider students within classes within schools. In primary schools, students typically are in a single class, and so classes are nested within schools. In secondary schools, however, students typically take several classes and students who are together in a particular class may not be together in other classes; consequently, random effects based on classes within schools are crossed. The \code{lmer()} function in the \pkg{lme4} package is capable of modeling both nested and crossed random effects, and the \code{cv()} methods for mixed models in the \pkg{cv} package pertain to both nested and crossed random effects. We present an example of the latter later in the vignette.
 
 We can think of two approaches to applying cross-validation to clustered data:[^cv-faq]
 
@@ -307,7 +307,7 @@ We can think of two approaches to applying cross-validation to clustered data:[^
 
 Following their use by @RaudenbushBryk:2002, data from the 1982 *High School and Beyond* (HSB) survey have become a staple of the literature on mixed-effects models. The HSB data are used by @FoxWeisberg:2019 [Sec. 7.2.2] to illustrate the application of linear mixed models to hierarchical data, and we'll closely follow their example here.
 
-The HSB data are included in the `MathAchieve` and `MathAchSchool` data sets in the **nlme** package  [@PinheiroBates:2000]. `MathAchieve` includes individual-level data on 7185  students in 160 high schools, and `MathAchSchool` includes school-level data:
+The HSB data are included in the \code{MathAchieve} and \code{MathAchSchool} data sets in the \pkg{nlme} package  [@PinheiroBates:2000]. \code{MathAchieve} includes individual-level data on 7185  students in 160 high schools, and \code{MathAchSchool} includes school-level data:
 ```{r HSB-data}
 data("MathAchieve", package="nlme")
 dim(MathAchieve)
@@ -321,9 +321,9 @@ tail(MathAchSchool, 2)
 ```
 The first few students are in school number 1224 and the last few in school 9586. 
 
-We'll use only the `School`, `SES` (students' socioeconomic status), and `MathAch` (their score on a standardized math-achievement test) variables in the `MathAchieve` data set, and `Sector` (`"Catholic"` or `"Public"`) in the `MathAchSchool` data set.
+We'll use only the \code{School}, \code{SES} (students' socioeconomic status), and \code{MathAch} (their score on a standardized math-achievement test) variables in the \code{MathAchieve} data set, and \code{Sector} (\code{"Catholic"} or \code{"Public"}) in the \code{MathAchSchool} data set.
 
-Some data-management is required before fitting a mixed-effects model to the HSB data, for which we use the **dplyr** package [@WickhamEtAl:2023]:
+Some data-management is required before fitting a mixed-effects model to the HSB data, for which we use the \pkg{dplyr} package [@WickhamEtAl:2023]:
 ```{r HSB-data-management, cache=TRUE}
 library("dplyr")
 MathAchieve %>% group_by(School) %>%
@@ -335,9 +335,9 @@ names(HSB) <- tolower(names(HSB))
 
 HSB$cses <- with(HSB, ses - mean.ses)
 ```
-In the process, we created two new school-level variables: `meanses`, which is the average SES for students in each school; and `cses`, which is school-average SES centered at its mean. For details, see @FoxWeisberg:2019 [Sec. 7.2.2].
+In the process, we created two new school-level variables: \code{meanses}, which is the average SES for students in each school; and \code{cses}, which is school-average SES centered at its mean. For details, see @FoxWeisberg:2019 [Sec. 7.2.2].
 
-Still following Fox and Weisberg, we proceed to use the `lmer()` function in the **lme4** package [@BatesEtAl:2015] to fit a mixed model for math achievement to the HSB data:
+Still following Fox and Weisberg, we proceed to use the \code{lmer()} function in the \pkg{lme4} package [@BatesEtAl:2015] to fit a mixed model for math achievement to the HSB data:
 ```{r HSB-lmer, cache=TRUE}
 library("lme4")
 hsb.lmer <- lmer(mathach ~ mean.ses*cses + sector*cses
@@ -353,11 +353,11 @@ or at the case (i.e., student) level,
 ```{r HSB-lmer-CV-case, cache=TRUE}
 cv(hsb.lmer, seed=1575)
 ```
-For cluster-level CV, the `clusterVariables` argument tells `cv()` how the clusters are defined. Were there more than one clustering variable, say classes within schools, these would be provided as a character vector of variable names: `clusterVariables = c("school", "class")`. For cluster-level CV, the default is `k = "loo"`, that is, leave one cluster out at a time; we instead specify `k = 10` folds of clusters, each fold therefore comprising $160/10 = 16$ schools. 
+For cluster-level CV, the \code{clusterVariables} argument tells \code{cv()} how the clusters are defined. Were there more than one clustering variable, say classes within schools, these would be provided as a character vector of variable names: \code{clusterVariables = c("school", "class")}. For cluster-level CV, the default is \code{k = "loo"}, that is, leave one cluster out at a time; we instead specify \code{k = 10} folds of clusters, each fold therefore comprising $160/10 = 16$ schools. 
 
-If the `clusterVariables` argument is omitted, then case-level CV is employed, with `k = 10` folds as the default, here each with $7185/10 \approx 719$ students. Notice that one of the 10 models refit with a fold removed failed to converge. Convergence problems are common in mixed-effects modeling. The apparent issue here is that an estimated variance component is close to or equal to 0, which is at a boundary of the parameter space. That shouldn't disqualify the fitted model for the kind of prediction required for cross-validation.
+If the \code{clusterVariables} argument is omitted, then case-level CV is employed, with \code{k = 10} folds as the default, here each with $7185/10 \approx 719$ students. Notice that one of the 10 models refit with a fold removed failed to converge. Convergence problems are common in mixed-effects modeling. The apparent issue here is that an estimated variance component is close to or equal to 0, which is at a boundary of the parameter space. That shouldn't disqualify the fitted model for the kind of prediction required for cross-validation.
 
-There is also a `cv()` method for linear mixed models fit by the `lme()` function in the **nlme** package, and the arguments for `cv()` in this case are the same as for a model fit by `lmer()` or `glmer()`. We illustrate with the mixed model fit to the HSB data:
+There is also a \code{cv()} method for linear mixed models fit by the \code{lme()} function in the \pkg{nlme} package, and the arguments for \code{cv()} in this case are the same as for a model fit by \code{lmer()} or \code{glmer()}. We illustrate with the mixed model fit to the HSB data:
 ```{r hsb-lme, cache=TRUE}
 library(nlme)
 hsb.lme <- lme(mathach ~ mean.ses*cses + sector*cses,
@@ -369,9 +369,9 @@ cv(hsb.lme, k=10, clusterVariables="school", seed=5240)
 
 cv(hsb.lme, seed=1575)
 ```
-We used the same random-number generator seeds as in the previous example cross-validating the model fit by `lmer()`, and so the same folds are employed in both cases.[^optimizer] The estimated covariance components and fixed effects in the summary output differ slightly between the `lmer()` and `lme()` solutions, although both functions seek to maximize the REML criterion. This is, of course, to be expected when different algorithms are used for numerical optimization.  To the precision reported, the cluster-level CV results for the `lmer()` and `lme()` models are identical, while the case-level CV results are very similar but not identical.
+We used the same random-number generator seeds as in the previous example cross-validating the model fit by \code{lmer()}, and so the same folds are employed in both cases.[^optimizer] The estimated covariance components and fixed effects in the summary output differ slightly between the \code{lmer()} and \code{lme()} solutions, although both functions seek to maximize the REML criterion. This is, of course, to be expected when different algorithms are used for numerical optimization.  To the precision reported, the cluster-level CV results for the \code{lmer()} and \code{lme()} models are identical, while the case-level CV results are very similar but not identical.
 
-[^optimizer]: The observant reader will notice that we set the argument `control=list(opt="optim")` in the call to `lme()`, changing the optimizer employed from the default `"nlminb"`. We did this because with the default optimizer, `lme()` encountered the same convergence issue as `lmer()`, but rather than issuing a warning, `lme()` failed, reporting an error. As it turns out, setting the optimizer to `"optim"` avoids this problem.
+[^optimizer]: The observant reader will notice that we set the argument \code{control=list(opt="optim")} in the call to \code{lme()}, changing the optimizer employed from the default \code{"nlminb"}. We did this because with the default optimizer, \code{lme()} encountered the same convergence issue as \code{lmer()}, but rather than issuing a warning, \code{lme()} failed, reporting an error. As it turns out, setting the optimizer to \code{"optim"} avoids this problem.
 
 ## Example: Contrived hierarchical data
 
@@ -416,7 +416,7 @@ Data <- data.frame(
 
 Here is a scatterplot of the data for a representative group of 10 (without loss of generality, the first 10) of 100 students, showing the 95% concentration ellipse for each cluster:[^2]
 
-[^2]: We find it convenient to use the **lattice** [@Sarkar:2008] and **latticeExtra** [@SarkarAndrews:2022] packages for this and other graphs in this section.
+[^2]: We find it convenient to use the \pkg{lattice} [@Sarkar:2008] and \pkg{latticeExtra} [@SarkarAndrews:2022] packages for this and other graphs in this section.
 
 ```{r plot1}
 #| out.width = "100%",
@@ -461,7 +461,7 @@ mod.2 <- lmer(y ~ x + xm + (1 | group), Data)
 mod.3 <- lmer(y ~ I(x - xm) + (1 | group), Data)
 ```
 
-We proceed to obtain predictions from the random-intercept model (`mod.0`) and the other models (`mod.1`, `mod.2`, and `mod.3`) based on fixed effects alone, as would be used for cross-validation based on clusters (i.e., students), and for fixed and random effects---so-called best linear unbiased predictions or BLUPs---as would be used for cross-validation based on cases (i.e., occasions within students):
+We proceed to obtain predictions from the random-intercept model (\code{mod.0}) and the other models (\code{mod.1}, \code{mod.2}, and \code{mod.3}) based on fixed effects alone, as would be used for cross-validation based on clusters (i.e., students), and for fixed and random effects---so-called best linear unbiased predictions or BLUPs---as would be used for cross-validation based on cases (i.e., occasions within students):
 
 ```{r}
 Data <- within(Data, {
@@ -490,7 +490,7 @@ Data_long$model <- factor(
 )
 ```
 
-Predictions based on the random-intercept model `mod.0` for the first 10 students are shown in the following graph:
+Predictions based on the random-intercept model \code{mod.0} for the first 10 students are shown in the following graph:
 
 ```{r plot-fits-mod0}
 #| out.width = "100%",
@@ -511,7 +511,7 @@ Predictions based on the random-intercept model `mod.0` for the first 10 student
 
 The fixed-effect predictions for the various individuals are identical---the estimated fixed-effects intercept or estimated general mean of $y$---while the BLUPs are the sums of the fixed-effects intercept and the random intercepts, and are only slightly shrunken towards the general mean. Because in our artificial data there is no population relationship between age and skill, the fixed-effect-only predictions and the BLUPs are not very different.
 
-Our next model, `mod.1`, includes a fixed intercept and fixed effect of `x` along with a random intercept:
+Our next model, \code{mod.1}, includes a fixed intercept and fixed effect of \code{x} along with a random intercept:
 
 ```{r}
 summary(mod.1)
@@ -537,17 +537,17 @@ Predictions from this model appear in the following graph:
     lines=list(lty=c(1, 3))))
 ```
 
-The BLUPs fit the observed data very closely, but predictions based on the fixed effects alone, with a common intercept and slope for all clusters, are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model, `mod.0`. We therefore anticipate (and show later in this section) that case-based cross-validation will prefer `mod1` to `mod0`, but that cluster-based cross-validation will prefer `mod0` to `mod1`.
+The BLUPs fit the observed data very closely, but predictions based on the fixed effects alone, with a common intercept and slope for all clusters, are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model, \code{mod.0}. We therefore anticipate (and show later in this section) that case-based cross-validation will prefer \code{mod1} to \code{mod0}, but that cluster-based cross-validation will prefer \code{mod0} to \code{mod1}.
 
-Our third model, `mod.2`, includes the contextual effect of $x$---that is, the cluster mean `xm`---along with $x$ and the intercept in the fixed-effect part of the model, and a random intercept:
+Our third model, \code{mod.2}, includes the contextual effect of $x$---that is, the cluster mean \code{xm]---along with $x$ and the intercept in the fixed-effect part of the model, and a random intercept:
 
 ```{r}
 summary(mod.2)
 ```
 
-This model is equivalent to fitting `y ~ I(x - xm) + xm + (1 | group)`, which is the model that generated the data once the coefficient of the contextual predictor `xm` is set to 0 (as it is in `mod.3`, discussed below).
+This model is equivalent to fitting \code{y ~ I(x - xm) + xm + (1 | group)}, which is the model that generated the data once the coefficient of the contextual predictor \code{xm} is set to 0 (as it is in \code{mod.3], discussed below).
 
-Predictions from model `mod.2` appear in the following graph:
+Predictions from model \code{mod.2} appear in the following graph:
 ```{r plot-fits-mod2}
 #| out.width = "100%",
 #| fig.height = 6,
@@ -566,19 +566,19 @@ Predictions from model `mod.2` appear in the following graph:
     lines=list(lty=c(1, 3))))
 ```
 
-Depending on the estimated variance parameters of the model, a mixed model like `mod.2` will apply varying degrees of shrinkage to the random-intercept BLUPs that correspond to variation in the heights of the parallel fitted lines for the individual students. In our contrived data, the `mod.2` applies little shrinkage, allowing substantial variability in the heights of the fitted lines, which closely approach the observed values for each student. The fit of the mixed model `mod.2` is consequently similar to that of a fixed-effects model with age and a categorical predictor for individual students (i.e., treating students as a factor, and not shown here). 
+Depending on the estimated variance parameters of the model, a mixed model like \code{mod.2} will apply varying degrees of shrinkage to the random-intercept BLUPs that correspond to variation in the heights of the parallel fitted lines for the individual students. In our contrived data, the \code{mod.2} applies little shrinkage, allowing substantial variability in the heights of the fitted lines, which closely approach the observed values for each student. The fit of the mixed model \code{mod.2} is consequently similar to that of a fixed-effects model with age and a categorical predictor for individual students (i.e., treating students as a factor, and not shown here). 
 
-The  mixed model `mod.2` therefore fits individual observations well, and we anticipate a favorable assessment using individual-based cross-validation. In contrast, the large variability in the BLUPs results in larger residuals for predictions based on fixed effects alone, and so we expect that cluster-based cross-validation won't show an advantage for model `mod.2` compared to the smaller model `mod.0`, which includes only fixed and random intercepts.
+The  mixed model \code{mod.2} therefore fits individual observations well, and we anticipate a favorable assessment using individual-based cross-validation. In contrast, the large variability in the BLUPs results in larger residuals for predictions based on fixed effects alone, and so we expect that cluster-based cross-validation won't show an advantage for model \code{mod.2} compared to the smaller model \code{mod.0}, which includes only fixed and random intercepts.
 
 Had the mixed model applied considerable shrinkage, then neither cluster-based nor case-based cross-validation would show much improvement over the random-intercept-only model. In our experience, the degree of shrinkage does not vary smoothly as parameters are changed but tends to be "all or nothing," and near the tipping point, the behavior of estimates can be affected considerably by the choice of algorithm used to fit the model.
 
-Finally, `mod.3` directly estimates the model used to generate the data. As mentioned, it is a constrained version of `mod.2`, with the coefficient of `xm` set to 0, and with `x` expressed as a deviation from the cluster mean `xm`:
+Finally, \code{mod.3} directly estimates the model used to generate the data. As mentioned, it is a constrained version of \code{mod.2}, with the coefficient of \code{xm} set to 0, and with \code{x} expressed as a deviation from the cluster mean \code{xm}:
 
 ```{r}
 summary(mod.3)
 ```
 
-The predictions from `mod.3` are therefore similar to those from `mod.2`:
+The predictions from \code{mod.3} are therefore similar to those from \code{mod.2}:
 
 ```{r plot-fits-mod3}
 #| out.width = "100%",
@@ -598,7 +598,7 @@ The predictions from `mod.3` are therefore similar to those from `mod.2`:
     lines=list(lty=c(1, 3))))
 ```
 
-We next carry out case-based cross-validation, which, as we have explained, is based on both fixed and predicted random effects (i.e., BLUPs), and cluster-based cross-validation, which is based on fixed effects only. In order to reduce between-model random variability in comparisons of models, we apply `cv()` to the list of models created by the `models()` function (introduced previously), performing cross-validation with the same folds for each model:
+We next carry out case-based cross-validation, which, as we have explained, is based on both fixed and predicted random effects (i.e., BLUPs), and cluster-based cross-validation, which is based on fixed effects only. In order to reduce between-model random variability in comparisons of models, we apply \code{cv()} to the list of models created by the \code{models()} function (introduced previously), performing cross-validation with the same folds for each model:
 
 ```{r cross-validation-clusters}
 #| out.width = "100%",
@@ -618,19 +618,19 @@ cvs_cases <- cv(modlist, data=Data, seed=9693)
 plot(cvs_cases, main="Model Comparison, Case-Based CV")
 ```
 
-In summary, model `mod.1`, with $x$ alone and without the contextual mean of $x$, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. Model `mod.2`, which includes both $x$ and its contextual mean, produces better results using both cluster-based and case-based CV. The data-generating model, `mod.3`, which includes the fixed effect of `x - xm` in place of separate terms in `x` and `xm`, isn't distinguishable from model `mod.2`, which includes `x` and `xm` separately, even though `mod.2` has an unnecessary parameter (recall that the population coefficient of `xm` is 0 when `x` is expressed as deviations from the contextual mean). These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
+In summary, model \code{mod.1}, with $x$ alone and without the contextual mean of $x$, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. Model \code{mod.2}, which includes both $x$ and its contextual mean, produces better results using both cluster-based and case-based CV. The data-generating model, \code{mod.3}, which includes the fixed effect of \code{x - xm} in place of separate terms in \code{x} and \code{xm}, isn't distinguishable from model \code{mod.2}, which includes \code{x} and \code{xm} separately, even though \code{mod.2} has an unnecessary parameter (recall that the population coefficient of \code{xm} is 0 when \code{x} is expressed as deviations from the contextual mean). These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
 
 ## Example: Crossed random effects
 
 Crossed random effects arise when the structure of the data aren't strictly hierarchical. Nevertheless, crossed and nested random effects can be handled in much the same manner, by refitting the mixed-effects model to the data with a fold of clusters or cases removed and using the refitted model to predict the response in the removed fold.
 
-We'll illustrate with data on pig growth, introduced by @DiggleLiangZeger:1994 [Table 3.1]. The data are in the `Pigs` data frame in the **cv** package:
+We'll illustrate with data on pig growth, introduced by @DiggleLiangZeger:1994 [Table 3.1]. The data are in the \code{Pigs} data frame in the \pkg{cv} package:
 ```{r pigs}
 head(Pigs, 9)
 head(xtabs(~ id + week, data=Pigs), 3)
 tail(xtabs(~ id + week, data=Pigs), 3)
 ```
-Each of 48 pigs is observed weekly over a period of 9 weeks, with the weight of the pig recorded in kg. The data are in "long" format, as is appropriate for use with the `lmer()` function in the **lme4** package. The data are very regular, with no missing cases.
+Each of 48 pigs is observed weekly over a period of 9 weeks, with the weight of the pig recorded in kg. The data are in "long" format, as is appropriate for use with the \code{lmer()} function in the \pkg{lme4} package. The data are very regular, with no missing cases.
 
 The following graph, showing the growth trajectories of the pigs, is similar to Figure 3.1 in @DiggleLiangZeger:1994; we add an overall least-squares line and a loess smooth, which are nearly indistinguishable:
 ```{r pigs-graph}
@@ -648,7 +648,7 @@ lines(with(Pigs, loess.smooth(week, weight, span=0.5)),
 ```
 The individual "growth curves" and the overall trend are generally linear, with some tendency for variability of pig weight to increase over weeks (a feature of the data that we ignore in the mixed model that we fit to the data below). 
 
-The **Stata** mixed-effects models manual proposes a model with crossed random effects for the `Pigs` data [@Stata:2023 page 37]:
+The \proglang{Stata} mixed-effects models manual proposes a model with crossed random effects for the \code{Pigs} data [@Stata:2023 page 37]:
 
 > [S]uppose that we wish to fit
 $$
@@ -662,18 +662,18 @@ all independently. That is, we assume an overall population-average growth curve
 
 Although we might prefer an alternative model,[^pig-alternative] we think that this is a reasonable specification.
 
-[^pig-alternative]: These are repeated-measures data, which would be more conventionally modeled with autocorrelated errors within pigs. The `lme()` function in the **nlme** package, for example, is capable of fitting a mixed-model of this form.
+[^pig-alternative]: These are repeated-measures data, which would be more conventionally modeled with autocorrelated errors within pigs. The \code{lme()} function in the \pkg{nlme} package, for example, is capable of fitting a mixed-model of this form.
 
-The **Stata** manual fits the mixed model by maximum likelihood (rather than REML), and we duplicate the results reported there using `lmer()`:
+The \proglang{Stata} manual fits the mixed model by maximum likelihood (rather than REML), and we duplicate the results reported there using \code{lmer()}:
 ```{r pigs-lmer}
 m.p <- lmer(weight ~ week + (1 | id) + (1 | week),
             data=Pigs, REML=FALSE, # i.e., ML
             control=lmerControl(optimizer="bobyqa"))
 summary(m.p)
 ```
-We opt for the non-default `"bobyqa"` optimizer because it provides more numerically stable results for subsequent cross-validation in this example.
+We opt for the non-default \code{"bobyqa"} optimizer because it provides more numerically stable results for subsequent cross-validation in this example.
 
-We can then cross-validate the model by omitting folds composed of pigs, folds composed of weeks, or folds composed of pig-weeks (which in the `Pigs` data set correspond to individual cases, using only the fixed effects):
+We can then cross-validate the model by omitting folds composed of pigs, folds composed of weeks, or folds composed of pig-weeks (which in the \code{Pigs} data set correspond to individual cases, using only the fixed effects):
 ```{r pigs-cv}
 cv(m.p, clusterVariables="id")
 
@@ -687,14 +687,14 @@ cv(m.p, k=10, seed=8469)
 ```
 Because these predictions are based on BLUPs, they are more accurate than the predictions based only on fixed effects.[^crossed-vs-nested] As well, the difference between the MSE computed for the model fit to the full data and the CV estimates of the MSE is greater here than for cluster-based predictions.
 
-[^crossed-vs-nested]: Even though there is only one observation per combination of pigs and weeks, we can use the BLUP for the omitted case because of the crossed structure of the random effects; that is each pig-week has a pig random effect and a week random effect. Although it probably isn't sensible, we can imagine a mixed model for the pig data that employs nested random effects, which would be specified by `lmer(weight ~ week + (1 | id/week), data=Pigs)`---that is, a random intercept that varies by combinations of `id` (pig) and `week`. This model can't be fit, however: With only one case per combination of `id` and `week`, the nested random-effect variance is indistinguishable from the case-level variance.
+[^crossed-vs-nested]: Even though there is only one observation per combination of pigs and weeks, we can use the BLUP for the omitted case because of the crossed structure of the random effects; that is each pig-week has a pig random effect and a week random effect. Although it probably isn't sensible, we can imagine a mixed model for the pig data that employs nested random effects, which would be specified by \code{lmer(weight ~ week + (1 | id/week), data=Pigs)}---that is, a random intercept that varies by combinations of \code{id} (pig) and \code{week}. This model can't be fit, however: With only one case per combination of \code{id} and \code{week}, the nested random-effect variance is indistinguishable from the case-level variance.
 
 
 # Replicating cross-validation
 
 Assuming that the number of cases $n$ is a multiple of the number of folds $k$---a slightly simplifying assumption---the number of possible partitions of cases into folds is $\frac{n!}{[(n/k)!]^k}$, a number that grows very large very quickly. For example, for $n = 10$ and $k = 5$, so that the folds are each of size $n/k = 2$, there are $113,400$ possible partitions; for $n=100$ and $k=5$, where $n/k = 20$, still a small problem, the number of possible partitions is truly astronomical, $1.09\times 10^{66}$.
 
-Because the partition into folds that's employed is selected randomly, the resulting CV criterion estimates are subject to sampling error. (An exception is LOO cross-validation, which is not at all random.) To get a sense of the magnitude of the sampling error, we can repeat the CV procedure with different randomly selected partitions into folds. All of the CV functions in the **cv** package are capable of repeated cross-validation, with the number of repetitions controlled by the `reps` argument, which defaults to `1`.
+Because the partition into folds that's employed is selected randomly, the resulting CV criterion estimates are subject to sampling error. (An exception is LOO cross-validation, which is not at all random.) To get a sense of the magnitude of the sampling error, we can repeat the CV procedure with different randomly selected partitions into folds. All of the CV functions in the \pkg{cv} package are capable of repeated cross-validation, with the number of repetitions controlled by the \code{reps} argument, which defaults to \code{1}.
 
 Here, for example, is 10-fold CV for the Mroz logistic regression, repeated 5 times:
 
@@ -702,13 +702,13 @@ Here, for example, is 10-fold CV for the Mroz logistic regression, repeated 5 ti
 cv(m.mroz, criterion=BayesRule, seed=248, reps=5, 
    method="Woodbury")
 ```
-When `reps` > `1`, the result returned by `cv()` is an object of class `"cvList"`---literally a list of `"cv"` objects. The results are reported for each repetition and then averaged across repetitions, with the standard deviations of the CV criterion and the biased-adjusted CV criterion given in parentheses. In this example, there is therefore little variation across repetitions, increasing our confidence in the reliability of the results. 
+When \code{reps} > \code{1}, the result returned by \code{cv()} is an object of class \code{"cvList"}---literally a list of \code{"cv"} objects. The results are reported for each repetition and then averaged across repetitions, with the standard deviations of the CV criterion and the biased-adjusted CV criterion given in parentheses. In this example, there is therefore little variation across repetitions, increasing our confidence in the reliability of the results. 
 
-Notice that the seed that's set in the `cv()` command pertains to the first repetition and the seeds for the remaining repetitions are then selected pseudo-randomly.[^replicates] Setting the first seed, however, makes the entire process easily replicable, and the seed for each repetition is stored in the corresponding element of the `"cvList"` object (which isn't, however, saved in the example).
+Notice that the seed that's set in the \code{cv()} command pertains to the first repetition and the seeds for the remaining repetitions are then selected pseudo-randomly.[^replicates] Setting the first seed, however, makes the entire process easily replicable, and the seed for each repetition is stored in the corresponding element of the \code{"cvList"} object (which isn't, however, saved in the example).
 
-[^replicates]: Because of the manner in which the computation is performed, the order of the replicates in the `"cvList"` object returned by `cv()` isn't the same as the order in which the replicates are computed. Each element of the result, however, is a `"cv"` object with the correct random-number seed saved, and so this technical detail can be safely ignored. The individual `"cv"` objects are printed in the order in which they are stored rather than the order in which they are computed.
+[^replicates]: Because of the manner in which the computation is performed, the order of the replicates in the \code{"cvList"} object returned by \code{cv()} isn't the same as the order in which the replicates are computed. Each element of the result, however, is a \code{"cv"} object with the correct random-number seed saved, and so this technical detail can be safely ignored. The individual \code{"cv"} objects are printed in the order in which they are stored rather than the order in which they are computed.
 
-It's also possible to replicate CV when comparing competing models via the `cv()` method for `"modList"` objects. Recall our comparison of polynomial regressions of varying degree fit to the `Auto` data; we performed 10-fold CV for each of 10 models. Here, we replicate that process 5 times for each model and graph the results:
+It's also possible to replicate CV when comparing competing models via the \code{cv()} method for \code{"modList"} objects. Recall our comparison of polynomial regressions of varying degree fit to the \code{Auto} data; we performed 10-fold CV for each of 10 models. Here, we replicate that process 5 times for each model and graph the results:
 ```{r model-comparison-with-reps}
 #| out.width = "100%",
 #| fig.height = 5,
@@ -744,7 +744,7 @@ anova(m.null, m.full)
 
 summary(m.null)
 ```
-Next, using the `stepAIC()` function in the **MASS** package [@VenablesRipley:2002], let us perform a forward stepwise regression to select a "best" model, starting with the null model, and using AIC as the model-selection criterion (see the help page for `stepAIC()` for details):[^selection-order]
+Next, using the \code{stepAIC()} function in the \pkg{MASS} package [@VenablesRipley:2002], let us perform a forward stepwise regression to select a "best" model, starting with the null model, and using AIC as the model-selection criterion (see the help page for \code{stepAIC()} for details):[^selection-order]
 
 [^selection-order]: It's generally advantageous to start with the largest model, here the one with 100 predictors, and proceed by backward elimination. In this demonstration, however, where all of the $\beta$s are really 0, the selected model will be small, and so we proceed by forward selection from the null model to save computing time.
 
@@ -763,7 +763,7 @@ If we cross-validate the selected model, we also obtain an optimistic estimate o
 cv(m.select, seed=2529)
 ```
 
-The `cvSelect()` function in the **cv** package allows us to cross-validate the whole model-selection procedure. The first argument to `cvSelect()` is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The `selectStepAIC()` function, also in **cv** and based on `stepAIC()`, is suitable for use with `cvSelect()`:
+The \code{cvSelect()} function in the \pkg{cv} package allows us to cross-validate the whole model-selection procedure. The first argument to \code{cvSelect()} is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The \code{selectStepAIC()} function, also in \pkg{cv} and based on \code{stepAIC()}, is suitable for use with \code{cvSelect()}:
 ```{r cvSelect-artificial-data, cache=TRUE}
 cv.select <- cvSelect(selectStepAIC, data=D, seed=3791,
                       model=m.null, direction="forward",
@@ -772,27 +772,27 @@ cv.select <- cvSelect(selectStepAIC, data=D, seed=3791,
 cv.select
 ```
 
-The other arguments to `cvSelect()` are:
+The other arguments to \code{cvSelect()} are:
 
-* `data`, the data set to which the model is fit;
-* `seed`, an optional seed for R's pseudo-random-number generator; as for `cv()`, if the seed isn't supplied by the user, a seed is randomly selected and saved;
-* additional arguments required by the model-selection function, here the starting `model` argument, the `direction` of model selection, and the `scope` of models considered (from the model with only a regression constant to the model with all 100 predictors).
+* \code{data}, the data set to which the model is fit;
+* \code{seed}, an optional seed for \proglang{R}'s pseudo-random-number generator; as for \code{cv()}, if the seed isn't supplied by the user, a seed is randomly selected and saved;
+* additional arguments required by the model-selection function, here the starting \code{model} argument, the \code{direction} of model selection, and the \code{scope} of models considered (from the model with only a regression constant to the model with all 100 predictors).
 
 
-By default, `cvSelect()` performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
+By default, \code{cvSelect()} performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
 
-Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves the coefficients of the selected models. In this example, the `compareFolds()` function reveals that the variables retained by the model-selection process in the several folds are quite different:
+Also by default, when the number of folds is 10 or fewer, \code{cvSelect()} saves the coefficients of the selected models. In this example, the \code{compareFolds()} function reveals that the variables retained by the model-selection process in the several folds are quite different:
 ```{r compare-selected-models}
 compareFolds(cv.select)
 ```
 ## Mroz's logistic regression revisited
 
-For a contrasting example we apply model selection to Mroz's logistic regression for married women's labor-force participation. First, recall the logistic regression model that we fit to the `Mroz` data:
+For a contrasting example we apply model selection to Mroz's logistic regression for married women's labor-force participation. First, recall the logistic regression model that we fit to the \code{Mroz} data:
 ```{r recall-Mroz-regression}
 summary(m.mroz)
 ```
 
-Applying stepwise model selection Mroz's logistic regression, using BIC as the model-selection criterion (via the argument `k=log(nrow(Mroz))` to `stepAIC()`) selects 5 of the 7 original predictors:
+Applying stepwise model selection Mroz's logistic regression, using BIC as the model-selection criterion (via the argument \code{k=log(nrow(Mroz))} to \code{stepAIC()}) selects 5 of the 7 original predictors:
 ```{r mroz-selection}
 m.mroz.sel <- stepAIC(m.mroz, k=log(nrow(Mroz)),
                       trace=FALSE)
@@ -800,7 +800,7 @@ summary(m.mroz.sel)
 BayesRule(Mroz$lfp == "yes",
           predict(m.mroz.sel, type="response"))
 ```
-Bayes rule applied to the selected model misclassifies 32% of the cases in the `Mroz` data. 
+Bayes rule applied to the selected model misclassifies 32% of the cases in the \code{Mroz} data. 
 
 Cross-validating the selected model produces a similar, slightly larger, estimate of misclassification, about 33%:
 ```{r cv-mroz-regression}
@@ -817,7 +817,7 @@ m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
                           AIC=FALSE)
 m.mroz.sel.cv
 ```
-Setting `AIC=FALSE` in the call to `cvSelect()` uses the BIC rather than the AIC as the model-selection criterion. As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using `compareFolds()`:
+Setting \code{AIC=FALSE} in the call to \code{cvSelect()} uses the BIC rather than the AIC as the model-selection criterion. As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using \code{compareFolds()}:
 ```{r compare-selected-models-mroz}
 compareFolds(m.mroz.sel.cv)
 ```
@@ -825,29 +825,29 @@ In this example, therefore, we appear to obtain a realistic estimate of model pe
 
 ## Cross-validating choice of transformations in regression
 
-The **cv** package also provides a `cvSelect()` procedure, `selectTrans()`, for choosing transformations of the predictors and the response in regression. 
+The \pkg{cv} package also provides a \code{cvSelect()} procedure, \code{selectTrans()}, for choosing transformations of the predictors and the response in regression. 
 
 Some background: As @Weisberg:2014 [Sec. 8.2] explains, there are technical advantages to having (numeric) predictors in linear regression analysis that are themselves linearly related. If the predictors *aren't* linearly related, then the relationships between them can often be straightened by power transformations. Transformations can be selected after graphical examination of the data, or by analytic methods. Once the relationships between the predictors are linearized, it can be advantageous similarly to transform the response variable towards normality.
 
 Selecting transformations analytically raises the possibility of automating the process, as would be required for cross-validation. One could, in principle, apply graphical methods to select transformations for each fold, but because a data analyst couldn't forget the choices made for previous folds, the process wouldn't really be applied independently to the folds.
 
-To illustrate, we adapt an example appearing in several places in @FoxWeisberg:2019 (for example in Chapter 3 on transforming data), using data on the prestige and other characteristics of 102 Canadian occupations circa 1970. The data are in the `Prestige` data frame in the **carData** package:
+To illustrate, we adapt an example appearing in several places in @FoxWeisberg:2019 (for example in Chapter 3 on transforming data), using data on the prestige and other characteristics of 102 Canadian occupations circa 1970. The data are in the \code{Prestige} data frame in the \pkg{carData} package:
 ```{r Prestige-data}
 data("Prestige", package="carData")
 head(Prestige)
 summary(Prestige)
 ```
-The variables in the `Prestige` data set are:
+The variables in the \code{Prestige} data set are:
 
-* `education`: average years of education for incumbents in the occupation, from the 1971 Canadian Census.
-* `income`: average dollars of annual income for the occupation, from the Census.
-* `women`: percentage of occupational incumbents who were women, also from the Census.
-* `prestige`: the average prestige rating of the occupation on a 0--100 "thermometer" scale, in a Canadian social survey conducted around the same time.
-* `type`, type of occupation, and `census`, the Census occupational code, which are not used in our example.
+* \code{education}: average years of education for incumbents in the occupation, from the 1971 Canadian Census.
+* \code{income}: average dollars of annual income for the occupation, from the Census.
+* \code{women}: percentage of occupational incumbents who were women, also from the Census.
+* \code{prestige}: the average prestige rating of the occupation on a 0--100 "thermometer" scale, in a Canadian social survey conducted around the same time.
+* \code{type}, type of occupation, and \code{census}, the Census occupational code, which are not used in our example.
 
-The object of a regression analysis for the `Prestige` data (and their original purpose) is to predict occupational prestige from the other variables in the data set.
+The object of a regression analysis for the \code{Prestige} data (and their original purpose) is to predict occupational prestige from the other variables in the data set.
 
-A scatterplot matrix (using the `scatterplotMatrix()` function in the **car** package) of the numeric variables in the data reveals that the distributions of `income` and `women` are positively skewed, and that some of the relationships among the three predictors, and between the predictors and the response (i.e., `prestige`), are nonlinear:
+A scatterplot matrix (using the \code{scatterplotMatrix()} function in the \pkg{car} package) of the numeric variables in the data reveals that the distributions of \code{income} and \code{women} are positively skewed, and that some of the relationships among the three predictors, and between the predictors and the response (i.e., \code{prestige}), are nonlinear:
 ```{r scatterplot-matrix}
 #| out.width = "100%",
 #| fig.height = 6,
@@ -856,13 +856,13 @@ library("car")
 scatterplotMatrix(~ prestige + income + education + women,
                   data=Prestige, smooth=list(spread=FALSE))
 ```
-The `powerTransform()` function in the **car** package transforms variables towards multivariate normality by a generalization of Box and Cox's maximum-likelihood-like approach [@BoxCox:1964]. Several "families" of power transformations can be used, including the original Box-Cox family, simple powers (and roots), and two adaptations of the Box-Cox family to data that may include negative values and zeros: the Box-Cox-with-negatives family and the Yeo-Johnson family; see @Weisberg:2014 [Chap. 8], and @FoxWeisberg:2019 [Chap. 3] for details. Because `women` has some zero values, we use the Yeo-Johnson family:
+The \code{powerTransform()} function in the \pkg{car} package transforms variables towards multivariate normality by a generalization of Box and Cox's maximum-likelihood-like approach [@BoxCox:1964]. Several "families" of power transformations can be used, including the original Box-Cox family, simple powers (and roots), and two adaptations of the Box-Cox family to data that may include negative values and zeros: the Box-Cox-with-negatives family and the Yeo-Johnson family; see @Weisberg:2014 [Chap. 8], and @FoxWeisberg:2019 [Chap. 3] for details. Because \code{women} has some 0 values, we use the Yeo-Johnson family:
 ```{r power-transform-Prestige}
 trans <- powerTransform( cbind(income, education, women) ~ 1,
                          data=Prestige, family="yjPower")
 summary(trans)
 ```
-We thus have evidence of the desirability of transforming `income` (by the $1/3$ power) and `women` (by the $0.16$ power---which is close to the "0" power, i.e., the log transformation), but not `education`. Applying the "rounded" power transformations makes the predictors better-behaved:
+We thus have evidence of the desirability of transforming \code{income} (by the $1/3$ power) and \code{women} (by the $0.16$ power---which is close to the "0" power, i.e., the log transformation), but not \code{education}. Applying the "rounded" power transformations makes the predictors better-behaved:
 ```{r transformed-predictors}
 #| out.width = "100%",
 #| fig.height = 6,
@@ -885,7 +885,7 @@ m.pres.trans <- lm(prestige ~ income + education + women, data=P)
 mse(Prestige$prestige, fitted(m.pres))
 mse(P$prestige, fitted(m.pres.trans))
 ```
-Similarly, component+residual plots for the two regressions, produced by the `crPlots()` function in the **car** package, suggest that the partial relationship of `prestige` to `income` is more nearly linear in the transformed data, but the transformation of `women` fails to capture what appears to be a slight quadratic partial relationship; the partial relationship of `prestige` to `education` is close to linear in both regressions:
+Similarly, component+residual plots for the two regressions, produced by the \code{crPlots()} function in the \pkg{car} package, suggest that the partial relationship of \code{prestige} to \code{income} is more nearly linear in the transformed data, but the transformation of \code{women] fails to capture what appears to be a slight quadratic partial relationship; the partial relationship of \code{prestige} to \code{education} is close to linear in both regressions:
 ```{r CR-plots-untransformed}
 #| fig.cap = "Component+residual plots for the `Prestige` regression with the original predictors."
 crPlots(m.pres)
@@ -895,18 +895,18 @@ crPlots(m.pres)
 crPlots(m.pres.trans)
 ```
 
-Having transformed the predictors towards multinormality, we now consider whether there's evidence for transforming the response (using `powerTransform()` for Box and Cox's original method), and we discover that there's not:
+Having transformed the predictors towards multinormality, we now consider whether there's evidence for transforming the response (using \code{powerTransform()} for Box and Cox's original method), and we discover that there's not:
 ```{r transform-response}
 summary(powerTransform(m.pres.trans))
 ```
 
-The `selectTrans()` function in the **cv** package automates the process of selecting predictor and response transformations. The function takes a `data` set and "working" `model` as arguments, along with the candidate `predictors` and `response` for transformation, and the transformation `family` to employ. If the `predictors` argument is missing then only the response is transformed, and if the `response` argument is missing, only the supplied predictors are transformed. The default `family` for transforming the predictors is `"bcPower"`---the original Box-Cox family---as is the default `family.y` for transforming the response; here we specify `family="yjPower` because of the zeros in `women`. `selectTrans()` returns the result of applying a lack-of-fit criterion to the model after the selected transformation is applied, with the default `criterion=mse`:
+The \code{selectTrans()} function in the \pkg{cv} package automates the process of selecting predictor and response transformations. The function takes a \code{data} set and "working" \code{model} as arguments, along with the candidate \code{predictors} and \code{response} for transformation, and the transformation \code{family} to employ. If the \code{predictors} argument is missing then only the response is transformed, and if the \code{response} argument is missing, only the supplied predictors are transformed. The default \code{family} for transforming the predictors is \code{"bcPower"}---the original Box-Cox family---as is the default \code{family.y} for transforming the response; here we specify \code{family="yjPower} because of the 0s in \code{women}. \code{selectTrans()} returns the result of applying a lack-of-fit criterion to the model after the selected transformation is applied, with the default \code{criterion=mse}:
 ```{r selectTrans}
 selectTrans(data=Prestige, model=m.pres,
             predictors=c("income", "education", "women"),
             response="prestige", family="yjPower")
 ```
-`selectTrans()` also takes an optional `indices` argument, making it suitable for doing computations on a subset of the data (i.e., a CV fold), and hence for use with `cvSelect()` (see `?selectTrans` for details):
+\code{selectTrans()} also takes an optional \code{indices} argument, making it suitable for doing computations on a subset of the data (i.e., a CV fold), and hence for use with \code{cvSelect()} (see \code{?selectTrans} for details):
 
 ```{r cv-select-transformations}
 cvs <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=1463,
@@ -919,7 +919,7 @@ cv(m.pres, seed=1463) # untransformed model with same folds
 
 compareFolds(cvs)
 ```
-The results suggest that the predictive power of the transformed regression is reliably greater than that of the untransformed regression (though in both case, the cross-validated MSE is considerably higher than the MSE computed for the whole data). Examining the selected transformations for each fold reveals that the predictor `education` and the response `prestige` are never transformed; that the $1/3$ power is selected for `income` in all of the folds; and that the transformation selected for `women` varies narrowly across the folds between the $0$th power (i.e., log) and the $1/3$ power.
+The results suggest that the predictive power of the transformed regression is reliably greater than that of the untransformed regression (though in both case, the cross-validated MSE is considerably higher than the MSE computed for the whole data). Examining the selected transformations for each fold reveals that the predictor \code{education} and the response \code{prestige} are never transformed; that the $1/3$ power is selected for \code{income} in all of the folds; and that the transformation selected for \code{women} varies narrowly across the folds between the $0$th power (i.e., log) and the $1/3$ power.
 
 
 ## Selecting both transformations and predictors[^Venables]
@@ -928,16 +928,16 @@ The results suggest that the predictive power of the transformed regression is r
 
 As we mentioned, @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"] explain that honest cross-validation has to take account of model specification and selection. Statistical modeling is at least partly a craft, and one could imagine applying that craft to successive partial data sets, each with a fold removed. The resulting procedure would be tedious, though possibly worth the effort, but it would also be difficult to realize in practice: After all, we can hardly erase our memory of statistical modeling choices between analyzing partial data sets.
 
-Alternatively, if we're able to automate the process of model selection, then we can more realistically apply CV mechanically. That's what we did in the preceding two sections, first for predictor selection and then for selection of transformations in regression. In this section, we consider the case where we both select variable transformations and then proceed to select predictors. It's insufficient to apply these steps sequentially, first, for example, using `cvSelect()` with `selectTrans()` and then with `selectStepAIC()`; rather we should apply the whole model-selection procedure with each fold omitted. The `selectTransAndStepAIC()` function, also supplied by the **cv** package, does exactly that.
+Alternatively, if we're able to automate the process of model selection, then we can more realistically apply CV mechanically. That's what we did in the preceding two sections, first for predictor selection and then for selection of transformations in regression. In this section, we consider the case where we both select variable transformations and then proceed to select predictors. It's insufficient to apply these steps sequentially, first, for example, using \code{cvSelect()} with \code{selectTrans()} and then with \code{selectStepAIC()}; rather we should apply the whole model-selection procedure with each fold omitted. The \code{selectTransAndStepAIC()} function, also supplied by the \pkg{cv} package, does exactly that.
 
-To illustrate this process, we return to the `Auto` data set:
+To illustrate this process, we return to the \code{Auto} data set:
 ```{r Auto-redux}
 summary(Auto)
 xtabs(~ year, data=Auto)
 xtabs(~ origin, data=Auto)
 xtabs(~ cylinders, data=Auto)
 ```
-We previously used the `Auto` here in a preliminary example where we employed CV to inform the selection of the order of a polynomial regression of `mpg` on `horsepower`. Here, we consider more generally the problem of predicting `mpg` from the other variables in the `Auto` data. We begin with a bit of data management, and then examine the pairwise relationships among the numeric variables in the data set:
+We previously used the \code{Auto} here in a preliminary example where we employed CV to inform the selection of the order of a polynomial regression of \code{mpg} on \code{horsepower}. Here, we consider more generally the problem of predicting \code{mpg} from the other variables in the \code{Auto} data. We begin with a bit of data management, and then examine the pairwise relationships among the numeric variables in the data set:
 ```{r Auto-explore}
 #| out.width = "100%",
 #| fig.height = 7,
@@ -953,9 +953,9 @@ Auto$name <- NULL
 scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
                   smooth=list(spread=FALSE), data=Auto)
 ```
-A comment before we proceed: `origin` is clearly categorical and so converting it to a factor is natural, but we could imagine treating `cylinders` and `year` as numeric predictors. There are, however, only 5 distinct values of `cylinders` (ranging from 3 to 8), but cars with 3 or 5 cylinders are rare. and none of the cars has 7 cylinders. There are similarly only 13 distinct years between 1970 and 1982 in the data, and the relationship between `mpg` and `year` is difficult to characterize.[^year] It's apparent that most these variables are positively skewed and that many of the pairwise relationships among them are nonlinear.
+A comment before we proceed: \code{origin} is clearly categorical and so converting it to a factor is natural, but we could imagine treating \code{cylinders} and \code{year} as numeric predictors. There are, however, only 5 distinct values of \code{cylinders} (ranging from 3 to 8), but cars with 3 or 5 cylinders are rare. and none of the cars has 7 cylinders. There are similarly only 13 distinct years between 1970 and 1982 in the data, and the relationship between \code{mpg} and \code{year} is difficult to characterize.[^year] It's apparent that most these variables are positively skewed and that many of the pairwise relationships among them are nonlinear.
 
-[^year]: Of course, making the decision to treat `year` as a factor on this basis could be construed as cheating in the current context, which illustrates the difficulty of automating the whole model-selection process. It's rarely desirable, in our opinion, to forgo exploration of the data to ensure the purity of model validation. We believe, however, that it's still useful to automate as much of the process as we can to obtain a more realistic, if still biased, estimate of the predictive power of a model.
+[^year]: Of course, making the decision to treat \code{year} as a factor on this basis could be construed as cheating in the current context, which illustrates the difficulty of automating the whole model-selection process. It's rarely desirable, in our opinion, to forgo exploration of the data to ensure the purity of model validation. We believe, however, that it's still useful to automate as much of the process as we can to obtain a more realistic, if still biased, estimate of the predictive power of a model.
 
 We begin with a "working model" that specifies linear partial relationships of the response to the numeric predictors:
 ```{r Auto-working-model}
@@ -969,7 +969,7 @@ Anova(m.auto)
 
 crPlots(m.auto)
 ```
-The component+residual plots, created with the `crPlots()` function in the previously loaded **car** package, clearly reveal the inadequacy of the model.
+The component+residual plots, created with the \code{crPlots()} function in the previously loaded \pkg{car} package, clearly reveal the inadequacy of the model.
 
 We proceed to transform the numeric predictors towards multi-normality: 
 ```{r Auto-transform}
@@ -1015,14 +1015,14 @@ And the partial relationships in the model fit to the transformed data are much 
 crPlots(m)
 ```
 
-Having transformed both the numeric predictors and the response, we proceed to use the `stepAIC()` function in the **MASS** package to perform predictor selection, employing the BIC model-selection criterion (by setting the `k` argument of `stepAIC()` to $\log(n)$):
+Having transformed both the numeric predictors and the response, we proceed to use the \code{stepAIC()} function in the \pkg{MASS} package to perform predictor selection, employing the BIC model-selection criterion (by setting the `k` argument of `stepAIC()` to $\log(n)$):
 ```{r}
 m.step <- stepAIC(m, k=log(nrow(A)), trace=FALSE)
 summary(m.step)
 
 Anova(m.step)
 ```
-The selected model includes three of the numeric predictors, `horsepower`, `weight`, and `acceleration`, along with the factors `year` and `origin`. We can calculate the MSE for this model, but we expect that the result will be optimistic because we used the whole data to help specify the model
+The selected model includes three of the numeric predictors, \code{horsepower}, \code{weight}, and \code{acceleration}, along with the factors \code{year} and \code{origin}. We can calculate the MSE for this model, but we expect that the result will be optimistic because we used the whole data to help specify the model
 ```{r MSE-whole-selected-model}
 mse(Auto$mpg, exp(fitted(m.step)))
 ```
@@ -1030,13 +1030,13 @@ This is considerably smaller than the MSE for the original working model:
 ```{r MSE-working-model}
 mse(Auto$mpg, fitted(m.auto))
 ```
-A perhaps subtle point is that we compute the MSE for the selected model on the original `mpg` response scale rather than the log scale, so as to make the selected model comparable to the working model. That's slightly uncomfortable given the skewed distribution of `mpg`. An alternative is to use the median absolute error instead of the mean-squared error, employing the `medAbsErr()` function from the **cv** package:
+A perhaps subtle point is that we compute the MSE for the selected model on the original \code{mpg} response scale rather than the log scale, so as to make the selected model comparable to the working model. That's slightly uncomfortable given the skewed distribution of \code{mpg}. An alternative is to use the median absolute error instead of the mean-squared error, employing the \code{medAbsErr()} function from the \pkg{cv} package:
 ```{r Auto-median-absolute-error}
 medAbsErr(Auto$mpg, exp(fitted(m.step)))
 medAbsErr(Auto$mpg, fitted(m.auto))
 ```
 
-Now let's use `cvSelect()` with `selectTransAndStepAIC()` to automate and cross-validate the whole model-specification process:
+Now let's use \code{cvSelect()} with \code{selectTransAndStepAIC()} to automate and cross-validate the whole model-specification process:
 ```{r Auto-transform-and-select}
 num.predictors
 cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
@@ -1046,19 +1046,19 @@ cvs
 
 compareFolds(cvs)
 ```
-Here, as for `selectTrans()`, the `predictors` and `response` arguments specify candidate variables for transformation,
-and `AIC=FALSE` uses the BIC for model selection. The starting model, `m.auto`, is the working model fit to the `Auto` data. The CV criterion isn't bias-adjusted because median absolute error isn't a mean of casewise error components.
+Here, as for \code{selectTrans()}, the \code{predictors} and \code{response} arguments specify candidate variables for transformation,
+and \code{AIC=FALSE} uses the BIC for model selection. The starting model, \code{m.auto}, is the working model fit to the \code{Auto} data. The CV criterion isn't bias-adjusted because median absolute error isn't a mean of casewise error components.
 
 Some noteworthy points:
 
-* `selectTransStepAIC()` automatically computes CV cost criteria, here the median absolute error, on the untransformed response scale.
-* The estimate of the median absolute error that we obtain by cross-validating the whole model-specification process is a little larger than the median absolute error computed for the model we fit to the `Auto` data separately selecting transformations of the predictors and the response and then selecting predictors for the whole data set.
-* When we look at the transformations and predictors selected with each of the 10 folds omitted (i.e., the output of `compareFolds()`), we see that there is little uncertainty in choosing variable transformations (the `lam.*`s for the $x$s and `lambda` for $y$ in the output), but considerably more uncertainty in subsequently selecting predictors: `horsepower`, `weight`, and `year` are always included among the selected predictors; `acceleration` and `displacement` are each included respectively in 4 and 3 of 10 selected models; and `cylinders` and `origin` are each included in only 1 of 10 models. Recall that when we selected predictors for the full data, we obtained a model with `horsepower`, `weight`, `acceleration`, `year`, and `origin`.
+* \code{selectTransStepAIC()} automatically computes CV cost criteria, here the median absolute error, on the untransformed response scale.
+* The estimate of the median absolute error that we obtain by cross-validating the whole model-specification process is a little larger than the median absolute error computed for the model we fit to the \code{Auto} data separately selecting transformations of the predictors and the response and then selecting predictors for the whole data set.
+* When we look at the transformations and predictors selected with each of the 10 folds omitted (i.e., the output of \code{compareFolds()}), we see that there is little uncertainty in choosing variable transformations (the \code{lam.*}s for the $x$s and \code{lambda} for $y$ in the output), but considerably more uncertainty in subsequently selecting predictors: \code{horsepower}, \code{weight}, and \code{year} are always included among the selected predictors; \code{acceleration} and \code{displacement} are each included respectively in 4 and 3 of 10 selected models; and \code{cylinders} and \code{origin} are each included in only 1 of 10 models. Recall that when we selected predictors for the full data, we obtained a model with \code{horsepower}, \code{weight}, \code{acceleration}, \code{year}, and \code{origin}.
 
 
 # Parallel computations
 
-The CV functions in the **cv** package are all capable of performing parallel computations by setting the `ncores` argument (specifying the number of computer cores to be used) to a number > `1` (which is the default). Parallel computation can be advantageous for large problems, reducing the execution time of the program.
+The CV functions in the \pkg{cv} package are all capable of performing parallel computations by setting the \code{ncores} argument (specifying the number of computer cores to be used) to a number > \code{1} (which is the default). Parallel computation can be advantageous for large problems, reducing the execution time of the program.
 
 To illustrate, let's time model selection in Mroz's logistic regression, repeating the computation as performed previously and then doing it in parallel using 2 cores:
 ```{r parallel-computation}
@@ -1081,20 +1081,20 @@ In this small problem, the parallel computation is actually *slower*, because th
 
 # Extending the cv package
 
-The **cv** package is designed to be extensible in several directions. In this vignette, we discuss three kinds of extensions, ordered by increasing general complexity: (1) adding a cross-validation cost criterion; (2) adding a model class that's not directly accommodated by the `cv()` default method or by another directly inherited method, with separate consideration of mixed-effects models; and (3) adding a new model-selection procedure suitable for use with `selectModel()`.
+The \pkg{cv} package is designed to be extensible in several directions. In this vignette, we discuss three kinds of extensions, ordered by increasing general complexity: (1) adding a cross-validation cost criterion; (2) adding a model class that's not directly accommodated by the \code{cv()} default method or by another directly inherited method, with separate consideration of mixed-effects models; and (3) adding a new model-selection procedure suitable for use with \code{selectModel()}.
 
 
 ## Adding a cost criterion
 
-A cost criterion suitable for use with `cv()` or `cvSelect()` should take two arguments, `y` (the observed response vector) and `yhat` (a vector of fitted or predicted response values), and return a numeric index of lack of fit. The **cv** package supplies several such criteria: `mse(y, yhat)`, which returns the mean-squared prediction error for a numeric response; `rmse(y, yhat)`, which returns the (square-)root mean-squared error; `medAbsErr(y, yhat)`, which returns the median absolute error; and `BayesRule(y, yhat)` (and its non-error-checking version, `BayesRule2(y, yhat))`, suitable for use with a binary regression model, where `y` is the binary response coded `0` for a "failure" or `1` for a "success"; where `yhat` is the predicted probability of success; and where the proportion of *incorrectly* classified cases is returned.
+A cost criterion suitable for use with \code{cv()} or \code{cvSelect()} should take two arguments, \code{y} (the observed response vector) and \code{yhat} (a vector of fitted or predicted response values), and return a numeric index of lack of fit. The \pkg{cv} package supplies several such criteria: \code{mse(y, yhat)}, which returns the mean-squared prediction error for a numeric response; \code{rmse(y, yhat)}, which returns the (square-)root mean-squared error; \code{medAbsErr(y, yhat)}, which returns the median absolute error; and \code{BayesRule(y, yhat)} (and its non-error-checking version, \code{BayesRule2(y, yhat))}, suitable for use with a binary regression model, where \code{y` is the binary response coded \code{0} for a "failure" or \code{1} for a "success"; where \code{yhat} is the predicted probability of success; and where the proportion of *incorrectly* classified cases is returned.
 
-To illustrate using a different prediction cost criterion, we'll base a cost criterion on the area under the receiver operating characteristic ("ROC") curve for a logistic regression. The ROC curve is a graphical representation of the classification power of a binary regression model, and the area under the ROC curve ("AUC"), which varies from 0 to 1, is a common summary measure based on the ROC [see @Wikipedia-ROC:2023]. The **Metrics** package [@HamnerFrasco:2018] includes a variety of measures useful for model selection, including an `auc()` function. We convert the AUC into a cost measure by taking its complement:
+To illustrate using a different prediction cost criterion, we'll base a cost criterion on the area under the receiver operating characteristic ("ROC") curve for a logistic regression. The ROC curve is a graphical representation of the classification power of a binary regression model, and the area under the ROC curve ("AUC"), which varies from 0 to 1, is a common summary measure based on the ROC [see @Wikipedia-ROC:2023]. The \pkg{Metrics} package [@HamnerFrasco:2018] includes a variety of measures useful for model selection, including an \code{auc()} function. We convert the AUC into a cost measure by taking its complement:
 
 ```{r AUCcomp}
 AUCcomp <- function(y, yhat) 1 - Metrics::auc(y, yhat)
 ```
 
-We then apply `AUCcomp()` to the the Mroz logistic regression discussed in the main **cv** package vignette, which we reproduce here, using the `Mroz` data frame from the **carData** package [@FoxWeisberg:2019]:
+We then apply \code{AUCcomp()} to the the Mroz logistic regression discussed in the main \pkg{cv} package vignette, which we reproduce here, using the \code{Mroz} data frame from the \pkg{carData} package [@FoxWeisberg:2019]:
 ```{r Mroz-regression}
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
@@ -1109,37 +1109,37 @@ cv(m.mroz, criterion=AUCcomp, seed=3639)
 ```
 As expected, the cross-validated complement to the AUC is somewhat less optimistic than the criterion computed from the model fit to the whole data set.
 
-As we explain in the vignette "Cross-validation of regression models," the `cv()` function differentiates between CV criteria that are averages of casewise components and criteria that are not. Computation of bias corrections and confidence intervals is limited to the former. We show in the appendix to this vignette that the AUC, and hence its complement, cannot be expressed as averages of casewise components.
+As we explain in the vignette "Cross-validation of regression models," the \code{cv()} function differentiates between CV criteria that are averages of casewise components and criteria that are not. Computation of bias corrections and confidence intervals is limited to the former. We show in the appendix to this vignette that the AUC, and hence its complement, cannot be expressed as averages of casewise components.
 
-`cv()` looks for a `"casewise loss"` attribute of the value returned by a CV criterion function. If this attribute exists, then the criterion is treated as the mean of casewise components, and `cv()` uses the unexported function `getLossFn()` to construct a function that returns the casewise components of the criterion.
+\code{cv()} looks for a \code{"casewise loss"} attribute of the value returned by a CV criterion function. If this attribute exists, then the criterion is treated as the mean of casewise components, and \code{cv()} uses the unexported function \code{getLossFn()} to construct a function that returns the casewise components of the criterion.
 
-We illustrate with the `mse()`:
+We illustrate with the \code{mse()}:
 ```{r}
 mse
 
 cv:::getLossFn(mse(rnorm(100), rnorm(100)))
 ```
-For this scheme to work, the "casewise loss" attribute must be a character string (or vector of character strings), here `"(y - yhat)^2"`, that evaluates to an expression that is a function of `y` and `yhat`, and that computes the vector of casewise components of the CV criterion.
+For this scheme to work, the "casewise loss" attribute must be a character string (or vector of character strings), here \code{"(y - yhat)\^2"}, that evaluates to an expression that is a function of \code{y} and \code{yhat}, and that computes the vector of casewise components of the CV criterion.
 
 ## Adding a model class not covered by the default cv() method
 
 ### Independently sampled cases
 
-Suppose that we want to cross-validate a multinomial logistic regression model fit by the `multinom()` function in the **nnet** package [@VenablesRipley:2002]. We borrow an example from @Fox:2016 [Sec. 14.2.1], with data from the British Election Panel Study on vote choice in the 2001 British election. Data for the example are in the `BEPS` data frame in the **carData** package:
+Suppose that we want to cross-validate a multinomial logistic regression model fit by the \code{multinom()} function in the \pkg{nnet} package [@VenablesRipley:2002]. We borrow an example from @Fox:2016 [Sec. 14.2.1], with data from the British Election Panel Study on vote choice in the 2001 British election. Data for the example are in the \code{BEPS} data frame in the \pkg{carData} package:
 ```{r BEPS-data}
 data("BEPS", package="carData")
 head(BEPS)
 ```
-The polytomous (multi-category) response variable is `vote`, a factor with levels `"Conservative"`, `"Labour"`, and `"Liberal Democrat"`. The predictors of `vote` are:
+The polytomous (multi-category) response variable is \code{vote}, a factor with levels \code{"Conservative"}, \code{"Labour"}, and \code{"Liberal Democrat"}. The predictors of \code{vote} are:
 
-* `age`, in years;
-* `econ.cond.national` and `econ.cond.household`, the respondent's ratings of the state of the economy, on 1 to 5 scales.
-* `Blair`, `Hague`, and `Kennedy`, ratings of the leaders of the Labour, Conservative, and Liberal Democratic parties, on 1 to 5 scales.
-* `Europe`, an 11-point scale on attitude towards European integration, with high scores representing "Euro-skepticism."
-* `political.knowledge`, knowledge of the parties' positions on European integration, with scores from 0 to 3.
-* `gender`, `"female"` or `"male"`.
+* \code{age}, in years;
+* \code{econ.cond.national} and \code{econ.cond.household}, the respondent's ratings of the state of the economy, on 1 to 5 scales.
+* \code{Blair}, \code{Hague}, and \code{Kennedy}, ratings of the leaders of the Labour, Conservative, and Liberal Democratic parties, on 1 to 5 scales.
+* \code{Europe}, an 11-point scale on attitude towards European integration, with high scores representing "Euro-skepticism."
+* \code{political.knowledge}, knowledge of the parties' positions on European integration, with scores from 0 to 3.
+* \code{gender}, \code{"female"} or \code{"male"}.
 
-The model fit to the data includes an interaction between `Europe` and `political.knowledge`; the other predictors enter the model additively:
+The model fit to the data includes an interaction between \code{Europe} and \code{political.knowledge}; the other predictors enter the model additively:
 ```{r BEPS-model}
 library("nnet")
 m.beps <- multinom(vote ~ age + gender + economic.cond.national +
@@ -1148,9 +1148,9 @@ m.beps <- multinom(vote ~ age + gender + economic.cond.national +
 
 car::Anova(m.beps)
 ```
-Most of the predictors, including the `Europe` $\times$ `political.knowledge` interaction, are associated with very small $p$-values; the `Anova()` function is from the **car** package [@FoxWeisberg:2019].
+Most of the predictors, including the \code{Europe} $\times$ \code{political.knowledge} interaction, are associated with very small $p$-values; the \code{Anova()} function is from the \pkg{car} package [@FoxWeisberg:2019].
 
-Here's an "effect plot", using the the **effects** package [@FoxWeisberg:2019] to visualize the `Europe` $\times$ `political.knowledge` interaction in a "stacked-area" graph:
+Here's an "effect plot", using the the \pkg{effects} package [@FoxWeisberg:2019] to visualize the \code{Europe} $\times$ \code{political.knowledge} interaction in a "stacked-area" graph:
 ```{r BEPS-plot, fig.width=9, fig.height=5}
 plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
             xlevels=list(Europe=1:11, political.knowledge=0:3),
@@ -1159,7 +1159,7 @@ plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
      axes=list(x=list(rug=FALSE), y=list(style="stacked")))
 ```
 
-To cross-validate this multinomial-logit model we need an appropriate cost criterion. None of the criteria supplied by the **cv** package---for example, neither `mse()`, which is appropriate for a numeric response, nor `BayesRule()`, which is appropriate for a binary response---will do. One possibility is to adapt Bayes rule to a polytomous response:
+To cross-validate this multinomial-logit model we need an appropriate cost criterion. None of the criteria supplied by the \pkg{cv} package---for example, neither \code{mse()}, which is appropriate for a numeric response, nor \code{BayesRule()}, which is appropriate for a binary response---will do. One possibility is to adapt Bayes rule to a polytomous response:
 ```{r BayesRuleMulti}
 head(BEPS$vote)
 yhat <- predict(m.beps, type="class")
@@ -1173,7 +1173,7 @@ BayesRuleMulti <- function(y, yhat){
 
 BayesRuleMulti(BEPS$vote, yhat)
 ```
-The `predict()` method for `"multinom"` models called with argument `type="class"` reports the Bayes-rule prediction for each case---that is, the response category with the highest predicted probability. Our `BayesRuleMulti()` function calculates the proportion of misclassified cases. Because this value is the mean of casewise components, we attach a `"casewise loss"` attribute to the result (as explained in the preceding section).
+The \code{predict()} method for \code{"multinom"} models called with argument \code{type="class"} reports the Bayes-rule prediction for each case---that is, the response category with the highest predicted probability. Our \code{BayesRuleMulti()} function calculates the proportion of misclassified cases. Because this value is the mean of casewise components, we attach a \code{"casewise loss"} attribute to the result (as explained in the preceding section).
 
 The marginal proportions for the response categories are
 ```{r BEPS-response-distribution}
@@ -1181,11 +1181,11 @@ xtabs(~ vote, data=BEPS)/nrow(BEPS)
 ```
 and so the marginal Bayes-rule prediction, that everyone will vote Labour, produces an error rate of $1 - 0.47213 = 0.52787$. The multinomial-logit model appears to do substantially better than that, but does its performance hold up to cross-validation?
 
-We check first whether the default `cv()` method works "out-of-the-box" for the `"multinom"` model:
+We check first whether the default \code{cv()} method works "out-of-the-box" for the \code{"multinom"} model:
 ```{r BEPS-test-default, error=TRUE}
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
 ```
-The default method of `GetResponse()` (a function supplied by the **cv** package---see `?GetResponse`) fails for a `"multinom"` object. A straightforward solution is to supply a `GetResponse.multinom()` method that returns the factor response [using the `get_response()` function from the **insight** package, @LudeckeWaggonerMakowski:2019],
+The default method of \code{GetResponse()} (a function supplied by the \pkg{cv} package---see \code{?GetResponse}) fails for a \code{"multinom"} object. A straightforward solution is to supply a \code{GetResponse.multinom()} method that returns the factor response [using the `get_response()` function from the \pkg{insight} package, @LudeckeWaggonerMakowski:2019],
 ```{r GetResponse.multinom}
 GetResponse.multinom <- function(model, ...) {
   insight::get_response(model)
@@ -1197,63 +1197,63 @@ and to try again:
 ```{r BEPS-test-default-2, error=TRUE}
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
 ```
-A `traceback()` (not shown) reveals that the problem is that the default method of `cv()` calls the `"multinom"` method for `predict()` with the argument `type="response"`, when the correct argument should be `type="class"`.  We therefore must write a "`multinom`" method for `cv()`, but that proves to be very simple:
+A \code{traceback()} (not shown) reveals that the problem is that the default method of \code{cv()} calls the \code{"multinom"} method for \code{predict()} with the argument \code{type="response"}, when the correct argument should be \code{type="class"}.  We therefore must write a \code{"multinom"} method for \code{cv()}, but that proves to be very simple:
 ```{r cv.nultinom}
 cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
                          seed, ...){
   NextMethod(type="class", criterion=criterion)
 }
 ```
-That is, we simply call the default `cv()` method with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`. 
+That is, we simply call the default \code{cv()} method with the \code{type} argument properly set. In addition to supplying the correct \code{type} argument, our method sets the default \code{criterion} for the \code{cv.multinom()} method to \code{BayesRuleMulti}. 
 
 Then:
 ```{r BEPS-cv}
 m.beps <- update(m.beps, trace=FALSE)
 cv(m.beps, seed=3465)
 ```
-Prior to invoking `cv()`, we called `update()` with `trace=FALSE` to suppress the iteration history reported by default by `multinom()`---it would be tedious to see the iteration history for each fold. The cross-validated polytomous Bayes-rule criterion confirms that the fitted model does substantially better than the marginal Bayes-rule prediction that everyone votes for Labour.
+Prior to invoking \code{cv()}, we called \code{update()} with \code{trace=FALSE} to suppress the iteration history reported by default by \code{multinom()}---it would be tedious to see the iteration history for each fold. The cross-validated polytomous Bayes-rule criterion confirms that the fitted model does substantially better than the marginal Bayes-rule prediction that everyone votes for Labour.
 
 ### Mixed-effects models
 
-Adding a `cv()` method for a mixed-model class is somewhat more complicated. We provide the `cvMixed()` function to facilitate this process, and to see how that works, consider the `"lme"` method from the **cv** package:
+Adding a \code{cv()} method for a mixed-model class is somewhat more complicated. We provide the \code{cvMixed()} function to facilitate this process, and to see how that works, consider the \code{"lme"} method from the \pkg{cv} package:
 ```{r cv.lme}
 cv:::cv.lme
 ```
-Notice that `cv.lme()` sets up a call to `cvMixed()`, which does the computational work. 
+Notice that \code{cv.lme()} sets up a call to \code{cvMixed()}, which does the computational work. 
 
-Most of the arguments of `cvMixed()` are familiar:
+Most of the arguments of \code{cvMixed()} are familiar:
 
-* `model` is the mixed-model object, here of class `"lme"`.
+* \code{model} is the mixed-model object, here of class \code{"lme"}.
 
-* `package` is the name of the package in which the mixed-modeling function used to fit the model, here  `lme()`, resides---i.e., `"nlme"`; `cvMixed()` uses this argument to retrieve the package namespace.
+* \code{package} is the name of the package in which the mixed-modeling function used to fit the model, here  \code{lme()}, resides---i.e., \code{"nlme"}; \code{cvMixed()} uses this argument to retrieve the package namespace.
 
-* `data` is the data set to which the model is fit, by default extracted by the `get_data()` function in the **insight** package.
+* \code{data} is the data set to which the model is fit, by default extracted by the \code{get_data()} function in the \pkg{insight} package.
 
-* `criterion` is the CV criterion, defaulting to the `mse()` function.
+* \code{criterion} is the CV criterion, defaulting to the \code{mse()} function.
 
-* `k` is the number of CV folds, defaulting to `"loo"` for CV by clusters and `10` for CV by cases.
+* \code{k} is the number of CV folds, defaulting to \code{"loo"} for CV by clusters and \code{10} for CV by cases.
 
-* `reps` is the number of times the CV process is repeated, defaulting to `1`.
+* \code{reps} is the number of times the CV process is repeated, defaulting to \code{1}.
 
-* `seed` is the seed for R's random-number generator, defaulting to a randomly selected (and saved) value.
+* \code{seed} is the seed for \proglang{R}'s random-number generator, defaulting to a randomly selected (and saved) value.
 
-* `ncores` is the number of cores to use for parallel computation; if `1`, the default, then the computation isn't parallelized.
+* \code{ncores} is the number of cores to use for parallel computation; if \code{1}, the default, then the computation isn't parallelized.
 
-* `clusterVariables` is a character vector of the names of variables defining clusters; if missing, then CV is based on cases rather than clusters. 
+* \code{clusterVariables} is a character vector of the names of variables defining clusters; if missing, then CV is based on cases rather than clusters. 
 
 The remaining two arguments are unfamiliar:
 
-* `predict.clusters.args` is a named list of arguments to be passed to the `predict()` function to obtain predictions for the full data set from a model fit to a subset of the data for cluster-based CV. The first two arguments should be `object` and `newdata`. It is typically necessary to tell `cvMixed()` how to base predictions only on fixed effects; in the case of `"lme"` models, this is done by setting `level = 0`.
+* \code{predict.clusters.args} is a named list of arguments to be passed to the \code{predict()} function to obtain predictions for the full data set from a model fit to a subset of the data for cluster-based CV. The first two arguments should be \code{object} and \code{newdata}. It is typically necessary to tell \code{cvMixed()} how to base predictions only on fixed effects; in the case of \code{"lme"} models, this is done by setting \code{level = 0}.
 
-* Similarly, `predict.cases.args` is a named list of arguments to be passed to `predict()` for case-based CV. Setting `level = 1` includes random effects in the predictions.
+* Similarly, \code{predict.cases.args} is a named list of arguments to be passed to \code{predict()} for case-based CV. Setting \code{level = 1} includes random effects in the predictions.
 
-Finally, any additional arguments, absorbed by `...`, are passed to `update()` when the model is refit with each fold omitted. `cvMixed()` returns an object of class `"cv"`.
+Finally, any additional arguments, absorbed by \code{...}, are passed to \code{update()} when the model is refit with each fold omitted. \code{cvMixed()} returns an object of class \code{"cv"}.
 
-Now imagine that we want to support a new class of mixed-effects models. To be concrete, we illustrate with the `glmmPQL()` function in the **MASS** package [@VenablesRipley:2002], which fits generalized-linear mixed-effects models by penalized quasi-likelihood.[^glmmPQL] Not coincidentally, the arguments of `glmmPQL()` are similar to those of `lme()` (with an additional `family` argument), because the former iteratively invokes the latter; so `cv.glmmPQL()` should resemble `cv.lme()`.
+Now imagine that we want to support a new class of mixed-effects models. To be concrete, we illustrate with the \code{glmmPQL()} function in the \pkg{MASS} package [@VenablesRipley:2002], which fits generalized-linear mixed-effects models by penalized quasi-likelihood.[^glmmPQL] Not coincidentally, the arguments of \code{glmmPQL()} are similar to those of \code{lme()} (with an additional \code{family} argument), because the former iteratively invokes the latter; so \code{cv.glmmPQL()} should resemble \code{cv.lme()}.
 
-[^glmmPQL]: This example is somewhat artificial in that `glmmPQL()` has largely been superseded by computationally superior functions, such the `glmer()` function in the **lme4** package. There is, however, one situation in which `glmmPQL()` might prove useful: to specify serial dependency in case-level errors within clusters for longitudinal data, which is not currently supported by `glmer()`.
+[^glmmPQL]: This example is somewhat artificial in that \code{glmmPQL()} has largely been superseded by computationally superior functions, such the \code{glmer()} function in the \pkg{lme4} package. There is, however, one situation in which \code{glmmPQL()} might prove useful: to specify serial dependency in case-level errors within clusters for longitudinal data, which is not currently supported by \code{glmer()}.
 
-As it turns out, neither the default method for `GetResponse()` nor `insight::get_data()` work for `"glmmPQL"` objects. These objects include a `"data"` element, however, and so we can simply extract this element as the default for the `data` argument of our `cv.glmmPQL()` method. 
+As it turns out, neither the default method for \code{GetResponse()} nor \code{insight::get_data()} work for \code{"glmmPQL"} objects. These objects include a \code{"data"} element, however, and so we can simply extract this element as the default for the \code{data} argument of our \code{cv.glmmPQL()} method. 
 
 To get the response variable is more complicated: We refit the fixed part of the model as a GLM with only the regression constant on the right-hand side, and extract the response from that; because all we need is the response variable, we limit the number of GLM iterations to 1 and suppress warning messages about non-convergence:
 
@@ -1267,7 +1267,7 @@ GetResponse.glmmPQL <- function(model, ...){
 }
 ```
 
-Writing the `cv()` method is then straightforward:
+Writing the \code{cv()} method is then straightforward:
 ```{r cv.glmmPQL}
 cv.glmmPQL <- function(model, data = model$data, criterion = mse,
                      k, reps = 1, seed, ncores = 1, clusterVariables, ...){
@@ -1293,16 +1293,16 @@ cv.glmmPQL <- function(model, data = model$data, criterion = mse,
     ...)
 }
 ```
-We set the argument `verbose=FALSE` to suppress `glmmPQL()`'s iteration counter when `cvMixed()` calls `update()`.
+We set the argument \code{verbose=FALSE} to suppress \code{glmmPQL()}'s iteration counter when \code{cvMixed()} calls \code{update()}.
 
-Let's apply our newly minted method to a logistic regression with a random intercept in an example that appears in `?glmmPQL`:
+Let's apply our newly minted method to a logistic regression with a random intercept in an example that appears in \code{?glmmPQL}:
 ```{r glmmPQL-example}
 library("MASS")
 m.pql <- glmmPQL(y ~ trt + I(week > 2), random = ~ 1 | ID,
              family = binomial, data = bacteria)
 summary(m.pql)
 ```
-We compare this result to that obtained from `glmer()` in the **lme4** package:
+We compare this result to that obtained from \code{glmer()} in the \pkg{lme4} package:
 ```{r compare-to-lme4}
 library("lme4")
 m.glmer <- glmer(y ~ trt + I(week > 2) + (1 | ID),
@@ -1314,13 +1314,13 @@ car::compareCoefs(m.pql, m.glmer)
 ```
 The two sets of estimates are similar, but not identical
 
-Finally, we try out our `cv.glmmPQL()` method, cross-validating both by clusters and by cases,
+Finally, we try out our \code{cv.glmmPQL()} method, cross-validating both by clusters and by cases,
 ```{r cv-example-glmmPQL, cache=TRUE}
 cv(m.pql, clusterVariables="ID", criterion=BayesRule)
 
 cv(m.pql, data=bacteria, criterion=BayesRule, seed=1490)
 ```
-and again compare to `glmer()`:
+and again compare to \code{glmer()}:
 ```{r cv-example-glmer, cache=TRUE}
 cv(m.glmer, clusterVariables="ID", criterion=BayesRule)
 
@@ -1330,13 +1330,13 @@ cv(m.glmer, data=bacteria, criterion=BayesRule, seed=1490)
 
 ## Adding a model-selection procedure
 
-The `selectStepAIC()` function supplied by the **cv** package, which is based on the `stepAIC()` function from the **nnet** package [@VenablesRipley:2002] for stepwise model selection, is suitable for the `procedure` argument of `cvSelect()`. The use of `selectStepAIC()` is illustrated in the principal vignette for the package. 
+The \code{selectStepAIC()} function supplied by the \pkg{cv} package, which is based on the \code{stepAIC()} function from the \pkg{nnet} package [@VenablesRipley:2002] for stepwise model selection, is suitable for the \code{procedure} argument of \code{cvSelect()}. The use of \code{selectStepAIC()} is illustrated in the principal vignette for the package. 
 
-We'll employ `selectStepAIC()` as a "template" for writing a CV model-selection procedure. To see the code for this function, type `cv::selectStepAIC` at the R command prompt, or examine the sources for the **cv** package at https://github.com/gmonette/cv (the code for `selectStepAIC()` is in https://github.com/gmonette/cv/blob/main/R/cvSelect.R).
+We'll employ \code{selectStepAIC()} as a "template" for writing a CV model-selection procedure. To see the code for this function, type \code{cv::selectStepAIC} at the \proglang{R} command prompt, or examine the sources for the \pkg{cv} package at https://github.com/gmonette/cv (the code for \code{selectStepAIC()} is in https://github.com/gmonette/cv/blob/main/R/cvSelect.R).
 
-Another approach to model selection is all-subsets regression. The `regsubsets()` function in the **leaps** package [@LumleyMiller:2020] implements an efficient algorithm for selecting the best-fitting linear least-squares regressions for subsets of predictors of all sizes, from 1 through the maximum number of candidate predictors.[^1] To illustrate the use of `regsubsets()`, we employ the `swiss` data frame supplied by the **leaps** package:
+Another approach to model selection is all-subsets regression. The \code{regsubsets()} function in the \pkg{leaps} package [@LumleyMiller:2020] implements an efficient algorithm for selecting the best-fitting linear least-squares regressions for subsets of predictors of all sizes, from 1 through the maximum number of candidate predictors.[^1] To illustrate the use of \code{regsubsets()}, we employ the \code{swiss} data frame supplied by the \pkg{leaps} package:
 
-[^1]: The `regsubsets()` function computes several measures of model predictive performance, including the $R^2$ and $R^2$ adjusted for degrees of freedom, the residual sums of squares, Mallows's $C_p$, and the BIC. Several of these are suitable for comparing models with differing numbers of coefficients---we use the BIC below---but all necessarily agree when comparing models with the *same* number of coefficients.
+[^1]: The \code{regsubsets()} function computes several measures of model predictive performance, including the $R^2$ and $R^2$ adjusted for degrees of freedom, the residual sums of squares, Mallows's $C_p$, and the BIC. Several of these are suitable for comparing models with differing numbers of coefficients---we use the BIC below---but all necessarily agree when comparing models with the *same* number of coefficients.
 
 ```{r swiss}
 library("leaps")
@@ -1345,14 +1345,14 @@ nrow(swiss)
 ```
 The data set includes the following variables, for each of 47 French-speaking Swiss provinces circa 1888:
 
-* `Fertility`: A standardized fertility measure.
-* `Agriculture`: The percentage of the male population engaged in agriculture.
-* `Examination`: The percentage of draftees into the Swiss army receiving the highest grade on an examination.
-* `Education`: The percentage of draftees with more than a primary-school education.
-* `Catholic`: The percentage of the population who were Catholic.
-* `Infant.Mortality`: The infant-mortality rate, expressed as the percentage of live births surviving less than a year.
+* \code{Fertility}: A standardized fertility measure.
+* \code{Agriculture}: The percentage of the male population engaged in agriculture.
+* \code{Examination}: The percentage of draftees into the Swiss army receiving the highest grade on an examination.
+* \code{Education}: The percentage of draftees with more than a primary-school education.
+* \code{Catholic}: The percentage of the population who were Catholic.
+* \code{Infant.Mortality}: The infant-mortality rate, expressed as the percentage of live births surviving less than a year.
 
-Following @LumleyMiller:2020, we treat `Fertility` as the response and the other variables as predictors in a linear least-squares regression:
+Following @LumleyMiller:2020, we treat \code{Fertility} as the response and the other variables as predictors in a linear least-squares regression:
 ```{r swiss-lm}
 m.swiss <- lm(Fertility ~ ., data=swiss)
 summary(m.swiss)
@@ -1372,7 +1372,7 @@ which.min(bics)
 
 car::subsets(swiss.sub, legend="topright")
 ```
-The graph, produced by the `subsets()` function in the **car** package, shows that the model with the smallest BIC is the best model with 4 predictors, including `Agriculture`, `Education`, `Catholic`, and `Infant.Mortality`, but not `Examination`:
+The graph, produced by the \code{subsets()} function in the \pkg{car} package, shows that the model with the smallest BIC is the best model with 4 predictors, including \code{Agriculture}, \code{Education}, \code{Catholic}, and \code{Infant.Mortality}, but not \code{Examination}:
 ```{r best-model}
 m.best <- update(m.swiss, . ~ . - Examination)
 summary(m.best)
@@ -1381,7 +1381,7 @@ cv(m.best, seed=8433) # use same folds as before
 ```
 The RMSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated RMSE is a bit lower; as we explain in the main vignette, however, it isn't kosher to select and cross-validate a model on the same data.
 
-Here's a function named `selectSubsets()`, meant to be used with `cvSelect()`, suitable for cross-validating the model-selection process:
+Here's a function named \code{selectSubsets()}, meant to be used with \code{cvSelect()}, suitable for cross-validating the model-selection process:
 ```{r selectSubsets}
 selectSubsets <- function(data=insight::get_data(model), 
                           model,
@@ -1435,11 +1435,11 @@ selectSubsets <- function(data=insight::get_data(model),
   )
 }
 ```
-A slightly tricky point is that because of scoping issues, `predict()` doesn't work with the model fit omitting the $i$th fold, and so the fitted values for all cases are computed directly as $\widehat{\mathbf{y}}_{-i} = \mathbf{X} \mathbf{b}_{-i}$, where $\mathbf{X}$ is the model-matrix for all of the cases, and $\mathbf{b}_{-i}$ is the vector of least-squares coefficients for the selected model with the $i$th fold omitted. 
+A slightly tricky point is that because of scoping issues, \code{predict()} doesn't work with the model fit omitting the $i$th fold, and so the fitted values for all cases are computed directly as $\widehat{\mathbf{y}}_{-i} = \mathbf{X} \mathbf{b}_{-i}$, where $\mathbf{X}$ is the model-matrix for all of the cases, and $\mathbf{b}_{-i}$ is the vector of least-squares coefficients for the selected model with the $i$th fold omitted. 
 
-Additionally, the command `lm(y[-indices] ~ X[-indices, x.names.i] - 1)`, which is the selected model with the $i$th fold deleted, produces awkward coefficient names like `"X[-indices, x.names.i]Infant.Mortality"`. Purely for aesthetic reasons, the command `sub("X\\[-indices, x.names.i\\]", "", names(coefs))` fixes these awkward names, removing the extraneous text, `"X[-indices, x.names.i]"`.
+Additionally, the command \code{lm(y[-indices] ~ X[-indices, x.names.i] - 1)}, which is the selected model with the $i$th fold deleted, produces awkward coefficient names like \code{"X[-indices, x.names.i]Infant.Mortality"}. Purely for aesthetic reasons, the command `sub("X\\[-indices, x.names.i\\]", "", names(coefs))` fixes these awkward names, removing the extraneous text, \code{"X[-indices, x.names.i]"}.
 
-Applying `selectSubsets()` to the full data produces the full-data cross-validated RMSE (which we obtained previously):
+Applying \code{selectSubsets()} to the full data produces the full-data cross-validated RMSE (which we obtained previously):
 %%```{r test-selectSubsets}
 %%selectSubsets(model=m.swiss)
 %%```
@@ -1448,12 +1448,12 @@ Similarly, applying the function to an imaginary "fold" of 5 cases returns the R
 %%selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 %%```
 
-Then, using `selectSubsets()` in cross-validation, we get:
+Then, using \code{selectSubsets()} in cross-validation, we get:
 ```{r cvSelect-selectSubsets}
 (cv.swiss <- cvSelect(selectSubsets, model=m.swiss,
                       data=swiss, seed=8433)) # use same folds
 ```
-Cross-validation shows that model selection exacts a penalty in RMSE. Examining the models selected for the 10 folds reveals that there is some uncertainty in identifying the predictors in the "best" model, with `Agriculture` sometimes appearing and sometimes not:
+Cross-validation shows that model selection exacts a penalty in RMSE. Examining the models selected for the 10 folds reveals that there is some uncertainty in identifying the predictors in the "best" model, with \code{Agriculture} sometimes appearing and sometimes not:
 ```{r best-models-by-folds}
 compareFolds(cv.swiss)
 ```
@@ -1462,9 +1462,9 @@ compareFolds(cv.swiss)
 
 ## Efficient computations for linear and generalized linear models
 
-The most straightforward way to implement cross-validation in R for statistical modeling functions that are written in the canonical manner is to use `update()` to refit the model with each fold removed. This is the approach taken in the default method for `cv()`, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds in modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.
+The most straightforward way to implement cross-validation in \proglang{R} for statistical modeling functions that are written in the canonical manner is to use \code{update()} to refit the model with each fold removed. This is the approach taken in the default method for \code{cv()}, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds in modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.
 
-The `"lm"` and `"glm"` methods for `cv()` take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the weight matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
+The \code{"lm"} and \code{"glm"} methods for \code{cv()} take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the weight matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
 
 The weighted-least-squares (WLS) estimator of $\boldsymbol{\beta}$ is [see, e.g., @Fox:2016, Sec. 12.2.2] [^WLS]
 $$
@@ -1472,7 +1472,7 @@ $$
   \mathbf{X}^T \mathbf{W} \mathbf{y}
 $$ 
 
-[^WLS]: This is a definitional formula, which assumes that the model matrix $\mathbf{X}$ is of full column rank, and which can be subject to numerical instability when $\mathbf{X}$ is ill-conditioned. `lm()` uses the singular-value decomposition of the model matrix to obtain computationally more stable results.
+[^WLS]: This is a definitional formula, which assumes that the model matrix $\mathbf{X}$ is of full column rank, and which can be subject to numerical instability when $\mathbf{X}$ is ill-conditioned. \code{lm()} uses the singular-value decomposition of the model matrix to obtain computationally more stable results.
 
 Fitted values are then $\widehat{\mathbf{y}} = \mathbf{X}\mathbf{b}_{\mathrm{WLS}}$.
 
@@ -1493,13 +1493,13 @@ where $\mathbf{A}$ is a nonsingular order-$n$ matrix. We apply this result by le
 \end{align*}
 where the subscript $\mathbf{j} = (i_{j1}, \ldots, i_{jm})^T$ represents the vector of indices for the cases in the $j$th fold, $j = 1, \ldots, k$. The negative sign in $\mathbf{V} = - \mathbf{X}_\mathbf{j}$ reflects the *removal*, rather than addition, of the cases in $\mathbf{j}$. 
 
-Applying the Woodbury identity isn't quite as fast as using the hatvalues, but it is generally much faster than refitting the model. A disadvantage of the Woodbury identity, however, is that it entails explicit matrix inversion and thus may be numerically unstable. The inverse of $\mathbf{A} = \mathbf{X}^T \mathbf{W} \mathbf{X}$ is available directly in the `"lm"` object, but the second term on the right-hand side of the Woodbury identity requires a matrix inversion with each fold deleted. (In contrast, the inverse of each $\mathbf{C} = \mathbf{W}_\mathbf{j}$ is straightforward because $\mathbf{W}$ is diagonal.)
+Applying the Woodbury identity isn't quite as fast as using the hatvalues, but it is generally much faster than refitting the model. A disadvantage of the Woodbury identity, however, is that it entails explicit matrix inversion and thus may be numerically unstable. The inverse of $\mathbf{A} = \mathbf{X}^T \mathbf{W} \mathbf{X}$ is available directly in the \code{"lm"} object, but the second term on the right-hand side of the Woodbury identity requires a matrix inversion with each fold deleted. (In contrast, the inverse of each $\mathbf{C} = \mathbf{W}_\mathbf{j}$ is straightforward because $\mathbf{W}$ is diagonal.)
 
 The Woodbury identity also requires that the model matrix be of full rank. We impose that restriction in our code by removing redundant regressors from the model matrix for all of the cases, but that doesn't preclude rank deficiency from surfacing when a fold is removed. Rank deficiency of $\mathbf{X}$ doesn't disqualify cross-validation because all we need are fitted values under the estimated model.
 
-`glm()` computes the maximum-likelihood estimates for a generalized linear model by iterated weighted least squares [see, e.g., @FoxWeisberg:2019, Sec. 6.12]. The last iteration is therefore just a WLS fit of the "working response" on the model matrix using "working weights." Both the working weights and the working response at convergence are available from the information in the object returned by `glm()`. 
+\code{glm()} computes the maximum-likelihood estimates for a generalized linear model by iterated weighted least squares [see, e.g., @FoxWeisberg:2019, Sec. 6.12]. The last iteration is therefore just a WLS fit of the "working response" on the model matrix using "working weights." Both the working weights and the working response at convergence are available from the information in the object returned by \code{glm()}. 
 
-We then treat re-estimation of the model with a case or cases deleted as a WLS problem, using the hatvalues or the Woodbury matrix identity. The resulting fitted values for the deleted fold aren't exact---that is, except for the Gaussian family, the result isn't identical to what we would obtain by literally refitting the model---but in our (limited) experience, the approximation is very good, especially for LOO CV, which is when we would be most tempted to use it. Nevertheless, because these results are approximate, the default for the `"glm"` `cv()` method is to perform the exact computation, which entails refitting the model with each fold omitted.
+We then treat re-estimation of the model with a case or cases deleted as a WLS problem, using the hatvalues or the Woodbury matrix identity. The resulting fitted values for the deleted fold aren't exact---that is, except for the Gaussian family, the result isn't identical to what we would obtain by literally refitting the model---but in our (limited) experience, the approximation is very good, especially for LOO CV, which is when we would be most tempted to use it. Nevertheless, because these results are approximate, the default for the \code{"glm"} \code{cv()} method is to perform the exact computation, which entails refitting the model with each fold omitted.
 
 ## Computation of the bias-corrected CV criterion and confidence intervals
 
@@ -1529,7 +1529,7 @@ $$
 $$
 where $z_{1 - \alpha/2}$ is the $1 - \alpha/2$ quantile of the standard-normal distribution (e.g, $z \approx 1.96$ for a 95% confidence interval, for which $1 - \alpha/2 = .975$).
 
-@BatesHastieTibshirani:2023 show that the coverage of this confidence interval is poor for small samples, and they suggest a much more computationally intensive procedure, called *nested cross-validation*, to compute better estimates of error and confidence intervals with better coverage for small samples. We may implement Bates et al.'s approach in a later release of the **cv** package. At present we use the confidence interval above for sufficiently large $n$, which, based on Bates et al.'s results, we take by default to be $n \ge 400$.
+@BatesHastieTibshirani:2023 show that the coverage of this confidence interval is poor for small samples, and they suggest a much more computationally intensive procedure, called *nested cross-validation*, to compute better estimates of error and confidence intervals with better coverage for small samples. We may implement Bates et al.'s approach in a later release of the \pkg{cv} package. At present we use the confidence interval above for sufficiently large $n$, which, based on Bates et al.'s results, we take by default to be $n \ge 400$.
 
 # Why the complement of AUC isn't a casewise CV criterion
 
@@ -1551,7 +1551,7 @@ Thus, equation (\ref{eq:cw}) produces either $2^{n_v}$ or $2^{n_v}-2$ constraint
 
 If $n_v=3$, we show below that (\ref{eq:cw}) has no consistent solution if we include all possibilities for $\mathbf{y}_v$, but does if we exclude cases where all $y$s have the same value. If $n_v=4$, we show that there are no consistent solutions in either case.
 
-The following R function computes AUC from $\mathbf{\widehat{y}}_v$ and $\mathbf{y}_v$, accommodating the cases where $\mathbf{y}_v$ is all 0s or all 1s:
+The following \proglang{R} function computes AUC from $\mathbf{\widehat{y}}_v$ and $\mathbf{y}_v$, accommodating the cases where $\mathbf{y}_v$ is all 0s or all 1s:
 
 ```{r}
 AUC <- function(y, yhat = seq_along(y)) {
