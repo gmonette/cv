@@ -1,0 +1,14 @@
+foreach
+iterators
+doParallel
+cv
+dplyr
+Matrix
+lme4
+nlme
+lattice
+latticeExtra
+MASS
+carData
+car
+nnet

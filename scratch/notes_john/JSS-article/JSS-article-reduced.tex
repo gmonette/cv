@@ -1,0 +1,3324 @@
+\documentclass[
+]{jss}
+
+%% recommended packages
+\usepackage{orcidlink,thumbpdf,lmodern}
+
+\usepackage[utf8]{inputenc}
+
+\author{
+John Fox~\orcidlink{0000-0002-1196-8012}\\McMaster
+University \And Georges Monette~\orcidlink{0000-0000-0000-0000}\\York
+University
+}
+\title{\pkg{cv}: An \proglang{R} Package for Cross-Validation of
+Regression Models}
+
+\Plainauthor{John Fox, Georges Monette}
+\Plaintitle{cv: An R Package for Cross-Validation of Regression Models}
+\Shorttitle{\pkg{cv}: Cross-Validation}
+
+
+\Abstract{
+The abstract of the article.
+}
+
+\Keywords{cross-validation, regression analysis, model
+selection, \proglang{R}}
+\Plainkeywords{cross-validation, regression analysis, model
+selection, R}
+
+%% publication information
+%% \Volume{50}
+%% \Issue{9}
+%% \Month{June}
+%% \Year{2012}
+%% \Submitdate{}
+%% \Acceptdate{2012-06-04}
+
+\Address{
+    John Fox\\
+    McMaster University\\
+    Hamilton, Ontario, Canada\\
+  E-mail: \email{jfox@mcmaster.ca}\\
+  URL: \url{https://www.john-fox.ca/}\\~\\
+      Georges Monette\\
+    York University\\
+    Toronto, Ontario, Canada\\
+  
+  
+  }
+
+
+% tightlist command for lists without linebreak
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+
+\usepackage{amsmath}
+
+\begin{document}
+
+
+
+\hypertarget{cross-validation}{%
+\section{Cross-validation}\label{cross-validation}}
+
+Cross-validation (CV) is an essentially simple and intuitively
+reasonable approach to estimating the predictive accuracy of regression
+models. CV is developed in many standard sources on regression modeling
+and ``machine learning''---we particularly recommend \citet[Secs. 5.1,
+5.3]{JamesEtAl:2021}---and so we will describe the method only briefly
+here before taking up computational issues and some examples. See
+\citet{ArlotCelisse:2010} for a wide-ranging, if technical, survey of
+cross-validation and related methods that emphasizes the statistical
+properties of CV.
+
+Validating research by replication on independently collected data is a
+common scientific norm. Emulating this process in a single study by
+data-division is less common: The data are randomly divided into two,
+possibly equal-size, parts; the first part is used to develop and fit a
+statistical model; and then the second part is used to assess the
+adequacy of the model fit to the first part of the data. Data-division,
+however, suffers from two problems: (1) Dividing the data decreases the
+sample size and thus increases sampling error; and (2), even more
+disconcertingly, particularly in smaller samples, the results can vary
+substantially based on the random division of the data: See \citet[Sec.
+5.3]{Harrell:2015} for this and other remarks about data-division and
+cross-validation.
+
+Cross-validation speaks to both of these issues. In CV, the data are
+randomly divided as equally as possible into several, say \(k\), parts,
+called ``folds.'' The statistical model is fit \(k\) times, leaving each
+fold out in turn. Each fitted model is then used to predict the response
+variable for the cases in the omitted fold. A CV criterion or ``cost''
+measure, such as the mean-squared error (``MSE'') of prediction, is then
+computed using these predicted values. In the extreme \(k = n\), the
+number of cases in the data, thus omitting individual cases and
+refitting the model \(n\) times---a procedure termed ``leave-one-out
+(LOO) cross-validation.''
+
+Because the \(n\) models are each fit to \(n - 1\) cases, LOO CV
+produces a nearly unbiased estimate of prediction error. The \(n\)
+regression models are highly statistical dependent, however, based as
+they are on nearly the same data, and so the resulting estimate of
+prediction error has relatively large variance. In contrast, estimated
+prediction error for \(k\)-fold CV with \(k = 5\) or \(10\) (commonly
+employed choices) are somewhat biased but have smaller variance. It is
+also possible to correct \(k\)-fold CV for bias (see below).
+
+\hypertarget{examples}{%
+\section{Examples}\label{examples}}
+
+\hypertarget{polynomial-regression-for-the-auto-data}{%
+\subsection{Polynomial regression for the Auto
+data}\label{polynomial-regression-for-the-auto-data}}
+
+The data for this example are drawn from the \pkg{ISLR2} package for
+\proglang{R}, associated with \citet{JamesEtAl:2021}. The presentation
+here is close (though not identical) to that in the original source
+\citep[ Secs. 5.1, 5.3]{JamesEtAl:2021}, and it demonstrates the use of
+the \texttt{cv()} function in the \pkg{cv} package.\footnote{\citet{JamesEtAl:2021}
+  use the \texttt{cv.glm()} function in the \pkg{boot} package
+  \citep{CantyRipley2022, DavisonHinkley:1997}. Despite its name,
+  \texttt{cv.glm()} is an independent function and not a method of a
+  \texttt{cv()} generic function.}
+
+The \texttt{Auto} dataset contains information about 392 cars:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> data("Auto", package="ISLR2")
+R> head(Auto)
+\end{CodeInput}
+\begin{CodeOutput}
+  mpg cylinders displacement horsepower weight acceleration year origin
+1  18         8          307        130   3504         12.0   70      1
+2  15         8          350        165   3693         11.5   70      1
+3  18         8          318        150   3436         11.0   70      1
+4  16         8          304        150   3433         12.0   70      1
+5  17         8          302        140   3449         10.5   70      1
+6  15         8          429        198   4341         10.0   70      1
+                       name
+1 chevrolet chevelle malibu
+2         buick skylark 320
+3        plymouth satellite
+4             amc rebel sst
+5               ford torino
+6          ford galaxie 500
+\end{CodeOutput}
+\begin{CodeInput}
+R> dim(Auto)
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 392   9
+\end{CodeOutput}
+\end{CodeChunk}
+
+With the exception of \texttt{origin} (which we don't use here), these
+variables are largely self-explanatory, except possibly for units of
+measurement: for details see \texttt{help("Auto",\ package="ISLR2")}.
+
+We'll focus here on the relationship of \texttt{mpg} (miles per gallon)
+to \texttt{horsepower}, as displayed in the following scatterplot:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> plot(mpg ~ horsepower, data=Auto)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/mpg-horsepower-scatterplot-1} 
+
+}
+
+\caption[`mpg` vs `horsepower` for the `Auto` data]{`mpg` vs `horsepower` for the `Auto` data}\label{fig:mpg-horsepower-scatterplot}
+\end{figure}
+\end{CodeChunk}
+
+The relationship between the two variables is monotone, decreasing, and
+nonlinear. Following \citet{JamesEtAl:2021}, we'll consider
+approximating the relationship by a polynomial regression, with the
+degree of the polynomial \(p\) ranging from 1 (a linear regression) to
+10.\footnote{Although it serves to illustrate the use of CV, a
+  polynomial is probably not the best choice here. Consider, for example
+  the scatterplot for log-transformed \texttt{mpg} and
+  \texttt{horsepower}, produced by
+  \texttt{plot(mpg\ \textasciitilde{}\ horsepower,\ data=Auto,\ log="xy")}
+  (execution of which is left to the reader).} Polynomial fits for
+\(p = 1\) to \(5\) are shown in the following figure:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> plot(mpg ~ horsepower, data=Auto)
+R> horsepower <- with(Auto, 
++                    seq(min(horsepower), max(horsepower), 
++                        length=1000))
+R> for (p in 1:5){
++   m <- lm(mpg ~ poly(horsepower,p), data=Auto)
++   mpg <- predict(m, newdata=data.frame(horsepower=horsepower))
++   lines(horsepower, mpg, col=p + 1, lty=p, lwd=2)
++ }
+R> legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
++        title="Degree", inset=0.02)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/mpg-horsepower-scatterplot-polynomials-1} 
+
+}
+
+\caption[`mpg` vs `horsepower` for the `Auto` data]{`mpg` vs `horsepower` for the `Auto` data}\label{fig:mpg-horsepower-scatterplot-polynomials}
+\end{figure}
+\end{CodeChunk}
+
+The linear fit is clearly inappropriate; the fits for \(p = 2\)
+(quadratic) through \(4\) are very similar; and the fit for \(p = 5\)
+may over-fit the data by chasing one or two relatively high \texttt{mpg}
+values at the right (but see the CV results reported below).
+
+The following graph shows two measures of estimated (squared) error as a
+function of polynomial-regression degree: The mean-squared error
+(``MSE''), defined as
+\(\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\), and
+the usual residual variance, defined as
+\(\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2\).
+The former necessarily declines with \(p\) (or, more strictly, can't
+increase with \(p\)), while the latter gets slightly larger for the
+largest values of \(p\), with the ``best'' value, by a small margin, for
+\(p = 7\).
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library("cv") # for mse() and other functions
+\end{CodeInput}
+\begin{CodeOutput}
+Loading required package: doParallel
+\end{CodeOutput}
+\begin{CodeOutput}
+Loading required package: foreach
+\end{CodeOutput}
+\begin{CodeOutput}
+Loading required package: iterators
+\end{CodeOutput}
+\begin{CodeOutput}
+Loading required package: parallel
+\end{CodeOutput}
+\begin{CodeInput}
+R> var <- mse <- numeric(10)
+R> for (p in 1:10){
++   m <- lm(mpg ~ poly(horsepower, p), data=Auto)
++   mse[p] <- mse(Auto$mpg, fitted(m))
++   var[p] <- summary(m)$sigma^2
++ }
+R> 
+R> plot(c(1, 10), range(mse, var), type="n",
++      xlab="Degree of polynomial, p",
++      ylab="Estimated Squared Error")
+R> lines(1:10, mse, lwd=2, lty=1, col=2, pch=16, type="b")
+R> lines(1:10, var, lwd=2, lty=2, col=3, pch=17, type="b")
+R> legend("topright", inset=0.02,
++        legend=c(expression(hat(sigma)^2), "MSE"),
++        lwd=2, lty=2:1, col=3:2, pch=17:16)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/mpg-horsepower-MSE-se-1} 
+
+}
+
+\caption[Estimated squared error as a function of polynomial degree, $p$]{Estimated squared error as a function of polynomial degree, $p$}\label{fig:mpg-horsepower-MSE-se}
+\end{figure}
+\end{CodeChunk}
+
+The code for this graph uses the \texttt{mse()} function from the
+\pkg{cv} package to compute the MSE for each fit.
+
+\hypertarget{using-cv}{%
+\subsubsection{Using cv()}\label{using-cv}}
+
+The generic \texttt{cv()} function has an \texttt{"lm"} method, which by
+default performs \(k = 10\)-fold CV:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> m.auto <- lm(mpg ~ poly(horsepower, 2), data=Auto)
+R> summary(m.auto)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Call:
+lm(formula = mpg ~ poly(horsepower, 2), data = Auto)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-14.7135  -2.5943  -0.0859   2.2868  15.8961 
+
+Coefficients:
+                      Estimate Std. Error t value Pr(>|t|)
+(Intercept)            23.4459     0.2209  106.13   <2e-16
+poly(horsepower, 2)1 -120.1377     4.3739  -27.47   <2e-16
+poly(horsepower, 2)2   44.0895     4.3739   10.08   <2e-16
+
+Residual standard error: 4.374 on 389 degrees of freedom
+Multiple R-squared:  0.6876,    Adjusted R-squared:  0.686 
+F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
+\end{CodeOutput}
+\begin{CodeInput}
+R> cv(m.auto)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 423836
+\end{CodeOutput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+method: Woodbury
+criterion: mse
+cross-validation criterion = 19.26863
+bias-adjusted cross-validation criterion = 19.25351
+full-sample criterion = 18.98477 
+\end{CodeOutput}
+\end{CodeChunk}
+
+The \code{"lm"} method by default uses \code{mse()} as the CV criterion
+and the Woodbury matrix identity to update the regression with each fold
+deleted without having literally to refit the model. Computational
+details are discussed in the final section of this vignette. The
+function reports the CV estimate of MSE, a biased-adjusted estimate of
+the MSE (the bias adjustment is explained in the final section), and the
+MSE is also computed for the original, full-sample regression. Because
+the division of the data into 10 folds is random, \code{cv()} explicitly
+(randomly) generates and saves a seed for \proglang{R}'s pseudo-random
+number generator, to make the results replicable. The user can also
+specify the seed directly via the \code{seed} argument to \code{cv()}.
+
+To perform LOO CV, we can set the \code{k} argument to \code{cv()} to
+the number of cases in the data, here \code{k=392}, or, more
+conveniently, to \code{k="loo"} or \code{k="n"}:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv(m.auto, k="loo")
+\end{CodeInput}
+\begin{CodeOutput}
+n-Fold Cross Validation
+method: hatvalues
+criterion: mse
+cross-validation criterion = 19.24821
+\end{CodeOutput}
+\end{CodeChunk}
+
+For LOO CV of a linear model, \code{cv()} by default uses the hatvalues
+from the model fit to the full data for the LOO updates, and reports
+only the CV estimate of MSE. Alternative methods are to use the Woodbury
+matrix identity or the ``naive'' approach of literally refitting the
+model with each case omitted. All three methods produce exact results
+for a linear model (within the precision of floating-point
+computations):
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv(m.auto, k="loo", method="naive")
+\end{CodeInput}
+\begin{CodeOutput}
+n-Fold Cross Validation
+method: naive
+criterion: mse
+cross-validation criterion = 19.24821
+bias-adjusted cross-validation criterion = 19.24787
+full-sample criterion = 18.98477 
+\end{CodeOutput}
+\begin{CodeInput}
+R> cv(m.auto, k="loo", method="Woodbury")
+\end{CodeInput}
+\begin{CodeOutput}
+n-Fold Cross Validation
+method: Woodbury
+criterion: mse
+cross-validation criterion = 19.24821
+bias-adjusted cross-validation criterion = 19.24787
+full-sample criterion = 18.98477 
+\end{CodeOutput}
+\end{CodeChunk}
+
+The \code{"naive"} and \code{"Woodbury"} methods also return the
+bias-adjusted estimate of MSE and the full-sample MSE, but bias isn't an
+issue for LOO CV.
+
+This is a small regression problem and all three computational
+approaches are essentially instantaneous, but it is still of interest to
+investigate their relative speed. In this comparison, we include the
+\code{cv.glm()} function from the \pkg{boot} package, which takes the
+naive approach, and for which we have to fit the linear model as an
+equivalent Gaussian GLM. We use the \code{microbenchmark()} function
+from the package of the same name for the timings \citep{Mersmann:2023}:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data=Auto)
+R> boot::cv.glm(Auto, m.auto.glm)$delta
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 19.24821 19.24787
+\end{CodeOutput}
+\begin{CodeInput}
+R> microbenchmark::microbenchmark(
++   hatvalues = cv(m.auto, k="loo"),
++   Woodbury = cv(m.auto, k="loo", method="Woodbury"),
++   naive = cv(m.auto, k="loo", method="naive"),
++   cv.glm = boot::cv.glm(Auto, m.auto.glm),
++   times=10
++ )
+\end{CodeInput}
+\begin{CodeOutput}
+Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :
+less accurate nanosecond times to avoid potential integer overflows
+\end{CodeOutput}
+\begin{CodeOutput}
+Unit: microseconds
+      expr        min         lq       mean     median         uq        max
+ hatvalues    984.287   1153.412   1160.394   1189.902   1199.414   1285.104
+  Woodbury  10145.122  10213.592  10525.532  10463.385  10657.581  11476.351
+     naive 216360.403 217763.218 223882.308 218184.226 219846.551 273572.951
+    cv.glm 380361.674 382182.689 400581.980 386284.739 436401.540 439866.368
+ neval cld
+    10 a  
+    10 a  
+    10  b 
+    10   c
+\end{CodeOutput}
+\end{CodeChunk}
+
+On our computer, using the hatvalues is about an order of magnitude
+faster than employing Woodbury matrix updates, and more than two orders
+of magnitude faster than refitting the model.\footnote{Out of
+  impatience, we asked \code{microbenchmark()} to execute each command
+  only 10 times rather than the default 100. With the exception of the
+  last columns, the output is self-explanatory. The last column shows
+  which methods have average timings that are statistically
+  distinguishable. Because of the small number of repetitions (i.e.,
+  10), the \code{"hatvalues"} and \code{"Woodbury"} methods aren't
+  distinguishable, but the difference between these methods persists
+  when we perform more repetitions---we invite the reader to redo this
+  computation with the default \code{times=100} repetitions.}
+
+\hypertarget{comparing-competing-models}{%
+\subsubsection{Comparing competing
+models}\label{comparing-competing-models}}
+
+The \code{cv()} function also has a method that can be applied to a list
+of regression models for the same data, composed using the
+\code{models()} function. For \(k\)-fold CV, the same folds are used for
+the competing models, which reduces random error in their comparison.
+This result can also be obtained by specifying a common seed for
+\proglang{R}'s random-number generator while applying \code{cv()}
+separately to each model, but employing a list of models is more
+convenient for both \(k\)-fold and LOO CV (where there is no random
+component to the composition of the \(n\) folds).
+
+We illustrate with the polynomial regression models of varying degree
+for the \code{Auto} data (discussed previously), beginning by fitting
+and saving the 10 models:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> for (p in 1:10){
++   assign(paste0("m.", p),
++          lm(mpg ~ poly(horsepower, p), data=Auto))
++ }
+R> objects(pattern="m\\.[0-9]")
+\end{CodeInput}
+\begin{CodeOutput}
+ [1] "m.1"  "m.10" "m.2"  "m.3"  "m.4"  "m.5"  "m.6"  "m.7"  "m.8"  "m.9" 
+\end{CodeOutput}
+\begin{CodeInput}
+R> summary(m.2) # for example, the quadratic fit
+\end{CodeInput}
+\begin{CodeOutput}
+
+Call:
+lm(formula = mpg ~ poly(horsepower, p), data = Auto)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-14.7135  -2.5943  -0.0859   2.2868  15.8961 
+
+Coefficients:
+                      Estimate Std. Error t value Pr(>|t|)
+(Intercept)            23.4459     0.2209  106.13   <2e-16
+poly(horsepower, p)1 -120.1377     4.3739  -27.47   <2e-16
+poly(horsepower, p)2   44.0895     4.3739   10.08   <2e-16
+
+Residual standard error: 4.374 on 389 degrees of freedom
+Multiple R-squared:  0.6876,    Adjusted R-squared:  0.686 
+F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
+\end{CodeOutput}
+\end{CodeChunk}
+
+We then apply \code{cv()} to the list of 10 models (the \code{data}
+argument is required):
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> # 10-fold CV
+R> cv.auto.10 <- cv(models(m.1, m.2, m.3, m.4, m.5,
++                      m.6, m.7, m.8, m.9, m.10),
++               data=Auto, seed=2120)
+R> cv.auto.10[1:2] # for the linear and quadratic models
+\end{CodeInput}
+\begin{CodeOutput}
+
+Model model.1:
+10-Fold Cross Validation
+method: Woodbury
+cross-validation criterion = 24.24642
+bias-adjusted cross-validation criterion = 24.23039
+full-sample criterion = 23.94366 
+
+Model model.2:
+10-Fold Cross Validation
+method: Woodbury
+cross-validation criterion = 19.34601
+bias-adjusted cross-validation criterion = 19.32699
+full-sample criterion = 18.98477 
+\end{CodeOutput}
+\begin{CodeInput}
+R> # LOO CV
+R> cv.auto.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
++                         m.6, m.7, m.8, m.9, m.10),
++                  data=Auto, k="loo")
+R> cv.auto.loo[1:2] # linear and quadratic models
+\end{CodeInput}
+\begin{CodeOutput}
+
+Model model.1:
+n-Fold Cross Validation
+method: hatvalues
+cross-validation criterion = 24.23151
+Model model.2:
+n-Fold Cross Validation
+method: hatvalues
+cross-validation criterion = 19.24821
+\end{CodeOutput}
+\end{CodeChunk}
+
+Because we didn't supply names for the models in the calls to the
+\code{models()} function, the names \code{model.1}, \code{model.2},
+etc., are generated by the function.
+
+Finally, we extract and graph the adjusted MSEs for \(10\)-fold CV and
+the MSEs for LOO CV:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv.mse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
+R> cv.mse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
+R> plot(c(1, 10), range(cv.mse.10, cv.mse.loo), type="n",
++      xlab="Degree of polynomial, p",
++      ylab="Cross-Validated MSE")
+R> lines(1:10, cv.mse.10, lwd=2, lty=1, col=2, pch=16, type="b")
+R> lines(1:10, cv.mse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
+R> legend("topright", inset=0.02,
++        legend=c("10-Fold CV", "LOO CV"),
++        lwd=2, lty=2:1, col=3:2, pch=17:16)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/polynomial-regression-CV-graph-1} 
+
+}
+
+\caption[Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$]{Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$}\label{fig:polynomial-regression-CV-graph}
+\end{figure}
+\end{CodeChunk}
+
+Alternatively, we can use the \code{plot()} method for
+\code{"cvModList"} objects to compare the models, though with separate
+graphs for 10-fold and LOO CV:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> plot(cv.auto.10, main="Polynomial Regressions, 10-Fold CV",
++      axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
+R> plot(cv.auto.loo, main="Polynomial Regressions, LOO CV",
++      axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/polynomial-regression-CV-graph-2-1} \includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/polynomial-regression-CV-graph-2-2} 
+
+}
+
+\caption[Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$]{Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$}\label{fig:polynomial-regression-CV-graph-2}
+\end{figure}
+\end{CodeChunk}
+
+In this example, 10-fold and LOO CV produce generally similar results,
+and also results that are similar to those produced by the estimated
+error variance \(\widehat{\sigma}^2\) for each model, reported above
+(except for the highest-degree polynomials, where the CV results more
+clearly suggest over-fitting).
+
+\hypertarget{cross-validating-mixed-effects-models}{%
+\section{Cross-validating mixed-effects
+models}\label{cross-validating-mixed-effects-models}}
+
+The fundamental analogy for cross-validation is to the collection of new
+data. That is, predicting the response in each fold from the model fit
+to data in the other folds is like using the model fit to all of the
+data to predict the response for new cases from the values of the
+predictors for those new cases. As we explained, the application of this
+idea to independently sampled cases is straightforward---simply
+partition the data into random folds of equal size and leave each fold
+out in turn, or, in the case of LOO CV, simply omit each case in turn.
+
+In contrast, mixed-effects models are fit to \emph{dependent} data, in
+which cases as clustered, such as hierarchical data, where the clusters
+comprise higher-level units (e.g., students clustered in schools), or
+longitudinal data, where the clusters are individuals and the cases
+repeated observations on the individuals over time.\footnote{There are,
+  however, more complex situations that give rise to so-called
+  \emph{crossed} (rather than \emph{nested}) random effects. For
+  example, consider students within classes within schools. In primary
+  schools, students typically are in a single class, and so classes are
+  nested within schools. In secondary schools, however, students
+  typically take several classes and students who are together in a
+  particular class may not be together in other classes; consequently,
+  random effects based on classes within schools are crossed. The
+  \code{lmer()} function in the \pkg{lme4} package is capable of
+  modeling both nested and crossed random effects, and the \code{cv()}
+  methods for mixed models in the \pkg{cv} package pertain to both
+  nested and crossed random effects. We present an example of the latter
+  later in the vignette.}
+
+We can think of two approaches to applying cross-validation to clustered
+data:\footnote{We subsequently discovered that \citet[Section
+  8]{Vehtari:2023} makes similar points.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Treat CV as analogous to predicting the response for one or more cases
+  in a \emph{newly observed cluster}. In this instance, the folds
+  comprise one or more whole clusters; we refit the model with all of
+  the cases in clusters in the current fold removed; and then we predict
+  the response for the cases in clusters in the current fold. These
+  predictions are based only on fixed effects because the random effects
+  for the omitted clusters are presumably unknown, as they would be for
+  data on cases in newly observed clusters.
+\item
+  Treat CV as analogous to predicting the response for a newly observed
+  case in an \emph{existing cluster}. In this instance, the folds
+  comprise one or more individual cases, and the predictions can use
+  both the fixed and random effects.
+\end{enumerate}
+
+\hypertarget{example-the-high-school-and-beyond-data}{%
+\subsection{Example: The High-School and Beyond
+data}\label{example-the-high-school-and-beyond-data}}
+
+Following their use by \citet{RaudenbushBryk:2002}, data from the 1982
+\emph{High School and Beyond} (HSB) survey have become a staple of the
+literature on mixed-effects models. The HSB data are used by \citet[Sec.
+7.2.2]{FoxWeisberg:2019} to illustrate the application of linear mixed
+models to hierarchical data, and we'll closely follow their example
+here.
+
+The HSB data are included in the \code{MathAchieve} and
+\code{MathAchSchool} data sets in the \pkg{nlme} package
+\citep{PinheiroBates:2000}. \code{MathAchieve} includes individual-level
+data on 7185 students in 160 high schools, and \code{MathAchSchool}
+includes school-level data:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> data("MathAchieve", package="nlme")
+R> dim(MathAchieve)
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 7185    6
+\end{CodeOutput}
+\begin{CodeInput}
+R> head(MathAchieve, 3)
+\end{CodeInput}
+\begin{CodeOutput}
+Grouped Data: MathAch ~ SES | School
+  School Minority    Sex    SES MathAch MEANSES
+1   1224       No Female -1.528   5.876  -0.428
+2   1224       No Female -0.588  19.708  -0.428
+3   1224       No   Male -0.528  20.349  -0.428
+\end{CodeOutput}
+\begin{CodeInput}
+R> tail(MathAchieve, 3)
+\end{CodeInput}
+\begin{CodeOutput}
+Grouped Data: MathAch ~ SES | School
+     School Minority    Sex    SES MathAch MEANSES
+7183   9586       No Female  1.332  19.641   0.627
+7184   9586       No Female -0.008  16.241   0.627
+7185   9586       No Female  0.792  22.733   0.627
+\end{CodeOutput}
+\begin{CodeInput}
+R> data("MathAchSchool", package="nlme")
+R> dim(MathAchSchool)
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 160   7
+\end{CodeOutput}
+\begin{CodeInput}
+R> head(MathAchSchool, 2)
+\end{CodeInput}
+\begin{CodeOutput}
+     School Size Sector PRACAD DISCLIM HIMINTY MEANSES
+1224   1224  842 Public   0.35   1.597       0  -0.428
+1288   1288 1855 Public   0.27   0.174       0   0.128
+\end{CodeOutput}
+\begin{CodeInput}
+R> tail(MathAchSchool, 2)
+\end{CodeInput}
+\begin{CodeOutput}
+     School Size   Sector PRACAD DISCLIM HIMINTY MEANSES
+9550   9550 1532   Public   0.45   0.791       0   0.059
+9586   9586  262 Catholic   1.00  -2.416       0   0.627
+\end{CodeOutput}
+\end{CodeChunk}
+
+The first few students are in school number 1224 and the last few in
+school 9586.
+
+We'll use only the \code{School}, \code{SES} (students' socioeconomic
+status), and \code{MathAch} (their score on a standardized
+math-achievement test) variables in the \code{MathAchieve} data set, and
+\code{Sector} (\code{"Catholic"} or \code{"Public"}) in the
+\code{MathAchSchool} data set.
+
+Some data-management is required before fitting a mixed-effects model to
+the HSB data, for which we use the \pkg{dplyr} package
+\citep{WickhamEtAl:2023}:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library("dplyr")
+\end{CodeInput}
+\begin{CodeOutput}
+
+Attaching package: 'dplyr'
+\end{CodeOutput}
+\begin{CodeOutput}
+The following objects are masked from 'package:stats':
+
+    filter, lag
+\end{CodeOutput}
+\begin{CodeOutput}
+The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union
+\end{CodeOutput}
+\begin{CodeInput}
+R> MathAchieve %>% group_by(School) %>%
++   summarize(mean.ses = mean(SES)) -> Temp
+R> Temp <- merge(MathAchSchool, Temp, by="School")
+R> HSB <- merge(Temp[, c("School", "Sector", "mean.ses")],
++              MathAchieve[, c("School", "SES", "MathAch")], by="School")
+R> names(HSB) <- tolower(names(HSB))
+R> 
+R> HSB$cses <- with(HSB, ses - mean.ses)
+\end{CodeInput}
+\end{CodeChunk}
+
+In the process, we created two new school-level variables:
+\code{meanses}, which is the average SES for students in each school;
+and \code{cses}, which is school-average SES centered at its mean. For
+details, see \citet[Sec. 7.2.2]{FoxWeisberg:2019}.
+
+Still following Fox and Weisberg, we proceed to use the \code{lmer()}
+function in the \pkg{lme4} package \citep{BatesEtAl:2015} to fit a mixed
+model for math achievement to the HSB data:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library("lme4")
+\end{CodeInput}
+\begin{CodeOutput}
+Loading required package: Matrix
+\end{CodeOutput}
+\begin{CodeInput}
+R> hsb.lmer <- lmer(mathach ~ mean.ses*cses + sector*cses
++                    + (cses | school), data=HSB)
+R> summary(hsb.lmer, correlation=FALSE)
+\end{CodeInput}
+\begin{CodeOutput}
+Linear mixed model fit by REML ['lmerMod']
+Formula: mathach ~ mean.ses * cses + sector * cses + (cses | school)
+   Data: HSB
+
+REML criterion at convergence: 46503.7
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-3.15926 -0.72319  0.01704  0.75444  2.95822 
+
+Random effects:
+ Groups   Name        Variance Std.Dev. Corr
+ school   (Intercept)  2.380   1.5426       
+          cses         0.101   0.3179   0.39
+ Residual             36.721   6.0598       
+Number of obs: 7185, groups:  school, 160
+
+Fixed effects:
+                    Estimate Std. Error t value
+(Intercept)          12.1279     0.1993  60.856
+mean.ses              5.3329     0.3692  14.446
+cses                  2.9450     0.1556  18.928
+sectorCatholic        1.2266     0.3063   4.005
+mean.ses:cses         1.0393     0.2989   3.477
+cses:sectorCatholic  -1.6427     0.2398  -6.851
+\end{CodeOutput}
+\end{CodeChunk}
+
+We can then cross-validate at the cluster (i.e., school) level,
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv(hsb.lmer, k=10, clusterVariables="school", seed=5240)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 5240
+\end{CodeOutput}
+\begin{CodeOutput}
+10-Fold Cross Validation based on 160 {school} clusters
+cross-validation criterion = 39.15662
+bias-adjusted cross-validation criterion = 39.14844
+95% CI for bias-adjusted CV criterion = (38.06554, 40.23135)
+full-sample criterion = 39.00599 
+\end{CodeOutput}
+\end{CodeChunk}
+
+or at the case (i.e., student) level,
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv(hsb.lmer, seed=1575)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 1575
+\end{CodeOutput}
+\begin{CodeOutput}
+Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :
+Model failed to converge with max|grad| = 0.00587228 (tol = 0.002, component 1)
+\end{CodeOutput}
+\begin{CodeOutput}
+boundary (singular) fit: see help('isSingular')
+\end{CodeOutput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+cross-validation criterion = 37.44473
+bias-adjusted cross-validation criterion = 37.33801
+95% CI for bias-adjusted CV criterion = (36.28761, 38.38841)
+full-sample criterion = 36.06767 
+\end{CodeOutput}
+\end{CodeChunk}
+
+For cluster-level CV, the \code{clusterVariables} argument tells
+\code{cv()} how the clusters are defined. Were there more than one
+clustering variable, say classes within schools, these would be provided
+as a character vector of variable names:
+\code{clusterVariables = c("school", "class")}. For cluster-level CV,
+the default is \code{k = "loo"}, that is, leave one cluster out at a
+time; we instead specify \code{k = 10} folds of clusters, each fold
+therefore comprising \(160/10 = 16\) schools.
+
+If the \code{clusterVariables} argument is omitted, then case-level CV
+is employed, with \code{k = 10} folds as the default, here each with
+\(7185/10 \approx 719\) students. Notice that one of the 10 models refit
+with a fold removed failed to converge. Convergence problems are common
+in mixed-effects modeling. The apparent issue here is that an estimated
+variance component is close to or equal to 0, which is at a boundary of
+the parameter space. That shouldn't disqualify the fitted model for the
+kind of prediction required for cross-validation.
+
+There is also a \code{cv()} method for linear mixed models fit by the
+\code{lme()} function in the \pkg{nlme} package, and the arguments for
+\code{cv()} in this case are the same as for a model fit by
+\code{lmer()} or \code{glmer()}. We illustrate with the mixed model fit
+to the HSB data:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library(nlme)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Attaching package: 'nlme'
+\end{CodeOutput}
+\begin{CodeOutput}
+The following object is masked from 'package:lme4':
+
+    lmList
+\end{CodeOutput}
+\begin{CodeOutput}
+The following object is masked from 'package:dplyr':
+
+    collapse
+\end{CodeOutput}
+\begin{CodeInput}
+R> hsb.lme <- lme(mathach ~ mean.ses*cses + sector*cses,
++                  random = ~ cses | school, data=HSB,
++                control=list(opt="optim"))
+R> summary(hsb.lme)
+\end{CodeInput}
+\begin{CodeOutput}
+Linear mixed-effects model fit by REML
+  Data: HSB 
+       AIC      BIC    logLik
+  46524.78 46593.57 -23252.39
+
+Random effects:
+ Formula: ~cses | school
+ Structure: General positive-definite, Log-Cholesky parametrization
+            StdDev     Corr  
+(Intercept) 1.54117685 (Intr)
+cses        0.01817364 0.006 
+Residual    6.06349216       
+
+Fixed effects:  mathach ~ mean.ses * cses + sector * cses 
+                        Value Std.Error   DF  t-value p-value
+(Intercept)         12.128207 0.1991964 7022 60.88567   0e+00
+mean.ses             5.336665 0.3689784  157 14.46335   0e+00
+cses                 2.942145 0.1512240 7022 19.45554   0e+00
+sectorCatholic       1.224531 0.3061139  157  4.00025   1e-04
+mean.ses:cses        1.044406 0.2910747 7022  3.58810   3e-04
+cses:sectorCatholic -1.642148 0.2331162 7022 -7.04433   0e+00
+ Correlation: 
+                    (Intr) men.ss cses   sctrCt mn.ss:
+mean.ses             0.256                            
+cses                 0.000  0.000                     
+sectorCatholic      -0.699 -0.356  0.000              
+mean.ses:cses        0.000  0.000  0.295  0.000       
+cses:sectorCatholic  0.000  0.000 -0.696  0.000 -0.351
+
+Standardized Within-Group Residuals:
+        Min          Q1         Med          Q3         Max 
+-3.17010624 -0.72487654  0.01489162  0.75426269  2.96549829 
+
+Number of Observations: 7185
+Number of Groups: 160 
+\end{CodeOutput}
+\begin{CodeInput}
+R> cv(hsb.lme, k=10, clusterVariables="school", seed=5240)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 5240
+\end{CodeOutput}
+\begin{CodeOutput}
+10-Fold Cross Validation based on 160 {school} clusters
+cross-validation criterion = 39.1569
+bias-adjusted cross-validation criterion = 39.14881
+95% CI for bias-adjusted CV criterion = (38.06591, 40.23171)
+full-sample criterion = 39.0062 
+\end{CodeOutput}
+\begin{CodeInput}
+R> cv(hsb.lme, seed=1575)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 1575
+\end{CodeOutput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+cross-validation criterion = 37.44163
+bias-adjusted cross-validation criterion = 37.40222
+95% CI for bias-adjusted CV criterion = (36.35136, 38.45309)
+full-sample criterion = 36.14707 
+\end{CodeOutput}
+\end{CodeChunk}
+
+We used the same random-number generator seeds as in the previous
+example cross-validating the model fit by \code{lmer()}, and so the same
+folds are employed in both cases.\footnote{The observant reader will
+  notice that we set the argument \code{control=list(opt="optim")} in
+  the call to \code{lme()}, changing the optimizer employed from the
+  default \code{"nlminb"}. We did this because with the default
+  optimizer, \code{lme()} encountered the same convergence issue as
+  \code{lmer()}, but rather than issuing a warning, \code{lme()} failed,
+  reporting an error. As it turns out, setting the optimizer to
+  \code{"optim"} avoids this problem.} The estimated covariance
+components and fixed effects in the summary output differ slightly
+between the \code{lmer()} and \code{lme()} solutions, although both
+functions seek to maximize the REML criterion. This is, of course, to be
+expected when different algorithms are used for numerical optimization.
+To the precision reported, the cluster-level CV results for the
+\code{lmer()} and \code{lme()} models are identical, while the
+case-level CV results are very similar but not identical.
+
+\hypertarget{example-contrived-hierarchical-data}{%
+\subsection{Example: Contrived hierarchical
+data}\label{example-contrived-hierarchical-data}}
+
+We introduce an artificial data set that exemplifies aspects of
+cross-validation particular to hierarchical models. Using this data set,
+we show that model comparisons employing cluster-based and those
+employing case-based cross-validation may not agree on a ``best'' model.
+Furthermore, commonly used measures of fit, such as mean-squared error,
+do not necessarily become smaller as models become larger, even when the
+models are nested, and even when the measure of fit is computed for the
+whole data set.
+
+Consider a researcher studying improvement in a skill, yodeling, for
+example, among students enrolled in a four-year yodeling program. The
+plan is to measure each student's skill level at the beginning of the
+program and every year thereafter until the end of the program,
+resulting in five annual measurements for each student. It turns out
+that yodeling appeals to students of all ages, and students enrolling in
+the program range in age from 20 to 70. Moreover, participants'
+untrained yodeling skill is similar at all ages, as is their rate of
+progress with training. All students complete the four-year program.
+
+The researcher, who has more expertise in yodeling than in modeling,
+decides to model the response, \(y\), yodeling skill, as a function of
+age, \(x\), reasoning that students get older during their stay in the
+program, and (incorrectly) that age can serve as a proxy for elapsed
+time. The researcher knows that a mixed model should be used to account
+for clustering due to the expected similarity of measurements taken from
+each student.
+
+We start by generating the data, using parameters consistent with the
+description above and meant to highlight the issues that arise in
+cross-validating mixed-effects models:\footnote{We invite the interested
+  reader to experiment with varying the parameters of our example.}
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> # Parameters:
+R> set.seed(9693) 
+R> Nb <- 100     # number of groups
+R> Nw <- 5       # number of individuals within groups
+R> Bb <- 0       # between-group regression coefficient on group mean
+R> SDre <- 2.0   # between-group SD of random level relative to group mean of x
+R> SDwithin <- 0.5  # within group SD
+R> Bw <- 1          # within group effect of x
+R> Ay <- 10         # intercept for response
+R> Ax <- 20         # starting level of x
+R> Nx <- Nw*10      # number of distinct x values
+R> 
+R> Data <- data.frame(
++   group = factor(rep(1:Nb, each=Nw)),
++   x = Ax + rep(1:Nx, length.out = Nw*Nb)
++ ) |>
++   within(
++     {
++       xm  <- ave(x, group, FUN = mean) # within-group mean
++       y <- Ay +
++         Bb * xm +                    # contextual effect
++         Bw * (x - xm) +              # within-group effect
++         rnorm(Nb, sd=SDre)[group] +  # random level by group
++         rnorm(Nb*Nw, sd=SDwithin)    # random error within groups
++     }
++   )
+\end{CodeInput}
+\end{CodeChunk}
+
+Here is a scatterplot of the data for a representative group of 10
+(without loss of generality, the first 10) of 100 students, showing the
+95\% concentration ellipse for each cluster:\footnote{We find it
+  convenient to use the \pkg{lattice} \citep{Sarkar:2008} and
+  \pkg{latticeExtra} \citep{SarkarAndrews:2022} packages for this and
+  other graphs in this section.}
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library("lattice")
+R> library("latticeExtra")
+R> plot <- xyplot(y ~ x, data=Data[1:Nx, ], group=group,
++                ylim=c(4, 16),
++                par.settings=list(superpose.symbol=list(pch=1, cex=0.7))) +
++     layer(panel.ellipse(..., center.cex=0))
+R> plot # display graph
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot1-1} 
+
+}
+
+\caption[Hierarchical data set, showing the first 10 of 100 students]{Hierarchical data set, showing the first 10 of 100 students.}\label{fig:plot1}
+\end{figure}
+\end{CodeChunk}
+
+The between-student effect of age is 0 but the within-student effect is
+1. Due to the large variation in ages between students, the
+least-squares regression of yodeling skill on age (for the 500
+observations among all 100 students) produces an estimated slope close
+to 0 (though with a small \(p\)-value), because the slope is heavily
+weighted toward the between-student effect:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> summary(lm(y ~ x, data=Data))
+\end{CodeInput}
+\begin{CodeOutput}
+
+Call:
+lm(formula = y ~ x, data = Data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5.7713 -1.6583 -0.0894  1.5520  7.6240 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept) 9.050430   0.347189  26.068  < 2e-16
+x           0.020908   0.007273   2.875  0.00422
+
+Residual standard error: 2.347 on 498 degrees of freedom
+Multiple R-squared:  0.01632,   Adjusted R-squared:  0.01435 
+F-statistic: 8.263 on 1 and 498 DF,  p-value: 0.004219
+\end{CodeOutput}
+\end{CodeChunk}
+
+The initial mixed-effects model that we fit to the data is a simple
+random-intercepts model:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> # random intercept only:
+R> mod.0 <- lmer(y ~ 1 + (1 | group), Data)
+R> summary(mod.0)
+\end{CodeInput}
+\begin{CodeOutput}
+Linear mixed model fit by REML ['lmerMod']
+Formula: y ~ 1 + (1 | group)
+   Data: Data
+
+REML criterion at convergence: 2103.1
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.03514 -0.72645 -0.01169  0.78477  2.04377 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ group    (Intercept) 2.900    1.703   
+ Residual             2.712    1.647   
+Number of obs: 500, groups:  group, 100
+
+Fixed effects:
+            Estimate Std. Error t value
+(Intercept)  10.0018     0.1855   53.91
+\end{CodeOutput}
+\end{CodeChunk}
+
+We will shortly consider three other, more complex, mixed models;
+because of data-management considerations, it is convenient to fit them
+now, but we defer discussion of these models:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> # effect of x and random intercept:
+R> mod.1 <- lmer(y ~ x + (1 | group), Data)
+R> 
+R> # effect of x, contextual (student) mean of x, and random intercept:
+R> mod.2 <- lmer(y ~ x + xm + (1 | group), Data)
+R>         # equivalent to y ~ I(x - xm) + xm + (1 | group)
+R> 
+R> # model generating the data (where Bb = 0)
+R> mod.3 <- lmer(y ~ I(x - xm) + (1 | group), Data)
+\end{CodeInput}
+\end{CodeChunk}
+
+We proceed to obtain predictions from the random-intercept model
+(\code{mod.0}) and the other models (\code{mod.1}, \code{mod.2}, and
+\code{mod.3}) based on fixed effects alone, as would be used for
+cross-validation based on clusters (i.e., students), and for fixed and
+random effects---so-called best linear unbiased predictions or
+BLUPs---as would be used for cross-validation based on cases (i.e.,
+occasions within students):
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> Data <- within(Data, {
++   fit_mod0.fe <- predict(mod.0, re.form = ~ 0) # fixed effects only
++   fit_mod0.re <- predict(mod.0) # fixed and random effects (BLUPs)
++   fit_mod1.fe <- predict(mod.1, re.form = ~ 0)
++   fit_mod1.re <- predict(mod.1)
++   fit_mod2.fe <- predict(mod.2, re.form = ~ 0)
++   fit_mod2.re <- predict(mod.2)
++   fit_mod3.fe <- predict(mod.3, re.form = ~ 0)
++   fit_mod3.re <- predict(mod.3)
++ })
+\end{CodeInput}
+\end{CodeChunk}
+
+We then prepare the data for plotting:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> Data_long <- reshape(Data[1:Nx, ], direction = "long", sep = ".", 
++               timevar = "effect", varying = grep("\\.", names(Data[1:Nx, ])))
+R> Data_long$id <- 1:nrow(Data_long)
+R> Data_long <- reshape(Data_long, direction = "long", sep = "_", 
++               timevar = "modelcode",  varying = grep("_", names(Data_long)))
+R> Data_long$model <- factor(
++   c("~ 1", "~ 1 + x", "~ 1 + x + xm", "~ 1 + I(x - xm)")
++   [match(Data_long$modelcode, c("mod0", "mod1", "mod2", "mod3"))]
++ )
+\end{CodeInput}
+\end{CodeChunk}
+
+Predictions based on the random-intercept model \code{mod.0} for the
+first 10 students are shown in the following graph:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> (plot +
++   xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" & effect == "fe"),
++          groups=group, type="l", lwd=2) +
++   xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" &  effect == "re"),
++          groups=group, type="l", lwd=2, lty=3)
++ ) |> update(
++   main="Model: y ~ 1 + (1 | group)",
++   key=list(
++     corner=c(0.05, 0.05),
++     text=list(c("fixed effects only","fixed and random")),
++     lines=list(lty=c(1, 3))))
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot-fits-mod0-1} 
+
+}
+
+\caption[Predictions from the random intercept model]{Predictions from the random intercept model.}\label{fig:plot-fits-mod0}
+\end{figure}
+\end{CodeChunk}
+
+The fixed-effect predictions for the various individuals are
+identical---the estimated fixed-effects intercept or estimated general
+mean of \(y\)---while the BLUPs are the sums of the fixed-effects
+intercept and the random intercepts, and are only slightly shrunken
+towards the general mean. Because in our artificial data there is no
+population relationship between age and skill, the fixed-effect-only
+predictions and the BLUPs are not very different.
+
+Our next model, \code{mod.1}, includes a fixed intercept and fixed
+effect of \code{x} along with a random intercept:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> summary(mod.1)
+\end{CodeInput}
+\begin{CodeOutput}
+Linear mixed model fit by REML ['lmerMod']
+Formula: y ~ x + (1 | group)
+   Data: Data
+
+REML criterion at convergence: 1564.5
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.90160 -0.63501  0.01879  0.55407  2.82932 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ group    (Intercept) 192.9406 13.8903 
+ Residual               0.2569  0.5068 
+Number of obs: 500, groups:  group, 100
+
+Fixed effects:
+             Estimate Std. Error t value
+(Intercept) -33.91892    1.56446  -21.68
+x             0.96529    0.01581   61.05
+
+Correlation of Fixed Effects:
+  (Intr)
+x -0.460
+\end{CodeOutput}
+\end{CodeChunk}
+
+Predictions from this model appear in the following graph:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> (plot +
++   xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "fe"),
++          groups=group, type="l", lwd=2) +
++   xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "re"),
++          groups=group, type="l", lwd=2, lty=3)
++ ) |> update(
++   main="Model: y ~ 1 + x + (1 | group)",
++   ylim=c(-15, 35),
++   key=list(
++     corner=c(0.95, 0.05),
++     text=list(c("fixed effects only","fixed and random")),
++     lines=list(lty=c(1, 3))))
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot-fits-mod1-1} 
+
+}
+
+\caption[Predictions from the model with random intercepts and $x$ as a fixed-effect predictor]{Predictions from the model with random intercepts and $x$ as a fixed-effect predictor.}\label{fig:plot-fits-mod1}
+\end{figure}
+\end{CodeChunk}
+
+The BLUPs fit the observed data very closely, but predictions based on
+the fixed effects alone, with a common intercept and slope for all
+clusters, are very poor---indeed, much worse than the fixed-effects-only
+predictions based on the simpler random-intercept model, \code{mod.0}.
+We therefore anticipate (and show later in this section) that case-based
+cross-validation will prefer \code{mod1} to \code{mod0}, but that
+cluster-based cross-validation will prefer \code{mod0} to \code{mod1}.
+
+Our third model, \code{mod.2}, includes the contextual effect of
+\(x\)---that is, the cluster mean \textbackslash code\{xm{]}---along
+with \(x\) and the intercept in the fixed-effect part of the model, and
+a random intercept:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> summary(mod.2)
+\end{CodeInput}
+\begin{CodeOutput}
+Linear mixed model fit by REML ['lmerMod']
+Formula: y ~ x + xm + (1 | group)
+   Data: Data
+
+REML criterion at convergence: 1169.2
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.98466 -0.63750  0.00191  0.55682  2.73246 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ group    (Intercept) 3.3986   1.8435  
+ Residual             0.2552   0.5052  
+Number of obs: 500, groups:  group, 100
+
+Fixed effects:
+            Estimate Std. Error t value
+(Intercept)  9.47866    0.61705   15.36
+x            0.99147    0.01597   62.07
+xm          -0.97998    0.02055  -47.68
+
+Correlation of Fixed Effects:
+   (Intr) x     
+x   0.000       
+xm -0.600 -0.777
+\end{CodeOutput}
+\end{CodeChunk}
+
+This model is equivalent to fitting
+\code{y ~ I(x - xm) + xm + (1 | group)}, which is the model that
+generated the data once the coefficient of the contextual predictor
+\code{xm} is set to 0 (as it is in \textbackslash code\{mod.3{]},
+discussed below).
+
+Predictions from model \code{mod.2} appear in the following graph:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> (plot +
++   xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "fe"),
++          groups=group, type="l", lwd=2) +
++   xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "re"),
++          groups=group, type="l", lwd=2, lty=3)
++ ) |> update(
++   main="Model: y ~ 1 + x + xm + (1 | group)",
++   ylim=c(4, 16),
++   key=list(
++     corner=c(0.05, 0.05),
++     text=list(c("fixed effects only","fixed and random")),
++     lines=list(lty=c(1, 3))))
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot-fits-mod2-1} 
+
+}
+
+\caption[Predictors from the model with random intercepts, $x$, and the group (student) mean of $x$ as predictors]{Predictors from the model with random intercepts, $x$, and the group (student) mean of $x$ as predictors.}\label{fig:plot-fits-mod2}
+\end{figure}
+\end{CodeChunk}
+
+Depending on the estimated variance parameters of the model, a mixed
+model like \code{mod.2} will apply varying degrees of shrinkage to the
+random-intercept BLUPs that correspond to variation in the heights of
+the parallel fitted lines for the individual students. In our contrived
+data, the \code{mod.2} applies little shrinkage, allowing substantial
+variability in the heights of the fitted lines, which closely approach
+the observed values for each student. The fit of the mixed model
+\code{mod.2} is consequently similar to that of a fixed-effects model
+with age and a categorical predictor for individual students (i.e.,
+treating students as a factor, and not shown here).
+
+The mixed model \code{mod.2} therefore fits individual observations
+well, and we anticipate a favorable assessment using individual-based
+cross-validation. In contrast, the large variability in the BLUPs
+results in larger residuals for predictions based on fixed effects
+alone, and so we expect that cluster-based cross-validation won't show
+an advantage for model \code{mod.2} compared to the smaller model
+\code{mod.0}, which includes only fixed and random intercepts.
+
+Had the mixed model applied considerable shrinkage, then neither
+cluster-based nor case-based cross-validation would show much
+improvement over the random-intercept-only model. In our experience, the
+degree of shrinkage does not vary smoothly as parameters are changed but
+tends to be ``all or nothing,'' and near the tipping point, the behavior
+of estimates can be affected considerably by the choice of algorithm
+used to fit the model.
+
+Finally, \code{mod.3} directly estimates the model used to generate the
+data. As mentioned, it is a constrained version of \code{mod.2}, with
+the coefficient of \code{xm} set to 0, and with \code{x} expressed as a
+deviation from the cluster mean \code{xm}:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> summary(mod.3)
+\end{CodeInput}
+\begin{CodeOutput}
+Linear mixed model fit by REML ['lmerMod']
+Formula: y ~ I(x - xm) + (1 | group)
+   Data: Data
+
+REML criterion at convergence: 1163.2
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.97703 -0.63204  0.00627  0.56032  2.72489 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ group    (Intercept) 3.3913   1.8415  
+ Residual             0.2552   0.5052  
+Number of obs: 500, groups:  group, 100
+
+Fixed effects:
+            Estimate Std. Error t value
+(Intercept) 10.00176    0.18553   53.91
+I(x - xm)    0.99147    0.01597   62.07
+
+Correlation of Fixed Effects:
+          (Intr)
+I(x - xm) 0.000 
+\end{CodeOutput}
+\end{CodeChunk}
+
+The predictions from \code{mod.3} are therefore similar to those from
+\code{mod.2}:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> (plot +
++   xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "fe"),
++          groups=group, type="l", lwd=2) +
++   xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "re"),
++          groups=group, type="l", lwd=2, lty=3)
++ ) |> update(
++   main="Model: y ~ 1 + I(x - xm) + (1 | group)",
++   ylim=c(4, 16),
++   key=list(
++     corner=c(0.05, 0.05),
++     text=list(c("fixed effects only","fixed and random")),
++     lines=list(lty=c(1, 3))))
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot-fits-mod3-1} 
+
+}
+
+\caption[Predictions from the estimated model generating the data]{Predictions from the estimated model generating the data.}\label{fig:plot-fits-mod3}
+\end{figure}
+\end{CodeChunk}
+
+We next carry out case-based cross-validation, which, as we have
+explained, is based on both fixed and predicted random effects (i.e.,
+BLUPs), and cluster-based cross-validation, which is based on fixed
+effects only. In order to reduce between-model random variability in
+comparisons of models, we apply \code{cv()} to the list of models
+created by the \code{models()} function (introduced previously),
+performing cross-validation with the same folds for each model:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> modlist <- models("~ 1"=mod.0, "~ 1 + x"=mod.1, 
++                   "~ 1 + x + xm"=mod.2, "~ 1 + I(x - xm)"=mod.3)
+R> cvs_clusters <- cv(modlist, data=Data, cluster="group", k=10, seed=6449)
+R> plot(cvs_clusters, main="Model Comparison, Cluster-Based CV")
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/cross-validation-clusters-1} 
+
+}
+
+\caption[10-fold cluster-based cross-validation comparing random intercept models with varying fixed effects]{10-fold cluster-based cross-validation comparing random intercept models with varying fixed effects. The error bars show the 95\% confidence interval around the CV estimate of the MSE for each model.}\label{fig:cross-validation-clusters}
+\end{figure}
+\end{CodeChunk}
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cvs_cases <- cv(modlist, data=Data, seed=9693)
+R> plot(cvs_cases, main="Model Comparison, Case-Based CV")
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/cross-validation-cases-1} 
+
+}
+
+\caption[10-fold case-based cross-validation comparing random intercept models with varying fixed effects]{10-fold case-based cross-validation comparing random intercept models with varying fixed effects.}\label{fig:cross-validation-cases}
+\end{figure}
+\end{CodeChunk}
+
+In summary, model \code{mod.1}, with \(x\) alone and without the
+contextual mean of \(x\), is assessed as fitting very poorly by
+cluster-based CV, but relatively much better by case-based CV. Model
+\code{mod.2}, which includes both \(x\) and its contextual mean,
+produces better results using both cluster-based and case-based CV. The
+data-generating model, \code{mod.3}, which includes the fixed effect of
+\code{x - xm} in place of separate terms in \code{x} and \code{xm},
+isn't distinguishable from model \code{mod.2}, which includes \code{x}
+and \code{xm} separately, even though \code{mod.2} has an unnecessary
+parameter (recall that the population coefficient of \code{xm} is 0 when
+\code{x} is expressed as deviations from the contextual mean). These
+conclusions are consistent with our observations based on graphing
+predictions from the various models, and they illustrate the
+desirability of assessing mixed-effect models at different hierarchical
+levels.
+
+\hypertarget{a-preliminary-example}{%
+\subsection{A preliminary example}\label{a-preliminary-example}}
+
+As \citet[Sec. 7.10.2: ``The Wrong and Right Way to Do
+Cross-validation'']{HastieTibshiraniFriedman:2009} explain, if the whole
+data are used to select or fine-tune a statistical model, subsequent
+cross-validation of the model is intrinsically misleading, because the
+model is selected to fit the whole data, including the part of the data
+that remains when each fold is removed.
+
+The following example is similar in spirit to one employed by
+\citet{HastieTibshiraniFriedman:2009}. Suppose that we randomly generate
+\(n = 1000\) independent observations for a response variable variable
+\(y \sim N(\mu = 10, \sigma^2 = 0)\), and independently sample \(1000\)
+observations for \(p = 100\) ``predictors,'' \(x_1, \ldots, x_{100}\),
+each from \(x_j \sim N(0, 1)\). The response has nothing to do with the
+predictors and so the population linear-regression model
+\(y_i = \alpha + \beta_1 x_{i1} + \cdots + \beta_{100} x_{i,100} + \varepsilon_i\)
+has \(\alpha = 10\) and all \(\beta_j = 0\).
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> set.seed(24361) # for reproducibility
+R> D <- data.frame(
++   y = rnorm(1000, mean=10),
++   X = matrix(rnorm(1000*100), 1000, 100)
++ )
+R> head(D[, 1:6])
+\end{CodeInput}
+\begin{CodeOutput}
+          y        X.1        X.2         X.3         X.4         X.5
+1 10.031647 -1.2388628 -0.2648705 -0.03539048 -2.57697337  0.81104761
+2  9.664989  0.1228689 -0.1774440  0.37290421 -0.93513788  0.62867324
+3 10.023249 -0.9505172 -0.7348667 -1.05978180  0.88294443  0.02391808
+4  8.990969  1.1357103  0.3241085  0.11036901  1.37630285 -0.42211426
+5  9.071249  1.4947403  1.8753802  0.10574793  0.29213991 -0.18456833
+6 11.349283 -0.1845331 -0.7803709 -1.23803778 -0.01094861  0.69103395
+\end{CodeOutput}
+\end{CodeChunk}
+
+Least-squares provides accurate estimates of the regression constant
+\(\alpha = 10\) and the error variance \(\sigma^2 = 1\) for the ``null
+model'' including only the regression constant; moreover, the omnibus
+\(F\)-test of the correct null hypothesis that all of the \(\beta\)s are
+0 for the ``full model'' with all 100 \(x\)s is associated with a large
+\(p\)-value:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> m.full <- lm(y ~ ., data=D)
+R> m.null <- lm(y ~ 1, data=D)
+R> anova(m.null, m.full)
+\end{CodeInput}
+\begin{CodeOutput}
+Analysis of Variance Table
+
+Model 1: y ~ 1
+Model 2: y ~ X.1 + X.2 + X.3 + X.4 + X.5 + X.6 + X.7 + X.8 + X.9 + X.10 + 
+    X.11 + X.12 + X.13 + X.14 + X.15 + X.16 + X.17 + X.18 + X.19 + 
+    X.20 + X.21 + X.22 + X.23 + X.24 + X.25 + X.26 + X.27 + X.28 + 
+    X.29 + X.30 + X.31 + X.32 + X.33 + X.34 + X.35 + X.36 + X.37 + 
+    X.38 + X.39 + X.40 + X.41 + X.42 + X.43 + X.44 + X.45 + X.46 + 
+    X.47 + X.48 + X.49 + X.50 + X.51 + X.52 + X.53 + X.54 + X.55 + 
+    X.56 + X.57 + X.58 + X.59 + X.60 + X.61 + X.62 + X.63 + X.64 + 
+    X.65 + X.66 + X.67 + X.68 + X.69 + X.70 + X.71 + X.72 + X.73 + 
+    X.74 + X.75 + X.76 + X.77 + X.78 + X.79 + X.80 + X.81 + X.82 + 
+    X.83 + X.84 + X.85 + X.86 + X.87 + X.88 + X.89 + X.90 + X.91 + 
+    X.92 + X.93 + X.94 + X.95 + X.96 + X.97 + X.98 + X.99 + X.100
+  Res.Df    RSS  Df Sum of Sq      F Pr(>F)
+1    999 973.65                            
+2    899 888.44 100    85.208 0.8622  0.825
+\end{CodeOutput}
+\begin{CodeInput}
+R> summary(m.null)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Call:
+lm(formula = y ~ 1, data = D)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.4585 -0.6809  0.0190  0.6365  2.9346 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept)  9.93704    0.03122   318.3   <2e-16
+
+Residual standard error: 0.9872 on 999 degrees of freedom
+\end{CodeOutput}
+\end{CodeChunk}
+
+Next, using the \code{stepAIC()} function in the \pkg{MASS} package
+\citep{VenablesRipley:2002}, let us perform a forward stepwise
+regression to select a ``best'' model, starting with the null model, and
+using AIC as the model-selection criterion (see the help page for
+\code{stepAIC()} for details):\footnote{It's generally advantageous to
+  start with the largest model, here the one with 100 predictors, and
+  proceed by backward elimination. In this demonstration, however, where
+  all of the \(\beta\)s are really 0, the selected model will be small,
+  and so we proceed by forward selection from the null model to save
+  computing time.}
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library("MASS")  # for stepAIC()
+R> m.select <- stepAIC(m.null,
++                     direction="forward", trace=FALSE,
++                     scope=list(lower=~1, upper=formula(m.full)))
+R> summary(m.select)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Call:
+lm(formula = y ~ X.99 + X.90 + X.87 + X.40 + X.65 + X.91 + X.53 + 
+    X.45 + X.31 + X.56 + X.61 + X.60 + X.46 + X.35 + X.92, data = D)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.2620 -0.6446  0.0236  0.6406  3.1180 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept)  9.93716    0.03098 320.803  < 2e-16
+X.99        -0.09103    0.03082  -2.953  0.00322
+X.90        -0.08205    0.03135  -2.617  0.00901
+X.87        -0.06942    0.03105  -2.235  0.02561
+X.40        -0.04759    0.03076  -1.547  0.12211
+X.65        -0.05523    0.03147  -1.755  0.07952
+X.91         0.05245    0.03084   1.700  0.08937
+X.53        -0.04921    0.03048  -1.615  0.10672
+X.45         0.05543    0.03182   1.742  0.08183
+X.31         0.04525    0.03108   1.456  0.14570
+X.56         0.05433    0.03273   1.660  0.09723
+X.61        -0.05085    0.03170  -1.604  0.10908
+X.60        -0.05133    0.03194  -1.607  0.10832
+X.46         0.05158    0.03272   1.576  0.11529
+X.35         0.04696    0.03146   1.493  0.13584
+X.92         0.04430    0.03100   1.429  0.15329
+
+Residual standard error: 0.9725 on 984 degrees of freedom
+Multiple R-squared:  0.04419,   Adjusted R-squared:  0.02962 
+F-statistic: 3.033 on 15 and 984 DF,  p-value: 8.338e-05
+\end{CodeOutput}
+\begin{CodeInput}
+R> mse(D$y, fitted(m.select))
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 0.9306254
+attr(,"casewise loss")
+[1] "(y - yhat)^2"
+\end{CodeOutput}
+\end{CodeChunk}
+
+The resulting model has 15 predictors, a very modest \(R^2 = .044\), but
+a small \(p\)-value for its omnibus \(F\)-test (which, of course, is
+entirely spurious because the same data were used to select and test the
+model). The MSE for the selected model is smaller than the true error
+variance \(\sigma^2 = 1\), as is the estimated error variance for the
+selected model, \(\widehat{\sigma}^2 = 0.973^2 = 0.947\).
+
+If we cross-validate the selected model, we also obtain an optimistic
+estimate of its predictive power (although the confidence interval for
+the bias-adjusted MSE includes 1):
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv(m.select, seed=2529)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 2529
+\end{CodeOutput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+method: Woodbury
+criterion: mse
+cross-validation criterion = 0.9593695
+bias-adjusted cross-validation criterion = 0.9578478
+95% CI for bias-adjusted CV criterion = (0.8766138, 1.039082)
+full-sample criterion = 0.9306254 
+\end{CodeOutput}
+\end{CodeChunk}
+
+The \code{cvSelect()} function in the \pkg{cv} package allows us to
+cross-validate the whole model-selection procedure. The first argument
+to \code{cvSelect()} is a model-selection function capable of refitting
+the model with a fold omitted and returning a CV criterion. The
+\code{selectStepAIC()} function, also in \pkg{cv} and based on
+\code{stepAIC()}, is suitable for use with \code{cvSelect()}:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv.select <- cvSelect(selectStepAIC, data=D, seed=3791,
++                       model=m.null, direction="forward",
++                       scope=list(lower=~1, 
++                                  upper=formula(m.full)))
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 3791
+\end{CodeOutput}
+\begin{CodeInput}
+R> cv.select
+\end{CodeInput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+cross-validation criterion = 1.06873
+bias-adjusted cross-validation criterion = 1.061183
+95% CI for bias-adjusted CV criterion = (0.9717229, 1.150642)
+full-sample criterion = 0.9306254 
+\end{CodeOutput}
+\end{CodeChunk}
+
+The other arguments to \code{cvSelect()} are:
+
+\begin{itemize}
+\tightlist
+\item
+  \code{data}, the data set to which the model is fit;
+\item
+  \code{seed}, an optional seed for \proglang{R}'s pseudo-random-number
+  generator; as for \code{cv()}, if the seed isn't supplied by the user,
+  a seed is randomly selected and saved;
+\item
+  additional arguments required by the model-selection function, here
+  the starting \code{model} argument, the \code{direction} of model
+  selection, and the \code{scope} of models considered (from the model
+  with only a regression constant to the model with all 100 predictors).
+\end{itemize}
+
+By default, \code{cvSelect()} performs 10-fold CV, and produces an
+estimate of MSE for the model-selection procedure even \emph{larger}
+than the true error variance, \(\sigma^2 = 1\).
+
+Also by default, when the number of folds is 10 or fewer,
+\code{cvSelect()} saves the coefficients of the selected models. In this
+example, the \code{compareFolds()} function reveals that the variables
+retained by the model-selection process in the several folds are quite
+different:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> compareFolds(cv.select)
+\end{CodeInput}
+\begin{CodeOutput}
+        (Intercept)    X.87    X.90    X.99    X.91    X.54    X.53    X.56
+Fold 1       9.9187 -0.0615 -0.0994 -0.0942  0.0512  0.0516                
+Fold 2       9.9451 -0.0745 -0.0899 -0.0614          0.0587          0.0673
+Fold 3       9.9423 -0.0783 -0.0718 -0.0987  0.0601                  0.0512
+Fold 4       9.9410 -0.0860 -0.0831 -0.0867  0.0570         -0.0508        
+Fold 5       9.9421 -0.0659 -0.0849 -0.1004  0.0701  0.0511 -0.0487  0.0537
+Fold 6       9.9633 -0.0733 -0.0874 -0.0960  0.0555  0.0629 -0.0478        
+Fold 7       9.9279 -0.0618 -0.0960 -0.0838  0.0533         -0.0464        
+Fold 8       9.9453 -0.0610 -0.0811 -0.0818          0.0497 -0.0612  0.0560
+Fold 9       9.9173 -0.0663 -0.0894 -0.1100  0.0504  0.0524          0.0747
+Fold 10      9.9449 -0.0745 -0.0906 -0.0891  0.0535  0.0482 -0.0583  0.0642
+           X.40    X.45    X.65    X.68    X.92    X.15    X.26    X.46    X.60
+Fold 1                  -0.0590                 -0.0456  0.0658  0.0608        
+Fold 2                                   0.0607          0.0487                
+Fold 3  -0.0496         -0.0664          0.0494                                
+Fold 4  -0.0597  0.0579 -0.0531          0.0519 -0.0566                 -0.0519
+Fold 5                           0.0587                          0.0527 -0.0603
+Fold 6  -0.0596  0.0552          0.0474                                        
+Fold 7           0.0572          0.0595                                        
+Fold 8           0.0547 -0.0617  0.0453  0.0493 -0.0613  0.0591  0.0703 -0.0588
+Fold 9  -0.0552  0.0573 -0.0635  0.0492         -0.0513  0.0484         -0.0507
+Fold 10 -0.0558                          0.0529                  0.0710        
+           X.61     X.8    X.28    X.29    X.31    X.35    X.70    X.89    X.17
+Fold 1  -0.0490          0.0616 -0.0537                  0.0638                
+Fold 2           0.0671                  0.0568                  0.0523        
+Fold 3  -0.0631          0.0616                                                
+Fold 4           0.0659         -0.0549          0.0527                  0.0527
+Fold 5           0.0425                  0.0672  0.0613          0.0493        
+Fold 6           0.0559         -0.0629  0.0498          0.0487                
+Fold 7                                                           0.0611  0.0472
+Fold 8  -0.0719                                          0.0586                
+Fold 9                   0.0525                                                
+Fold 10 -0.0580                                  0.0603                        
+           X.25     X.4    X.64    X.81    X.97    X.11     X.2    X.33    X.47
+Fold 1                                   0.0604          0.0575                
+Fold 2   0.0478          0.0532  0.0518                                        
+Fold 3                           0.0574                          0.0473        
+Fold 4                   0.0628                                                
+Fold 5   0.0518                                                                
+Fold 6                                           0.0521                        
+Fold 7           0.0550                                                        
+Fold 8                                                                         
+Fold 9                                   0.0556                          0.0447
+Fold 10          0.0516                                                        
+            X.6    X.72    X.73    X.77    X.79 X.88
+Fold 1   0.0476                                     
+Fold 2                   0.0514                     
+Fold 3                                              
+Fold 4                                  -0.0473     
+Fold 5           0.0586                         0.07
+Fold 6                          -0.0489             
+Fold 7                                              
+Fold 8                                              
+Fold 9                                              
+Fold 10                                             
+\end{CodeOutput}
+\end{CodeChunk}
+
+\hypertarget{cross-validating-choice-of-transformations-in-regression}{%
+\subsection{Cross-validating choice of transformations in
+regression}\label{cross-validating-choice-of-transformations-in-regression}}
+
+The \pkg{cv} package also provides a \code{cvSelect()} procedure,
+\code{selectTrans()}, for choosing transformations of the predictors and
+the response in regression.
+
+Some background: As \citet[Sec. 8.2]{Weisberg:2014} explains, there are
+technical advantages to having (numeric) predictors in linear regression
+analysis that are themselves linearly related. If the predictors
+\emph{aren't} linearly related, then the relationships between them can
+often be straightened by power transformations. Transformations can be
+selected after graphical examination of the data, or by analytic
+methods. Once the relationships between the predictors are linearized,
+it can be advantageous similarly to transform the response variable
+towards normality.
+
+Selecting transformations analytically raises the possibility of
+automating the process, as would be required for cross-validation. One
+could, in principle, apply graphical methods to select transformations
+for each fold, but because a data analyst couldn't forget the choices
+made for previous folds, the process wouldn't really be applied
+independently to the folds.
+
+To illustrate, we adapt an example appearing in several places in
+\citet{FoxWeisberg:2019} (for example in Chapter 3 on transforming
+data), using data on the prestige and other characteristics of 102
+Canadian occupations circa 1970. The data are in the \code{Prestige}
+data frame in the \pkg{carData} package:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> data("Prestige", package="carData")
+R> head(Prestige)
+\end{CodeInput}
+\begin{CodeOutput}
+                    education income women prestige census type
+gov.administrators      13.11  12351 11.16     68.8   1113 prof
+general.managers        12.26  25879  4.02     69.1   1130 prof
+accountants             12.77   9271 15.70     63.4   1171 prof
+purchasing.officers     11.42   8865  9.11     56.8   1175 prof
+chemists                14.62   8403 11.68     73.5   2111 prof
+physicists              15.64  11030  5.13     77.6   2113 prof
+\end{CodeOutput}
+\begin{CodeInput}
+R> summary(Prestige)
+\end{CodeInput}
+\begin{CodeOutput}
+   education          income          women           prestige    
+ Min.   : 6.380   Min.   :  611   Min.   : 0.000   Min.   :14.80  
+ 1st Qu.: 8.445   1st Qu.: 4106   1st Qu.: 3.592   1st Qu.:35.23  
+ Median :10.540   Median : 5930   Median :13.600   Median :43.60  
+ Mean   :10.738   Mean   : 6798   Mean   :28.979   Mean   :46.83  
+ 3rd Qu.:12.648   3rd Qu.: 8187   3rd Qu.:52.203   3rd Qu.:59.27  
+ Max.   :15.970   Max.   :25879   Max.   :97.510   Max.   :87.20  
+     census       type   
+ Min.   :1113   bc  :44  
+ 1st Qu.:3120   prof:31  
+ Median :5135   wc  :23  
+ Mean   :5402   NA's: 4  
+ 3rd Qu.:8312            
+ Max.   :9517            
+\end{CodeOutput}
+\end{CodeChunk}
+
+The variables in the \code{Prestige} data set are:
+
+\begin{itemize}
+\tightlist
+\item
+  \code{education}: average years of education for incumbents in the
+  occupation, from the 1971 Canadian Census.
+\item
+  \code{income}: average dollars of annual income for the occupation,
+  from the Census.
+\item
+  \code{women}: percentage of occupational incumbents who were women,
+  also from the Census.
+\item
+  \code{prestige}: the average prestige rating of the occupation on a
+  0--100 ``thermometer'' scale, in a Canadian social survey conducted
+  around the same time.
+\item
+  \code{type}, type of occupation, and \code{census}, the Census
+  occupational code, which are not used in our example.
+\end{itemize}
+
+The object of a regression analysis for the \code{Prestige} data (and
+their original purpose) is to predict occupational prestige from the
+other variables in the data set.
+
+A scatterplot matrix (using the \code{scatterplotMatrix()} function in
+the \pkg{car} package) of the numeric variables in the data reveals that
+the distributions of \code{income} and \code{women} are positively
+skewed, and that some of the relationships among the three predictors,
+and between the predictors and the response (i.e., \code{prestige}), are
+nonlinear:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library("car")
+\end{CodeInput}
+\begin{CodeOutput}
+Loading required package: carData
+\end{CodeOutput}
+\begin{CodeInput}
+R> scatterplotMatrix(~ prestige + income + education + women,
++                   data=Prestige, smooth=list(spread=FALSE))
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/scatterplot-matrix-1} 
+
+}
+
+\caption[Scatterplot matrix for the `Prestige` data]{Scatterplot matrix for the `Prestige` data.}\label{fig:scatterplot-matrix}
+\end{figure}
+\end{CodeChunk}
+
+The \code{powerTransform()} function in the \pkg{car} package transforms
+variables towards multivariate normality by a generalization of Box and
+Cox's maximum-likelihood-like approach \citep{BoxCox:1964}. Several
+``families'' of power transformations can be used, including the
+original Box-Cox family, simple powers (and roots), and two adaptations
+of the Box-Cox family to data that may include negative values and
+zeros: the Box-Cox-with-negatives family and the Yeo-Johnson family; see
+\citet[Chap. 8]{Weisberg:2014}, and \citet[Chap. 3]{FoxWeisberg:2019}
+for details. Because \code{women} has some 0 values, we use the
+Yeo-Johnson family:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> trans <- powerTransform( cbind(income, education, women) ~ 1,
++                          data=Prestige, family="yjPower")
+R> summary(trans)
+\end{CodeInput}
+\begin{CodeOutput}
+yjPower Transformations to Multinormality 
+          Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd
+income       0.2678        0.33       0.1051       0.4304
+education    0.5162        1.00      -0.2822       1.3145
+women        0.1630        0.16       0.0112       0.3149
+
+ Likelihood ratio test that all transformation parameters are equal to 0
+                               LRT df      pval
+LR test, lambda = (0 0 0) 15.73879  3 0.0012827
+\end{CodeOutput}
+\end{CodeChunk}
+
+We thus have evidence of the desirability of transforming \code{income}
+(by the \(1/3\) power) and \code{women} (by the \(0.16\) power---which
+is close to the ``0'' power, i.e., the log transformation), but not
+\code{education}. Applying the ``rounded'' power transformations makes
+the predictors better-behaved:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> P <- Prestige[, c("prestige", "income", "education", "women")]
+R> (lambdas <- trans$roundlam)
+\end{CodeInput}
+\begin{CodeOutput}
+   income education     women 
+0.3300000 1.0000000 0.1630182 
+\end{CodeOutput}
+\begin{CodeInput}
+R> names(lambdas) <- c("income", "education", "women")
+R> for (var in c("income", "education", "women")){
++   P[, var] <- yjPower(P[, var], lambda=lambdas[var])
++ }
+R> summary(P)
+\end{CodeInput}
+\begin{CodeOutput}
+    prestige         income        education          women      
+ Min.   :14.80   Min.   :22.15   Min.   : 6.380   Min.   :0.000  
+ 1st Qu.:35.23   1st Qu.:44.17   1st Qu.: 8.445   1st Qu.:1.731  
+ Median :43.60   Median :50.26   Median :10.540   Median :3.362  
+ Mean   :46.83   Mean   :50.76   Mean   :10.738   Mean   :3.502  
+ 3rd Qu.:59.27   3rd Qu.:56.24   3rd Qu.:12.648   3rd Qu.:5.591  
+ Max.   :87.20   Max.   :83.62   Max.   :15.970   Max.   :6.830  
+\end{CodeOutput}
+\begin{CodeInput}
+R> scatterplotMatrix(~ prestige + income + education + women,
++                   data=P, smooth=list(spread=FALSE))
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/transformed-predictors-1} 
+
+}
+
+\caption[Scatterplot matrix for the `Prestige` data with the predictors transformed]{Scatterplot matrix for the `Prestige` data with the predictors transformed.}\label{fig:transformed-predictors}
+\end{figure}
+\end{CodeChunk}
+
+Comparing the MSE for the regressions with the original and transformed
+predictors shows a advantage to the latter:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> m.pres <- lm(prestige ~ income + education + women, data=Prestige)
+R> m.pres.trans <- lm(prestige ~ income + education + women, data=P)
+R> mse(Prestige$prestige, fitted(m.pres))
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 59.15265
+attr(,"casewise loss")
+[1] "(y - yhat)^2"
+\end{CodeOutput}
+\begin{CodeInput}
+R> mse(P$prestige, fitted(m.pres.trans))
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 50.60016
+attr(,"casewise loss")
+[1] "(y - yhat)^2"
+\end{CodeOutput}
+\end{CodeChunk}
+
+Similarly, component+residual plots for the two regressions, produced by
+the \code{crPlots()} function in the \pkg{car} package, suggest that the
+partial relationship of \code{prestige} to \code{income} is more nearly
+linear in the transformed data, but the transformation of
+\textbackslash code\{women{]} fails to capture what appears to be a
+slight quadratic partial relationship; the partial relationship of
+\code{prestige} to \code{education} is close to linear in both
+regressions:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> crPlots(m.pres)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics{JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1} 
+
+}
+
+\caption[Component+residual plots for the `Prestige` regression with the original predictors]{Component+residual plots for the `Prestige` regression with the original predictors.}\label{fig:CR-plots-untransformed}
+\end{figure}
+\end{CodeChunk}
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> crPlots(m.pres.trans)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics{JSS-article-reduced_files/figure-latex/CR-plots-transformed-1} 
+
+}
+
+\caption[Component+residual plots for the `Prestige` regression with transformed predictors]{Component+residual plots for the `Prestige` regression with transformed predictors.}\label{fig:CR-plots-transformed}
+\end{figure}
+\end{CodeChunk}
+
+Having transformed the predictors towards multinormality, we now
+consider whether there's evidence for transforming the response (using
+\code{powerTransform()} for Box and Cox's original method), and we
+discover that there's not:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> summary(powerTransform(m.pres.trans))
+\end{CodeInput}
+\begin{CodeOutput}
+bcPower Transformation to Normality 
+   Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd
+Y1    1.0194           1       0.6773       1.3615
+
+Likelihood ratio test that transformation parameter is equal to 0
+ (log transformation)
+                          LRT df       pval
+LR test, lambda = (0) 32.2174  1 1.3785e-08
+
+Likelihood ratio test that no transformation is needed
+                             LRT df    pval
+LR test, lambda = (1) 0.01238421  1 0.91139
+\end{CodeOutput}
+\end{CodeChunk}
+
+The \code{selectTrans()} function in the \pkg{cv} package automates the
+process of selecting predictor and response transformations. The
+function takes a \code{data} set and ``working'' \code{model} as
+arguments, along with the candidate \code{predictors} and
+\code{response} for transformation, and the transformation \code{family}
+to employ. If the \code{predictors} argument is missing then only the
+response is transformed, and if the \code{response} argument is missing,
+only the supplied predictors are transformed. The default \code{family}
+for transforming the predictors is \code{"bcPower"}---the original
+Box-Cox family---as is the default \code{family.y} for transforming the
+response; here we specify \code{family="yjPower} because of the 0s in
+\code{women}. \code{selectTrans()} returns the result of applying a
+lack-of-fit criterion to the model after the selected transformation is
+applied, with the default \code{criterion=mse}:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> selectTrans(data=Prestige, model=m.pres,
++             predictors=c("income", "education", "women"),
++             response="prestige", family="yjPower")
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 50.60016
+attr(,"casewise loss")
+[1] "(y - yhat)^2"
+\end{CodeOutput}
+\end{CodeChunk}
+
+\code{selectTrans()} also takes an optional \code{indices} argument,
+making it suitable for doing computations on a subset of the data (i.e.,
+a CV fold), and hence for use with \code{cvSelect()} (see
+\code{?selectTrans} for details):
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cvs <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=1463,
++                 predictors=c("income", "education", "women"),
++                 response="prestige",
++                 family="yjPower")
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 1463
+\end{CodeOutput}
+\begin{CodeInput}
+R> cvs
+\end{CodeInput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+cross-validation criterion = 54.4871
+bias-adjusted cross-validation criterion = 54.30824
+full-sample criterion = 50.60016 
+\end{CodeOutput}
+\begin{CodeInput}
+R> cv(m.pres, seed=1463) # untransformed model with same folds
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 1463
+\end{CodeOutput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+method: Woodbury
+criterion: mse
+cross-validation criterion = 63.2926
+bias-adjusted cross-validation criterion = 63.07251
+full-sample criterion = 59.15265 
+\end{CodeOutput}
+\begin{CodeInput}
+R> compareFolds(cvs)
+\end{CodeInput}
+\begin{CodeOutput}
+        lam.education lam.income lam.women lambda
+Fold 1          1.000      0.330     0.330      1
+Fold 2          1.000      0.330     0.169      1
+Fold 3          1.000      0.330     0.330      1
+Fold 4          1.000      0.330     0.330      1
+Fold 5          1.000      0.330     0.000      1
+Fold 6          1.000      0.330     0.330      1
+Fold 7          1.000      0.330     0.330      1
+Fold 8          1.000      0.330     0.000      1
+Fold 9          1.000      0.330     0.000      1
+Fold 10         1.000      0.330     0.000      1
+\end{CodeOutput}
+\end{CodeChunk}
+
+The results suggest that the predictive power of the transformed
+regression is reliably greater than that of the untransformed regression
+(though in both case, the cross-validated MSE is considerably higher
+than the MSE computed for the whole data). Examining the selected
+transformations for each fold reveals that the predictor
+\code{education} and the response \code{prestige} are never transformed;
+that the \(1/3\) power is selected for \code{income} in all of the
+folds; and that the transformation selected for \code{women} varies
+narrowly across the folds between the \(0\)th power (i.e., log) and the
+\(1/3\) power.
+
+\hypertarget{selecting-both-transformations-and-predictorsvenables}{%
+\subsection[Selecting both transformations and
+predictors]{\texorpdfstring{Selecting both transformations and
+predictors\footnote{The presentation in the section benefits from an
+  email conversation with Bill Venables, who of course isn't responsible
+  for the use to which we've put his insightful remarks.}}{Selecting both transformations and predictors}}\label{selecting-both-transformations-and-predictorsvenables}}
+
+As we mentioned, \citet[Sec. 7.10.2: ``The Wrong and Right Way to Do
+Cross-validation'']{HastieTibshiraniFriedman:2009} explain that honest
+cross-validation has to take account of model specification and
+selection. Statistical modeling is at least partly a craft, and one
+could imagine applying that craft to successive partial data sets, each
+with a fold removed. The resulting procedure would be tedious, though
+possibly worth the effort, but it would also be difficult to realize in
+practice: After all, we can hardly erase our memory of statistical
+modeling choices between analyzing partial data sets.
+
+Alternatively, if we're able to automate the process of model selection,
+then we can more realistically apply CV mechanically. That's what we did
+in the preceding two sections, first for predictor selection and then
+for selection of transformations in regression. In this section, we
+consider the case where we both select variable transformations and then
+proceed to select predictors. It's insufficient to apply these steps
+sequentially, first, for example, using \code{cvSelect()} with
+\code{selectTrans()} and then with \code{selectStepAIC()}; rather we
+should apply the whole model-selection procedure with each fold omitted.
+The \code{selectTransAndStepAIC()} function, also supplied by the
+\pkg{cv} package, does exactly that.
+
+To illustrate this process, we return to the \code{Auto} data set:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> summary(Auto)
+\end{CodeInput}
+\begin{CodeOutput}
+      mpg          cylinders      displacement     horsepower        weight    
+ Min.   : 9.00   Min.   :3.000   Min.   : 68.0   Min.   : 46.0   Min.   :1613  
+ 1st Qu.:17.00   1st Qu.:4.000   1st Qu.:105.0   1st Qu.: 75.0   1st Qu.:2225  
+ Median :22.75   Median :4.000   Median :151.0   Median : 93.5   Median :2804  
+ Mean   :23.45   Mean   :5.472   Mean   :194.4   Mean   :104.5   Mean   :2978  
+ 3rd Qu.:29.00   3rd Qu.:8.000   3rd Qu.:275.8   3rd Qu.:126.0   3rd Qu.:3615  
+ Max.   :46.60   Max.   :8.000   Max.   :455.0   Max.   :230.0   Max.   :5140  
+                                                                               
+  acceleration        year           origin                      name    
+ Min.   : 8.00   Min.   :70.00   Min.   :1.000   amc matador       :  5  
+ 1st Qu.:13.78   1st Qu.:73.00   1st Qu.:1.000   ford pinto        :  5  
+ Median :15.50   Median :76.00   Median :1.000   toyota corolla    :  5  
+ Mean   :15.54   Mean   :75.98   Mean   :1.577   amc gremlin       :  4  
+ 3rd Qu.:17.02   3rd Qu.:79.00   3rd Qu.:2.000   amc hornet        :  4  
+ Max.   :24.80   Max.   :82.00   Max.   :3.000   chevrolet chevette:  4  
+                                                 (Other)           :365  
+\end{CodeOutput}
+\begin{CodeInput}
+R> xtabs(~ year, data=Auto)
+\end{CodeInput}
+\begin{CodeOutput}
+year
+70 71 72 73 74 75 76 77 78 79 80 81 82 
+29 27 28 40 26 30 34 28 36 29 27 28 30 
+\end{CodeOutput}
+\begin{CodeInput}
+R> xtabs(~ origin, data=Auto)
+\end{CodeInput}
+\begin{CodeOutput}
+origin
+  1   2   3 
+245  68  79 
+\end{CodeOutput}
+\begin{CodeInput}
+R> xtabs(~ cylinders, data=Auto)
+\end{CodeInput}
+\begin{CodeOutput}
+cylinders
+  3   4   5   6   8 
+  4 199   3  83 103 
+\end{CodeOutput}
+\end{CodeChunk}
+
+We previously used the \code{Auto} here in a preliminary example where
+we employed CV to inform the selection of the order of a polynomial
+regression of \code{mpg} on \code{horsepower}. Here, we consider more
+generally the problem of predicting \code{mpg} from the other variables
+in the \code{Auto} data. We begin with a bit of data management, and
+then examine the pairwise relationships among the numeric variables in
+the data set:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> Auto$cylinders <- factor(Auto$cylinders,
++                          labels=c("3.4", "3.4", "5.6", "5.6", "8"))
+R> Auto$year <- as.factor(Auto$year)
+R> Auto$origin <- factor(Auto$origin,
++                       labels=c("America", "Europe", "Japan"))
+R> rownames(Auto) <- make.names(Auto$name, unique=TRUE)
+R> Auto$name <- NULL
+R> 
+R> scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
++                   smooth=list(spread=FALSE), data=Auto)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/Auto-explore-1} 
+
+}
+
+\caption[Scatterplot matrix for the numeric variables in the `Auto` data]{Scatterplot matrix for the numeric variables in the `Auto` data}\label{fig:Auto-explore}
+\end{figure}
+\end{CodeChunk}
+
+A comment before we proceed: \code{origin} is clearly categorical and so
+converting it to a factor is natural, but we could imagine treating
+\code{cylinders} and \code{year} as numeric predictors. There are,
+however, only 5 distinct values of \code{cylinders} (ranging from 3 to
+8), but cars with 3 or 5 cylinders are rare. and none of the cars has 7
+cylinders. There are similarly only 13 distinct years between 1970 and
+1982 in the data, and the relationship between \code{mpg} and
+\code{year} is difficult to characterize.\footnote{Of course, making the
+  decision to treat \code{year} as a factor on this basis could be
+  construed as cheating in the current context, which illustrates the
+  difficulty of automating the whole model-selection process. It's
+  rarely desirable, in our opinion, to forgo exploration of the data to
+  ensure the purity of model validation. We believe, however, that it's
+  still useful to automate as much of the process as we can to obtain a
+  more realistic, if still biased, estimate of the predictive power of a
+  model.} It's apparent that most these variables are positively skewed
+and that many of the pairwise relationships among them are nonlinear.
+
+We begin with a ``working model'' that specifies linear partial
+relationships of the response to the numeric predictors:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> m.auto <- lm(mpg ~ ., data = Auto)
+R> summary(m.auto)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Call:
+lm(formula = mpg ~ ., data = Auto)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-9.0064 -1.7450 -0.0917  1.5251 10.9504 
+
+Coefficients:
+               Estimate Std. Error t value Pr(>|t|)
+(Intercept)  37.0341323  1.9693933  18.805  < 2e-16
+cylinders5.6 -2.6029412  0.6552000  -3.973 8.54e-05
+cylinders8   -0.5824578  1.1714516  -0.497 0.619335
+displacement  0.0174253  0.0067340   2.588 0.010043
+horsepower   -0.0413534  0.0133786  -3.091 0.002145
+weight       -0.0055479  0.0006323  -8.774  < 2e-16
+acceleration  0.0615272  0.0883132   0.697 0.486431
+year71        0.9680584  0.8373899   1.156 0.248408
+year72       -0.6014345  0.8251155  -0.729 0.466517
+year73       -0.6876890  0.7402723  -0.929 0.353510
+year74        1.3755758  0.8765000   1.569 0.117408
+year75        0.9299288  0.8590716   1.082 0.279742
+year76        1.5598929  0.8225051   1.897 0.058669
+year77        2.9094161  0.8417285   3.456 0.000611
+year78        3.1751976  0.7989396   3.974 8.48e-05
+year79        5.0192987  0.8457587   5.935 6.76e-09
+year80        9.0997634  0.8972933  10.141  < 2e-16
+year81        6.6886597  0.8852181   7.556 3.28e-13
+year82        8.0711248  0.8706683   9.270  < 2e-16
+originEurope  2.0466642  0.5171236   3.958 9.07e-05
+originJapan   2.1448874  0.5077169   4.225 3.02e-05
+
+Residual standard error: 2.924 on 371 degrees of freedom
+Multiple R-squared:  0.8668,    Adjusted R-squared:  0.8596 
+F-statistic: 120.7 on 20 and 371 DF,  p-value: < 2.2e-16
+\end{CodeOutput}
+\begin{CodeInput}
+R> Anova(m.auto)
+\end{CodeInput}
+\begin{CodeOutput}
+Anova Table (Type II tests)
+
+Response: mpg
+             Sum Sq  Df F value    Pr(>F)
+cylinders     292.3   2 17.0915 7.935e-08
+displacement   57.3   1  6.6959  0.010043
+horsepower     81.7   1  9.5544  0.002145
+weight        658.3   1 76.9801 < 2.2e-16
+acceleration    4.2   1  0.4854  0.486431
+year         3016.8  12 29.3987 < 2.2e-16
+origin        190.3   2 11.1287 2.024e-05
+Residuals    3172.5 371                  
+\end{CodeOutput}
+\begin{CodeInput}
+R> crPlots(m.auto)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/Auto-working-model-1} 
+
+}
+
+\caption[Component+residual plots for the working model fit to the `Auto` data]{Component+residual plots for the working model fit to the `Auto` data}\label{fig:Auto-working-model}
+\end{figure}
+\end{CodeChunk}
+
+The component+residual plots, created with the \code{crPlots()} function
+in the previously loaded \pkg{car} package, clearly reveal the
+inadequacy of the model.
+
+We proceed to transform the numeric predictors towards multi-normality:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> num.predictors <- c("displacement", "horsepower", "weight", "acceleration")
+R> tr.x <- powerTransform(Auto[, num.predictors])
+R> summary(tr.x)
+\end{CodeInput}
+\begin{CodeOutput}
+bcPower Transformations to Multinormality 
+             Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd
+displacement   -0.0509           0      -0.2082       0.1065
+horsepower     -0.1249           0      -0.2693       0.0194
+weight         -0.0870           0      -0.2948       0.1208
+acceleration    0.3061           0      -0.0255       0.6376
+
+Likelihood ratio test that transformation parameters are equal to 0
+ (all log transformations)
+                                 LRT df    pval
+LR test, lambda = (0 0 0 0) 4.872911  4 0.30059
+
+Likelihood ratio test that no transformations are needed
+                                 LRT df       pval
+LR test, lambda = (1 1 1 1) 390.0777  4 < 2.22e-16
+\end{CodeOutput}
+\end{CodeChunk}
+
+We then apply the (rounded) transformations---all, as it turns out,
+logs---to the data and re-estimate the model:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> A <- Auto
+R> powers <- tr.x$roundlam
+R> for (pred in num.predictors){
++   A[, pred] <- bcPower(A[, pred], lambda=powers[pred])
++ }
+R> head(A)
+\end{CodeInput}
+\begin{CodeOutput}
+                          mpg cylinders displacement horsepower   weight
+chevrolet.chevelle.malibu  18         8     5.726848   4.867534 8.161660
+buick.skylark.320          15         8     5.857933   5.105945 8.214194
+plymouth.satellite         18         8     5.762051   5.010635 8.142063
+amc.rebel.sst              16         8     5.717028   5.010635 8.141190
+ford.torino                17         8     5.710427   4.941642 8.145840
+ford.galaxie.500           15         8     6.061457   5.288267 8.375860
+                          acceleration year  origin
+chevrolet.chevelle.malibu     2.484907   70 America
+buick.skylark.320             2.442347   70 America
+plymouth.satellite            2.397895   70 America
+amc.rebel.sst                 2.484907   70 America
+ford.torino                   2.351375   70 America
+ford.galaxie.500              2.302585   70 America
+\end{CodeOutput}
+\begin{CodeInput}
+R> m <- update(m.auto, data=A)
+\end{CodeInput}
+\end{CodeChunk}
+
+Finally, we perform Box-Cox regression to transform the response (also
+obtaining a log transformation):
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> summary(powerTransform(m))
+\end{CodeInput}
+\begin{CodeOutput}
+bcPower Transformation to Normality 
+   Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd
+Y1    0.0024           0      -0.1607       0.1654
+
+Likelihood ratio test that transformation parameter is equal to 0
+ (log transformation)
+                               LRT df    pval
+LR test, lambda = (0) 0.0008015428  1 0.97741
+
+Likelihood ratio test that no transformation is needed
+                           LRT df       pval
+LR test, lambda = (1) 124.1307  1 < 2.22e-16
+\end{CodeOutput}
+\begin{CodeInput}
+R> m <- update(m, log(mpg) ~ .)
+R> summary(m)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Call:
+lm(formula = log(mpg) ~ cylinders + displacement + horsepower + 
+    weight + acceleration + year + origin, data = A)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.33412 -0.05774  0.00410  0.06072  0.38081 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)   8.89652    0.35822  24.835  < 2e-16
+cylinders5.6 -0.06355    0.02574  -2.469   0.0140
+cylinders8   -0.07691    0.03900  -1.972   0.0493
+displacement  0.02799    0.05146   0.544   0.5868
+horsepower   -0.29010    0.05631  -5.152 4.20e-07
+weight       -0.54274    0.08193  -6.624 1.23e-10
+acceleration -0.14214    0.05630  -2.525   0.0120
+year71        0.02505    0.02891   0.866   0.3869
+year72       -0.01680    0.02894  -0.580   0.5620
+year73       -0.04257    0.02602  -1.636   0.1026
+year74        0.04932    0.03041   1.622   0.1056
+year75        0.04715    0.02959   1.594   0.1118
+year76        0.07087    0.02845   2.491   0.0132
+year77        0.13241    0.02927   4.523 8.21e-06
+year78        0.14472    0.02777   5.211 3.13e-07
+year79        0.23354    0.02921   7.994 1.67e-14
+year80        0.32381    0.03170  10.216  < 2e-16
+year81        0.25655    0.03094   8.291 2.10e-15
+year82        0.30756    0.03036  10.131  < 2e-16
+originEurope  0.04921    0.01955   2.518   0.0122
+originJapan   0.04409    0.01947   2.265   0.0241
+
+Residual standard error: 0.1043 on 371 degrees of freedom
+Multiple R-squared:  0.9108,    Adjusted R-squared:  0.906 
+F-statistic: 189.4 on 20 and 371 DF,  p-value: < 2.2e-16
+\end{CodeOutput}
+\begin{CodeInput}
+R> Anova(m)
+\end{CodeInput}
+\begin{CodeOutput}
+Anova Table (Type II tests)
+
+Response: log(mpg)
+             Sum Sq  Df F value    Pr(>F)
+cylinders    0.0663   2  3.0521   0.04845
+displacement 0.0032   1  0.2959   0.58679
+horsepower   0.2885   1 26.5420 4.198e-07
+weight       0.4769   1 43.8805 1.229e-10
+acceleration 0.0693   1  6.3745   0.01199
+year         4.4521  12 34.1339 < 2.2e-16
+origin       0.0807   2  3.7128   0.02532
+Residuals    4.0325 371                  
+\end{CodeOutput}
+\end{CodeChunk}
+
+The transformed numeric variables are much better-behaved:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight 
++                   + acceleration, 
++                   smooth=list(spread=FALSE), data=A)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1} 
+
+}
+
+\caption[Scatterplot matrix for the transformed numeric variables in the `Auto` data]{Scatterplot matrix for the transformed numeric variables in the `Auto` data}\label{fig:Auto-transformed-scatterplot-matrix}
+\end{figure}
+\end{CodeChunk}
+
+And the partial relationships in the model fit to the transformed data
+are much more nearly linear:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> crPlots(m)
+\end{CodeInput}
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1} 
+
+}
+
+\caption[Component+residual plots for the model fit to the transformed `Auto` data]{Component+residual plots for the model fit to the transformed `Auto` data}\label{fig:Auto-CR-plots-transformed}
+\end{figure}
+\end{CodeChunk}
+
+Having transformed both the numeric predictors and the response, we
+proceed to use the \code{stepAIC()} function in the \pkg{MASS} package
+to perform predictor selection, employing the BIC model-selection
+criterion (by setting the \texttt{k} argument of \texttt{stepAIC()} to
+\(\log(n)\)):
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> m.step <- stepAIC(m, k=log(nrow(A)), trace=FALSE)
+R> summary(m.step)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Call:
+lm(formula = log(mpg) ~ horsepower + weight + acceleration + 
+    year + origin, data = A)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.35230 -0.05682  0.00677  0.06741  0.35861 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)
+(Intercept)   9.434594   0.261529  36.075  < 2e-16
+horsepower   -0.276254   0.056143  -4.921 1.30e-06
+weight       -0.609071   0.056003 -10.876  < 2e-16
+acceleration -0.131380   0.053195  -2.470  0.01397
+year71        0.027984   0.028936   0.967  0.33412
+year72       -0.007111   0.028446  -0.250  0.80274
+year73       -0.039529   0.026014  -1.520  0.12947
+year74        0.052752   0.029986   1.759  0.07936
+year75        0.053199   0.029280   1.817  0.07004
+year76        0.074317   0.028212   2.634  0.00878
+year77        0.137931   0.028875   4.777 2.56e-06
+year78        0.145876   0.027529   5.299 1.99e-07
+year79        0.236036   0.029080   8.117 6.99e-15
+year80        0.335274   0.031148  10.764  < 2e-16
+year81        0.262872   0.030555   8.603  < 2e-16
+year82        0.323391   0.029608  10.922  < 2e-16
+originEurope  0.055818   0.016785   3.326  0.00097
+originJapan   0.043554   0.017479   2.492  0.01314
+
+Residual standard error: 0.1049 on 374 degrees of freedom
+Multiple R-squared:  0.909, Adjusted R-squared:  0.9049 
+F-statistic: 219.8 on 17 and 374 DF,  p-value: < 2.2e-16
+\end{CodeOutput}
+\begin{CodeInput}
+R> Anova(m.step)
+\end{CodeInput}
+\begin{CodeOutput}
+Anova Table (Type II tests)
+
+Response: log(mpg)
+             Sum Sq  Df  F value    Pr(>F)
+horsepower   0.2663   1  24.2120 1.296e-06
+weight       1.3010   1 118.2805 < 2.2e-16
+acceleration 0.0671   1   6.0998  0.013965
+year         4.7589  12  36.0549 < 2.2e-16
+origin       0.1366   2   6.2090  0.002225
+Residuals    4.1137 374                   
+\end{CodeOutput}
+\end{CodeChunk}
+
+The selected model includes three of the numeric predictors,
+\code{horsepower}, \code{weight}, and \code{acceleration}, along with
+the factors \code{year} and \code{origin}. We can calculate the MSE for
+this model, but we expect that the result will be optimistic because we
+used the whole data to help specify the model
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> mse(Auto$mpg, exp(fitted(m.step)))
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 6.512144
+attr(,"casewise loss")
+[1] "(y - yhat)^2"
+\end{CodeOutput}
+\end{CodeChunk}
+
+This is considerably smaller than the MSE for the original working
+model:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> mse(Auto$mpg, fitted(m.auto))
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 8.093171
+attr(,"casewise loss")
+[1] "(y - yhat)^2"
+\end{CodeOutput}
+\end{CodeChunk}
+
+A perhaps subtle point is that we compute the MSE for the selected model
+on the original \code{mpg} response scale rather than the log scale, so
+as to make the selected model comparable to the working model. That's
+slightly uncomfortable given the skewed distribution of \code{mpg}. An
+alternative is to use the median absolute error instead of the
+mean-squared error, employing the \code{medAbsErr()} function from the
+\pkg{cv} package:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> medAbsErr(Auto$mpg, exp(fitted(m.step)))
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 1.339604
+\end{CodeOutput}
+\begin{CodeInput}
+R> medAbsErr(Auto$mpg, fitted(m.auto))
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 1.666121
+\end{CodeOutput}
+\end{CodeChunk}
+
+Now let's use \code{cvSelect()} with \code{selectTransAndStepAIC()} to
+automate and cross-validate the whole model-specification process:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> num.predictors
+\end{CodeInput}
+\begin{CodeOutput}
+[1] "displacement" "horsepower"   "weight"       "acceleration"
+\end{CodeOutput}
+\begin{CodeInput}
+R> cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
++                 predictors=num.predictors,
++                 response="mpg", AIC=FALSE, criterion=medAbsErr)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 76692
+\end{CodeOutput}
+\begin{CodeInput}
+R> cvs
+\end{CodeInput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+cross-validation criterion = 1.495075
+full-sample criterion = 1.339604 
+\end{CodeOutput}
+\begin{CodeInput}
+R> compareFolds(cvs)
+\end{CodeInput}
+\begin{CodeOutput}
+        (Intercept) horsepower lam.acceleration lam.displacement lam.horsepower
+Fold 1      9.71384   -0.17408          0.50000          0.00000        0.00000
+Fold 2      9.21713   -0.31480          0.00000          0.00000        0.00000
+Fold 3      9.61824   -0.19248          0.00000          0.00000        0.00000
+Fold 4      8.69910   -0.25523          0.50000          0.00000        0.00000
+Fold 5      9.14403   -0.14934          0.00000          0.00000        0.00000
+Fold 6      9.63481   -0.16739          0.50000          0.00000        0.00000
+Fold 7      9.98933   -0.36847          0.00000          0.00000       -0.15447
+Fold 8      9.06301   -0.29721          0.00000          0.00000        0.00000
+Fold 9      8.88315   -0.22684          0.00000          0.00000        0.00000
+Fold 10     9.61727   -0.17086          0.00000          0.00000        0.00000
+        lam.weight   lambda   weight   year71   year72   year73   year74
+Fold 1     0.00000  0.00000 -0.74636  0.03764 -0.00327 -0.02477  0.05606
+Fold 2     0.00000  0.00000 -0.47728  0.02173 -0.01488 -0.03770  0.04312
+Fold 3     0.00000  0.00000 -0.72085  0.01128 -0.02569 -0.03872  0.05187
+Fold 4     0.00000  0.00000 -0.53846  0.02153 -0.02922 -0.05181  0.04136
+Fold 5     0.00000  0.00000 -0.69081  0.02531 -0.01062 -0.04625  0.05039
+Fold 6     0.00000  0.00000 -0.74049  0.02456  0.00759 -0.03412  0.06266
+Fold 7     0.00000  0.00000 -0.72843  0.02532 -0.01271 -0.04144  0.04568
+Fold 8     0.00000  0.00000 -0.46392  0.02702 -0.02041 -0.05605  0.04437
+Fold 9     0.00000  0.00000 -0.47136  0.00860 -0.03620 -0.04835  0.01906
+Fold 10    0.00000  0.00000 -0.73550  0.02937 -0.00899 -0.03814  0.05408
+          year75   year76   year77   year78   year79   year80   year81   year82
+Fold 1   0.07080  0.07250  0.14420  0.14281  0.23266  0.35127  0.25635  0.30546
+Fold 2   0.04031  0.06718  0.13094  0.14917  0.21871  0.33192  0.26196  0.30943
+Fold 3   0.03837  0.06399  0.11593  0.12601  0.20499  0.32821  0.24478  0.29204
+Fold 4   0.04072  0.05537  0.12292  0.14083  0.22878  0.32947  0.25140  0.27248
+Fold 5   0.05596  0.07044  0.13356  0.14724  0.24675  0.33331  0.26938  0.32594
+Fold 6   0.06940  0.07769  0.14211  0.14647  0.23532  0.34761  0.26737  0.33062
+Fold 7   0.03614  0.07385  0.12976  0.14040  0.23976  0.33998  0.27652  0.30659
+Fold 8   0.06573  0.08135  0.13158  0.13987  0.23011  0.32880  0.25886  0.30538
+Fold 9   0.03018  0.05846  0.10536  0.11722  0.20665  0.31533  0.23352  0.29375
+Fold 10  0.04881  0.07862  0.14101  0.14313  0.23258  0.35649  0.26214  0.32421
+        acceleration displacement cylinders5.6 cylinders8 originEurope
+Fold 1                                                                
+Fold 2      -0.18909     -0.09197                                     
+Fold 3                                                                
+Fold 4      -0.03484                  -0.09080   -0.10909             
+Fold 5                                                         0.06261
+Fold 6                                                                
+Fold 7                                                                
+Fold 8      -0.17676     -0.10542                                     
+Fold 9      -0.14514     -0.13452                                     
+Fold 10                                                               
+        originJapan
+Fold 1             
+Fold 2             
+Fold 3             
+Fold 4             
+Fold 5         0.04
+Fold 6             
+Fold 7             
+Fold 8             
+Fold 9             
+Fold 10            
+\end{CodeOutput}
+\end{CodeChunk}
+
+Here, as for \code{selectTrans()}, the \code{predictors} and
+\code{response} arguments specify candidate variables for
+transformation, and \code{AIC=FALSE} uses the BIC for model selection.
+The starting model, \code{m.auto}, is the working model fit to the
+\code{Auto} data. The CV criterion isn't bias-adjusted because median
+absolute error isn't a mean of casewise error components.
+
+Some noteworthy points:
+
+\begin{itemize}
+\tightlist
+\item
+  \code{selectTransStepAIC()} automatically computes CV cost criteria,
+  here the median absolute error, on the untransformed response scale.
+\item
+  The estimate of the median absolute error that we obtain by
+  cross-validating the whole model-specification process is a little
+  larger than the median absolute error computed for the model we fit to
+  the \code{Auto} data separately selecting transformations of the
+  predictors and the response and then selecting predictors for the
+  whole data set.
+\item
+  When we look at the transformations and predictors selected with each
+  of the 10 folds omitted (i.e., the output of \code{compareFolds()}),
+  we see that there is little uncertainty in choosing variable
+  transformations (the \code{lam.*}s for the \(x\)s and \code{lambda}
+  for \(y\) in the output), but considerably more uncertainty in
+  subsequently selecting predictors: \code{horsepower}, \code{weight},
+  and \code{year} are always included among the selected predictors;
+  \code{acceleration} and \code{displacement} are each included
+  respectively in 4 and 3 of 10 selected models; and \code{cylinders}
+  and \code{origin} are each included in only 1 of 10 models. Recall
+  that when we selected predictors for the full data, we obtained a
+  model with \code{horsepower}, \code{weight}, \code{acceleration},
+  \code{year}, and \code{origin}.
+\end{itemize}
+
+\hypertarget{extending-the-cv-package}{%
+\section{Extending the cv package}\label{extending-the-cv-package}}
+
+The \pkg{cv} package is designed to be extensible in several directions.
+In this vignette, we discuss three kinds of extensions, ordered by
+increasing general complexity: (1) adding a cross-validation cost
+criterion; (2) adding a model class that's not directly accommodated by
+the \code{cv()} default method or by another directly inherited method,
+with separate consideration of mixed-effects models; and (3) adding a
+new model-selection procedure suitable for use with
+\code{selectModel()}.
+
+\hypertarget{adding-a-model-class-not-covered-by-the-default-cv-method}{%
+\subsection{Adding a model class not covered by the default cv()
+method}\label{adding-a-model-class-not-covered-by-the-default-cv-method}}
+
+\hypertarget{independently-sampled-cases}{%
+\subsubsection{Independently sampled
+cases}\label{independently-sampled-cases}}
+
+Suppose that we want to cross-validate a multinomial logistic regression
+model fit by the \code{multinom()} function in the \pkg{nnet} package
+\citep{VenablesRipley:2002}. We borrow an example from \citet[Sec.
+14.2.1]{Fox:2016}, with data from the British Election Panel Study on
+vote choice in the 2001 British election. Data for the example are in
+the \code{BEPS} data frame in the \pkg{carData} package:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> data("BEPS", package="carData")
+R> head(BEPS)
+\end{CodeInput}
+\begin{CodeOutput}
+              vote age economic.cond.national economic.cond.household Blair
+1 Liberal Democrat  43                      3                       3     4
+2           Labour  36                      4                       4     4
+3           Labour  35                      4                       4     5
+4           Labour  24                      4                       2     2
+5           Labour  41                      2                       2     1
+6           Labour  47                      3                       4     4
+  Hague Kennedy Europe political.knowledge gender
+1     1       4      2                   2 female
+2     4       4      5                   2   male
+3     2       3      3                   2   male
+4     1       3      4                   0 female
+5     1       4      6                   2   male
+6     4       2      4                   2   male
+\end{CodeOutput}
+\end{CodeChunk}
+
+The polytomous (multi-category) response variable is \code{vote}, a
+factor with levels \code{"Conservative"}, \code{"Labour"}, and
+\code{"Liberal Democrat"}. The predictors of \code{vote} are:
+
+\begin{itemize}
+\tightlist
+\item
+  \code{age}, in years;
+\item
+  \code{econ.cond.national} and \code{econ.cond.household}, the
+  respondent's ratings of the state of the economy, on 1 to 5 scales.
+\item
+  \code{Blair}, \code{Hague}, and \code{Kennedy}, ratings of the leaders
+  of the Labour, Conservative, and Liberal Democratic parties, on 1 to 5
+  scales.
+\item
+  \code{Europe}, an 11-point scale on attitude towards European
+  integration, with high scores representing ``Euro-skepticism.''
+\item
+  \code{political.knowledge}, knowledge of the parties' positions on
+  European integration, with scores from 0 to 3.
+\item
+  \code{gender}, \code{"female"} or \code{"male"}.
+\end{itemize}
+
+The model fit to the data includes an interaction between \code{Europe}
+and \code{political.knowledge}; the other predictors enter the model
+additively:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library("nnet")
+R> m.beps <- multinom(vote ~ age + gender + economic.cond.national +
++                        economic.cond.household + Blair + Hague + Kennedy +
++                        Europe*political.knowledge, data=BEPS)
+\end{CodeInput}
+\begin{CodeOutput}
+# weights:  36 (22 variable)
+initial  value 1675.383740 
+iter  10 value 1240.047788
+iter  20 value 1163.199642
+iter  30 value 1116.519687
+final  value 1116.519666 
+converged
+\end{CodeOutput}
+\begin{CodeInput}
+R> car::Anova(m.beps)
+\end{CodeInput}
+\begin{CodeOutput}
+Analysis of Deviance Table (Type II tests)
+
+Response: vote
+                           LR Chisq Df Pr(>Chisq)
+age                          13.872  2  0.0009721
+gender                        0.453  2  0.7972568
+economic.cond.national       30.604  2  2.262e-07
+economic.cond.household       5.652  2  0.0592570
+Blair                       135.369  2  < 2.2e-16
+Hague                       166.770  2  < 2.2e-16
+Kennedy                      68.878  2  1.105e-15
+Europe                       78.033  2  < 2.2e-16
+political.knowledge          55.568  2  8.582e-13
+Europe:political.knowledge   50.804  2  9.291e-12
+\end{CodeOutput}
+\end{CodeChunk}
+
+Most of the predictors, including the \code{Europe} \(\times\)
+\code{political.knowledge} interaction, are associated with very small
+\(p\)-values; the \code{Anova()} function is from the \pkg{car} package
+\citep{FoxWeisberg:2019}.
+
+Here's an ``effect plot'', using the the \pkg{effects} package
+\citep{FoxWeisberg:2019} to visualize the \code{Europe} \(\times\)
+\code{political.knowledge} interaction in a ``stacked-area'' graph:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
++             xlevels=list(Europe=1:11, political.knowledge=0:3),
++             fixed.predictors=list(given.values=c(gendermale=0.5))),
++      lines=list(col=c("blue", "red", "orange")),
++      axes=list(x=list(rug=FALSE), y=list(style="stacked")))
+\end{CodeInput}
+
+
+\begin{center}\includegraphics{JSS-article-reduced_files/figure-latex/BEPS-plot-1} \end{center}
+
+\end{CodeChunk}
+
+To cross-validate this multinomial-logit model we need an appropriate
+cost criterion. None of the criteria supplied by the \pkg{cv}
+package---for example, neither \code{mse()}, which is appropriate for a
+numeric response, nor \code{BayesRule()}, which is appropriate for a
+binary response---will do. One possibility is to adapt Bayes rule to a
+polytomous response:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> head(BEPS$vote)
+\end{CodeInput}
+\begin{CodeOutput}
+[1] Liberal Democrat Labour           Labour           Labour          
+[5] Labour           Labour          
+Levels: Conservative Labour Liberal Democrat
+\end{CodeOutput}
+\begin{CodeInput}
+R> yhat <- predict(m.beps, type="class")
+R> head(yhat)
+\end{CodeInput}
+\begin{CodeOutput}
+[1] Labour           Labour           Labour           Labour          
+[5] Liberal Democrat Labour          
+Levels: Conservative Labour Liberal Democrat
+\end{CodeOutput}
+\begin{CodeInput}
+R> BayesRuleMulti <- function(y, yhat){
++   result <- mean(y != yhat)
++   attr(result, "casewise loss") <- "y != yhat"
++   result
++ }
+R> 
+R> BayesRuleMulti(BEPS$vote, yhat)
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 0.3186885
+attr(,"casewise loss")
+[1] "y != yhat"
+\end{CodeOutput}
+\end{CodeChunk}
+
+The \code{predict()} method for \code{"multinom"} models called with
+argument \code{type="class"} reports the Bayes-rule prediction for each
+case---that is, the response category with the highest predicted
+probability. Our \code{BayesRuleMulti()} function calculates the
+proportion of misclassified cases. Because this value is the mean of
+casewise components, we attach a \code{"casewise loss"} attribute to the
+result (as explained in the preceding section).
+
+The marginal proportions for the response categories are
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> xtabs(~ vote, data=BEPS)/nrow(BEPS)
+\end{CodeInput}
+\begin{CodeOutput}
+vote
+    Conservative           Labour Liberal Democrat 
+       0.3029508        0.4721311        0.2249180 
+\end{CodeOutput}
+\end{CodeChunk}
+
+and so the marginal Bayes-rule prediction, that everyone will vote
+Labour, produces an error rate of \(1 - 0.47213 = 0.52787\). The
+multinomial-logit model appears to do substantially better than that,
+but does its performance hold up to cross-validation?
+
+We check first whether the default \code{cv()} method works
+``out-of-the-box'' for the \code{"multinom"} model:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv(m.beps, seed=3465, criterion=BayesRuleMulti)
+\end{CodeInput}
+\begin{CodeOutput}
+Error in GetResponse.default(model): non-vector response
+\end{CodeOutput}
+\end{CodeChunk}
+
+The default method of \code{GetResponse()} (a function supplied by the
+\pkg{cv} package---see \code{?GetResponse}) fails for a
+\code{"multinom"} object. A straightforward solution is to supply a
+\code{GetResponse.multinom()} method that returns the factor response
+\citep[using the \texttt{get\_response()} function from the
+\pkg{insight} package,][]{LudeckeWaggonerMakowski:2019},
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> GetResponse.multinom <- function(model, ...) {
++   insight::get_response(model)
++ }
+R> 
+R> head(GetResponse(m.beps))
+\end{CodeInput}
+\begin{CodeOutput}
+[1] Liberal Democrat Labour           Labour           Labour          
+[5] Labour           Labour          
+Levels: Conservative Labour Liberal Democrat
+\end{CodeOutput}
+\end{CodeChunk}
+
+and to try again:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv(m.beps, seed=3465, criterion=BayesRuleMulti)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 3465
+\end{CodeOutput}
+\begin{CodeOutput}
+# weights:  36 (22 variable)
+initial  value 1507.296060 
+iter  10 value 1134.575036
+iter  20 value 1037.413231
+iter  30 value 1007.705242
+iter  30 value 1007.705235
+iter  30 value 1007.705235
+final  value 1007.705235 
+converged
+\end{CodeOutput}
+\begin{CodeOutput}
+Error in match.arg(type): 'arg' should be one of "class", "probs"
+\end{CodeOutput}
+\end{CodeChunk}
+
+A \code{traceback()} (not shown) reveals that the problem is that the
+default method of \code{cv()} calls the \code{"multinom"} method for
+\code{predict()} with the argument \code{type="response"}, when the
+correct argument should be \code{type="class"}. We therefore must write
+a \code{"multinom"} method for \code{cv()}, but that proves to be very
+simple:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
++                          seed, ...){
++   NextMethod(type="class", criterion=criterion)
++ }
+\end{CodeInput}
+\end{CodeChunk}
+
+That is, we simply call the default \code{cv()} method with the
+\code{type} argument properly set. In addition to supplying the correct
+\code{type} argument, our method sets the default \code{criterion} for
+the \code{cv.multinom()} method to \code{BayesRuleMulti}.
+
+Then:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> m.beps <- update(m.beps, trace=FALSE)
+R> cv(m.beps, seed=3465)
+\end{CodeInput}
+\begin{CodeOutput}
+R RNG seed set to 3465
+\end{CodeOutput}
+\begin{CodeOutput}
+10-Fold Cross Validation
+cross-validation criterion = 0.3245902
+bias-adjusted cross-validation criterion = 0.3236756
+95% CI for bias-adjusted CV criterion = (0.300168, 0.3471831)
+full-sample criterion = 0.3186885 
+\end{CodeOutput}
+\end{CodeChunk}
+
+Prior to invoking \code{cv()}, we called \code{update()} with
+\code{trace=FALSE} to suppress the iteration history reported by default
+by \code{multinom()}---it would be tedious to see the iteration history
+for each fold. The cross-validated polytomous Bayes-rule criterion
+confirms that the fitted model does substantially better than the
+marginal Bayes-rule prediction that everyone votes for Labour.
+
+\hypertarget{computational-notes}{%
+\section{Computational notes}\label{computational-notes}}
+
+\hypertarget{efficient-computations-for-linear-and-generalized-linear-models}{%
+\subsection{Efficient computations for linear and generalized linear
+models}\label{efficient-computations-for-linear-and-generalized-linear-models}}
+
+The most straightforward way to implement cross-validation in
+\proglang{R} for statistical modeling functions that are written in the
+canonical manner is to use \code{update()} to refit the model with each
+fold removed. This is the approach taken in the default method for
+\code{cv()}, and it is appropriate if the cases are independently
+sampled. Refitting the model in this manner for each fold is generally
+feasible when the number of folds in modest, but can be prohibitively
+costly for leave-one-out cross-validation when the number of cases is
+large.
+
+The \code{"lm"} and \code{"glm"} methods for \code{cv()} take advantage
+of computational efficiencies by avoiding refitting the model with each
+fold removed. Consider, in particular, the weighted linear model
+\(\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}\),
+where
+\(\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)\).
+Here, \(\mathbf{y}\) is the response vector, \(\mathbf{X}\) the model
+matrix, and \(\boldsymbol{\varepsilon}\) the error vector, each for
+\(n\) cases, and \(\boldsymbol{\beta}\) is the vector of \(p\)
+population regression coefficients. The errors are assumed to be
+multivariately normally distributed with 0 means and covariance matrix
+\(\sigma^2 \mathbf{W}^{-1}\), where \(\mathbf{W} = \mathrm{diag}(w_i)\)
+is a diagonal matrix of inverse-variance weights. For the linear model
+with constant error variance, the weight matrix is taken to be
+\(\mathbf{W} = \mathbf{I}_n\), the order-\(n\) identity matrix.
+
+The weighted-least-squares (WLS) estimator of \(\boldsymbol{\beta}\) is
+\citep[see, e.g.,][Sec. 12.2.2]{Fox:2016} \footnote{This is a
+  definitional formula, which assumes that the model matrix
+  \(\mathbf{X}\) is of full column rank, and which can be subject to
+  numerical instability when \(\mathbf{X}\) is ill-conditioned.
+  \code{lm()} uses the singular-value decomposition of the model matrix
+  to obtain computationally more stable results.} \[
+\mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} 
+  \mathbf{X}^T \mathbf{W} \mathbf{y}
+\]
+
+Fitted values are then
+\(\widehat{\mathbf{y}} = \mathbf{X}\mathbf{b}_{\mathrm{WLS}}\).
+
+The LOO fitted value for the \(i\)th case can be efficiently computed by
+\(\widehat{y}_{-i} = y_i - e_i/(1 - h_i)\) where
+\(h_i = \mathbf{x}^T_i \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i\)
+(the so-called ``hatvalue''). Here, \(\mathbf{x}^T_i\) is the \(i\)th
+row of \(\mathbf{X}\), and \(\mathbf{x}_i\) is the \(i\)th row written
+as a column vector. This approach can break down when one or more
+hatvalues are equal to 1, in which case the formula for
+\(\widehat{y}_{-i}\) requires division by 0.
+
+To compute cross-validated fitted values when the folds contain more
+than one case, we make use of the Woodbury matrix identify
+\citep{Wikipedia-Woodbury:2023}, \[
+\left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k} 
+\mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} = \mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} + 
+\mathbf{VA}^{-1}\mathbf{U} \right)^{-1} \mathbf{VA}^{-1}
+\] where \(\mathbf{A}\) is a nonsingular order-\(n\) matrix. We apply
+this result by letting \begin{align*}
+    \mathbf{A} &= \mathbf{X}^T \mathbf{W} \mathbf{X} \\
+    \mathbf{U} &= \mathbf{X}_\mathbf{j}^T \\
+    \mathbf{V} &= - \mathbf{X}_\mathbf{j} \\
+    \mathbf{C} &= \mathbf{W}_\mathbf{j} \\
+\end{align*} where the subscript
+\(\mathbf{j} = (i_{j1}, \ldots, i_{jm})^T\) represents the vector of
+indices for the cases in the \(j\)th fold, \(j = 1, \ldots, k\). The
+negative sign in \(\mathbf{V} = - \mathbf{X}_\mathbf{j}\) reflects the
+\emph{removal}, rather than addition, of the cases in \(\mathbf{j}\).
+
+Applying the Woodbury identity isn't quite as fast as using the
+hatvalues, but it is generally much faster than refitting the model. A
+disadvantage of the Woodbury identity, however, is that it entails
+explicit matrix inversion and thus may be numerically unstable. The
+inverse of \(\mathbf{A} = \mathbf{X}^T \mathbf{W} \mathbf{X}\) is
+available directly in the \code{"lm"} object, but the second term on the
+right-hand side of the Woodbury identity requires a matrix inversion
+with each fold deleted. (In contrast, the inverse of each
+\(\mathbf{C} = \mathbf{W}_\mathbf{j}\) is straightforward because
+\(\mathbf{W}\) is diagonal.)
+
+The Woodbury identity also requires that the model matrix be of full
+rank. We impose that restriction in our code by removing redundant
+regressors from the model matrix for all of the cases, but that doesn't
+preclude rank deficiency from surfacing when a fold is removed. Rank
+deficiency of \(\mathbf{X}\) doesn't disqualify cross-validation because
+all we need are fitted values under the estimated model.
+
+\code{glm()} computes the maximum-likelihood estimates for a generalized
+linear model by iterated weighted least squares \citep[see, e.g.,][Sec.
+6.12]{FoxWeisberg:2019}. The last iteration is therefore just a WLS fit
+of the ``working response'' on the model matrix using ``working
+weights.'' Both the working weights and the working response at
+convergence are available from the information in the object returned by
+\code{glm()}.
+
+We then treat re-estimation of the model with a case or cases deleted as
+a WLS problem, using the hatvalues or the Woodbury matrix identity. The
+resulting fitted values for the deleted fold aren't exact---that is,
+except for the Gaussian family, the result isn't identical to what we
+would obtain by literally refitting the model---but in our (limited)
+experience, the approximation is very good, especially for LOO CV, which
+is when we would be most tempted to use it. Nevertheless, because these
+results are approximate, the default for the \code{"glm"} \code{cv()}
+method is to perform the exact computation, which entails refitting the
+model with each fold omitted.
+
+\hypertarget{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}{%
+\subsection{Computation of the bias-corrected CV criterion and
+confidence
+intervals}\label{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}}
+
+Let \(\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})\) represent a
+cross-validation cost criterion, such as mean-squared error, computed
+for all of the \(n\) values of the response \(\mathbf{y}\) based on
+fitted values \(\widehat{\mathbf{y}}\) from the model fit to all of the
+data. We require that \(\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})\)
+is the mean of casewise components, that is,
+\(\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i, \widehat{y}_i)\).\footnote{\citet{ArlotCelisse:2010}
+  term the casewise loss, \(\mathrm{cv}(y_i, \widehat{y}_i)\), the
+  ``contrast function.''} For example,
+\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\).
+
+We divide the \(n\) cases into \(k\) folds of approximately
+\(n_j \approx n/k\) cases each, where \(n = \sum n_j\). As above, let
+\(\mathbf{j}\) denote the indices of the cases in the \(j\)th fold.
+
+Now define
+\(\mathrm{CV}_j = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})\).
+The superscript \((j)\) on \(\widehat{\mathbf{y}}^{(j)}\) represents
+fitted values computed for all of the cases from the model with fold
+\(j\) omitted. Let \(\widehat{\mathbf{y}}^{(-i)}\) represent the vector
+of fitted values for all \(n\) cases where the fitted value for the
+\(i\)th case is computed from the model fit with the fold including the
+\(i\)th case omitted (i.e., fold \(j\) for which \(i \in \mathbf{j}\)).
+
+Then the cross-validation criterion is just
+\(\mathrm{CV} = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(-i)})\).
+Following \citet[pp.~293--295]{DavisonHinkley:1997}, the bias-adjusted
+cross-validation criterion is \[
+\mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
+\]
+
+We compute the standard error of CV as \[
+\mathrm{SE}(\mathrm{CV}) = \frac{1}{\sqrt n} \sqrt{ \frac{\sum_{i=1}^n \left[ \mathrm{cv}(y_i, \widehat{y}_i^{(-i)} ) - \mathrm{CV} \right]^2 }{n - 1} }
+\] that is, as the standard deviation of the casewise components of CV
+divided by the square-root of the number of cases.
+
+We then use \(\mathrm{SE}(\mathrm{CV})\) to construct a
+\(100 \times (1 - \alpha)\)\% confidence interval around the
+\emph{adjusted} CV estimate of error: \[
+\left[ \mathrm{CV}_{\mathrm{adj}} - z_{1 - \alpha/2}\mathrm{SE}(\mathrm{CV}), \mathrm{CV}_{\mathrm{adj}} + z_{1 - \alpha/2}\mathrm{SE}(\mathrm{CV})  \right]
+\] where \(z_{1 - \alpha/2}\) is the \(1 - \alpha/2\) quantile of the
+standard-normal distribution (e.g, \(z \approx 1.96\) for a 95\%
+confidence interval, for which \(1 - \alpha/2 = .975\)).
+
+\citet{BatesHastieTibshirani:2023} show that the coverage of this
+confidence interval is poor for small samples, and they suggest a much
+more computationally intensive procedure, called \emph{nested
+cross-validation}, to compute better estimates of error and confidence
+intervals with better coverage for small samples. We may implement Bates
+et al.'s approach in a later release of the \pkg{cv} package. At present
+we use the confidence interval above for sufficiently large \(n\),
+which, based on Bates et al.'s results, we take by default to be
+\(n \ge 400\).
+
+\bibliography{cv.bib}
+
+
+
+\end{document}
