@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.12.31)  4 JAN 2024 14:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.12.31)  4 JAN 2024 15:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -778,43 +778,57 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [19]
+<JSS-article-reduced_files/figure-latex/plot1-1.pdf, id=331, 317.185pt x 243.91125pt>
+File: JSS-article-reduced_files/figure-latex/plot1-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/plot1-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot1-1.pdf  used on input line 1073.
+(pdftex.def)             Requested size: 199.19283pt x 153.18106pt.
+<JSS-article-reduced_files/figure-latex/plot1-2.pdf, id=332, 317.185pt x 266.9975pt>
+File: JSS-article-reduced_files/figure-latex/plot1-2.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/plot1-2.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot1-2.pdf  used on input line 1073.
+(pdftex.def)             Requested size: 199.19283pt x 167.67967pt.
+<JSS-article-reduced_files/figure-latex/plot1-3.pdf, id=333, 317.185pt x 266.9975pt>
+File: JSS-article-reduced_files/figure-latex/plot1-3.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/plot1-3.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot1-3.pdf  used on input line 1073.
+(pdftex.def)             Requested size: 199.19283pt x 167.67967pt.
+<JSS-article-reduced_files/figure-latex/plot1-4.pdf, id=334, 317.185pt x 266.9975pt>
+File: JSS-article-reduced_files/figure-latex/plot1-4.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/plot1-4.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot1-4.pdf  used on input line 1073.
+(pdftex.def)             Requested size: 199.19283pt x 167.67967pt.
+<JSS-article-reduced_files/figure-latex/plot1-5.pdf, id=335, 317.185pt x 266.9975pt>
+File: JSS-article-reduced_files/figure-latex/plot1-5.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/plot1-5.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot1-5.pdf  used on input line 1073.
+(pdftex.def)             Requested size: 199.19283pt x 167.67967pt.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 20 []
  []
 
 [20]
-<JSS-article-reduced_files/figure-latex/plot1-1.pdf, id=339, 317.185pt x 388.45125pt>
-File: JSS-article-reduced_files/figure-latex/plot1-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/plot1-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot1-1.pdf  used on input line 1082.
-(pdftex.def)             Requested size: 442.65375pt x 542.15652pt.
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 21
  []
 
-[21]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 22 []
- []
-
-[22 <./JSS-article-reduced_files/figure-latex/plot1-1.pdf>]
-Overfull \hbox (6.67001pt too wide) in paragraph at lines 1153--1156
+[21 <./JSS-article-reduced_files/figure-latex/plot1-1.pdf> <./JSS-article-reduced_files/figure-latex/plot1-2.pdf> <./JSS-article-reduced_files/figure-latex/plot1-3.pdf> <./JSS-article-reduced_files/figure-latex/plot1-4.pdf> <./JSS-article-reduced_files/figure-latex/plot1-5.pdf>]
+Overfull \hbox (6.67001pt too wide) in paragraph at lines 1144--1147
 []\T1/lmr/m/n/10.95 We will shortly con-sider three other, more com-plex, mixed mod-els; be-cause of data-management
  []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
+\T1/lmr/m/n/10.95 22 []
+ []
+
+[22]
+Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 23
  []
 
 [23]
-<JSS-article-reduced_files/figure-latex/plot-fits-mod0-1.pdf, id=360, 317.185pt x 411.5375pt>
-File: JSS-article-reduced_files/figure-latex/plot-fits-mod0-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/plot-fits-mod0-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot-fits-mod0-1.pdf  used on input line 1229.
-(pdftex.def)             Requested size: 442.65375pt x 574.37775pt.
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 24 []
  []
@@ -824,12 +838,17 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 25
  []
 
-[25 <./JSS-article-reduced_files/figure-latex/plot-fits-mod0-1.pdf>]
-<JSS-article-reduced_files/figure-latex/plot-fits-mod1-1.pdf, id=379, 317.185pt x 411.5375pt>
-File: JSS-article-reduced_files/figure-latex/plot-fits-mod1-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/plot-fits-mod1-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot-fits-mod1-1.pdf  used on input line 1299.
-(pdftex.def)             Requested size: 442.65375pt x 574.37775pt.
+[25]
+<JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf, id=410, 324.21124pt x 388.45125pt>
+File: JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf  used on input line 1359.
+(pdftex.def)             Requested size: 442.65375pt x 530.3968pt.
+<JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf, id=411, 324.21124pt x 388.45125pt>
+File: JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf  used on input line 1374.
+(pdftex.def)             Requested size: 442.65375pt x 530.3968pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 26 []
@@ -840,64 +859,52 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 27
  []
 
-[27 <./JSS-article-reduced_files/figure-latex/plot-fits-mod1-1.pdf>]
-<JSS-article-reduced_files/figure-latex/plot-fits-mod2-1.pdf, id=397, 317.185pt x 411.5375pt>
-File: JSS-article-reduced_files/figure-latex/plot-fits-mod2-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/plot-fits-mod2-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot-fits-mod2-1.pdf  used on input line 1379.
-(pdftex.def)             Requested size: 442.65375pt x 574.37775pt.
-
+[27 <./JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 28 []
  []
 
-[28]
+[28 <./JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 29
  []
 
-[29 <./JSS-article-reduced_files/figure-latex/plot-fits-mod2-1.pdf>]
+[29]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 30 []
  []
 
 [30]
-<JSS-article-reduced_files/figure-latex/plot-fits-mod3-1.pdf, id=419, 317.185pt x 411.5375pt>
-File: JSS-article-reduced_files/figure-latex/plot-fits-mod3-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/plot-fits-mod3-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/plot-fits-mod3-1.pdf  used on input line 1471.
-(pdftex.def)             Requested size: 442.65375pt x 574.37775pt.
-<JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf, id=420, 324.21124pt x 388.45125pt>
-File: JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf  used on input line 1496.
-(pdftex.def)             Requested size: 442.65375pt x 530.3968pt.
-<JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf, id=421, 324.21124pt x 388.45125pt>
-File: JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf  used on input line 1511.
-(pdftex.def)             Requested size: 442.65375pt x 530.3968pt.
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 31
  []
 
 [31]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1615.
+(/Users/johnfox/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 32 []
  []
 
-[32 <./JSS-article-reduced_files/figure-latex/plot-fits-mod3-1.pdf>]
+[32{/Users/johnfox/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 33
  []
 
-[33 <./JSS-article-reduced_files/figure-latex/cross-validation-clusters-1.pdf>]
+[33]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 34 []
  []
 
-[34 <./JSS-article-reduced_files/figure-latex/cross-validation-cases-1.pdf>]
+[34]
+<JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf, id=489, 308.15125pt x 387.4475pt>
+File: JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf  used on input line 1812.
+(pdftex.def)             Requested size: 442.65375pt x 556.6056pt.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 35
  []
@@ -907,36 +914,45 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 36 []
  []
 
-[36]
+[36 <./JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf>]
+<JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf, id=514, 308.15125pt x 387.4475pt>
+File: JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf  used on input line 1887.
+(pdftex.def)             Requested size: 442.65375pt x 556.6056pt.
+<JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf, id=515, 329.23pt x 246.9225pt>
+File: JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf  used on input line 1934.
+(pdftex.def)             Requested size: 354.12434pt x 265.5985pt.
+<JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf, id=516, 329.23pt x 246.9225pt>
+File: JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf  used on input line 1948.
+(pdftex.def)             Requested size: 354.12434pt x 265.5985pt.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 37
  []
 
 [37]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1752.
-(/Users/johnfox/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
-File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 38 []
  []
 
-[38{/Users/johnfox/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}]
+[38 <./JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 39
  []
 
-[39]
+[39 <./JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf> <./JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 40 []
  []
 
 [40]
-<JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf, id=513, 308.15125pt x 387.4475pt>
-File: JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf  used on input line 1949.
-(pdftex.def)             Requested size: 442.65375pt x 556.6056pt.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <12> on input line 2081.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 41
@@ -947,22 +963,15 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 42 []
  []
 
-[42 <./JSS-article-reduced_files/figure-latex/scatterplot-matrix-1.pdf>]
-<JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf, id=538, 308.15125pt x 387.4475pt>
-File: JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf  used on input line 2024.
-(pdftex.def)             Requested size: 442.65375pt x 556.6056pt.
-<JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf, id=539, 329.23pt x 246.9225pt>
-File: JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf  used on input line 2071.
-(pdftex.def)             Requested size: 354.12434pt x 265.5985pt.
-<JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf, id=540, 329.23pt x 246.9225pt>
-File: JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf  used on input line 2085.
-(pdftex.def)             Requested size: 354.12434pt x 265.5985pt.
+[42]
+<JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf, id=572, 308.15125pt x 459.7175pt>
+File: JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf  used on input line 2178.
+(pdftex.def)             Requested size: 442.65375pt x 660.4284pt.
+
+LaTeX Warning: Float too large for page by 47.42812pt on input line 2183.
+
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 43
@@ -973,37 +982,51 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 44 []
  []
 
-[44 <./JSS-article-reduced_files/figure-latex/transformed-predictors-1.pdf>]
+[44 <./JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 45
  []
 
-[45 <./JSS-article-reduced_files/figure-latex/CR-plots-untransformed-1.pdf> <./JSS-article-reduced_files/figure-latex/CR-plots-transformed-1.pdf>]
+[45]
+<JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf, id=597, 334.24875pt x 495.8525pt>
+File: JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf  used on input line 2271.
+(pdftex.def)             Requested size: 442.65375pt x 656.7215pt.
+
+LaTeX Warning: Float too large for page by 43.7212pt on input line 2276.
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 46 []
  []
 
 [46]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 2218.
-
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 47
  []
 
-[47]
+[47 <./JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 48 []
  []
 
 [48]
-<JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf, id=597, 308.15125pt x 459.7175pt>
-File: JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf  used on input line 2315.
+<JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf, id=618, 308.15125pt x 459.7175pt>
+File: JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf  used on input line 2435.
 (pdftex.def)             Requested size: 442.65375pt x 660.4284pt.
 
-LaTeX Warning: Float too large for page by 47.42812pt on input line 2320.
+LaTeX Warning: Float too large for page by 47.42812pt on input line 2440.
+
+<JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf, id=619, 338.26375pt x 495.8525pt>
+File: JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf  used on input line 2452.
+(pdftex.def)             Requested size: 442.65375pt x 648.89815pt.
+
+LaTeX Warning: Float too large for page by 35.89786pt on input line 2457.
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -1015,26 +1038,17 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 50 []
  []
 
-[50 <./JSS-article-reduced_files/figure-latex/Auto-explore-1.pdf>]
-<JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf, id=617, 334.24875pt x 495.8525pt>
-File: JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf  used on input line 2408.
-(pdftex.def)             Requested size: 442.65375pt x 656.7215pt.
-
-LaTeX Warning: Float too large for page by 43.7212pt on input line 2413.
-
-
+[50 <./JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 51
  []
 
-[51]
+[51 <./JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf>]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 52 []
  []
 
-[52 <./JSS-article-reduced_files/figure-latex/Auto-working-model-1.pdf>]
+[52]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 53
  []
@@ -1045,21 +1059,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [54]
-<JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf, id=642, 308.15125pt x 459.7175pt>
-File: JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf  used on input line 2572.
-(pdftex.def)             Requested size: 442.65375pt x 660.4284pt.
-
-LaTeX Warning: Float too large for page by 47.42812pt on input line 2577.
-
-<JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf, id=643, 338.26375pt x 495.8525pt>
-File: JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf  used on input line 2589.
-(pdftex.def)             Requested size: 442.65375pt x 648.89815pt.
-
-LaTeX Warning: Float too large for page by 35.89786pt on input line 2594.
+Underfull \vbox (badness 1033) has occurred while \output is active []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -1067,21 +1067,42 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [55]
+Overfull \hbox (11.58861pt too wide) in paragraph at lines 2752--2755
+[]\T1/lmr/m/n/10.95 The poly-to-mous (multi-category) re-sponse vari-able is \T1/lmtt/m/n/10.95 vote\T1/lmr/m/n/10.95 , a fac-tor with lev-els \T1/lmtt/m/n/10.95 "Conservative"\T1/lmr/m/n/10.95 ,
+ []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 56 []
  []
 
-[56 <./JSS-article-reduced_files/figure-latex/Auto-transformed-scatterplot-matrix-1.pdf>]
+[56]
+<JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf, id=685, 617.30624pt x 341.275pt>
+File: JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf Graphic file (type pdf)
+<use JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf>
+Package pdftex.def Info: JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf  used on input line 2837.
+(pdftex.def)             Requested size: 354.12434pt x 195.77855pt.
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 57
  []
 
-[57 <./JSS-article-reduced_files/figure-latex/Auto-CR-plots-transformed-1.pdf>]
+[57]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 58 []
  []
 
-[58]
+[58 <./JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf>]
+Overfull \hbox (20.25705pt too wide) in paragraph at lines 2920--2926
+[]\T1/lmr/m/n/10.95 The de-fault method of \T1/lmtt/m/n/10.95 GetResponse() \T1/lmr/m/n/10.95 (a func-tion sup-plied by the \T1/lmr/b/n/10.95 cv \T1/lmr/m/n/10.95 package---see \T1/lmtt/m/n/10.95 ?GetResponse\T1/lmr/m/n/10.95 )
+ []
+
+
+Overfull \hbox (15.98694pt too wide) in paragraph at lines 2920--2926
+\T1/lmr/m/n/10.95 fails for a \T1/lmtt/m/n/10.95 "multinom" \T1/lmr/m/n/10.95 ob-ject. A straight-for-ward so-lu-tion is to sup-ply a \T1/lmtt/m/n/10.95 GetResponse.multinom()
+ []
+
+
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 59
  []
@@ -1097,98 +1118,44 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [61]
-Overfull \hbox (11.58861pt too wide) in paragraph at lines 2889--2892
-[]\T1/lmr/m/n/10.95 The poly-to-mous (multi-category) re-sponse vari-able is \T1/lmtt/m/n/10.95 vote\T1/lmr/m/n/10.95 , a fac-tor with lev-els \T1/lmtt/m/n/10.95 "Conservative"\T1/lmr/m/n/10.95 ,
- []
+Underfull \vbox (badness 3701) has occurred while \output is active []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 \T1/lmr/m/n/10.95 62 []
  []
 
-[62]
-<JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf, id=709, 617.30624pt x 341.275pt>
-File: JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf Graphic file (type pdf)
-<use JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf>
-Package pdftex.def Info: JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf  used on input line 2974.
-(pdftex.def)             Requested size: 354.12434pt x 195.77855pt.
-
-Underfull \vbox (badness 2856) has occurred while \output is active []
-
-
+[62] (./JSS-article-reduced.bbl
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 63
  []
 
-[63]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 64 []
- []
-
-[64 <./JSS-article-reduced_files/figure-latex/BEPS-plot-1.pdf>]
-Overfull \hbox (20.25705pt too wide) in paragraph at lines 3057--3063
-[]\T1/lmr/m/n/10.95 The de-fault method of \T1/lmtt/m/n/10.95 GetResponse() \T1/lmr/m/n/10.95 (a func-tion sup-plied by the \T1/lmr/b/n/10.95 cv \T1/lmr/m/n/10.95 package---see \T1/lmtt/m/n/10.95 ?GetResponse\T1/lmr/m/n/10.95 )
- []
-
-
-Overfull \hbox (15.98694pt too wide) in paragraph at lines 3057--3063
-\T1/lmr/m/n/10.95 fails for a \T1/lmtt/m/n/10.95 "multinom" \T1/lmr/m/n/10.95 ob-ject. A straight-for-ward so-lu-tion is to sup-ply a \T1/lmtt/m/n/10.95 GetResponse.multinom()
- []
-
-
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 65
- []
-
-[65]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 66 []
- []
-
-[66]
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 67
- []
-
-[67]
-Underfull \vbox (badness 3701) has occurred while \output is active []
-
-
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 68 []
- []
-
-[68] (./JSS-article-reduced.bbl
-Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 69
- []
-
-[69])
-Underfull \hbox (badness 10000) in paragraph at lines 3325--3325
+[63])
+Underfull \hbox (badness 10000) in paragraph at lines 3188--3188
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3325--3325
+Underfull \hbox (badness 10000) in paragraph at lines 3188--3188
 
  []
 
 LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <13> not available
-(Font)              Font shape `T1/pzc/m/it' tried instead on input line 3325.
+(Font)              Font shape `T1/pzc/m/it' tried instead on input line 3188.
 
 Underfull \vbox (badness 3977) has occurred while \output is active []
 
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-\T1/lmr/m/n/10.95 70 []
+\T1/lmr/m/n/10.95 64 []
  []
 
-[70]
+[64]
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
-[] \T1/lmr/m/n/10.95 71
+[] \T1/lmr/m/n/10.95 65
  []
 
-[71] (./JSS-article-reduced.aux)
+[65] (./JSS-article-reduced.aux)
  ***********
 LaTeX2e <2023-11-01>
 L3 programming layer <2023-12-11>
@@ -1197,18 +1164,18 @@ Package rerunfilecheck Info: File `JSS-article-reduced.out' has not changed.
 (rerunfilecheck)             Checksum: 65532C74464C824E3CBB8C5D53220BEF;5190.
  ) 
 Here is how much of TeX's memory you used:
- 23292 strings out of 476135
- 453850 string characters out of 5794013
+ 23293 strings out of 476135
+ 453551 string characters out of 5794013
  1939457 words of memory out of 5000000
- 44719 multiletter control sequences out of 15000+600000
+ 44725 multiletter control sequences out of 15000+600000
  694611 words of font info for 106 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 99i,14n,101p,666b,864s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 99i,14n,101p,715b,864s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmb10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbo10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmro10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtto10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/urw/zapfchan/uzcmi8a.pfb>
-Output written on JSS-article-reduced.pdf (71 pages, 2071607 bytes).
+Output written on JSS-article-reduced.pdf (65 pages, 2066588 bytes).
 PDF statistics:
- 986 PDF objects out of 1000 (max. 8388607)
- 776 compressed objects within 8 object streams
- 182 named destinations out of 1000 (max. 500000)
+ 960 PDF objects out of 1000 (max. 8388607)
+ 756 compressed objects within 8 object streams
+ 177 named destinations out of 1000 (max. 500000)
  264 words of extra memory for PDF output out of 10000 (max. 10000000)
 

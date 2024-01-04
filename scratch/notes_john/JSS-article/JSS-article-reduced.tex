@@ -311,14 +311,14 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 886597
+R RNG seed set to 838816
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.41669
-bias-adjusted cross-validation criterion = 19.39385
+cross-validation criterion = 19.36368
+bias-adjusted cross-validation criterion = 19.34363
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1068,22 +1068,13 @@ Here is a scatterplot of the data for a representative group of 10
   other graphs in this section.}
 
 \begin{CodeChunk}
-\begin{CodeInput}
-R> library("lattice")
-R> library("latticeExtra")
-R> plot <- xyplot(y ~ x, data=Data[1:Nx, ], group=group,
-+                ylim=c(4, 16),
-+                par.settings=list(superpose.symbol=list(pch=1, cex=0.7))) +
-+     layer(panel.ellipse(..., center.cex=0))
-R> plot # display graph
-\end{CodeInput}
 \begin{figure}
 
-{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot1-1} 
+{\centering \subfloat[\label{fig:plot1-1}]{\includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/plot1-1} }\subfloat[\label{fig:plot1-2}]{\includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/plot1-2} }\newline\subfloat[\label{fig:plot1-3}]{\includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/plot1-3} }\subfloat[\label{fig:plot1-4}]{\includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/plot1-4} }\newline\subfloat[\label{fig:plot1-5}]{\includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/plot1-5} }
 
 }
 
-\caption[Hierarchical data set, showing the first 10 of 100 students]{Hierarchical data set, showing the first 10 of 100 students.}\label{fig:plot1}
+\caption[(a) Hierarchical data set, showing the first 10 of 100 students, and (b)--(e) several mixed models fit to the data]{(a) Hierarchical data set, showing the first 10 of 100 students, and (b)--(e) several mixed models fit to the data}\label{fig:plot1}
 \end{figure}
 \end{CodeChunk}
 
@@ -1176,63 +1167,10 @@ random effects---so-called best linear unbiased predictions or
 BLUPs---as would be used for cross-validation based on cases (i.e.,
 occasions within students):
 
-\begin{CodeChunk}
-\begin{CodeInput}
-R> Data <- within(Data, {
-+   fit_mod0.fe <- predict(mod.0, re.form = ~ 0) # fixed effects only
-+   fit_mod0.re <- predict(mod.0) # fixed and random effects (BLUPs)
-+   fit_mod1.fe <- predict(mod.1, re.form = ~ 0)
-+   fit_mod1.re <- predict(mod.1)
-+   fit_mod2.fe <- predict(mod.2, re.form = ~ 0)
-+   fit_mod2.re <- predict(mod.2)
-+   fit_mod3.fe <- predict(mod.3, re.form = ~ 0)
-+   fit_mod3.re <- predict(mod.3)
-+ })
-\end{CodeInput}
-\end{CodeChunk}
-
 We then prepare the data for plotting:
-
-\begin{CodeChunk}
-\begin{CodeInput}
-R> Data_long <- reshape(Data[1:Nx, ], direction = "long", sep = ".", 
-+               timevar = "effect", varying = grep("\\.", names(Data[1:Nx, ])))
-R> Data_long$id <- 1:nrow(Data_long)
-R> Data_long <- reshape(Data_long, direction = "long", sep = "_", 
-+               timevar = "modelcode",  varying = grep("_", names(Data_long)))
-R> Data_long$model <- factor(
-+   c("~ 1", "~ 1 + x", "~ 1 + x + xm", "~ 1 + I(x - xm)")
-+   [match(Data_long$modelcode, c("mod0", "mod1", "mod2", "mod3"))]
-+ )
-\end{CodeInput}
-\end{CodeChunk}
 
 Predictions based on the random-intercept model \code{mod.0} for the
 first 10 students are shown in the following graph:
-
-\begin{CodeChunk}
-\begin{CodeInput}
-R> (plot +
-+   xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" & effect == "fe"),
-+          groups=group, type="l", lwd=2) +
-+   xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" &  effect == "re"),
-+          groups=group, type="l", lwd=2, lty=3)
-+ ) |> update(
-+   main="Model: y ~ 1 + (1 | group)",
-+   key=list(
-+     corner=c(0.05, 0.05),
-+     text=list(c("fixed effects only","fixed and random")),
-+     lines=list(lty=c(1, 3))))
-\end{CodeInput}
-\begin{figure}
-
-{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot-fits-mod0-1} 
-
-}
-
-\caption[Predictions from the random intercept model]{Predictions from the random intercept model.}\label{fig:plot-fits-mod0}
-\end{figure}
-\end{CodeChunk}
 
 The fixed-effect predictions for the various individuals are
 identical---the estimated fixed-effects intercept or estimated general
@@ -1278,31 +1216,6 @@ x -0.460
 \end{CodeChunk}
 
 Predictions from this model appear in the following graph:
-
-\begin{CodeChunk}
-\begin{CodeInput}
-R> (plot +
-+   xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "fe"),
-+          groups=group, type="l", lwd=2) +
-+   xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "re"),
-+          groups=group, type="l", lwd=2, lty=3)
-+ ) |> update(
-+   main="Model: y ~ 1 + x + (1 | group)",
-+   ylim=c(-15, 35),
-+   key=list(
-+     corner=c(0.95, 0.05),
-+     text=list(c("fixed effects only","fixed and random")),
-+     lines=list(lty=c(1, 3))))
-\end{CodeInput}
-\begin{figure}
-
-{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot-fits-mod1-1} 
-
-}
-
-\caption[Predictions from the model with random intercepts and $x$ as a fixed-effect predictor]{Predictions from the model with random intercepts and $x$ as a fixed-effect predictor.}\label{fig:plot-fits-mod1}
-\end{figure}
-\end{CodeChunk}
 
 The BLUPs fit the observed data very closely, but predictions based on
 the fixed effects alone, with a common intercept and slope for all
@@ -1358,31 +1271,6 @@ generated the data once the coefficient of the contextual predictor
 discussed below).
 
 Predictions from model \code{mod.2} appear in the following graph:
-
-\begin{CodeChunk}
-\begin{CodeInput}
-R> (plot +
-+   xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "fe"),
-+          groups=group, type="l", lwd=2) +
-+   xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "re"),
-+          groups=group, type="l", lwd=2, lty=3)
-+ ) |> update(
-+   main="Model: y ~ 1 + x + xm + (1 | group)",
-+   ylim=c(4, 16),
-+   key=list(
-+     corner=c(0.05, 0.05),
-+     text=list(c("fixed effects only","fixed and random")),
-+     lines=list(lty=c(1, 3))))
-\end{CodeInput}
-\begin{figure}
-
-{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot-fits-mod2-1} 
-
-}
-
-\caption[Predictors from the model with random intercepts, $x$, and the group (student) mean of $x$ as predictors]{Predictors from the model with random intercepts, $x$, and the group (student) mean of $x$ as predictors.}\label{fig:plot-fits-mod2}
-\end{figure}
-\end{CodeChunk}
 
 Depending on the estimated variance parameters of the model, a mixed
 model like \code{mod.2} will apply varying degrees of shrinkage to the
@@ -1450,31 +1338,6 @@ I(x - xm) 0.000
 
 The predictions from \code{mod.3} are therefore similar to those from
 \code{mod.2}:
-
-\begin{CodeChunk}
-\begin{CodeInput}
-R> (plot +
-+   xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "fe"),
-+          groups=group, type="l", lwd=2) +
-+   xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "re"),
-+          groups=group, type="l", lwd=2, lty=3)
-+ ) |> update(
-+   main="Model: y ~ 1 + I(x - xm) + (1 | group)",
-+   ylim=c(4, 16),
-+   key=list(
-+     corner=c(0.05, 0.05),
-+     text=list(c("fixed effects only","fixed and random")),
-+     lines=list(lty=c(1, 3))))
-\end{CodeInput}
-\begin{figure}
-
-{\centering \includegraphics[width=1\linewidth]{JSS-article-reduced_files/figure-latex/plot-fits-mod3-1} 
-
-}
-
-\caption[Predictions from the estimated model generating the data]{Predictions from the estimated model generating the data.}\label{fig:plot-fits-mod3}
-\end{figure}
-\end{CodeChunk}
 
 We next carry out case-based cross-validation, which, as we have
 explained, is based on both fixed and predicted random effects (i.e.,
