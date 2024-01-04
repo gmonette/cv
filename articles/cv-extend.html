@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-01-03</h4>
+            <h4 data-toc-skip class="date">2024-01-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-extend.Rmd" class="external-link"><code>vignettes/cv-extend.Rmd</code></a></small>
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -200,7 +200,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt;     attr(result, "casewise loss") &lt;- "(y - yhat)^2"</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55fec3bfda98&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55ad7290f950&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span>
 <span></span>
 <span><span class="fu">cv</span><span class="fu">:::</span><span class="fu">getLossFn</span><span class="op">(</span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -208,7 +208,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55fec393c358&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x55ad7264ad98&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>"(y - yhat)^2"</code>, that evaluates to an expression that is a
@@ -452,7 +452,7 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
 <span><span class="co">#&gt;             newdata = data, level = 1), ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55fecc6cbd88&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55ad7adfadb0&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
