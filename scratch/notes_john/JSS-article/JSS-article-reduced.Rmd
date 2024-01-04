@@ -454,9 +454,7 @@ summary(lm(y ~ x, data=Data))
 ```
 
 The initial mixed-effects model that we fit to the data is a simple random-intercepts model:
-```{r include=FALSE, echo=FALSE}
-library(lme4) # necessary for some reason to knit vignette in RStudio, harmless otherwise
-```
+
 ```{r}
 # random intercept only:
 mod.0 <- lmer(y ~ 1 + (1 | group), Data)
