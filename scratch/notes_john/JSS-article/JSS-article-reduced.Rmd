@@ -28,7 +28,9 @@ keywords:
   plain:     [cross-validation, regression analysis, model selection, R]
 preamble: >
   \usepackage{amsmath}
-output: rticles::jss_article
+output: 
+  rticles::jss_article:
+    extra_dependencies: "subfig"
 bibliography: ["cv.bib"]
 ---
 
@@ -209,9 +211,10 @@ legend("topright", inset=0.02,
 Alternatively, we can use the \code{plot()} method for \code{"cvModList"} objects to compare the models, though with separate graphs for 10-fold and LOO CV:
 
 ```{r, polynomial-regression-CV-graph-2, fig.show="hold"}
-#| out.width = "45%",
-#| fig.height = 6,
-#| fig.cap = "Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$"
+#| fig.height = 5,
+#| fig.cap = "Cross-validated (a) 10-fold and (b) LOO MSE as a function of polynomial degree, $p$",
+#| fig.subcap=c('', ''),
+#| fig.ncol = 2, out.width = "50%", fig.align = "center"
 plot(cv.auto.10, main="Polynomial Regressions, 10-Fold CV",
      axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
 plot(cv.auto.loo, main="Polynomial Regressions, LOO CV",

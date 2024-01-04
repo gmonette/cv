@@ -56,6 +56,7 @@ selection, R}
 
 
 
+\usepackage{subfig}
 
 \usepackage{amsmath}
 
@@ -310,14 +311,14 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 423836
+R RNG seed set to 886597
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.26863
-bias-adjusted cross-validation criterion = 19.25351
+cross-validation criterion = 19.41669
+bias-adjusted cross-validation criterion = 19.39385
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -587,11 +588,11 @@ R> plot(cv.auto.loo, main="Polynomial Regressions, LOO CV",
 \end{CodeInput}
 \begin{figure}
 
-{\centering \includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/polynomial-regression-CV-graph-2-1} \includegraphics[width=0.45\linewidth]{JSS-article-reduced_files/figure-latex/polynomial-regression-CV-graph-2-2} 
+{\centering \subfloat[\label{fig:polynomial-regression-CV-graph-2-1}]{\includegraphics[width=0.5\linewidth]{JSS-article-reduced_files/figure-latex/polynomial-regression-CV-graph-2-1} }\subfloat[\label{fig:polynomial-regression-CV-graph-2-2}]{\includegraphics[width=0.5\linewidth]{JSS-article-reduced_files/figure-latex/polynomial-regression-CV-graph-2-2} }
 
 }
 
-\caption[Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$]{Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$}\label{fig:polynomial-regression-CV-graph-2}
+\caption[Cross-validated (a) 10-fold and (b) LOO MSE as a function of polynomial degree, $p$]{Cross-validated (a) 10-fold and (b) LOO MSE as a function of polynomial degree, $p$}\label{fig:polynomial-regression-CV-graph-2}
 \end{figure}
 \end{CodeChunk}
 
