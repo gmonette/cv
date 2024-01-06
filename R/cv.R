@@ -124,7 +124,7 @@ cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10, reps=1, seed,
                        confint = n >= 400, level=0.95,
                        ncores=1,
-                       method=NULL, type="response", ...){
+                       type="response", ...){
 
   f <- function(i){
     # helper function to compute cv criterion for each fold
@@ -215,14 +215,13 @@ cv.default <- function(model, data=insight::get_data(model),
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
                  "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 "method"=method,
                  "criterion" = deparse(substitute(criterion)))
   class(result) <- "cv"
   if (reps == 1) {
     return(result)
   } else {
     res <- cv(model=model, data=data, criterion=criterion,
-              k=k, ncores=ncores, method=method, reps=reps - 1, ...)
+              k=k, ncores=ncores, reps=reps - 1, ...)
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {

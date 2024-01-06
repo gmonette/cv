@@ -22,7 +22,6 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   confint = n >= 400,
   level = 0.95,
   ncores = 1,
-  method = NULL,
   type = "response",
   ...
 )
@@ -92,10 +91,6 @@ criterion, if the criterion is the average of casewise components.}
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}
 
-\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
-or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
-of the available options.}
-
 \item{type}{for the default method, value to be passed to the
 \code{type} argument of \code{predict()};
 the default is \code{type="response"}, which is appropriate, e.g., for a \code{"glm"} model
@@ -105,6 +100,10 @@ and may be recognized or ignored by \code{predict()} methods for other model cla
 
 \item{digits}{significant digits for printing,
 default taken from the \code{"digits"} option}
+
+\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
+or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
+of the available options.}
 }
 \value{
 The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
