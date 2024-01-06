@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-01-04</h4>
+            <h4 data-toc-skip class="date">2024-01-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -280,12 +280,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 350172</span></span>
+<span><span class="co">#&gt; R RNG seed set to 31633</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.319</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.302</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.214</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.202</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -319,7 +319,6 @@ computations):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k<span class="op">=</span><span class="st">"loo"</span>, method<span class="op">=</span><span class="st">"naive"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: naive</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
@@ -356,11 +355,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times<span class="op">=</span><span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   2.2421   2.4017   2.5069   2.5311   2.5976   2.7689    10</span></span>
-<span><span class="co">#&gt;   Woodbury  22.3441  22.5601  23.1145  22.6989  22.7419  27.3722    10</span></span>
-<span><span class="co">#&gt;      naive 477.5424 486.3233 499.9555 488.0516 493.1605 611.3556    10</span></span>
-<span><span class="co">#&gt;     cv.glm 828.8303 831.4012 849.0685 839.1597 846.9114 951.0859    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min       lq     mean   median       uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues   2.1317   2.3602   2.4974   2.5569   2.5698    2.8404    10</span></span>
+<span><span class="co">#&gt;   Woodbury  22.4924  22.7658  23.6618  23.0642  23.1466   29.7981    10</span></span>
+<span><span class="co">#&gt;      naive 478.8522 482.7342 511.3701 488.4532 492.2218  616.2687    10</span></span>
+<span><span class="co">#&gt;     cv.glm 823.7349 830.8154 883.1337 831.1833 958.9825 1089.3034    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -623,7 +622,6 @@ last section of the vignette for details):</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">248</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 248</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: exact</span></span>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31952</span></span>
@@ -658,7 +656,6 @@ exact and the approximate methods:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, k<span class="op">=</span><span class="st">"loo"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: exact</span></span>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
@@ -695,11 +692,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>               cost<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span>,</span>
 <span>  times<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median       uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.4899    2.5299    2.5953    2.5676    2.635    2.7553    10</span></span>
-<span><span class="co">#&gt;   Woodbury   71.3235   71.6878   72.8719   72.7322   73.587   75.3323    10</span></span>
-<span><span class="co">#&gt;      exact 3025.8664 3043.7833 3113.4618 3110.0591 3184.384 3205.0756    10</span></span>
-<span><span class="co">#&gt;     cv.glm 3682.5112 3740.3770 3825.0814 3811.6298 3927.029 3970.5593    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.5301    2.5675    3.0119    2.5965    2.8009    6.4736    10</span></span>
+<span><span class="co">#&gt;   Woodbury   72.5381   73.0910   75.1309   73.9288   76.6338   82.7772    10</span></span>
+<span><span class="co">#&gt;      exact 3058.7426 3078.8553 3148.0809 3126.9404 3238.1222 3253.3384    10</span></span>
+<span><span class="co">#&gt;     cv.glm 3724.1279 3823.8450 3835.7163 3842.0671 3874.0776 3917.5637    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -2063,7 +2060,6 @@ larger, estimate of misclassification, about 33%:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz.sel</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">345266</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 345266</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: exact</span></span>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.33068</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.33332</span></span>
@@ -2909,7 +2905,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          AIC<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.353   0.000   0.353</span></span>
+<span><span class="co">#&gt;   0.359   0.000   0.359</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectStepAIC</span>, <span class="va">Mroz</span>,</span>
 <span>                          seed<span class="op">=</span><span class="fl">6681</span>,</span>
@@ -2919,7 +2915,7 @@ doing it in parallel using 2 cores:</p>
 <span>                          ncores<span class="op">=</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.069   0.000   1.475</span></span>
+<span><span class="co">#&gt;   0.066   0.001   1.496</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
