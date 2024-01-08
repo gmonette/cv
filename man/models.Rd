@@ -24,6 +24,7 @@ models(...)
   axis.args = list(labels = names(x), las = 3L),
   col = palette()[2L],
   lwd = 2,
+  grid = TRUE,
   ...
 )
 }
@@ -55,7 +56,7 @@ individual models.}
 to be used to create the same set of CV folds for all of the models;
 if omitted, a seed will be randomly generated and saved.}
 
-\item{quietly}{If \code{TRUE} (the default), simple messages (for example about the
+\item{quietly}{if \code{TRUE} (the default), simple messages (for example about the
 value to which the random-number generator seed is set), but not warnings or
 errors, are suppressed.}
 
@@ -89,6 +90,8 @@ are used and can't be modified.}
 element of the color palette; see \code{\link{palette}()}.}
 
 \item{lwd}{line width for the line (defaults to 2).}
+
+\item{grid}{if \code{TRUE} (the default), include grid lines on the graph.}
 }
 \value{
 \code{models()} returns a \code{"modList"} object, the

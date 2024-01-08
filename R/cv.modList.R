@@ -19,9 +19,10 @@
 #' @param seed (optional) seed for R's pseudo-random-number generator,
 #' to be used to create the same set of CV folds for all of the models;
 #' if omitted, a seed will be randomly generated and saved.
-#' @param quietly If \code{TRUE} (the default), simple messages (for example about the
+#' @param quietly if \code{TRUE} (the default), simple messages (for example about the
 #' value to which the random-number generator seed is set), but not warnings or
 #' errors, are suppressed.
+#' @param grid if \code{TRUE} (the default), include grid lines on the graph.
 #' @param ... for \code{models()}, two or more competing models fit to the
 #' the same data; the several models may be named.
 #' For \code{cv()}, additional arguments to be passed to the \code{cv()} method
@@ -161,7 +162,8 @@ plot.cvModList <- function(x, y,
                            ylab,
                            main,
                            axis.args = list(labels=names(x), las=3L),
-                           col=palette()[2L], lwd=2, ...){
+                           col=palette()[2L], lwd=2,
+                           grid=TRUE, ...){
   spread <- match.arg(spread)
   if (missing(ylab)){
     ylab <- if (inherits(x[[1L]], "cvList")){
@@ -219,6 +221,7 @@ plot.cvModList <- function(x, y,
     plot(c(1L, length(x)), c(min(min.y), max(max.y)),
          xlab=xlab, ylab=ylab,
          main=main, axes=FALSE, type="n")
+    if (grid) grid()
     xs <- seq(along=x)
     points(xs, crit, type="b", col=col, lwd=lwd)
     arrows(xs, min.y, xs, max.y, length=0.125, angle=90,
@@ -256,6 +259,7 @@ plot.cvModList <- function(x, y,
     plot(seq(along=crit), crit, xlab=xlab, ylab=ylab, main=main,
          axes=FALSE, type="b", col=col, lwd=lwd,
          ylim=c(min.y, max.y), ...)
+    if (grid) grid()
     if (plot.cis){
       xs <- seq_along(cis)
       arrows(xs, lowers, xs, uppers, length=0.125, angle=90,
