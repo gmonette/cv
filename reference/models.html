@@ -98,6 +98,7 @@ different response variables.</p>
 <span>  axis.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, las <span class="op">=</span> <span class="fl">3L</span><span class="op">)</span>,</span>
 <span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palette.html" class="external-link">palette</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">2L</span><span class="op">]</span>,</span>
 <span>  lwd <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  grid <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -146,7 +147,7 @@ if omitted, a seed will be randomly generated and saved.</p></dd>
 
 
 <dt>quietly</dt>
-<dd><p>If <code>TRUE</code> (the default), simple messages (for example about the
+<dd><p>if <code>TRUE</code> (the default), simple messages (for example about the
 value to which the random-number generator seed is set), but not warnings or
 errors, are suppressed.</p></dd>
 
@@ -200,6 +201,10 @@ element of the color palette; see <code><a href="https://rdrr.io/r/grDevices/pal
 
 <dt>lwd</dt>
 <dd><p>line width for the line (defaults to 2).</p></dd>
+
+
+<dt>grid</dt>
+<dd><p>if <code>TRUE</code> (the default), include grid lines on the graph.</p></dd>
 
 </dl></div>
     <div class="section level2">
