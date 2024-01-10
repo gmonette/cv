@@ -218,8 +218,8 @@ which is literally a list of <code>"cv"</code> objects.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The default <code>cv()</code> method uses <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a>()</code> to refit the model
 to each fold, and should work if there are appropriate <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>
-and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a>()</code> methods, and if the default method for <code><a href="getResponse.html">GetResponse</a>()</code>
-works or if a <code><a href="getResponse.html">GetResponse()</a></code> method is supplied.</p>
+and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a>()</code> methods, and if the default method for <code>GetResponse()</code>
+works or if a <code>GetResponse()</code> method is supplied.</p>
 <p>The <code>"lm"</code> and <code>"glm"</code> methods can use much faster computational
 algorithms, as selected by the <code>method</code> argument. The linear-model
 method accommodates weighted linear models.</p>
