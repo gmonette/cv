@@ -89,9 +89,9 @@ horsepower <- with(Auto,
 for (p in 1:5){
   m <- lm(mpg ~ poly(horsepower,p), data=Auto)
   mpg <- predict(m, newdata=data.frame(horsepower=horsepower))
-  lines(horsepower, mpg, col=p + 1, lty=p, lwd=2)
+  lines(horsepower, mpg, col=p + 1, lty=p, lwd=4)
 }
-legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
+legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=4,
        title="Degree", inset=0.02)
 ```
 
@@ -211,7 +211,7 @@ cv.auto.10[2] # e.g., for quadratic model
 cv.auto.loo <- cv(mlist, data=Auto, k="loo")
 cv.auto.loo[2] # e.g., for quadratic model
 ```
-The \code{models()} function takes an arbitrary number of regression models as its arguments, which are optionally named, to create a \code{"modList"} object. Because we generated the polynomial regression models in a named list, we conveniently employ \code{do.call()} to supply the models as arguments to \code{models()}. Note that the names created for the list (e.g., \code{"m.2"}) are then used for the models. We can also invoke the \code{plot()} method for \code{"cvModList"} objects to compare the models (see Figure \ref{fig:polynomial-regression-CV-graph-2}):
+The \code{models()} function takes an arbitrary number of regression models as its arguments, which are optionally named, to create a \code{"modList"} object. Because we generated the polynomial regression models in a named list, we conveniently employ \code{do.call()} to supply the models as arguments to \code{models()}. The names created for the list (e.g., \code{"m.2"}) are then used for the models. We can also invoke the \code{plot()} method for \code{"cvModList"} objects to compare the models (see Figure \ref{fig:polynomial-regression-CV-graph-2}):
 
 ```{r, polynomial-regression-CV-graph-2, fig.show="hold"}
 #| fig.height = 5,
@@ -273,7 +273,7 @@ HSB <- within(HSB, {
   cses <- ses - mean.ses
 })
 ```
-In the process, we merged variables from the school-level and student-level data sets and created two new school-level variables: \code{mean.ses}, which is the average SES for students in each school; and \code{cses}, which is each students' SES centered at their school means. For details, see @FoxWeisberg:2019 [Sec. 7.2.2].
+In the process, we merged variables from the school-level and student-level data sets and created two new school-level variables: \code{mean.ses}, which is the average SES for students in each school; and \code{cses}, which is the individual students' SES centered at their school means. For details, see @FoxWeisberg:2019 [Sec. 7.2.2].
 
 Still following Fox and Weisberg, we proceed to use the \code{lmer()} function in the \pkg{lme4} package [@BatesEtAl:2015] to fit a mixed model for math achievement to the HSB data:
 ```{r HSB-lmer, cache=TRUE}

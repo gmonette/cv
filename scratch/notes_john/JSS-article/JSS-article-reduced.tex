@@ -338,12 +338,10 @@ Residuals:
 -14.7135  -2.5943  -0.0859   2.2868  15.8961 
 
 Coefficients:
-                      Estimate Std. Error t value Pr(>|t|)    
-(Intercept)            23.4459     0.2209  106.13   <2e-16 ***
-poly(horsepower, 2)1 -120.1377     4.3739  -27.47   <2e-16 ***
-poly(horsepower, 2)2   44.0895     4.3739   10.08   <2e-16 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+                      Estimate Std. Error t value Pr(>|t|)
+(Intercept)            23.4459     0.2209  106.13   <2e-16
+poly(horsepower, 2)1 -120.1377     4.3739  -27.47   <2e-16
+poly(horsepower, 2)2   44.0895     4.3739   10.08   <2e-16
 
 Residual standard error: 4.374 on 389 degrees of freedom
 Multiple R-squared:  0.6876,    Adjusted R-squared:  0.686 
@@ -353,15 +351,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 542508
+R RNG seed set to 32925
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.57393
-bias-adjusted cross-validation criterion = 19.54281
-95% CI for bias-adjusted CV criterion = (16.03528, 23.05034)
+cross-validation criterion = 19.41501
+bias-adjusted cross-validation criterion = 19.3924
+95% CI for bias-adjusted CV criterion = (15.88674, 22.89806)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -556,10 +554,10 @@ The \code{models()} function takes an arbitrary number of regression
 models as its arguments, which are optionally named, to create a
 \code{"modList"} object. Because we generated the polynomial regression
 models in a named list, we conveniently employ \code{do.call()} to
-supply the models as arguments to \code{models()}. Note that the names
-created for the list (e.g., \code{"m.2"}) are then used for the models.
-We can also invoke the \code{plot()} method for \code{"cvModList"}
-objects to compare the models (see Figure
+supply the models as arguments to \code{models()}. The names created for
+the list (e.g., \code{"m.2"}) are then used for the models. We can also
+invoke the \code{plot()} method for \code{"cvModList"} objects to
+compare the models (see Figure
 \ref{fig:polynomial-regression-CV-graph-2}):
 
 \begin{CodeChunk}
@@ -737,8 +735,8 @@ R> HSB <- within(HSB, {
 In the process, we merged variables from the school-level and
 student-level data sets and created two new school-level variables:
 \code{mean.ses}, which is the average SES for students in each school;
-and \code{cses}, which is each students' SES centered at their school
-means. For details, see \citet[Sec. 7.2.2]{FoxWeisberg:2019}.
+and \code{cses}, which is the individual students' SES centered at their
+school means. For details, see \citet[Sec. 7.2.2]{FoxWeisberg:2019}.
 
 Still following Fox and Weisberg, we proceed to use the \code{lmer()}
 function in the \pkg{lme4} package \citep{BatesEtAl:2015} to fit a mixed
@@ -950,11 +948,9 @@ Residuals:
 -5.7713 -1.6583 -0.0894  1.5520  7.6240 
 
 Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept) 9.050430   0.347189  26.068  < 2e-16 ***
-x           0.020908   0.007273   2.875  0.00422 ** 
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept) 9.050430   0.347189  26.068  < 2e-16
+x           0.020908   0.007273   2.875  0.00422
 
 Residual standard error: 2.347 on 498 degrees of freedom
 Multiple R-squared:  0.01632,   Adjusted R-squared:  0.01435 
@@ -1277,10 +1273,8 @@ Residuals:
 -3.4585 -0.6809  0.0190  0.6365  2.9346 
 
 Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  9.93704    0.03122   318.3   <2e-16 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept)  9.93704    0.03122   318.3   <2e-16
 
 Residual standard error: 0.9872 on 999 degrees of freedom
 \end{CodeOutput}
@@ -1338,25 +1332,23 @@ Residuals:
 -3.2620 -0.6446  0.0236  0.6406  3.1180 
 
 Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  9.93716    0.03098 320.803  < 2e-16 ***
-X.99        -0.09103    0.03082  -2.953  0.00322 ** 
-X.90        -0.08205    0.03135  -2.617  0.00901 ** 
-X.87        -0.06942    0.03105  -2.235  0.02561 *  
-X.40        -0.04759    0.03076  -1.547  0.12211    
-X.65        -0.05523    0.03147  -1.755  0.07952 .  
-X.91         0.05245    0.03084   1.700  0.08937 .  
-X.53        -0.04921    0.03048  -1.615  0.10672    
-X.45         0.05543    0.03182   1.742  0.08183 .  
-X.31         0.04525    0.03108   1.456  0.14570    
-X.56         0.05433    0.03273   1.660  0.09723 .  
-X.61        -0.05085    0.03170  -1.604  0.10908    
-X.60        -0.05133    0.03194  -1.607  0.10832    
-X.46         0.05158    0.03272   1.576  0.11529    
-X.35         0.04696    0.03146   1.493  0.13584    
-X.92         0.04430    0.03100   1.429  0.15329    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept)  9.93716    0.03098 320.803  < 2e-16
+X.99        -0.09103    0.03082  -2.953  0.00322
+X.90        -0.08205    0.03135  -2.617  0.00901
+X.87        -0.06942    0.03105  -2.235  0.02561
+X.40        -0.04759    0.03076  -1.547  0.12211
+X.65        -0.05523    0.03147  -1.755  0.07952
+X.91         0.05245    0.03084   1.700  0.08937
+X.53        -0.04921    0.03048  -1.615  0.10672
+X.45         0.05543    0.03182   1.742  0.08183
+X.31         0.04525    0.03108   1.456  0.14570
+X.56         0.05433    0.03273   1.660  0.09723
+X.61        -0.05085    0.03170  -1.604  0.10908
+X.60        -0.05133    0.03194  -1.607  0.10832
+X.46         0.05158    0.03272   1.576  0.11529
+X.35         0.04696    0.03146   1.493  0.13584
+X.92         0.04430    0.03100   1.429  0.15329
 
 Residual standard error: 0.9725 on 984 degrees of freedom
 Multiple R-squared:  0.04419,   Adjusted R-squared:  0.02962 
@@ -2119,27 +2111,25 @@ Residuals:
 -0.35230 -0.05682  0.00677  0.06741  0.35861 
 
 Coefficients:
-              Estimate Std. Error t value Pr(>|t|)    
-(Intercept)   9.434594   0.261529  36.075  < 2e-16 ***
-horsepower   -0.276254   0.056143  -4.921 1.30e-06 ***
-weight       -0.609071   0.056003 -10.876  < 2e-16 ***
-acceleration -0.131380   0.053195  -2.470  0.01397 *  
-year71        0.027984   0.028936   0.967  0.33412    
-year72       -0.007111   0.028446  -0.250  0.80274    
-year73       -0.039529   0.026014  -1.520  0.12947    
-year74        0.052752   0.029986   1.759  0.07936 .  
-year75        0.053199   0.029280   1.817  0.07004 .  
-year76        0.074317   0.028212   2.634  0.00878 ** 
-year77        0.137931   0.028875   4.777 2.56e-06 ***
-year78        0.145876   0.027529   5.299 1.99e-07 ***
-year79        0.236036   0.029080   8.117 6.99e-15 ***
-year80        0.335274   0.031148  10.764  < 2e-16 ***
-year81        0.262872   0.030555   8.603  < 2e-16 ***
-year82        0.323391   0.029608  10.922  < 2e-16 ***
-originEurope  0.055818   0.016785   3.326  0.00097 ***
-originJapan   0.043554   0.017479   2.492  0.01314 *  
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+              Estimate Std. Error t value Pr(>|t|)
+(Intercept)   9.434594   0.261529  36.075  < 2e-16
+horsepower   -0.276254   0.056143  -4.921 1.30e-06
+weight       -0.609071   0.056003 -10.876  < 2e-16
+acceleration -0.131380   0.053195  -2.470  0.01397
+year71        0.027984   0.028936   0.967  0.33412
+year72       -0.007111   0.028446  -0.250  0.80274
+year73       -0.039529   0.026014  -1.520  0.12947
+year74        0.052752   0.029986   1.759  0.07936
+year75        0.053199   0.029280   1.817  0.07004
+year76        0.074317   0.028212   2.634  0.00878
+year77        0.137931   0.028875   4.777 2.56e-06
+year78        0.145876   0.027529   5.299 1.99e-07
+year79        0.236036   0.029080   8.117 6.99e-15
+year80        0.335274   0.031148  10.764  < 2e-16
+year81        0.262872   0.030555   8.603  < 2e-16
+year82        0.323391   0.029608  10.922  < 2e-16
+originEurope  0.055818   0.016785   3.326  0.00097
+originJapan   0.043554   0.017479   2.492  0.01314
 
 Residual standard error: 0.1049 on 374 degrees of freedom
 Multiple R-squared:  0.909, Adjusted R-squared:  0.9049 
@@ -2449,7 +2439,7 @@ function(y, yhat){
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x129d04270>
+<bytecode: 0x13e7ed098>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
