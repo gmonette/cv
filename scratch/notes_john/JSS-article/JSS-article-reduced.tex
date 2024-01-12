@@ -313,7 +313,7 @@ which takes the following arguments:
   \code{"Woodbury"} for \(k\)-fold CV, both of which are much more
   efficient than literally updating the least-squares fit (see below and
   Section
-  \ref{efficient-computation-for-linear-and-generalized-linear-models}).
+  \ref{efficient-computations-for-linear-and-generalized-linear-models}).
 \item
   \code{ncores}, the number of cores to employ for parallel computation;
   if \code{cores = 1} (the default), the computations are not
@@ -351,15 +351,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 32925
+R RNG seed set to 735559
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.41501
-bias-adjusted cross-validation criterion = 19.3924
-95% CI for bias-adjusted CV criterion = (15.88674, 22.89806)
+cross-validation criterion = 19.44017
+bias-adjusted cross-validation criterion = 19.41622
+95% CI for bias-adjusted CV criterion = (15.87764, 22.95479)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2439,7 +2439,7 @@ function(y, yhat){
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x13e7ed098>
+<bytecode: 0x13db9d388>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
