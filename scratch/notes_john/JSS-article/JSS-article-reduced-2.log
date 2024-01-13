@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.12.31)  12 JAN 2024 12:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.12.31)  13 JAN 2024 15:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -888,7 +888,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [29]
-Overfull \hbox (3.07053pt too wide) in paragraph at lines 1706--1712
+Overfull \hbox (3.07053pt too wide) in paragraph at lines 1705--1711
 []\T1/lmr/m/n/10.95 The es-ti-mate of the MSE that we ob-tain by cross-validating the whole model-specification
  []
 
@@ -898,7 +898,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [30]
-Overfull \hbox (11.58861pt too wide) in paragraph at lines 1776--1779
+Overfull \hbox (11.58861pt too wide) in paragraph at lines 1775--1778
 []\T1/lmr/m/n/10.95 The poly-to-mous (multi-category) re-sponse vari-able is \T1/lmtt/m/n/10.95 vote\T1/lmr/m/n/10.95 , a fac-tor with lev-els \T1/lmtt/m/n/10.95 "Conservative"\T1/lmr/m/n/10.95 ,
  []
 
@@ -911,7 +911,7 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 <JSS-article-reduced-2_files/figure-latex/BEPS-plot-1.pdf, id=514, 617.30624pt x 341.275pt>
 File: JSS-article-reduced-2_files/figure-latex/BEPS-plot-1.pdf Graphic file (type pdf)
 <use JSS-article-reduced-2_files/figure-latex/BEPS-plot-1.pdf>
-Package pdftex.def Info: JSS-article-reduced-2_files/figure-latex/BEPS-plot-1.pdf  used on input line 1836.
+Package pdftex.def Info: JSS-article-reduced-2_files/figure-latex/BEPS-plot-1.pdf  used on input line 1835.
 (pdftex.def)             Requested size: 354.12434pt x 195.77855pt.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
@@ -924,12 +924,12 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [33 <./JSS-article-reduced-2_files/figure-latex/BEPS-plot-1.pdf>]
-Overfull \hbox (20.25705pt too wide) in paragraph at lines 1952--1958
+Overfull \hbox (20.25705pt too wide) in paragraph at lines 1951--1957
 []\T1/lmr/m/n/10.95 The de-fault method of \T1/lmtt/m/n/10.95 GetResponse() \T1/lmr/m/n/10.95 (a func-tion sup-plied by the \T1/lmr/b/n/10.95 cv \T1/lmr/m/n/10.95 package---see \T1/lmtt/m/n/10.95 ?GetResponse\T1/lmr/m/n/10.95 )
  []
 
 
-Overfull \hbox (15.98694pt too wide) in paragraph at lines 1952--1958
+Overfull \hbox (15.98694pt too wide) in paragraph at lines 1951--1957
 \T1/lmr/m/n/10.95 fails for a \T1/lmtt/m/n/10.95 "multinom" \T1/lmr/m/n/10.95 ob-ject. A straight-for-ward so-lu-tion is to sup-ply a \T1/lmtt/m/n/10.95 GetResponse.multinom()
  []
 
@@ -959,17 +959,17 @@ Overfull \hbox (10.94998pt too wide) has occurred while \output is active
  []
 
 [38])
-Underfull \hbox (badness 10000) in paragraph at lines 2209--2209
+Underfull \hbox (badness 10000) in paragraph at lines 2208--2208
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2209--2209
+Underfull \hbox (badness 10000) in paragraph at lines 2208--2208
 
  []
 
 LaTeX Font Info:    Font shape `T1/pzc/m/n' in size <13> not available
-(Font)              Font shape `T1/pzc/m/it' tried instead on input line 2209.
+(Font)              Font shape `T1/pzc/m/it' tried instead on input line 2208.
 
 Overfull \hbox (10.94998pt too wide) has occurred while \output is active
 [] \T1/lmr/m/n/10.95 39
@@ -995,7 +995,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  99i,14n,101p,729b,864s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmb10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbo10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmro10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtto10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/urw/zapfchan/uzcmi8a.pfb>
-Output written on JSS-article-reduced-2.pdf (39 pages, 948186 bytes).
+Output written on JSS-article-reduced-2.pdf (39 pages, 948336 bytes).
 PDF statistics:
  770 PDF objects out of 1000 (max. 8388607)
  612 compressed objects within 7 object streams

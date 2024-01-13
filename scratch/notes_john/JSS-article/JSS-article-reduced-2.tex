@@ -351,15 +351,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 392419
+R RNG seed set to 352413
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.16505
-bias-adjusted cross-validation criterion = 19.15554
-95% CI for bias-adjusted CV criterion = (15.71577, 22.59531)
+cross-validation criterion = 19.42674
+bias-adjusted cross-validation criterion = 19.40347
+95% CI for bias-adjusted CV criterion = (15.89518, 22.91177)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1287,7 +1287,7 @@ cylinders
 \end{CodeOutput}
 \end{CodeChunk}
 
-The \code{Auto} appeared in a preliminary example in Section
+The \code{Auto} data appeared in a preliminary example in Section
 \ref{preliminary-example-polynomial-regression}, where we employed CV to
 inform the selection of the degree of a polynomial regression of
 \code{mpg} on \code{horsepower}. Here, we consider more generally the
@@ -1328,16 +1328,16 @@ however, only 5 distinct values of \code{cylinders} (ranging from 3 to
 8), but cars with 3 or 5 cylinders are rare, and none of the cars has 7
 cylinders. There are similarly only 13 distinct years between 1970 and
 1982 in the data, and the relationship between \code{mpg} and
-\code{year} is difficult to characterize.\footnote{Of course, making the
-  decision to treat \code{year} as a factor on this basis could be
-  construed as cheating in the current context, which illustrates the
-  difficulty of automating the whole model-selection process. It's
-  rarely desirable, in our opinion, to forgo exploration of the data to
-  ensure the purity of model validation. We believe, however, that it's
-  still useful to automate as much of the process as we can to obtain a
-  more realistic, if still biased, estimate of the predictive power of a
-  model.} It's apparent that most these variables are positively skewed
-and that many of the pairwise relationships among them are nonlinear.
+\code{year} is difficult to characterize.\footnote{Making the decision
+  to treat \code{year} as a factor on this basis could be construed as
+  cheating in the current context, which illustrates the difficulty of
+  automating the whole model-selection process. It's rarely desirable,
+  in our opinion, to forgo exploration of the data to ensure the purity
+  of model validation. We believe, however, that it's still useful to
+  automate as much of the process as we can to obtain a more realistic,
+  if still biased, estimate of the predictive power of a model.} It's
+apparent that most these variables are positively skewed and that many
+of the pairwise relationships among them are nonlinear.
 
 We start with a ``working model'' that specifies linear partial
 relationships of the response to the numeric predictors:
@@ -1687,12 +1687,11 @@ additional optional arguments and details):
   generator; as for \code{cv()}, if the seed isn't supplied by the user,
   then a seed is randomly selected and saved.
 \item
-  additional arguments required by the model-selection function, here
-  the starting \code{model} for predictor selection; the names of the
-  variables, \code{predictors} and \code{response}, that are candidates
-  for transformation; and \code{AIC=FALSE}, which specifies use of the
-  BIC for model selection. The starting model, \code{m.auto}, is the
-  working model fit to the \code{Auto} data.
+  Arguments required by the model-selection function: the starting
+  \code{model} (\code{m.auto}) for predictor selection, the names of the
+  variables---\code{predictors} and \code{response}---that are
+  candidates for transformation, and \code{AIC=FALSE}, which specifies
+  use of the BIC for model selection.
 \end{itemize}
 
 Some noteworthy points:
@@ -1860,7 +1859,7 @@ function(y, yhat){
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x13ca97218>
+<bytecode: 0x128c4cd38>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}

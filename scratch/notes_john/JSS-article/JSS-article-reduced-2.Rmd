@@ -520,7 +520,7 @@ xtabs(~ cylinders, data=Auto)
 
 [^Venables]: This example benefits from an email conversation with Bill Venables, who of course isn't responsible for the use to which we've put his insightful remarks.
 
-The \code{Auto} appeared in a preliminary example in Section \ref{preliminary-example-polynomial-regression}, where we employed CV to inform the selection of the degree of a polynomial regression of \code{mpg} on \code{horsepower}. Here, we consider more generally the problem of predicting \code{mpg} from the other variables in the \code{Auto} data. We begin with a bit of data management, and then examine the pairwise relationships among the numeric variables in the data set (Figure \ref{fig:Auto-explore}, produced by the \code{scatterplotMatrix()} function in the \pkg{car} package):
+The \code{Auto} data appeared in a preliminary example in Section \ref{preliminary-example-polynomial-regression}, where we employed CV to inform the selection of the degree of a polynomial regression of \code{mpg} on \code{horsepower}. Here, we consider more generally the problem of predicting \code{mpg} from the other variables in the \code{Auto} data. We begin with a bit of data management, and then examine the pairwise relationships among the numeric variables in the data set (Figure \ref{fig:Auto-explore}, produced by the \code{scatterplotMatrix()} function in the \pkg{car} package):
 ```{r Auto-explore}
 #| out.width = "60%",
 #| fig.height = 5,
@@ -539,7 +539,7 @@ scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration,
 ```
 A comment before we proceed: \code{origin} is clearly categorical and so converting it to a factor is natural, but we could imagine treating \code{cylinders} and \code{year} as numeric predictors. There are, however, only 5 distinct values of \code{cylinders} (ranging from 3 to 8), but cars with 3 or 5 cylinders are rare, and none of the cars has 7 cylinders. There are similarly only 13 distinct years between 1970 and 1982 in the data, and the relationship between \code{mpg} and \code{year} is difficult to characterize.[^year] It's apparent that most these variables are positively skewed and that many of the pairwise relationships among them are nonlinear.
 
-[^year]: Of course, making the decision to treat \code{year} as a factor on this basis could be construed as cheating in the current context, which illustrates the difficulty of automating the whole model-selection process. It's rarely desirable, in our opinion, to forgo exploration of the data to ensure the purity of model validation. We believe, however, that it's still useful to automate as much of the process as we can to obtain a more realistic, if still biased, estimate of the predictive power of a model.
+[^year]: Making the decision to treat \code{year} as a factor on this basis could be construed as cheating in the current context, which illustrates the difficulty of automating the whole model-selection process. It's rarely desirable, in our opinion, to forgo exploration of the data to ensure the purity of model validation. We believe, however, that it's still useful to automate as much of the process as we can to obtain a more realistic, if still biased, estimate of the predictive power of a model.
 
 We start with a "working model" that specifies linear partial relationships of the response to the numeric predictors:
 ```{r Auto-working-model}
@@ -625,7 +625,7 @@ The other arguments to \code{cvSelect()} are (see \code{?cvSelect} for additiona
 
 * \code{data}, the data set to which the model is fit.
 * \code{seed}, an optional seed for \proglang{R}'s pseudo-random-number generator; as for \code{cv()}, if the seed isn't supplied by the user, then a seed is randomly selected and saved.
-* additional arguments required by the model-selection function, here the starting \code{model} for predictor selection; the names of the variables, \code{predictors} and \code{response}, that are candidates for transformation; and \code{AIC=FALSE}, which specifies use of the BIC for model selection. The starting model, \code{m.auto}, is the working model fit to the \code{Auto} data.
+* Arguments required by the model-selection function: the starting \code{model} (\code{m.auto}) for predictor selection, the names of the variables---\code{predictors} and \code{response}---that are candidates for transformation, and \code{AIC=FALSE}, which specifies use of the BIC for model selection. 
 
 Some noteworthy points:
 
