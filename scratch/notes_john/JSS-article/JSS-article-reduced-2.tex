@@ -8,7 +8,7 @@
 
 \author{
 John Fox~\orcidlink{0000-0002-1196-8012}\\McMaster
-University \And Georges Monette~\orcidlink{0000-0000-0000-0000}\\York
+University \And Georges Monette~\orcidlink{0000-0003-0076-5532}\\York
 University
 }
 \title{\pkg{cv}: An \proglang{R} Package for Cross-Validation of
@@ -351,15 +351,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 352413
+R RNG seed set to 801552
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.42674
-bias-adjusted cross-validation criterion = 19.40347
-95% CI for bias-adjusted CV criterion = (15.89518, 22.91177)
+cross-validation criterion = 19.32751
+bias-adjusted cross-validation criterion = 19.30935
+95% CI for bias-adjusted CV criterion = (15.83674, 22.78196)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -847,9 +847,9 @@ simple procedure for extending \code{cv()} to other classes of
 mixed-effects models. See the vignettes in the \pkg{cv} package for
 details.
 
-\hypertarget{example-contrived-hierarchical-data}{%
-\subsection{Example: Contrived hierarchical
-data}\label{example-contrived-hierarchical-data}}
+\hypertarget{example-cv-of-clusters-versus-individuals-using-contrived-data}{%
+\subsection{Example: CV of clusters versus individuals using contrived
+data}\label{example-cv-of-clusters-versus-individuals-using-contrived-data}}
 
 In this section, we introduce an artificial data set that exemplifies
 aspects of cross-validation particular to hierarchical models. Using
@@ -1859,7 +1859,7 @@ function(y, yhat){
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x128c4cd38>
+<bytecode: 0x123a02cc0>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}

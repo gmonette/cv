@@ -9,7 +9,7 @@ author:
     email: \email{jfox@mcmaster.ca}
     url: https://www.john-fox.ca/
   - name: Georges Monette
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0003-0076-5532
     affiliation: 'York University'
     # To add another line, use \AND at the end of the previous one as above
     address: |
@@ -297,7 +297,7 @@ If the \code{clusterVariables} argument is omitted, then case-level CV is employ
 
 \code{cv()} also has methods for mixed models fit by the \code{glmer()} function in the \pkg{lme4} package, the \code{lme()} function in the \pkg{nlme} package [@PinheiroBates:2000], and the \code{glmmTMB()} function in the \pkg{glmmTMB} package [@BrooksEtAl], along with a simple procedure for extending \code{cv()} to other classes of mixed-effects models. See the vignettes in the \pkg{cv} package for details.
 
-## Example: Contrived hierarchical data
+## Example: CV of clusters versus individuals using contrived data
 
 In this section, we introduce an artificial data set that exemplifies aspects of cross-validation particular to hierarchical models. Using this data set, we show that model comparisons employing cluster-based and those employing case-based cross-validation may not agree on a "best" model. Furthermore, commonly used measures of fit, such as mean-squared error, do not necessarily become smaller as models become larger, even when the models are nested, and even when the measure of fit is computed for the whole data set.
 

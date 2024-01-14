@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.12.31)  13 JAN 2024 15:49
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.12.31)  14 JAN 2024 14:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -984,18 +984,18 @@ L3 programming layer <2023-12-11>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `JSS-article-reduced-2.out' has not changed.
-(rerunfilecheck)             Checksum: 91DFF44CE0483A5B6C9F9DC68AE797FF;3291.
+(rerunfilecheck)             Checksum: E63AB692A257376EFC787B8C7C8732D0;3468.
  ) 
 Here is how much of TeX's memory you used:
  23165 strings out of 476135
- 448045 string characters out of 5794013
+ 448168 string characters out of 5794013
  1939457 words of memory out of 5000000
  44651 multiletter control sequences out of 15000+600000
  687004 words of font info for 102 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  99i,14n,101p,729b,864s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmb10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbo10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmro10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtto10.pfb></Users/johnfox/Library/TinyTeX/texmf-dist/fonts/type1/urw/zapfchan/uzcmi8a.pfb>
-Output written on JSS-article-reduced-2.pdf (39 pages, 948336 bytes).
+Output written on JSS-article-reduced-2.pdf (39 pages, 948423 bytes).
 PDF statistics:
  770 PDF objects out of 1000 (max. 8388607)
  612 compressed objects within 7 object streams

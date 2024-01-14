@@ -14,7 +14,7 @@
 
 - Fix bug in cv.lm() and cv.glm() with method="hatvalues" for cost criteria other than mse().
 
-- Add selectTransAndStepAIC() procedure for use with cvSelect().
+- Add selectTransStepAIC() procedure for use with cvSelect().
 
 - Add medAbsErr() and rmse() cost criteria.
 
