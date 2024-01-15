@@ -297,7 +297,7 @@ If the \code{clusterVariables} argument is omitted, then case-level CV is employ
 
 \code{cv()} also has methods for mixed models fit by the \code{glmer()} function in the \pkg{lme4} package, the \code{lme()} function in the \pkg{nlme} package [@PinheiroBates:2000], and the \code{glmmTMB()} function in the \pkg{glmmTMB} package [@BrooksEtAl], along with a simple procedure for extending \code{cv()} to other classes of mixed-effects models. See the vignettes in the \pkg{cv} package for details.
 
-## Example: CV of clusters versus individuals using contrived data
+## Example: Contrasting cluster-based and case-based CV
 
 In this section, we introduce an artificial data set that exemplifies aspects of cross-validation particular to hierarchical models. Using this data set, we show that model comparisons employing cluster-based and those employing case-based cross-validation may not agree on a "best" model. Furthermore, commonly used measures of fit, such as mean-squared error, do not necessarily become smaller as models become larger, even when the models are nested, and even when the measure of fit is computed for the whole data set.
 
@@ -335,11 +335,11 @@ Data <- data.frame(
 })
 ```
 
-Figure \ref{fig:plot1} (a) shows a scatterplot the data for a representative group of 10 (without loss of generality, the first 10) of the 100 students, displaying the 95% concentration ellipse for each cluster:
+Figure \ref{fig:plot1} (a) shows a scatterplot the data for a representative group of 10 (without loss of generality, the first 10) of the 100 students, displaying the 95% concentration ellipse for each cluster.
 
 ```{r plot1, echo=FALSE, results=FALSE}
 #| fig.height = 4,
-#| fig.cap = "(a) Hierarchical data set, showing the first 10 of 100 students, and (b)--(e) several mixed models fit to the data",
+#| fig.cap = "(a) Hierarchical data set, showing the first 10 of 100 students, and (b)--(e) predictions from several mixed models fit to the data",
 #| fig.subcap=rep("", 5),
 #| fig.ncol = 2, out.width = "45%", fig.align = "center"
 library("lattice")
@@ -381,52 +381,55 @@ Data_long$model <- factor(
   xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" & effect == "fe"),
          groups=group, type="l", lwd=2) +
   xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" &  effect == "re"),
-         groups=group, type="l", lwd=2, lty=3)
+         groups=group, type="l", lwd=2, lty=2)
 ) |> update(
   main="Model: y ~ 1 + (1 | group)",
   key=list(
     corner=c(0.05, 0.05),
     text=list(c("fixed effects only","fixed and random")),
-    lines=list(lty=c(1, 3))))
+    lines=list(lty=c(1, 2), lwd=2)))
 
 (plot +
   xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "fe"),
          groups=group, type="l", lwd=2) +
   xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "re"),
-         groups=group, type="l", lwd=2, lty=3)
+         groups=group, type="l", lwd=2, lty=2)
 ) |> update(
   main="Model: y ~ 1 + x + (1 | group)",
-  ylim=c(-15, 35),
-  key=list(
-    corner=c(0.95, 0.05),
-    text=list(c("fixed effects only","fixed and random")),
-    lines=list(lty=c(1, 3))))
+  ylim=c(-15, 35) #,
+  # key=list(
+  #   corner=c(0.95, 0.05),
+  #   text=list(c("fixed effects only","fixed and random")),
+  #   lines=list(lty=c(1, 3)))
+  )
 
 (plot +
   xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "fe"),
          groups=group, type="l", lwd=2) +
   xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "re"),
-         groups=group, type="l", lwd=2, lty=3)
+         groups=group, type="l", lwd=2, lty=2)
 ) |> update(
   main="Model: y ~ 1 + x + xm + (1 | group)",
-  ylim=c(4, 16),
-  key=list(
-    corner=c(0.05, 0.05),
-    text=list(c("fixed effects only","fixed and random")),
-    lines=list(lty=c(1, 3))))
+  ylim=c(4, 16) #,
+  # key=list(
+  #   corner=c(0.05, 0.05),
+  #   text=list(c("fixed effects only","fixed and random")),
+  #   lines=list(lty=c(1, 3)))
+  )
 
 (plot +
   xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "fe"),
          groups=group, type="l", lwd=2) +
   xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "re"),
-         groups=group, type="l", lwd=2, lty=3)
+         groups=group, type="l", lwd=2, lty=2)
 ) |> update(
   main="Model: y ~ 1 + I(x - xm) + (1 | group)",
-  ylim=c(4, 16),
-  key=list(
-    corner=c(0.05, 0.05),
-    text=list(c("fixed effects only","fixed and random")),
-    lines=list(lty=c(1, 3))))
+  ylim=c(4, 16) #,
+  # key=list(
+  #   corner=c(0.05, 0.05),
+  #   text=list(c("fixed effects only","fixed and random")),
+  #   lines=list(lty=c(1, 3)))
+  )
 
 ```
 
@@ -436,38 +439,21 @@ The between-student effect of age is 0 but the within-student effect is 1. Due t
 summary(lm(y ~ x, data=Data))
 ```
 
-The initial mixed-effects model that we fit to the data is a simple random-intercepts model:
-
-```{r}
-# random intercept only:
+We proceed to fit several mixed-effects models to the data, using the `compareCoefs()` function from the \pkg{car} package [@FoxWeisberg:2019] to display the fixed-effect estimates for these models. We discuss each of these models below.
+```{r fitted-mixed-models}
 mod.0 <- lmer(y ~ 1 + (1 | group), Data)
-summary(mod.0)
-```
-
-We will shortly consider three other, more complex, mixed models.
-
-We proceed to obtain predictions from the random-intercept model (\code{mod.0}) for fixed effects alone, as would be used for cross-validation based on clusters (i.e., students), and for fixed and random effects---the BLUPs---as would be used for cross-validation based on cases (i.e., occasions within students). Predictions for the random-intercept model, \code{mod.0}, for the first 10 students are shown in Figure \ref{fig:plot1} (b). The fixed-effect predictions for the various individuals are identical---the estimated fixed-effects intercept or estimated general mean of $y$---while the BLUPs are the sums of the fixed-effects intercept and the random intercepts, and are only slightly shrunken towards the general mean. Because in our artificial data there is no population relationship between age and skill, the fixed-effect-only predictions and the BLUPs are not very different.
-
-Our next model, \code{mod.1}, includes a fixed intercept and fixed effect of \code{x} along with a random intercept:
-
-```{r}
-# effect of x and random intercept:
 mod.1 <- lmer(y ~ x + (1 | group), Data)
-summary(mod.1)
-```
-
-Predictions from this model appear in Figure \ref{fig:plot1} (c). The BLUPs fit the observed data very closely, but predictions based on the fixed effects alone, with a common intercept and slope for all clusters, are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model, \code{mod.0}. We therefore anticipate (and show later in this section) that case-based cross-validation will prefer \code{mod1} to \code{mod0}, but that cluster-based cross-validation will prefer \code{mod0} to \code{mod1}.
-
-Our third model, \code{mod.2}, includes the "contextual effect" of $x$---that is, the cluster mean \code{xm}---along with $x$ and the intercept in the fixed-effect part of the model, and a random intercept:
-
-```{r}
-# effect of x, contextual (student) mean of x, and random intercept:
 mod.2 <- lmer(y ~ x + xm + (1 | group), Data)
-        # equivalent to y ~ I(x - xm) + xm + (1 | group)
-summary(mod.2)
+mod.3 <- lmer(y ~ I(x - xm) + (1 | group), Data)
+library("car", quietly=TRUE)
+compareCoefs(mod.0, mod.1, mod.2, mod.3)
 ```
 
-This model is equivalent to fitting \code{y ~ I(x - xm) + xm + (1 | group)}, which is the model that generated the data once the coefficient of the contextual predictor \code{xm} is set to 0 (as it is in \code{mod.3}, discussed below). 
+The initial mixed-effects model, \code{mod.0}, is a simple random-intercepts model. We obtain predictions from this model for the fixed effects alone, as would be used for cross-validation based on clusters (i.e., students), and for fixed and random effects---the BLUPs---as would be used for cross-validation based on cases (i.e., occasions within students). Predictions from \code{mod.0} for the first 10 students are shown in Figure \ref{fig:plot1} (b). The fixed-effect predictions for the various individuals are identical---the estimated fixed-effects intercept or estimated general mean of $y$---while the BLUPs are the sums of the fixed-effects intercept and the random intercepts, and are only slightly shrunken towards the general mean. Because in our artificial data there is no population relationship between age and skill, the fixed-effect-only predictions and the BLUPs are not very different.
+
+Our next model, \code{mod.1}, includes a fixed intercept and the fixed effect of \code{x}, along with a random intercept. Predictions from this model appear in Figure \ref{fig:plot1} (c). The BLUPs fit the observed data very closely, but predictions based on the fixed effects alone, with a common intercept and slope for all clusters, are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model, \code{mod.0}. We therefore anticipate (and show later in this section) that case-based cross-validation will prefer \code{mod.1} to \code{mod.0}, but that cluster-based cross-validation will prefer \code{mod.0} to \code{mod.1}.
+
+Our third model, \code{mod.2}, includes the "contextual effect" of $x$---that is, the cluster mean \code{xm}---along with $x$ and the intercept in the fixed-effect part of the model, and a random intercept. This model is equivalent to fitting \code{y ~ I(x - xm) + xm + (1 | group)}, which is the model that generated the data once the coefficient of the contextual predictor \code{xm} is set to 0 (as it is in \code{mod.3}, discussed below). 
 
 Predictions from \code{mod.2} appear in Figure \ref{fig:plot1} (d). Depending on the estimated variance parameters of the model, a mixed model like \code{mod.2} will apply varying degrees of shrinkage to the random-intercept BLUPs that correspond to variation in the heights of the parallel fitted lines for the individual students. In our contrived data, \code{mod.2} applies little shrinkage, allowing substantial variability in the heights of the fitted lines, which closely approach the observed values for each student. The fit of the mixed model \code{mod.2} is consequently similar to that of a fixed-effects model with age and a categorical predictor for individual students (i.e., treating students as a factor, and not shown here).
 
@@ -475,15 +461,7 @@ The  mixed model \code{mod.2} therefore fits the individual observations well, a
 
 Had the mixed model applied considerable shrinkage, then neither cluster-based nor case-based cross-validation would show much improvement over the random-intercept-only model. In our experience, the degree of shrinkage does not vary smoothly as parameters are changed but tends to be "all or nothing," and near the tipping point, the behavior of estimates can be affected considerably by the choice of algorithm used to fit the model.
 
-Finally, \code{mod.3} directly estimates the model used to generate the data. As mentioned, it is a constrained version of \code{mod.2}, with the coefficient of \code{xm} set to 0, and with \code{x} expressed as a deviation from the cluster mean \code{xm}:
-
-```{r}
-# model generating the data (where Bb = 0)
-mod.3 <- lmer(y ~ I(x - xm) + (1 | group), Data)
-summary(mod.3)
-```
-
-The predictions from \code{mod.3}, shown in Figure \ref{fig:plot1} (e), are therefore similar to those from \code{mod.2}.
+Finally, \code{mod.3} directly estimates the model used to generate the data. As mentioned, it is a constrained version of \code{mod.2}, with the coefficient of \code{xm} set to 0, and with \code{x} expressed as a deviation from the cluster mean \code{xm}. The predictions from \code{mod.3}, shown in Figure \ref{fig:plot1} (e), are therefore similar to those from \code{mod.2}.
 
 We next carry out case-based cross-validation, which, as we have explained, includes both fixed and predicted random effects (i.e., BLUPs), and cluster-based cross-validation, which includes fixed effects only. In order to reduce between-model random variability in comparisons of models, we apply \code{cv()} to the list of models created by the \code{models()} function (introduced previously), performing cross-validation with the same folds for each model (see Figure \ref{fig:cross-validation-clusters}):
 
@@ -533,7 +511,6 @@ Auto$origin <- factor(Auto$origin,
 rownames(Auto) <- make.names(Auto$name, unique=TRUE)
 Auto$name <- NULL
 
-library("car", quietly=TRUE)
 scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
                   smooth=list(spread=FALSE), data=Auto, pch=".")
 ```

@@ -351,15 +351,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 801552
+R RNG seed set to 610656
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.32751
-bias-adjusted cross-validation criterion = 19.30935
-95% CI for bias-adjusted CV criterion = (15.83674, 22.78196)
+cross-validation criterion = 19.39106
+bias-adjusted cross-validation criterion = 19.36966
+95% CI for bias-adjusted CV criterion = (15.86196, 22.87735)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -847,9 +847,9 @@ simple procedure for extending \code{cv()} to other classes of
 mixed-effects models. See the vignettes in the \pkg{cv} package for
 details.
 
-\hypertarget{example-cv-of-clusters-versus-individuals-using-contrived-data}{%
-\subsection{Example: CV of clusters versus individuals using contrived
-data}\label{example-cv-of-clusters-versus-individuals-using-contrived-data}}
+\hypertarget{example-contrasting-cluster-based-and-case-based-cv}{%
+\subsection{Example: Contrasting cluster-based and case-based
+CV}\label{example-contrasting-cluster-based-and-case-based-cv}}
 
 In this section, we introduce an artificial data set that exemplifies
 aspects of cross-validation particular to hierarchical models. Using
@@ -914,7 +914,7 @@ R> Data <- data.frame(
 Figure \ref{fig:plot1} (a) shows a scatterplot the data for a
 representative group of 10 (without loss of generality, the first 10) of
 the 100 students, displaying the 95\% concentration ellipse for each
-cluster:
+cluster.
 
 \begin{CodeChunk}
 \begin{figure}
@@ -923,7 +923,7 @@ cluster:
 
 }
 
-\caption[(a) Hierarchical data set, showing the first 10 of 100 students, and (b)--(e) several mixed models fit to the data]{(a) Hierarchical data set, showing the first 10 of 100 students, and (b)--(e) several mixed models fit to the data}\label{fig:plot1}
+\caption[(a) Hierarchical data set, showing the first 10 of 100 students, and (b)--(e) predictions from several mixed models fit to the data]{(a) Hierarchical data set, showing the first 10 of 100 students, and (b)--(e) predictions from several mixed models fit to the data}\label{fig:plot1}
 \end{figure}
 \end{CodeChunk}
 
@@ -958,142 +958,72 @@ F-statistic: 8.263 on 1 and 498 DF,  p-value: 0.004219
 \end{CodeOutput}
 \end{CodeChunk}
 
-The initial mixed-effects model that we fit to the data is a simple
-random-intercepts model:
+We proceed to fit several mixed-effects models to the data, using the
+\texttt{compareCoefs()} function from the \pkg{car} package
+\citep{FoxWeisberg:2019} to display the fixed-effect estimates for these
+models. We discuss each of these models below.
 
 \begin{CodeChunk}
 \begin{CodeInput}
-R> # random intercept only:
 R> mod.0 <- lmer(y ~ 1 + (1 | group), Data)
-R> summary(mod.0)
-\end{CodeInput}
-\begin{CodeOutput}
-Linear mixed model fit by REML ['lmerMod']
-Formula: y ~ 1 + (1 | group)
-   Data: Data
-
-REML criterion at convergence: 2103.1
-
-Scaled residuals: 
-     Min       1Q   Median       3Q      Max 
--2.03514 -0.72645 -0.01169  0.78477  2.04377 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- group    (Intercept) 2.900    1.703   
- Residual             2.712    1.647   
-Number of obs: 500, groups:  group, 100
-
-Fixed effects:
-            Estimate Std. Error t value
-(Intercept)  10.0018     0.1855   53.91
-\end{CodeOutput}
-\end{CodeChunk}
-
-We will shortly consider three other, more complex, mixed models.
-
-We proceed to obtain predictions from the random-intercept model
-(\code{mod.0}) for fixed effects alone, as would be used for
-cross-validation based on clusters (i.e., students), and for fixed and
-random effects---the BLUPs---as would be used for cross-validation based
-on cases (i.e., occasions within students). Predictions for the
-random-intercept model, \code{mod.0}, for the first 10 students are
-shown in Figure \ref{fig:plot1} (b). The fixed-effect predictions for
-the various individuals are identical---the estimated fixed-effects
-intercept or estimated general mean of \(y\)---while the BLUPs are the
-sums of the fixed-effects intercept and the random intercepts, and are
-only slightly shrunken towards the general mean. Because in our
-artificial data there is no population relationship between age and
-skill, the fixed-effect-only predictions and the BLUPs are not very
-different.
-
-Our next model, \code{mod.1}, includes a fixed intercept and fixed
-effect of \code{x} along with a random intercept:
-
-\begin{CodeChunk}
-\begin{CodeInput}
-R> # effect of x and random intercept:
 R> mod.1 <- lmer(y ~ x + (1 | group), Data)
-R> summary(mod.1)
+R> mod.2 <- lmer(y ~ x + xm + (1 | group), Data)
+R> mod.3 <- lmer(y ~ I(x - xm) + (1 | group), Data)
+R> library("car", quietly=TRUE)
+R> compareCoefs(mod.0, mod.1, mod.2, mod.3)
 \end{CodeInput}
 \begin{CodeOutput}
-Linear mixed model fit by REML ['lmerMod']
-Formula: y ~ x + (1 | group)
-   Data: Data
+Calls:
+1: lmer(formula = y ~ 1 + (1 | group), data = Data)
+2: lmer(formula = y ~ x + (1 | group), data = Data)
+3: lmer(formula = y ~ x + xm + (1 | group), data = Data)
+4: lmer(formula = y ~ I(x - xm) + (1 | group), data = Data)
 
-REML criterion at convergence: 1564.5
-
-Scaled residuals: 
-     Min       1Q   Median       3Q      Max 
--2.90160 -0.63501  0.01879  0.55407  2.82932 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- group    (Intercept) 192.9406 13.8903 
- Residual               0.2569  0.5068 
-Number of obs: 500, groups:  group, 100
-
-Fixed effects:
-             Estimate Std. Error t value
-(Intercept) -33.91892    1.56446  -21.68
-x             0.96529    0.01581   61.05
-
-Correlation of Fixed Effects:
-  (Intr)
-x -0.460
+            Model 1 Model 2 Model 3 Model 4
+(Intercept)  10.002 -33.919   9.479  10.002
+SE            0.186   1.564   0.617   0.186
+                                           
+x                    0.9653  0.9915        
+SE                   0.0158  0.0160        
+                                           
+xm                          -0.9800        
+SE                           0.0206        
+                                           
+I(x - xm)                             0.992
+SE                                    0.016
+                                           
 \end{CodeOutput}
 \end{CodeChunk}
 
-Predictions from this model appear in Figure \ref{fig:plot1} (c). The
-BLUPs fit the observed data very closely, but predictions based on the
-fixed effects alone, with a common intercept and slope for all clusters,
-are very poor---indeed, much worse than the fixed-effects-only
-predictions based on the simpler random-intercept model, \code{mod.0}.
-We therefore anticipate (and show later in this section) that case-based
-cross-validation will prefer \code{mod1} to \code{mod0}, but that
-cluster-based cross-validation will prefer \code{mod0} to \code{mod1}.
+The initial mixed-effects model, \code{mod.0}, is a simple
+random-intercepts model. We obtain predictions from this model for the
+fixed effects alone, as would be used for cross-validation based on
+clusters (i.e., students), and for fixed and random effects---the
+BLUPs---as would be used for cross-validation based on cases (i.e.,
+occasions within students). Predictions from \code{mod.0} for the first
+10 students are shown in Figure \ref{fig:plot1} (b). The fixed-effect
+predictions for the various individuals are identical---the estimated
+fixed-effects intercept or estimated general mean of \(y\)---while the
+BLUPs are the sums of the fixed-effects intercept and the random
+intercepts, and are only slightly shrunken towards the general mean.
+Because in our artificial data there is no population relationship
+between age and skill, the fixed-effect-only predictions and the BLUPs
+are not very different.
+
+Our next model, \code{mod.1}, includes a fixed intercept and the fixed
+effect of \code{x}, along with a random intercept. Predictions from this
+model appear in Figure \ref{fig:plot1} (c). The BLUPs fit the observed
+data very closely, but predictions based on the fixed effects alone,
+with a common intercept and slope for all clusters, are very
+poor---indeed, much worse than the fixed-effects-only predictions based
+on the simpler random-intercept model, \code{mod.0}. We therefore
+anticipate (and show later in this section) that case-based
+cross-validation will prefer \code{mod.1} to \code{mod.0}, but that
+cluster-based cross-validation will prefer \code{mod.0} to \code{mod.1}.
 
 Our third model, \code{mod.2}, includes the ``contextual effect'' of
 \(x\)---that is, the cluster mean \code{xm}---along with \(x\) and the
-intercept in the fixed-effect part of the model, and a random intercept:
-
-\begin{CodeChunk}
-\begin{CodeInput}
-R> # effect of x, contextual (student) mean of x, and random intercept:
-R> mod.2 <- lmer(y ~ x + xm + (1 | group), Data)
-R>         # equivalent to y ~ I(x - xm) + xm + (1 | group)
-R> summary(mod.2)
-\end{CodeInput}
-\begin{CodeOutput}
-Linear mixed model fit by REML ['lmerMod']
-Formula: y ~ x + xm + (1 | group)
-   Data: Data
-
-REML criterion at convergence: 1169.2
-
-Scaled residuals: 
-     Min       1Q   Median       3Q      Max 
--2.98466 -0.63750  0.00191  0.55682  2.73246 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- group    (Intercept) 3.3986   1.8435  
- Residual             0.2552   0.5052  
-Number of obs: 500, groups:  group, 100
-
-Fixed effects:
-            Estimate Std. Error t value
-(Intercept)  9.47866    0.61705   15.36
-x            0.99147    0.01597   62.07
-xm          -0.97998    0.02055  -47.68
-
-Correlation of Fixed Effects:
-   (Intr) x     
-x   0.000       
-xm -0.600 -0.777
-\end{CodeOutput}
-\end{CodeChunk}
-
+intercept in the fixed-effect part of the model, and a random intercept.
 This model is equivalent to fitting
 \code{y ~ I(x - xm) + xm + (1 | group)}, which is the model that
 generated the data once the coefficient of the contextual predictor
@@ -1130,44 +1060,9 @@ used to fit the model.
 Finally, \code{mod.3} directly estimates the model used to generate the
 data. As mentioned, it is a constrained version of \code{mod.2}, with
 the coefficient of \code{xm} set to 0, and with \code{x} expressed as a
-deviation from the cluster mean \code{xm}:
-
-\begin{CodeChunk}
-\begin{CodeInput}
-R> # model generating the data (where Bb = 0)
-R> mod.3 <- lmer(y ~ I(x - xm) + (1 | group), Data)
-R> summary(mod.3)
-\end{CodeInput}
-\begin{CodeOutput}
-Linear mixed model fit by REML ['lmerMod']
-Formula: y ~ I(x - xm) + (1 | group)
-   Data: Data
-
-REML criterion at convergence: 1163.2
-
-Scaled residuals: 
-     Min       1Q   Median       3Q      Max 
--2.97703 -0.63204  0.00627  0.56032  2.72489 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- group    (Intercept) 3.3913   1.8415  
- Residual             0.2552   0.5052  
-Number of obs: 500, groups:  group, 100
-
-Fixed effects:
-            Estimate Std. Error t value
-(Intercept) 10.00176    0.18553   53.91
-I(x - xm)    0.99147    0.01597   62.07
-
-Correlation of Fixed Effects:
-          (Intr)
-I(x - xm) 0.000 
-\end{CodeOutput}
-\end{CodeChunk}
-
-The predictions from \code{mod.3}, shown in Figure \ref{fig:plot1} (e),
-are therefore similar to those from \code{mod.2}.
+deviation from the cluster mean \code{xm}. The predictions from
+\code{mod.3}, shown in Figure \ref{fig:plot1} (e), are therefore similar
+to those from \code{mod.2}.
 
 We next carry out case-based cross-validation, which, as we have
 explained, includes both fixed and predicted random effects (i.e.,
@@ -1307,7 +1202,6 @@ R> Auto$origin <- factor(Auto$origin,
 R> rownames(Auto) <- make.names(Auto$name, unique=TRUE)
 R> Auto$name <- NULL
 R> 
-R> library("car", quietly=TRUE)
 R> scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
 +                   smooth=list(spread=FALSE), data=Auto, pch=".")
 \end{CodeInput}
@@ -1859,7 +1753,7 @@ function(y, yhat){
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x123a02cc0>
+<bytecode: 0x139564668>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
