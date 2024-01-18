@@ -85,11 +85,8 @@
 <div class="row">
   <main id="main" class="col-md-9">
 <!-- badges: end -->
-<div class="section level1">
-<div class="page-header"><h1 id="cv-package-for-r-various-functions-for-cross-validation-of-regression-models">cv package for R: Various Functions for Cross-Validation of Regression Models<a class="anchor" aria-label="anchor" href="#cv-package-for-r-various-functions-for-cross-validation-of-regression-models"></a>
-</h1></div>
 <p><img src="reference/figures/cv-hex.png" style="float:right; height:200px;"></p>
-<p>Some of the functions supplied by the package:</p>
+<p>The <strong>cv</strong> package for R provides a consistent and extensible framework for cross-validating standard R statistical models. Some of the functions supplied by the package:</p>
 <ul>
 <li><p><code><a href="reference/cv.html">cv()</a></code> is a generic function with a default method, computationally efficient <code>"lm"</code> and <code>"glm"</code> methods, an <code>"rlm"</code> method (for robust linear models), and a method for a list of competing models. There are also <code>"merMod"</code>, <code>"lme"</code>, and <code>"glmmTMB"</code> methods for mixed-effects models. <code><a href="reference/cv.html">cv()</a></code> supports parallel computations.</p></li>
 <li><p><code><a href="reference/cost-functions.html">mse()</a></code> (mean-squared error), <code><a href="reference/cost-functions.html">rmse()</a></code> (root-mean-squared error), <code><a href="reference/cost-functions.html">medAbsErr()</a></code> (median absolute error), and <code><a href="reference/cost-functions.html">BayesRule()</a></code> are cross-validation criteria (“cost functions”), suitable for use with <code><a href="reference/cv.html">cv()</a></code>.</p></li>
@@ -98,7 +95,10 @@
 <li><p><code><a href="reference/cvSelect.html">selectTrans()</a></code> is a procedure for selecting predictor and response transformations in regression, suitable for use with <code><a href="reference/cvSelect.html">cvSelect()</a></code>, based on the <code>powerTransform()</code> function in the <strong>car</strong> package.</p></li>
 <li><p><code><a href="reference/cvSelect.html">selectTransStepAIC()</a></code> is a procedure also suitable for use with <code><a href="reference/cvSelect.html">cvSelect()</a></code>, that first selects predictor and response transformations and then selects predictors.</p></li>
 </ul>
-<p>For additional information on using the <strong>cv</strong> package, see the “<a href="https://gmonette.github.io/cv/articles/cv.html">Cross-validation of regression models</a>” vignette (<code><a href="articles/cv.html">vignette("cv", package="cv")</a></code>). The <strong>cv</strong> package is designed to be extensible to other classes of regression models and other model-selection procedures; for details, see the “<a href="https://gmonette.github.io/cv/articles/cv-extend.html">Extending the cv package</a>” vignette (<code><a href="articles/cv-extend.html">vignette("cv-extend", package="cv")</a></code>).</p>
+<p>For additional information on using the <strong>cv</strong> package, see the “<a href="https://gmonette.github.io/cv/articles/cv.html">Cross-validation of regression models</a>” vignette (<code><a href="articles/cv.html">vignette("cv", package="cv")</a></code>). The <strong>cv</strong> package is designed to be extensible to other classes of regression models, other CV criteria, and other model-selection procedures; for details, see the “<a href="https://gmonette.github.io/cv/articles/cv-extend.html">Extending the cv package</a>” vignette (<code><a href="articles/cv-extend.html">vignette("cv-extend", package="cv")</a></code>).</p>
+<div class="section level2">
+<h2 id="installing-the-cv-package">Installing the cv package<a class="anchor" aria-label="anchor" href="#installing-the-cv-package"></a>
+</h2>
 <p>To install the current version of the <strong>cv</strong> package from CRAN:</p>
 <pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cv"</span><span class="op">)</span></span></code></pre>
 <p>To install the development version of the <strong>cv</strong> package from GitHub:</p>
