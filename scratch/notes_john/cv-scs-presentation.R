@@ -104,6 +104,170 @@ plot(cv.auto.10, main="Polynomial Regressions, 10-Fold CV",
 plot(cv.auto.loo, main="Polynomial Regressions, LOO CV",
      axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
 
+# Cross-validating mixed-effects models
+
+  # Example: The High-School and Beyond Data
+
+    # Some data management:
+
+data("MathAchieve", package="nlme")
+dim(MathAchieve)
+head(MathAchieve, 3)
+tail(MathAchieve, 3)
+
+data("MathAchSchool", package="nlme")
+dim(MathAchSchool)
+head(MathAchSchool, 2)
+tail(MathAchSchool, 2)
+
+HSB <- MathAchieve
+HSB <- merge(MathAchSchool[, c("School", "Sector")],
+             HSB[, c("School", "SES", "MathAch")], by="School")
+names(HSB) <- tolower(names(HSB))
+HSB <- within(HSB, {
+  mean.ses <- ave(ses, school)
+  cses <- ses - mean.ses
+})
+
+    # fitting a mixed model:
+library("lme4", quietly=TRUE)
+hsb.lmer <- lmer(mathach ~ mean.ses*cses + sector*cses
+                 + (cses | school), data=HSB)
+summary(hsb.lmer, correlation=FALSE)
+
+      # CV by clusters:
+cv(hsb.lmer, k=10, clusterVariables="school", seed=5240)
+
+      # CV by cases:
+cv(hsb.lmer, seed=1575)
+
+  # Understanding CV of mixed models using artificial data sets
+
+    # Data generation:
+set.seed(9693)
+Nb <- 100     # number of groups
+Nw <- 5       # number of individuals within groups
+Bb <- 0       # between-group regression coefficient on group mean
+SDre <- 2.0   # between-group SD of random level relative to group mean of x
+SDwithin <- 0.5  # within group SD
+Bw <- 1          # within group effect of x
+Ay <- 10         # intercept for response
+Ax <- 20         # starting level of x
+Nx <- Nw*10      # number of distinct x values
+
+Data <- data.frame(
+  group = factor(rep(1:Nb, each=Nw)),
+  x = Ax + rep(1:Nx, length.out = Nw*Nb)
+) |> within ({
+  xm  <- ave(x, group, FUN = mean) # within-group mean
+  y <- Ay +
+    Bb * xm +                    # contextual effect
+    Bw * (x - xm) +              # within-group effect
+    rnorm(Nb, sd=SDre)[group] +  # random level by group
+    rnorm(Nb*Nw, sd=SDwithin)    # random error within groups
+})
+
+    # graphing the data:
+
+library("lattice")
+library("latticeExtra")
+library("gridExtra")
+library("lme4", quietly=TRUE)
+plot1 <- xyplot(y ~ x, data=Data[1:Nx, ], group=group,
+               ylim=c(4, 16),
+               par.settings=list(superpose.symbol=list(pch=1, cex=0.7))) +
+  layer(panel.ellipse(..., center.cex=0))
+
+    # mixed-models fit to the data (see further below):
+mod.0 <- lmer(y ~ 1 + (1 | group), Data)
+mod.1 <- lmer(y ~ x + (1 | group), Data)
+mod.2 <- lmer(y ~ x + xm + (1 | group), Data)
+mod.3 <- lmer(y ~ I(x - xm) + (1 | group), Data)
+
+Data <- within(Data, {
+  fit_mod0.fe <- predict(mod.0, re.form = ~ 0) # fixed effects only
+  fit_mod0.re <- predict(mod.0) # fixed and random effects (BLUPs)
+  fit_mod1.fe <- predict(mod.1, re.form = ~ 0)
+  fit_mod1.re <- predict(mod.1)
+  fit_mod2.fe <- predict(mod.2, re.form = ~ 0)
+  fit_mod2.re <- predict(mod.2)
+  fit_mod3.fe <- predict(mod.3, re.form = ~ 0)
+  fit_mod3.re <- predict(mod.3)
+})
+
+Data_long <- reshape(Data[1:Nx, ], direction = "long", sep = ".",
+                     timevar = "effect", varying = grep("\\.", names(Data[1:Nx, ])))
+Data_long$id <- 1:nrow(Data_long)
+Data_long <- reshape(Data_long, direction = "long", sep = "_",
+                     timevar = "modelcode",  varying = grep("_", names(Data_long)))
+Data_long$model <- factor(
+  c("~ 1", "~ 1 + x", "~ 1 + x + xm", "~ 1 + I(x - xm)")
+  [match(Data_long$modelcode, c("mod0", "mod1", "mod2", "mod3"))]
+)
+
+plot2 <- (plot +
+            xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" & effect == "fe"),
+                   groups=group, type="l", lwd=2) +
+            xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" &  effect == "re"),
+                   groups=group, type="l", lwd=2, lty=2)
+) |> update(
+  main="Model: y ~ 1 + (1 | group)",
+  key=list(
+    corner=c(0.05, 0.05),
+    text=list(c("fixed effects only","fixed and random")),
+    lines=list(lty=c(1, 2), lwd=2)))
+
+plot3 <- (plot +
+    xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "fe"),
+           groups=group, type="l", lwd=2) +
+    xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "re"),
+           groups=group, type="l", lwd=2, lty=2)
+) |> update(
+  main="Model: y ~ 1 + x + (1 | group)",
+  ylim=c(-15, 35) )
+
+
+plot4 <- (plot +
+    xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "fe"),
+           groups=group, type="l", lwd=2) +
+    xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "re"),
+           groups=group, type="l", lwd=2, lty=2)
+) |> update(
+  main="Model: y ~ 1 + x + xm + (1 | group)",
+  ylim=c(4, 16)
+)
+
+plot5 <- (plot +
+    xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "fe"),
+           groups=group, type="l", lwd=2) +
+    xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "re"),
+           groups=group, type="l", lwd=2, lty=2)
+) |> update(
+  main="Model: y ~ 1 + I(x - xm) + (1 | group)",
+  ylim=c(4, 16) #,
+)
+
+    # (zoom the plot):
+grid.arrange(plot1, plot2, plot3, plot4, plot5, nrow=2)
+
+    # models fit to the data:
+mod.lm <- lm(y ~ x, data=Data)
+car::compareCoefs(mod.lm, mod.0, mod.1, mod.2, mod.3)
+
+    # cluster-based vs. case-based CV:
+modlist <- models("~ 1"=mod.0, "~ 1 + x"=mod.1,
+                  "~ 1 + x + xm"=mod.2, "~ 1 + I(x - xm)"=mod.3)
+
+cvs_clusters <- cv(modlist, data=Data, cluster="group", k=10, seed=6449)
+plot(cvs_clusters, main="Model Comparison, Cluster-Based CV")
+
+cvs_cases <- cv(modlist, data=Data, seed=9693)
+plot(cvs_cases, main="Model Comparison, Case-Based CV")
+
+
+# Cross-Validating model specification and selection:
+#   Example: The Auto data redux
+
 names(Auto) # recall
 xtabs(~ year, data=Auto)
 xtabs(~ origin, data=Auto)
