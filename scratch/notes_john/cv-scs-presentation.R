@@ -91,6 +91,8 @@ mlist[2] # e.g., the quadratic fit
 
   # 10-fold CV
 mlist <- do.call(models, mlist) # create "modList" object
+names(mlist)
+mlist$m.2
 cv.auto.10 <- cv(mlist, data=Auto, seed=2120)
 cv.auto.10[2] # e.g., for quadratic model
 
