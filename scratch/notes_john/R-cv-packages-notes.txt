@@ -1,0 +1,58 @@
+Web Pages for Cross Validation Packages on CRAN
+
+https://cran.r-project.org/web/packages/caret/
+** evaluate further
+
+https://cran.r-project.org/web/packages/crossval/
+not actively developed since 2014
+no vignettes/weak documentation
+no parallel computation, naive algorithm
+
+https://cran.r-project.org/web/packages/cvms/
+extensive vignettes/docs
+cross_validate() for (G)L(M)Ms
+naive algorithm
+parallel computation supported
+pre-process for folds
+actively developed
+** evaluate further
+
+https://cran.r-project.org/web/packages/cvTools/
+not actively developed
+no vignettes
+repeated CV but no parallel computation
+naive algorithm
+similar design to our cv() in some respects
+
+https://cran.r-project.org/web/packages/cvwrapr/index.html
+not old but apparently not actively developed
+awkward structure to main kfoldcv() function, not extensible(?),
+  takes matrix rather than model input
+vignettes and docs very basic
+supports parallel computation
+naive algorithm
+
+https://cran.r-project.org/web/packages/groupdata2
+creates folds, must write or find function for CV
+
+https://cran.r-project.org/web/packages/mlexperiments/
+novel R6 approach
+a few "learner" function supplied, otherwise must be programmed
+not model-based
+has vignettes
+** evaluate further
+
+https://cran.r-project.org/web/packages/origami/
+focuses on creating folds; user supplies a function to compute
+  CV criterion for each fold
+not model-based
+has vignette
+
+https://cran.r-project.org/web/packages/surveyCV/
+for complex surveys, using survey package
+essentially limited to linear and logistic regression
+with lower-level programming can be adapted to other
+  models
+
+https://cran.r-project.org/web/packages/tidyfit/
+** evaluate further
