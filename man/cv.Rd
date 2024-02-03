@@ -19,6 +19,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   k = 10,
   reps = 1,
   seed,
+  details = k <= 10,
   confint = n >= 400,
   level = 0.95,
   ncores = 1,
@@ -37,6 +38,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   k = 10,
   reps = 1,
   seed,
+  details = k <= 10,
   confint = n >= 400,
   level = 0.95,
   method = c("auto", "hatvalues", "Woodbury", "naive"),
@@ -51,6 +53,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   k = 10,
   reps = 1,
   seed,
+  details = k <= 10,
   confint = n >= 400,
   level = 0.95,
   method = c("exact", "hatvalues", "Woodbury"),
@@ -74,13 +77,18 @@ where \code{y} is the observed values of the response and
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 cross-validation.}
 
-\item{reps}{number of times to replicate k-fold CV (default is \code{1})}
+\item{reps}{number of times to replicate k-fold CV (default is \code{1}).}
 
 \item{seed}{for R's random number generator; optional, if not
 supplied a random seed will be selected and saved; not needed
-for n-fold cross-validation}
+for n-fold cross-validation.}
 
 \item{...}{to match generic; passed to \code{predict()} for the default method.}
+
+\item{details}{if \code{TRUE} (the default if the number of
+folds \code{k <= 10}), save detailed information about the value of the
+CV criterion for the cases in each fold and the regression coefficients
+with that fold deleted.}
 
 \item{confint}{if \code{TRUE} (the default if the number of cases is 400
 or greater), compute a confidence interval for the bias-corrected CV
@@ -89,7 +97,7 @@ criterion, if the criterion is the average of casewise components.}
 \item{level}{confidence level (default \code{0.95}).}
 
 \item{ncores}{number of cores to use for parallel computations
-(default is \code{1}, i.e., computations aren't done in parallel)}
+(default is \code{1}, i.e., computations aren't done in parallel).}
 
 \item{type}{for the default method, value to be passed to the
 \code{type} argument of \code{predict()};

@@ -2,6 +2,7 @@
 
 if (Sys.getenv("RUN_ALL_CV_TESTS") == "true"){
 
+library("lme4")
 data("sleepstudy", package="lme4")
 fm1 <- lme4::lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
 
@@ -26,6 +27,7 @@ test_that("parallel computations lmer k-fold cases", {
                cv(fm1, k=5, ncores=2, seed=321))
 })
 
+require("nlme")
 data("Orthodont", package="nlme")
 fm2 <- nlme::lme(distance ~ age + Sex, data = Orthodont,
            random = ~ 1 | Subject)

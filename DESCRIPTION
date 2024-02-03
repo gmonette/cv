@@ -1,8 +1,8 @@
 Package: cv
 Type: Package
 Title: Cross-Validation of Regression Models
-Version: 1.1.0
-Date: 2024-01-10
+Version: 1.2.0
+Date: 2024-02-03
 Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
   comment = c(ORCID = "0000-0002-1196-8012")),
 	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"))
@@ -17,6 +17,7 @@ Description: Cross-validation methods of regression models that exploit features
 Depends: R (>= 3.5.0), doParallel 
 Imports: car,
          foreach, 
+         glmmTMB,
          insight, 
          lme4, 
          MASS,
@@ -26,7 +27,6 @@ Suggests: boot,
           carData,
           dplyr,
           effects,
-          glmmTMB,
           ISLR2,
           knitr,
           lattice,

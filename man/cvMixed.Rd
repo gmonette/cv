@@ -17,10 +17,13 @@ cvMixed(
   confint,
   level = 0.95,
   seed,
+  details = k <= 10,
   ncores = 1,
   clusterVariables,
   predict.clusters.args = list(object = model, newdata = data),
   predict.cases.args = list(object = model, newdata = data),
+  blups,
+  fixed.effects,
   ...
 )
 
@@ -33,6 +36,8 @@ cvMixed(
   seed,
   ncores = 1,
   clusterVariables,
+  blups = coef,
+  fixed.effects = lme4::fixef,
   ...
 )
 
@@ -45,6 +50,8 @@ cvMixed(
   seed,
   ncores = 1,
   clusterVariables,
+  blups = coef,
+  fixed.effects = nlme::fixef,
   ...
 )
 
@@ -57,6 +64,8 @@ cvMixed(
   seed,
   ncores = 1,
   clusterVariables,
+  blups = coef,
+  fixed.effects = glmmTMB::fixef,
   ...
 )
 }
@@ -90,6 +99,11 @@ criterion, if the criterion is the average of casewise components.}
 supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation}
 
+\item{details}{if \code{TRUE} (the default if the number of
+folds \code{k <= 10}), save detailed information about the value of the
+CV criterion for the cases in each fold and coefficients
+with that fold deleted.}
+
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}
 
@@ -109,6 +123,12 @@ the whole data set from a mixed model when performing CV on cases;
 the first two elements should be
 \code{model} and \code{newdata}; see the "Extending the cv package" vignette
 (\code{vignette("cv-extend", package="cv")}).}
+
+\item{blups}{a function to be used to compute BLUPs for
+case-based CV when \code{details = TRUE}.}
+
+\item{fixed.effects}{a function to be used to compute fixed-effect
+coefficients for cluster-based CV when \code{details = TRUE}.}
 
 \item{...}{for \code{cv()} methods, to match generic,
 and for \code{cvMixed()}, arguments to be passed to \code{update()}.}

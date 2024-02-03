@@ -14,16 +14,20 @@
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
-#' @param reps number of times to replicate k-fold CV (default is \code{1})
+#' @param reps number of times to replicate k-fold CV (default is \code{1}).
 #' @param confint if \code{TRUE} (the default if the number of cases is 400
 #' or greater), compute a confidence interval for the bias-corrected CV
 #' criterion, if the criterion is the average of casewise components.
 #' @param level confidence level (default \code{0.95}).
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
-#' for n-fold cross-validation
+#' for n-fold cross-validation.
+#' @param details if \code{TRUE} (the default if the number of
+#' folds \code{k <= 10}), save detailed information about the value of the
+#' CV criterion for the cases in each fold and the regression coefficients
+#' with that fold deleted.
 #' @param ncores number of cores to use for parallel computations
-#'        (default is \code{1}, i.e., computations aren't done in parallel)
+#'        (default is \code{1}, i.e., computations aren't done in parallel).
 #' @param method computational method to apply to a linear (i.e. \code{"lm"}) model
 #' or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 #' of the available options.
@@ -122,6 +126,7 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10, reps=1, seed,
+                       details = k <= 10,
                        confint = n >= 400, level=0.95,
                        ncores=1,
                        type="response", ...){
@@ -132,7 +137,8 @@ cv.default <- function(model, data=insight::get_data(model),
     model.i <- update(model, data=data[ - indices.i, ])
     fit.all.i <- predict(model.i, newdata=data, type=type, ...)
     fit.i <- fit.all.i[indices.i]
-    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+         coef.i=coef(model.i))
   }
 
   fPara <- function(i){
@@ -145,7 +151,8 @@ cv.default <- function(model, data=insight::get_data(model),
       newdata=data, type=type), dots)
     fit.all.i <- do.call(predict, predict.args)
     fit.i <- fit.all.i[indices.i]
-    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+         coef.i=coef(predict.args$object))
   }
 
   y <- GetResponse(model)
@@ -180,6 +187,16 @@ cv.default <- function(model, data=insight::get_data(model),
   } else {
     numeric(n)
   }
+
+  if (details){
+    crit.i <- numeric(k)
+    coef.i <- vector(k, mode="list")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
+  } else {
+    crit.i <- NULL
+    coef.i <- NULL
+  }
+
   if (ncores > 1){
     dots <- list(...)
     cl <- makeCluster(ncores)
@@ -190,12 +207,22 @@ cv.default <- function(model, data=insight::get_data(model),
     stopCluster(cl)
     for (i in 1L:k){
       yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      if (details){
+        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                               yhat[indices[starts[i]:ends[i]]])
+        coef.i[[i]] <- result[[i]]$coef.i
+      }
     }
   } else {
     result <- vector(k, mode="list")
     for (i in 1L:k){
       result[[i]] <- f(i)
       yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      if (details){
+        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                               yhat[indices[starts[i]:ends[i]]])
+        coef.i[[i]] <- result[[i]]$coef.i
+      }
     }
   }
   cv <- criterion(y, yhat)
@@ -215,13 +242,16 @@ cv.default <- function(model, data=insight::get_data(model),
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
                  "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 "criterion" = deparse(substitute(criterion)))
+                 "criterion" = deparse(substitute(criterion)),
+                 "details"=list(criterion=crit.i,
+                              coefficients=coef.i))
   class(result) <- "cv"
   if (reps == 1) {
     return(result)
   } else {
     res <- cv(model=model, data=data, criterion=criterion,
-              k=k, ncores=ncores, reps=reps - 1, ...)
+              k=k, ncores=ncores, reps=reps - 1,
+              details=details, ...)
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {
@@ -303,6 +333,7 @@ print.cvList <- function(x, ...){
 #' @export
 cv.lm <- function(model, data=insight::get_data(model),
                   criterion=mse, k=10, reps=1, seed,
+                  details = k <= 10,
                   confint = n >= 400, level=0.95,
                   method=c("auto", "hatvalues", "Woodbury", "naive"),
                   ncores=1, ...){
@@ -322,7 +353,8 @@ cv.lm <- function(model, data=insight::get_data(model),
     b.i <- UpdateLM(indices.i)
     fit.all.i <- X %*% b.i
     fit.i <- fit.all.i[indices.i]
-    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+         coef.i=b.i)
   }
   X <- model.matrix(model)
   y <- GetResponse(model)
@@ -371,6 +403,17 @@ cv.lm <- function(model, data=insight::get_data(model),
     class(result) <- "cv"
     return(result)
   }
+
+  if (details){
+    names.b <- names(b)
+    crit.i <- numeric(k)
+    coef.i <- vector(k, mode="list")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
+  } else {
+    crit.i <- NULL
+    coef.i <- NULL
+  }
+
   XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
   Xy <- t(X) %*% (w * y)
   if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
@@ -399,12 +442,26 @@ cv.lm <- function(model, data=insight::get_data(model),
     stopCluster(cl)
     for (i in 1L:k){
       yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      if (details){
+        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                               yhat[indices[starts[i]:ends[i]]])
+        b.i <- result[[i]]$coef.i
+        names(b.i) <- names.b
+        coef.i[[i]] <- b.i
+      }
     }
   } else {
     result <- vector(k, mode="list")
     for (i in 1L:k){
       result[[i]] <- f(i)
       yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      if (details){
+        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                               yhat[indices[starts[i]:ends[i]]])
+        b.i <- result[[i]]$coef.i
+        names(b.i) <- names.b
+        coef.i[[i]] <- b.i
+      }
     }
   }
   cv <- criterion(y, yhat)
@@ -425,13 +482,16 @@ cv.lm <- function(model, data=insight::get_data(model),
                  "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  "method"=method,
-                 "criterion" = deparse(substitute(criterion)))
+                 "criterion" = deparse(substitute(criterion)),
+                 "details"=list(criterion=crit.i,
+                                coefficients=coef.i))
   class(result) <- "cv"
   if (reps == 1) {
     return(result)
   } else {
     res <- cv(model=model, data=data, criterion=criterion,
-              k=k, ncores=ncores, method=method, reps=reps - 1, ...)
+              k=k, ncores=ncores, method=method, reps=reps - 1,
+              details=details, ...)
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {
@@ -449,6 +509,7 @@ cv.lm <- function(model, data=insight::get_data(model),
 #' @export
 cv.glm <- function(model, data=insight::get_data(model),
                    criterion=mse, k=10, reps=1, seed,
+                   details = k <= 10,
                    confint = n >= 400, level=0.95,
                    method=c("exact", "hatvalues", "Woodbury"),
                    ncores=1,
@@ -469,7 +530,8 @@ cv.glm <- function(model, data=insight::get_data(model),
     b.i <- UpdateIWLS(indices.i)
     fit.all.i <- linkinv(X %*% b.i)
     fit.i <- fit.all.i[indices.i]
-    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i))
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+         coef.i=b.i)
   }
   n <- nrow(data)
   if (is.character(k)){
@@ -496,7 +558,7 @@ cv.glm <- function(model, data=insight::get_data(model),
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
     result <- cv.default(model=model, data=data, criterion=criterion, k=k, reps=reps, seed=seed,
-               ncores=ncores, method=method, ...)
+               ncores=ncores, method=method, details=details, ...)
     if (inherits(result, "cv")) result$"criterion" <- deparse(substitute(criterion))
     return(result)
   } else if (method == "hatvalues") {
@@ -541,6 +603,17 @@ cv.glm <- function(model, data=insight::get_data(model),
     starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
     indices <- if (n > k) sample(n, n)  else 1:n # permute cases
     yhat <- numeric(n)
+
+    if (details){
+      names.b <- names(b)
+      crit.i <- numeric(k)
+      coef.i <- vector(k, mode="list")
+      names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
+    } else {
+      crit.i <- NULL
+      coef.i <- NULL
+    }
+
     if (ncores > 1L){
       cl <- makeCluster(ncores)
       registerDoParallel(cl)
@@ -550,12 +623,26 @@ cv.glm <- function(model, data=insight::get_data(model),
       stopCluster(cl)
       for (i in 1L:k){
         yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+        if (details){
+          crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                                 yhat[indices[starts[i]:ends[i]]])
+          b.i <- result[[i]]$coef.i
+          names(b.i) <- names.b
+          coef.i[[i]] <- b.i
+        }
       }
     } else {
       result <- vector(k, mode="list")
       for (i in 1L:k){
         result[[i]] <- f(i)
         yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+        if (details){
+          crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                                 yhat[indices[starts[i]:ends[i]]])
+          b.i <- result[[i]]$coef.i
+          names(b.i) <- names.b
+          coef.i[[i]] <- b.i
+        }
       }
     }
     cv <- criterion(y, yhat)
@@ -576,7 +663,9 @@ cv.glm <- function(model, data=insight::get_data(model),
                    "full crit" = cv.full, confint=ci,
                    "k" = if (k == n) "n" else k, "seed" = seed,
                    "method"=method,
-                   "criterion" = deparse(substitute(criterion)))
+                   "criterion" = deparse(substitute(criterion)),
+                   "details"=list(criterion=crit.i,
+                                  coefficients=coef.i))
     class(result) <- "cv"
     if (reps == 1) {
       return(result)

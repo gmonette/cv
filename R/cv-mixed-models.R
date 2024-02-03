@@ -30,6 +30,10 @@
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
 #' for n-fold cross-validation
+#' @param details if \code{TRUE} (the default if the number of
+#' folds \code{k <= 10}), save detailed information about the value of the
+#' CV criterion for the cases in each fold and coefficients
+#' with that fold deleted.
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel)
 #' @param clusterVariables a character vector of names of the variables
@@ -46,7 +50,10 @@
 #' the first two elements should be
 #' \code{model} and \code{newdata}; see the "Extending the cv package" vignette
 #' (\code{vignette("cv-extend", package="cv")}).
-#'
+#' @param blups a function to be used to compute BLUPs for
+#' case-based CV when \code{details = TRUE}.
+#' @param fixed.effects a function to be used to compute fixed-effect
+#' coefficients for cluster-based CV when \code{details = TRUE}.
 #' @param ... for \code{cv()} methods, to match generic,
 #' and for \code{cvMixed()}, arguments to be passed to \code{update()}.
 #'
@@ -91,10 +98,12 @@ cvMixed <- function(model,
                     reps=1,
                     confint, level=0.95,
                     seed,
+                    details = k <= 10,
                     ncores=1,
                     clusterVariables,
                     predict.clusters.args=list(object=model, newdata=data),
                     predict.cases.args=list(object=model, newdata=data),
+                    blups, fixed.effects,
                     ...){
 
   pkg.env <- getNamespace(package)
@@ -109,7 +118,8 @@ cvMixed <- function(model,
     fit.all.i <- do.call(predict, predict.clusters.args)
     fit.i <- fit.all.i[index <- !index]
     list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-         indices.i=index)
+         indices.i=index,
+         coef.i=fixed.effects(predict.clusters.args$object))
   }
 
   f.cases <- function(i, predict.clusters.args, predict.cases.args, ...){
@@ -121,14 +131,15 @@ cvMixed <- function(model,
     fit.all.i <- do.call(predict, predict.cases.args)
     fit.i <- fit.all.i[indices.i]
     list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-         indices.i=indices.i)
+         indices.i=indices.i,
+         coef.i=blups(predict.cases.args$object))
   }
   y <- GetResponse(model)
 
   if (missing(clusterVariables)) clusterVariables <- NULL
   if (is.null(clusterVariables)){
     n <- nrow(data)
-    if (missing(k)) k <- 10
+    if (missing(k) || is.null(k)) k <- 10
     if (is.character(k)){
       if (k == "n" || k == "loo") {
         k <- n
@@ -138,7 +149,7 @@ cvMixed <- function(model,
   } else {
     clusters <- defineClusters(clusterVariables, data)
     n <- nrow(clusters)
-    if (missing(k)) k <- nrow(clusters)
+    if (missing(k) || is.null(k)) k <- nrow(clusters)
     f <- f.clusters
   }
 
@@ -155,6 +166,15 @@ cvMixed <- function(model,
     if (reps > 1) stop("reps should not be > 1 for n-fold CV")
     if (!missing(seed) && !is.null(seed)) message("Note: seed ignored for n-fold CV")
     seed <- NULL
+  }
+
+  if (details){
+    crit.i <- numeric(k)
+    coef.i <- vector(k, mode="list")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
+  } else {
+    crit.i <- NULL
+    coef.i <- NULL
   }
 
   nk <-  n %/% k # number in each fold
@@ -180,12 +200,22 @@ cvMixed <- function(model,
     stopCluster(cl)
     for (i in 1L:k){
       yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
+      if (details){
+        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                               yhat[indices[starts[i]:ends[i]]])
+        coef.i[[i]] <- result[[i]]$coef.i
+      }
     }
   } else {
     result <- vector(k, mode="list")
     for (i in 1L:k){
       result[[i]] <- f(i, predict.clusters.args, predict.cases.args, ...)
       yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
+      if (details){
+        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                               yhat[indices[starts[i]:ends[i]]])
+        coef.i[[i]] <- result[[i]]$coef.i
+      }
     }
   }
   cv <- criterion(y, yhat)
@@ -220,8 +250,9 @@ cvMixed <- function(model,
                  "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  clusters = clusterVariables,
-                 "n clusters" = if (!is.null(clusterVariables)) n else NULL
-  )
+                 "n clusters" = if (!is.null(clusterVariables)) n else NULL,
+                 "details"=list(criterion=crit.i,
+                                coefficients=coef.i))
   class(result) <- "cv"
   if (reps == 1) {
     return(result)
@@ -250,7 +281,9 @@ cvMixed <- function(model,
 #' @describeIn cvMixed \code{cv()} method
 #' @export
 cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
-                      k, reps = 1, seed, ncores = 1, clusterVariables, ...){
+                      k, reps = 1, seed,
+                      ncores = 1, clusterVariables,
+                      blups=coef, fixed.effects=lme4::fixef, ...){
   cvMixed(
     model,
     package="lme4",
@@ -270,13 +303,17 @@ cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
                                type="response",
                                re.form=NA,
                                allow.new.levels=TRUE),
+    blups=blups,
+    fixed.effects=fixed.effects,
     ...)
 }
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
 cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
-                   k, reps = 1, seed, ncores = 1, clusterVariables, ...){
+                   k, reps = 1, seed,
+                   ncores = 1, clusterVariables,
+                   blups=coef, fixed.effects=nlme::fixef, ...){
   cvMixed(
     model,
     package="nlme",
@@ -293,13 +330,17 @@ cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
     predict.cases.args=list(object=model,
                             newdata=data,
                             level=1),
+    blups=blups,
+    fixed.effects=fixed.effects,
     ...)
 }
 
 #' @describeIn cvMixed \code{cv()} method
 #' @export
 cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
-                       k, reps = 1, seed, ncores = 1, clusterVariables, ...){
+                       k, reps = 1, seed,
+                       ncores = 1, clusterVariables,
+                       blups=coef, fixed.effects=glmmTMB::fixef, ...){
   cvMixed(
     model,
     package="glmmTMB",
@@ -319,6 +360,8 @@ cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
                                type="response",
                                re.form=NA,
                                allow.new.levels=TRUE),
+    blups=blups,
+    fixed.effects=fixed.effects,
     ...)
 }
 

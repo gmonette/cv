@@ -1,5 +1,9 @@
 # cv 1.1.0
 
+- **TBA**
+
+# cv 1.1.0
+
 - cv() et al. now work properly with "non-casewise average" CV criteria such as the new rmse() and medAbsErr(), not just with "casewise-average" fit criteria such as mse() and BayesRule().
 
 - Bias adjustment and confidence intervals (which are new) are computed only for casewise-average CV criteria. Demonstrate that 1 - AUC isn't a casewise-average criterion.
