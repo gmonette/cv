@@ -121,7 +121,8 @@ GetResponse.glmmPQL <- function(model, ...){
 
 ## ----cv.glmmPQL---------------------------------------------------------------
 cv.glmmPQL <- function(model, data = model$data, criterion = mse,
-                     k, reps = 1, seed, ncores = 1, clusterVariables, ...){
+                     k, reps = 1, seed, ncores = 1, clusterVariables, 
+                     blups=coef, fixed.effects=nlme::fixef, ...){
   cvMixed(
     model,
     package="MASS",
@@ -140,6 +141,8 @@ cv.glmmPQL <- function(model, data = model$data, criterion = mse,
                             newdata=data,
                             level=1,
                             type="response"),
+    blups=blups,
+    fixed.effects=fixed.effects,
     verbose=FALSE,
     ...)
 }

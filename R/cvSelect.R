@@ -1,6 +1,7 @@
 #' Cross-Validate a Model-Selection Procedure
 #'
-#' \code{cvSelect()} is a general function to cross-validate a model-selection procedure;
+#' \code{cvSelect()} and the \code{cv()} \code{"function"} method
+#' are general functions to cross-validate a model-selection procedure;
 #' \code{selectStepAIC()} is a procedure that applies the \code{\link[MASS]{stepAIC}()}
 #' model-selection function in the \pkg{MASS} package; \code{selectTrans()} is a procedure
 #' for selecting predictor and response transformations in regression, which
@@ -11,8 +12,8 @@
 #' @param procedure a model-selection procedure function (see Details).
 #' @param data full data frame for model selection.
 #' @param y.expression normally the response variable is found from the
-#' \code{model} argument; but if, for a particular selection procedure, the
-#' \code{model} argument is absent, or if the response can't be inferred from the
+#' \code{model} or \code{working.model} argument; but if, for a particular selection procedure, the
+#' \code{model} or \code{working.model} argument is absent, or if the response can't be inferred from the
 #' model, the response can be specified by an expression, such as \code{expression(log(income))},
 #' to be evaluated within the data set provided by the \code{data} argument.
 #' @param k perform k-fold cross-validation (default is 10); \code{k}
@@ -28,7 +29,8 @@
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel)
-#' @param ... for \code{cvSelect()}, arguments to be passed to \code{procedure()};
+#' @param ... for \code{cvSelect()} and the \code{cv()} \code{"function"} method,
+#' arguments to be passed to \code{procedure()};
 #' for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.
 #' @importFrom MASS stepAIC
 #' @describeIn cvSelect apply cross-validation to a model-selection procedure.
@@ -46,16 +48,17 @@
 #' If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvList")} is returned,
 #' which is literally a list of \code{c("cvSelect", "cv")} objects.
 #' @details
-#' The model-selection function supplied as the \code{procedure} argument
-#' to \code{cvSelect()} should accept the following arguments:
+#' The model-selection function supplied as the \code{procedure} (for \code{cvSelect()})
+#' or \code{model} (for \code{cv()}) argument
+#' should accept the following arguments:
 #' \describe{
-#'  \item{\code{data}}{set to the \code{data} argument to \code{cvSelect()}.}
+#'  \item{\code{data}}{set to the \code{data} argument to \code{cvSelect()} or \code{cv()}.}
 #'  \item{\code{indices}}{the indices of the rows of \code{data} defining the current fold; if missing,
 #'  the model-selection procedure is applied to the full \code{data}.}
 #'   \item{other arguments}{to be passed via \code{...}
-#'   from \code{cvSelect()}.}
+#'   from \code{cvSelect()} or \code{cv()}.}
 #' }
-#' \code{procedure()} should return a list with the following
+#' \code{procedure()} or \code{model()} should return a list with the following
 #' named elements: \code{fit.i}, the vector of predicted values for the cases in
 #' the current fold computed from the model omitting these cases;
 #' \code{crit.all.i}, the CV criterion computed for all of the cases using
@@ -204,7 +207,11 @@ cvSelect <- function(procedure, data, criterion=mse,
 #' @describeIn cvSelect select a model using the \code{\link[MASS]{stepAIC}()} function in the
 #' \pkg{MASS} package.
 #' @param indices indices of cases in data defining the current fold.
-#' @param model a regression model object fit to data.
+#' @param model a regression model object fit to data, or for the
+#' \code{cv()} \code{"function"} method,  model-selection procedure function
+#' (see Details).
+#' @param working.model a regression model object fit to data, typically
+#' to begin a model-selection process.
 #' @param criterion a CV criterion ("cost" or lack-of-fit) function.
 #' @param AIC if \code{TRUE} (the default) use the AIC as the
 #' model-selection criterion; if \code{FALSE}, use the BIC.
@@ -214,8 +221,8 @@ cvSelect <- function(procedure, data, criterion=mse,
 #' @examples
 #' data("Auto", package="ISLR2")
 #' m.auto <- lm(mpg ~ . - name - origin, data=Auto)
-#' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
-#' cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
+#' cv(selectStepAIC, Auto, seed=123, working.model=m.auto)
+#' cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
 #'          AIC=FALSE, k=5, reps=3) # via BIC
 #' @export
 selectStepAIC <- function(data, indices,
@@ -311,13 +318,12 @@ yjPowerInverse <- function(y, lambda) {
 #' @param rounded if \code{TRUE} (the default) use nicely rounded versions
 #' of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).
 #' @examples
-#'
 #' data("Prestige", package="carData")
 #' m.pres <- lm(prestige ~ income + education + women,
 #'              data=Prestige)
-#' cvt <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=123,
-#'                 predictors=c("income", "education", "women"),
-#'                 response="prestige", family="yjPower")
+#' cvt <- cv(selectTrans, data=Prestige, working.model=m.pres, seed=123,
+#'           predictors=c("income", "education", "women"),
+#'           response="prestige", family="yjPower")
 #' cvt
 #' compareFolds(cvt)
 #' coef(cvt, average=median, NAs=1) # NAs not really needed here
@@ -429,18 +435,17 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
 #' @describeIn cvSelect select transformations of the predictors and response,
 #' and then select predictors.
 #' @examples
-#'
 #' Auto$year <- as.factor(Auto$year)
 #' Auto$origin <- factor(Auto$origin,
 #'                       labels=c("America", "Europe", "Japan"))
 #' rownames(Auto) <- make.names(Auto$name, unique=TRUE)
 #' Auto$name <- NULL
 #' m.auto <- lm(mpg ~ . , data=Auto)
-#' cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
-#'                 criterion=medAbsErr,
-#'                 predictors=c("cylinders", "displacement", "horsepower",
-#'                              "weight", "acceleration"),
-#'                 response="mpg", AIC=FALSE)
+#' cvs <- cv(selectTransStepAIC, data=Auto, seed=76692, working.model=m.auto,
+#'           criterion=medAbsErr,
+#'           predictors=c("cylinders", "displacement", "horsepower",
+#'                        "weight", "acceleration"),
+#'           response="mpg", AIC=FALSE)
 #' cvs
 #' compareFolds(cvs)
 #' @export
@@ -658,3 +663,31 @@ coef.cvSelect <- function(object, average, NAs=0, ...){
   coef[is.na(coef)] <- NAs
   apply(coef, 2, average)
 }
+
+#' @describeIn cvSelect \code{cv()} method
+#' @export
+cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
+                        seed=NULL, working.model=NULL, y.expression=NULL,
+                        confint = n >= 400, level=0.95,
+                        save.coef = k <= 10, ncores = 1, ...){
+  n <- nrow(data)
+  cvSelect(procedure=model,
+           data=data,
+           criterion=criterion,
+           model=working.model,
+           y.expression=y.expression,
+           k=k,
+           confint=confint,
+           level=level,
+           reps=reps,
+           save.coef=save.coef,
+           seed=seed,
+           ncores=ncores,
+           ...)
+}
+
+#' @section Deprecated:
+#' The \code{cvSelect()} function is deprecated in favor of the \code{cv()}
+#' \code{"function"} method, which has the same functionality. \code{cvSelect()}
+#' will eventually be removed from the \pkg{cv} package.
+#'

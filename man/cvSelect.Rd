@@ -7,6 +7,7 @@
 \alias{selectTransStepAIC}
 \alias{compareFolds}
 \alias{coef.cvSelect}
+\alias{cv.function}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
 cvSelect(
@@ -67,6 +68,22 @@ selectTransStepAIC(
 compareFolds(object, digits = 3, ...)
 
 \method{coef}{cvSelect}(object, average, NAs = 0, ...)
+
+\method{cv}{`function`}(
+  model,
+  data,
+  criterion = mse,
+  k = 10,
+  reps = 1,
+  seed = NULL,
+  working.model = NULL,
+  y.expression = NULL,
+  confint = n >= 400,
+  level = 0.95,
+  save.coef = k <= 10,
+  ncores = 1,
+  ...
+)
 }
 \arguments{
 \item{procedure}{a model-selection procedure function (see Details).}
@@ -75,11 +92,13 @@ compareFolds(object, digits = 3, ...)
 
 \item{criterion}{a CV criterion ("cost" or lack-of-fit) function.}
 
-\item{model}{a regression model object fit to data.}
+\item{model}{a regression model object fit to data, or for the
+\code{cv()} \code{"function"} method,  model-selection procedure function
+(see Details).}
 
 \item{y.expression}{normally the response variable is found from the
-\code{model} argument; but if, for a particular selection procedure, the
-\code{model} argument is absent, or if the response can't be inferred from the
+\code{model} or \code{working.model} argument; but if, for a particular selection procedure, the
+\code{model} or \code{working.model} argument is absent, or if the response can't be inferred from the
 model, the response can be specified by an expression, such as \code{expression(log(income))},
 to be evaluated within the data set provided by the \code{data} argument.}
 
@@ -103,7 +122,8 @@ criterion, if the criterion is the average of casewise components.}
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}
 
-\item{...}{for \code{cvSelect()}, arguments to be passed to \code{procedure()};
+\item{...}{for \code{cvSelect()} and the \code{cv()} \code{"function"} method,
+arguments to be passed to \code{procedure()};
 for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.}
 
 \item{indices}{indices of cases in data defining the current fold.}
@@ -144,6 +164,9 @@ estimates for each fold are returned.}
 averaged estimates; the default, \code{0}, is appropriate, e.g.,
 for regression coefficients; the value \code{1} might be appropriate
 for power-transformation estimates.}
+
+\item{working.model}{a regression model object fit to data, typically
+to begin a model-selection process.}
 }
 \value{
 An object of class \code{"cvSelect"},
@@ -161,7 +184,8 @@ If \code{reps} > \code{1}, then an object of class \code{c("cvSelectList", "cvLi
 which is literally a list of \code{c("cvSelect", "cv")} objects.
 }
 \description{
-\code{cvSelect()} is a general function to cross-validate a model-selection procedure;
+\code{cvSelect()} and the \code{cv()} \code{"function"} method
+are general functions to cross-validate a model-selection procedure;
 \code{selectStepAIC()} is a procedure that applies the \code{\link[MASS]{stepAIC}()}
 model-selection function in the \pkg{MASS} package; \code{selectTrans()} is a procedure
 for selecting predictor and response transformations in regression, which
@@ -170,16 +194,17 @@ uses the \code{\link[car]{powerTransform}()} function in the
 transformation with predictor selection.
 }
 \details{
-The model-selection function supplied as the \code{procedure} argument
-to \code{cvSelect()} should accept the following arguments:
+The model-selection function supplied as the \code{procedure} (for \code{cvSelect()})
+or \code{model} (for \code{cv()}) argument
+should accept the following arguments:
 \describe{
-\item{\code{data}}{set to the \code{data} argument to \code{cvSelect()}.}
+\item{\code{data}}{set to the \code{data} argument to \code{cvSelect()} or \code{cv()}.}
 \item{\code{indices}}{the indices of the rows of \code{data} defining the current fold; if missing,
 the model-selection procedure is applied to the full \code{data}.}
 \item{other arguments}{to be passed via \code{...}
-from \code{cvSelect()}.}
+from \code{cvSelect()} or \code{cv()}.}
 }
-\code{procedure()} should return a list with the following
+\code{procedure()} or \code{model()} should return a list with the following
 named elements: \code{fit.i}, the vector of predicted values for the cases in
 the current fold computed from the model omitting these cases;
 \code{crit.all.i}, the CV criterion computed for all of the cases using
@@ -219,36 +244,36 @@ and then select predictors.
 \item \code{compareFolds()}: print the coefficients from the selected models
 for the several folds.
 
+\item \code{cv(`function`)}: \code{cv()} method
+
 }}
 \examples{
 data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ . - name - origin, data=Auto)
-cvSelect(selectStepAIC, Auto, seed=123, model=m.auto)
-cvSelect(selectStepAIC, Auto, seed=123, model=m.auto,
+cv(selectStepAIC, Auto, seed=123, working.model=m.auto)
+cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
          AIC=FALSE, k=5, reps=3) # via BIC
-
 data("Prestige", package="carData")
 m.pres <- lm(prestige ~ income + education + women,
              data=Prestige)
-cvt <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=123,
-                predictors=c("income", "education", "women"),
-                response="prestige", family="yjPower")
+cvt <- cv(selectTrans, data=Prestige, working.model=m.pres, seed=123,
+          predictors=c("income", "education", "women"),
+          response="prestige", family="yjPower")
 cvt
 compareFolds(cvt)
 coef(cvt, average=median, NAs=1) # NAs not really needed here
 cv(m.pres, seed=123)
-
 Auto$year <- as.factor(Auto$year)
 Auto$origin <- factor(Auto$origin,
                       labels=c("America", "Europe", "Japan"))
 rownames(Auto) <- make.names(Auto$name, unique=TRUE)
 Auto$name <- NULL
 m.auto <- lm(mpg ~ . , data=Auto)
-cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
-                criterion=medAbsErr,
-                predictors=c("cylinders", "displacement", "horsepower",
-                             "weight", "acceleration"),
-                response="mpg", AIC=FALSE)
+cvs <- cv(selectTransStepAIC, data=Auto, seed=76692, working.model=m.auto,
+          criterion=medAbsErr,
+          predictors=c("cylinders", "displacement", "horsepower",
+                       "weight", "acceleration"),
+          response="mpg", AIC=FALSE)
 cvs
 compareFolds(cvs)
 }
