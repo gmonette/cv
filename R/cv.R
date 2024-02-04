@@ -42,7 +42,11 @@
 #' the criterion for the model applied to the full data (\code{"full crit"}),
 #' the confidence interval and level for the bias-adjusted CV criterion (\code{"confint"}),
 #' the number of folds (\code{"k"}), and the seed for R's random-number
-#' generator (\code{"seed"}). Some methods may return a
+#' generator (\code{"seed"}). If \code{details=TRUE}, then the returned object
+#' will also include a \code{"details"} component, which is a list of two
+#' elements: \code{"criterion"}, containing the CV criterion computed for the
+#' cases in each fold; and \code{"coefficients"}, regression coefficients computed
+#' for the model with each fold deleted.  Some methods may return a
 #' subset of these components and may add additional information.
 #' If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
 #' which is literally a list of \code{"cv"} objects.
