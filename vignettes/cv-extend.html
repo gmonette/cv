@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-02-04" />
+<meta name="date" content="2024-02-05" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-02-04</h4>
+<h4 class="date">2024-02-05</h4>
 
 
 
@@ -476,7 +476,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x13750b2a8&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x11af53320&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -1051,9 +1051,9 @@ as predictors in a linear least-squares regression:</p>
 <span id="cb23-31"><a href="#cb23-31" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 59.683</span></span>
 <span id="cb23-32"><a href="#cb23-32" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 58.846</span></span>
 <span id="cb23-33"><a href="#cb23-33" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 44.788</span></span></code></pre></div>
-<p>Thus, the RMSE for the model fit to the complete data is considerably
-smaller than the CV estimate of the RMSE. Can we do better by selecting
-a subset of the predictors, taking account of the additional uncertainty
+<p>Thus, the MSE for the model fit to the complete data is considerably
+smaller than the CV estimate of the MSE. Can we do better by selecting a
+subset of the predictors, taking account of the additional uncertainty
 induced by model selection?</p>
 <p>First, let’s apply best-subset selection to the complete data
 set:</p>
@@ -1127,8 +1127,8 @@ is the best model with 4 predictors, including <code>Agriculture</code>,
 <span id="cb25-31"><a href="#cb25-31" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 58.467</span></span>
 <span id="cb25-32"><a href="#cb25-32" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 57.778</span></span>
 <span id="cb25-33"><a href="#cb25-33" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
-<p>The RMSE for the selected model is (of course) slightly higher than
-for the full model fit previously, but the cross-validated RMSE is a bit
+<p>The MSE for the selected model is (of course) slightly higher than
+for the full model fit previously, but the cross-validated MSE is a bit
 lower; as we explain in the main vignette, however, it isn’t kosher to
 select and cross-validate a model on the same data.</p>
 <p>Here’s a function named <code>selectSubsets()</code>, meant to be
@@ -1138,7 +1138,7 @@ model-selection process:</p>
 <span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>                          model,</span>
 <span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>                          indices,</span>
 <span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>                          <span class="at">criterion=</span>mse,</span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>                          <span class="at">save.coef=</span><span class="cn">TRUE</span>, ...){</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>                          <span class="at">details=</span><span class="cn">TRUE</span>, ...){</span>
 <span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>  </span>
 <span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">inherits</span>(model, <span class="st">&quot;lm&quot;</span>, <span class="at">which=</span><span class="cn">TRUE</span>) <span class="sc">!=</span> <span class="dv">1</span>)</span>
 <span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;selectSubsets is appropriate only for &#39;lm&#39; models&quot;</span>)</span>
@@ -1172,7 +1172,7 @@ model-selection process:</p>
 <span id="cb26-36"><a href="#cb26-36" tabindex="-1"></a>  <span class="co">#   and the regression coefficients</span></span>
 <span id="cb26-37"><a href="#cb26-37" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">fit.i=</span>fit.i, <span class="co"># fitted values for i-th fold</span></span>
 <span id="cb26-38"><a href="#cb26-38" tabindex="-1"></a>       <span class="at">crit.all.i=</span><span class="fu">criterion</span>(y, fit.all.i), <span class="co"># CV crit for all cases</span></span>
-<span id="cb26-39"><a href="#cb26-39" tabindex="-1"></a>       <span class="at">coefficients =</span> <span class="cf">if</span> (save.coef){ <span class="co"># regression coefficients</span></span>
+<span id="cb26-39"><a href="#cb26-39" tabindex="-1"></a>       <span class="at">coefficients =</span> <span class="cf">if</span> (details){ <span class="co"># regression coefficients</span></span>
 <span id="cb26-40"><a href="#cb26-40" tabindex="-1"></a>         coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(m.best.i)</span>
 <span id="cb26-41"><a href="#cb26-41" tabindex="-1"></a>         </span>
 <span id="cb26-42"><a href="#cb26-42" tabindex="-1"></a>         <span class="co"># fix coefficient names</span></span>
@@ -1203,14 +1203,14 @@ aesthetic reasons, the command
 these awkward names, removing the extraneous text,
 <code>&quot;X[-indices, x.names.i]&quot;</code>.</p>
 <p>Applying <code>selectSubsets()</code> to the full data produces the
-full-data cross-validated RMSE (which we obtained previously):</p>
+full-data cross-validated MSE (which we obtained previously):</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">selectSubsets</span>(<span class="at">model=</span>m.swiss)</span>
 <span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt; [1] 45.916</span></span>
 <span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
 <span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span></code></pre></div>
 <p>Similarly, applying the function to an imaginary “fold” of 5 cases
-returns the RMSE for the cases in the fold, based on the model selected
-and fit to the cases omitting the fold; the RMSE for all of the cases,
+returns the MSE for the cases in the fold, based on the model selected
+and fit to the cases omitting the fold; the MSE for all of the cases,
 based on the same model; and the coefficients of the selected model,
 which includes 4 or the 5 predictors (and the intercept):</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">selectSubsets</span>(<span class="at">model=</span>m.swiss, <span class="at">indices=</span><span class="fu">seq</span>(<span class="dv">5</span>, <span class="dv">45</span>, <span class="at">by=</span><span class="dv">10</span>))</span>
@@ -1236,22 +1236,31 @@ get:</p>
 <span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 65.835</span></span>
 <span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.644</span></span>
 <span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
-<p>Cross-validation shows that model selection exacts a penalty in RMSE.
+<p>Cross-validation shows that model selection exacts a penalty in MSE.
 Examining the models selected for the 10 folds reveals that there is
 some uncertainty in identifying the predictors in the “best” model, with
 <code>Agriculture</code> sometimes appearing and sometimes not:</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">compareFolds</span>(cv.swiss)</span>
-<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a><span class="co">#&gt;         (Intercept) Catholic Education Infant.Mortality Agriculture</span></span>
-<span id="cb30-3"><a href="#cb30-3" tabindex="-1"></a><span class="co">#&gt; Fold 1      59.0852   0.1397   -1.0203           1.2985       -0.17</span></span>
-<span id="cb30-4"><a href="#cb30-4" tabindex="-1"></a><span class="co">#&gt; Fold 2      67.0335   0.1367   -1.0499           0.9413       -0.20</span></span>
-<span id="cb30-5"><a href="#cb30-5" tabindex="-1"></a><span class="co">#&gt; Fold 3      55.0453   0.1221   -0.8757           1.3541       -0.15</span></span>
-<span id="cb30-6"><a href="#cb30-6" tabindex="-1"></a><span class="co">#&gt; Fold 4      62.5543   0.1236   -0.9719           1.0679       -0.16</span></span>
-<span id="cb30-7"><a href="#cb30-7" tabindex="-1"></a><span class="co">#&gt; Fold 5      50.4643   0.1057   -0.7863           1.2144            </span></span>
-<span id="cb30-8"><a href="#cb30-8" tabindex="-1"></a><span class="co">#&gt; Fold 6      68.0289   0.1195   -1.0073           0.8294       -0.17</span></span>
-<span id="cb30-9"><a href="#cb30-9" tabindex="-1"></a><span class="co">#&gt; Fold 7      66.5219   0.1357   -1.0827           0.9523       -0.19</span></span>
-<span id="cb30-10"><a href="#cb30-10" tabindex="-1"></a><span class="co">#&gt; Fold 8      46.3507   0.0776   -0.7637           1.4463            </span></span>
-<span id="cb30-11"><a href="#cb30-11" tabindex="-1"></a><span class="co">#&gt; Fold 9      62.2632   0.1230   -1.0067           1.1000       -0.17</span></span>
-<span id="cb30-12"><a href="#cb30-12" tabindex="-1"></a><span class="co">#&gt; Fold 10     52.5112   0.1005   -0.7232           1.0809</span></span></code></pre></div>
+<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a><span class="co">#&gt; CV criterion by folds:</span></span>
+<span id="cb30-3"><a href="#cb30-3" tabindex="-1"></a><span class="co">#&gt;   fold.1   fold.2   fold.3   fold.4   fold.5   fold.6   fold.7   fold.8 </span></span>
+<span id="cb30-4"><a href="#cb30-4" tabindex="-1"></a><span class="co">#&gt;  76.6964  61.3105 131.1616   9.0662  52.9403  41.0853  51.8768 136.9498 </span></span>
+<span id="cb30-5"><a href="#cb30-5" tabindex="-1"></a><span class="co">#&gt;   fold.9  fold.10 </span></span>
+<span id="cb30-6"><a href="#cb30-6" tabindex="-1"></a><span class="co">#&gt;  24.1808  82.2587 </span></span>
+<span id="cb30-7"><a href="#cb30-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb30-8"><a href="#cb30-8" tabindex="-1"></a><span class="co">#&gt; Coefficients by folds:</span></span>
+<span id="cb30-9"><a href="#cb30-9" tabindex="-1"></a><span class="co">#&gt;         (Intercept) Catholic Education Infant.Mortality Agriculture</span></span>
+<span id="cb30-10"><a href="#cb30-10" tabindex="-1"></a><span class="co">#&gt; Fold 1      59.0852   0.1397   -1.0203           1.2985       -0.17</span></span>
+<span id="cb30-11"><a href="#cb30-11" tabindex="-1"></a><span class="co">#&gt; Fold 2      67.0335   0.1367   -1.0499           0.9413       -0.20</span></span>
+<span id="cb30-12"><a href="#cb30-12" tabindex="-1"></a><span class="co">#&gt; Fold 3      55.0453   0.1221   -0.8757           1.3541       -0.15</span></span>
+<span id="cb30-13"><a href="#cb30-13" tabindex="-1"></a><span class="co">#&gt; Fold 4      62.5543   0.1236   -0.9719           1.0679       -0.16</span></span>
+<span id="cb30-14"><a href="#cb30-14" tabindex="-1"></a><span class="co">#&gt; Fold 5      50.4643   0.1057   -0.7863           1.2144            </span></span>
+<span id="cb30-15"><a href="#cb30-15" tabindex="-1"></a><span class="co">#&gt; Fold 6      68.0289   0.1195   -1.0073           0.8294       -0.17</span></span>
+<span id="cb30-16"><a href="#cb30-16" tabindex="-1"></a><span class="co">#&gt; Fold 7      66.5219   0.1357   -1.0827           0.9523       -0.19</span></span>
+<span id="cb30-17"><a href="#cb30-17" tabindex="-1"></a><span class="co">#&gt; Fold 8      46.3507   0.0776   -0.7637           1.4463            </span></span>
+<span id="cb30-18"><a href="#cb30-18" tabindex="-1"></a><span class="co">#&gt; Fold 9      62.2632   0.1230   -1.0067           1.1000       -0.17</span></span>
+<span id="cb30-19"><a href="#cb30-19" tabindex="-1"></a><span class="co">#&gt; Fold 10     52.5112   0.1005   -0.7232           1.0809</span></span></code></pre></div>
+<p>As well, the fold-wise MSE varies considerably, reflecting the small
+size of the <code>swiss</code> data set (47 cases),</p>
 </div>
 <div id="appendix-why-the-complement-of-auc-isnt-a-casewise-cv-criterion" class="section level2">
 <h2>Appendix: Why the complement of AUC isn’t a casewise CV

@@ -193,7 +193,7 @@ selectSubsets <- function(data=insight::get_data(model),
                           model,
                           indices,
                           criterion=mse,
-                          save.coef=TRUE, ...){
+                          details=TRUE, ...){
   
   if (inherits(model, "lm", which=TRUE) != 1)
     stop("selectSubsets is appropriate only for 'lm' models")
@@ -227,7 +227,7 @@ selectSubsets <- function(data=insight::get_data(model),
   #   and the regression coefficients
   list(fit.i=fit.i, # fitted values for i-th fold
        crit.all.i=criterion(y, fit.all.i), # CV crit for all cases
-       coefficients = if (save.coef){ # regression coefficients
+       coefficients = if (details){ # regression coefficients
          coefs <- coef(m.best.i)
          
          # fix coefficient names

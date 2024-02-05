@@ -97,7 +97,8 @@
 #' data("Auto", package="ISLR2")
 #' m.auto <- lm(mpg ~ horsepower, data=Auto)
 #' cv(m.auto,  k="loo")
-#' cv(m.auto, seed=1234)
+#' (cv.auto <- cv(m.auto, seed=1234))
+#' compareFolds(cv.auto)
 #' cv(m.auto, seed=1234, reps=3)
 #'
 #' data("Mroz", package="carData")

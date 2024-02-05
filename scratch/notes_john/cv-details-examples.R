@@ -38,4 +38,7 @@ cvclus$details
 lapply(cvcase$details$coefficients,
        function(x) rownames(x$Subject))
 
+data("Auto", package="ISLR2")
+m.auto <- lm(mpg ~ . - name - origin, data=Auto)
+cv.sel <- cv(selectStepAIC, Auto, seed=123, working.model=m.auto)
 

@@ -23,8 +23,14 @@
 #' or greater), compute a confidence interval for the bias-corrected CV
 #' criterion, if the criterion is the average of casewise components.
 #' @param level confidence level (default \code{0.95}).
-#' @param save.coef save the coefficients from the selected models? (default is \code{TRUE} if
-#' \code{k} is 10 or smaller, \code{FALSE} otherwise)
+#' @param save.coef save the coefficients from the selected models? Deprecated
+#' in favor of the \code{details} argument; if specified, \code{details} is set
+#' is set to the value of \code{save.coef}.
+#' @param details if \code{TRUE}, save detailed information about the value of the
+#' CV criterion for the cases in each fold and the regression coefficients
+#' (and possibly other information)
+#' with that fold deleted; default is \code{TRUE} if \code{k} is 10 or smaller,
+#' \code{FALSE} otherwise.
 #' @param reps number of times to replicate k-fold CV (default is \code{1})
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
 #' @param ncores number of cores to use for parallel computations
@@ -85,8 +91,10 @@ cvSelect <- function(procedure, data, criterion=mse,
                      model, y.expression,
                      k=10, confint = n >= 400, level=0.95,
                      reps=1,
-                     save.coef = k <= 10,
+                     save.coef,
+                     details = k <= 10,
                      seed, ncores=1, ...){
+  if (!missing(save.coef)) details <- save.coef
   n <- nrow(data)
   y <- if (!missing(model)) {
     GetResponse(model)
@@ -130,10 +138,21 @@ cvSelect <- function(procedure, data, criterion=mse,
   }
   crit.all.i <- numeric(k)
 
+  if (details){
+    crit.i <- numeric(k)
+    coef.i <- vector(k, mode="list")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
+  } else {
+    crit.i <- NULL
+    coef.i <- NULL
+  }
+
   if (ncores > 1){
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    arglist <- c(list(data=data, indices=1, save.coef=save.coef,
+    arglist <- c(list(data=data, indices=1,
+                      # save.coef=save.coef,
+                      details = k <= 10,
                       criterion=criterion, model=model),
                  list(...))
     selection <- foreach(i = 1L:k) %dopar% {
@@ -143,25 +162,43 @@ cvSelect <- function(procedure, data, criterion=mse,
       do.call(procedure, arglist)
     }
     stopCluster(cl)
+
     for (i in 1L:k){
       yhat[indices[starts[i]:ends[i]]] <- selection[[i]]$fit.i
       crit.all.i[i] <- selection[[i]]$crit.all.i
+
+      if (details){
+        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                               yhat[indices[starts[i]:ends[i]]])
+        coef.i[[i]] <- selection[[i]]$coefficients
+      }
+
     }
-    coefs <- if (save.coef){
-      lapply(selection, function(x) x$coefficients)
-    } else {
-      NULL
-    }
+
+    # coefs <- if (save.coef){
+    #   lapply(selection, function(x) x$coefficients)
+    # } else {
+    #   NULL
+    # }
+
   } else {
     coefs <- vector(k, mode="list")
     for (i in 1L:k){
       indices.i <- indices[starts[i]:ends[i]]
       selection <- procedure(data, indices.i,
-                             save.coef=save.coef,
+                             # save.coef=save.coef,
+                             details = k <= 10,
                              criterion=criterion, model=model, ...)
       crit.all.i[i] <- selection$crit.all.i
       yhat[indices.i] <- selection$fit.i
-      if (save.coef) coefs[[i]] <- selection$coefficients
+#      if (save.coef) coefs[[i]] <- selection$coefficients
+
+      if (details){
+        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
+                               yhat[indices[starts[i]:ends[i]]])
+        coef.i[[i]] <- selection$coefficients
+      }
+
     }
   }
   cv <- criterion(y, yhat)
@@ -184,7 +221,9 @@ cvSelect <- function(procedure, data, criterion=mse,
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "confint" = ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 coefficients = if (save.coef) coefs else NULL)
+                 # coefficients = if (save.coef) coefs else NULL
+                 "details" = list(criterion=crit.i,
+                                  coefficients=coef.i))
   class(result) <- c("cvSelect", "cv")
   if (reps == 1) {
     return(result)
@@ -227,7 +266,9 @@ cvSelect <- function(procedure, data, criterion=mse,
 #' @export
 selectStepAIC <- function(data, indices,
                           model, criterion=mse, AIC=TRUE,
-                          save.coef=TRUE, ...){
+                          # save.coef=TRUE,
+                          details=TRUE,
+                          ...){
   y <- GetResponse(model)
   if (missing(indices)) {
     k. = if (AIC) 2 else log(nrow(data))
@@ -241,7 +282,7 @@ selectStepAIC <- function(data, indices,
   fit.all.i <- predict(model.i, newdata=data, type="response")
   fit.i <- fit.all.i[indices]
   list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-       coefficients=if (save.coef) coef(model.i) else NULL)
+       coefficients=if (details) coef(model.i) else NULL)
 }
 
 
@@ -329,7 +370,10 @@ yjPowerInverse <- function(y, lambda) {
 #' coef(cvt, average=median, NAs=1) # NAs not really needed here
 #' cv(m.pres, seed=123)
 #' @export
-selectTrans <- function(data, indices, save.coef=TRUE, model,
+selectTrans <- function(data, indices,
+                        # save.coef=TRUE,
+                        details=TRUE,
+                        model,
                         criterion=mse, predictors, response,
                         family=c("bcPower", "bcnPower", "yjPower", "basicPower"),
                         family.y=c("bcPower", "bcnPower", "yjPower", "basicPower"),
@@ -427,7 +471,7 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
   # ... and for current fold only:
   # compute and return CV info and transformation parameters:
   list(fit.i=fit.o.i[indices], crit.all.i=criterion(y, fit.o.i),
-       coefficients = if (save.coef) c(lambdas, gammas, transy)
+       coefficients = if (details) c(lambdas, gammas, transy)
   )
 }
 
@@ -451,7 +495,8 @@ selectTrans <- function(data, indices, save.coef=TRUE, model,
 #' @export
 selectTransStepAIC <- function(data,
                                indices,
-                               save.coef = TRUE,
+                               # save.coef = TRUE,
+                               details = TRUE,
                                model,
                                criterion = mse,
                                predictors,
@@ -612,7 +657,7 @@ selectTransStepAIC <- function(data,
   # compute and return CV info, transformation parameters,
   #   and regression coefficients:
   list(fit.i=fit.all.i[indices], crit.all.i=criterion(y, fit.all.i),
-       coefficients=if (save.coef) c(powers, coef(model.i)) else NULL
+       coefficients=if (details) c(powers, coef(model.i)) else NULL
   )
 }
 
@@ -628,10 +673,12 @@ compareFolds <- function(object, digits=3, ...){
 }
 
 #' @export
-compareFolds.cvSelect <- function(object, digits=3, ...){
-  coefficients <- object$coefficients
+compareFolds.default <- function(object, digits=3, ...){
+  coefficients <- object$details$coefficients
   if (is.null(coefficients))
-    stop("coefficients for folds not available")
+    stop("details for folds not available")
+  cat("CV criterion by folds:\n")
+  print(object$details$criterion)
   names <- unlist(lapply(coefficients, names))
   counts <- table(names)
   counts <- sort(counts, decreasing=TRUE)
@@ -641,6 +688,7 @@ compareFolds.cvSelect <- function(object, digits=3, ...){
   for (i in seq(along=coefficients)){
     table[i, names(coefficients[[i]])] <- coefficients[[i]]
   }
+  cat("\nCoefficients by folds:\n")
   printCoefmat(table, na.print="", digits=digits)
 }
 
@@ -669,7 +717,9 @@ coef.cvSelect <- function(object, average, NAs=0, ...){
 cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
                         seed=NULL, working.model=NULL, y.expression=NULL,
                         confint = n >= 400, level=0.95,
-                        save.coef = k <= 10, ncores = 1, ...){
+                        # save.coef = n >= 400,
+                        details = k <= 10,
+                        ncores = 1, ...){
   n <- nrow(data)
   cvSelect(procedure=model,
            data=data,
@@ -680,7 +730,8 @@ cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
            confint=confint,
            level=level,
            reps=reps,
-           save.coef=save.coef,
+           # save.coef=save.coef,
+           details = details,
            seed=seed,
            ncores=ncores,
            ...)

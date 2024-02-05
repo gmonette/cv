@@ -20,7 +20,8 @@ cvSelect(
   confint = n >= 400,
   level = 0.95,
   reps = 1,
-  save.coef = k <= 10,
+  save.coef,
+  details = k <= 10,
   seed,
   ncores = 1,
   ...
@@ -32,14 +33,14 @@ selectStepAIC(
   model,
   criterion = mse,
   AIC = TRUE,
-  save.coef = TRUE,
+  details = TRUE,
   ...
 )
 
 selectTrans(
   data,
   indices,
-  save.coef = TRUE,
+  details = TRUE,
   model,
   criterion = mse,
   predictors,
@@ -53,7 +54,7 @@ selectTrans(
 selectTransStepAIC(
   data,
   indices,
-  save.coef = TRUE,
+  details = TRUE,
   model,
   criterion = mse,
   predictors,
@@ -80,7 +81,7 @@ compareFolds(object, digits = 3, ...)
   y.expression = NULL,
   confint = n >= 400,
   level = 0.95,
-  save.coef = k <= 10,
+  details = k <= 10,
   ncores = 1,
   ...
 )
@@ -114,8 +115,15 @@ criterion, if the criterion is the average of casewise components.}
 
 \item{reps}{number of times to replicate k-fold CV (default is \code{1})}
 
-\item{save.coef}{save the coefficients from the selected models? (default is \code{TRUE} if
-\code{k} is 10 or smaller, \code{FALSE} otherwise)}
+\item{save.coef}{save the coefficients from the selected models? Deprecated
+in favor of the \code{details} argument; if specified, \code{details} is set
+is set to the value of \code{save.coef}.}
+
+\item{details}{if \code{TRUE}, save detailed information about the value of the
+CV criterion for the cases in each fold and the regression coefficients
+(and possibly other information)
+with that fold deleted; default is \code{TRUE} if \code{k} is 10 or smaller,
+\code{FALSE} otherwise.}
 
 \item{seed}{for R's random number generator; not used for n-fold cross-validation.}
 

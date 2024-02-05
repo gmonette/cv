@@ -330,7 +330,7 @@ summary(m.swiss)
 
 cv(m.swiss, seed=8433)
 ```
-Thus, the RMSE for the model fit to the complete data is considerably smaller than the CV estimate of the RMSE. Can we do better by selecting a subset of the predictors, taking account of the additional uncertainty induced by model selection?
+Thus, the MSE for the model fit to the complete data is considerably smaller than the CV estimate of the MSE. Can we do better by selecting a subset of the predictors, taking account of the additional uncertainty induced by model selection?
 
 First, let's apply best-subset selection to the complete data set:
 ```{r subset-selection}
@@ -350,7 +350,7 @@ summary(m.best)
 
 cv(m.best, seed=8433) # use same folds as before
 ```
-The RMSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated RMSE is a bit lower; as we explain in the main vignette, however, it isn't kosher to select and cross-validate a model on the same data.
+The MSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated MSE is a bit lower; as we explain in the main vignette, however, it isn't kosher to select and cross-validate a model on the same data.
 
 Here's a function named `selectSubsets()`, meant to be used with `cvSelect()`, suitable for cross-validating the model-selection process:
 ```{r selectSubsets}
@@ -358,7 +358,7 @@ selectSubsets <- function(data=insight::get_data(model),
                           model,
                           indices,
                           criterion=mse,
-                          save.coef=TRUE, ...){
+                          details=TRUE, ...){
   
   if (inherits(model, "lm", which=TRUE) != 1)
     stop("selectSubsets is appropriate only for 'lm' models")
@@ -392,7 +392,7 @@ selectSubsets <- function(data=insight::get_data(model),
   #   and the regression coefficients
   list(fit.i=fit.i, # fitted values for i-th fold
        crit.all.i=criterion(y, fit.all.i), # CV crit for all cases
-       coefficients = if (save.coef){ # regression coefficients
+       coefficients = if (details){ # regression coefficients
          coefs <- coef(m.best.i)
          
          # fix coefficient names
@@ -410,11 +410,11 @@ A slightly tricky point is that because of scoping issues, `predict()` doesn't w
 
 Additionally, the command `lm(y[-indices] ~ X[-indices, x.names.i] - 1)`, which is the selected model with the $i$th fold deleted, produces awkward coefficient names like `"X[-indices, x.names.i]Infant.Mortality"`. Purely for aesthetic reasons, the command `sub("X\\[-indices, x.names.i\\]", "", names(coefs))` fixes these awkward names, removing the extraneous text, `"X[-indices, x.names.i]"`.
 
-Applying `selectSubsets()` to the full data produces the full-data cross-validated RMSE (which we obtained previously):
+Applying `selectSubsets()` to the full data produces the full-data cross-validated MSE (which we obtained previously):
 ```{r test-selectSubsets}
 selectSubsets(model=m.swiss)
 ```
-Similarly, applying the function to an imaginary "fold" of 5 cases returns the RMSE for the cases in the fold, based on the model selected and fit to the cases omitting the fold; the RMSE for all of the cases, based on the same model; and the coefficients of the selected model, which includes 4 or the 5 predictors (and the intercept):
+Similarly, applying the function to an imaginary "fold" of 5 cases returns the MSE for the cases in the fold, based on the model selected and fit to the cases omitting the fold; the MSE for all of the cases, based on the same model; and the coefficients of the selected model, which includes 4 or the 5 predictors (and the intercept):
 ```{r test-selectSubsets-fold}
 selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 ```
@@ -424,10 +424,11 @@ Then, using `selectSubsets()` in cross-validation, we get:
 (cv.swiss <- cvSelect(selectSubsets, model=m.swiss,
                       data=swiss, seed=8433)) # use same folds
 ```
-Cross-validation shows that model selection exacts a penalty in RMSE. Examining the models selected for the 10 folds reveals that there is some uncertainty in identifying the predictors in the "best" model, with `Agriculture` sometimes appearing and sometimes not:
+Cross-validation shows that model selection exacts a penalty in MSE. Examining the models selected for the 10 folds reveals that there is some uncertainty in identifying the predictors in the "best" model, with `Agriculture` sometimes appearing and sometimes not:
 ```{r best-models-by-folds}
 compareFolds(cv.swiss)
 ```
+As well, the fold-wise MSE varies considerably, reflecting the small size of the `swiss` data set (47 cases),
 
 ## Appendix: Why the complement of AUC isn't a casewise CV criterion
 

@@ -791,7 +791,7 @@ The other arguments to `cvSelect()` are:
 
 By default, `cvSelect()` performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
 
-Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves the coefficients of the selected models. In this example, the `compareFolds()` function reveals that the variables retained by the model-selection process in the several folds are quite different:
+Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves details data about the folds. In this example, the `compareFolds()` function reveals that the variables retained by the model-selection process in the several folds are quite different:
 ```{r compare-selected-models}
 compareFolds(cv.select)
 ```
