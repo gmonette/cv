@@ -1,6 +1,8 @@
-# cv 1.1.0
+# cv 1.2.0
 
-- **TBA**
+- New cv.function() method meant to replace cvSelect(), which is deprecated.
+
+- cv.default() and other cv() methods acauire a details argument, which if TRUE includes information about the folds in the returned object.
 
 # cv 1.1.0
 
