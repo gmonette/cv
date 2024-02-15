@@ -6,8 +6,11 @@
 #' model-selection function in the \pkg{MASS} package; \code{selectTrans()} is a procedure
 #' for selecting predictor and response transformations in regression, which
 #' uses the \code{\link[car]{powerTransform}()} function in the
-#' \pkg{car} package; and \code{selectTransAndStepAIC()} combines predictor and response
-#' transformation with predictor selection.
+#' \pkg{car} package; \code{selectTransAndStepAIC()} combines predictor and response
+#' transformation with predictor selection; and \code{selectModelList()}
+#' uses cross-validation to select a model from a list of models created by
+#' \code{\link{models}()} and employs (nested) cross-validation to assess the predictive
+#' accuracy of this procedure.
 #'
 #' @param procedure a model-selection procedure function (see Details).
 #' @param data full data frame for model selection.
@@ -31,6 +34,7 @@
 #' (and possibly other information)
 #' with that fold deleted; default is \code{TRUE} if \code{k} is 10 or smaller,
 #' \code{FALSE} otherwise.
+#' @param save.model save the model that's selected using the \emph{full} data set.
 #' @param reps number of times to replicate k-fold CV (default is \code{1})
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
 #' @param ncores number of cores to use for parallel computations
@@ -93,6 +97,7 @@ cvSelect <- function(procedure, data, criterion=mse,
                      reps=1,
                      save.coef,
                      details = k <= 10,
+                     save.model=FALSE,
                      seed, ncores=1, ...){
   if (!missing(save.coef)) details <- save.coef
   n <- nrow(data)
@@ -111,7 +116,7 @@ cvSelect <- function(procedure, data, criterion=mse,
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
   if (k != n){
-    if (missing(seed)) seed <- sample(1e6, 1L)
+    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
@@ -141,10 +146,13 @@ cvSelect <- function(procedure, data, criterion=mse,
   if (details){
     crit.i <- numeric(k)
     coef.i <- vector(k, mode="list")
-    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
+    model.name.i <- character(k)
+    names(crit.i) <- names(coef.i) <- names(model.name.i) <-
+      paste("fold", 1:k, sep=".")
   } else {
     crit.i <- NULL
     coef.i <- NULL
+    model.name.i <- NULL
   }
 
   if (ncores > 1){
@@ -171,6 +179,7 @@ cvSelect <- function(procedure, data, criterion=mse,
         crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
                                yhat[indices[starts[i]:ends[i]]])
         coef.i[[i]] <- selection[[i]]$coefficients
+        model.name.i[[i]] <- if (!is.null(selection$model.name)) selection$model.name else ""
       }
 
     }
@@ -182,7 +191,7 @@ cvSelect <- function(procedure, data, criterion=mse,
     # }
 
   } else {
-    coefs <- vector(k, mode="list")
+ #   coefs <- vector(k, mode="list")
     for (i in 1L:k){
       indices.i <- indices[starts[i]:ends[i]]
       selection <- procedure(data, indices.i,
@@ -197,12 +206,23 @@ cvSelect <- function(procedure, data, criterion=mse,
         crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
                                yhat[indices[starts[i]:ends[i]]])
         coef.i[[i]] <- selection$coefficients
+        model.name.i[[i]] <- if (!is.null(selection$model.name)) selection$model.name else ""
       }
 
     }
   }
   cv <- criterion(y, yhat)
-  cv.full <- procedure(data, model=model, criterion=criterion, ...)
+  result.full <- procedure(data, model=model, criterion=criterion,
+                       seed = seed, # to use same folds if necessary
+                       save.model=save.model,
+                       ...)
+  if (is.list(result.full)){
+    cv.full <- result.full$criterion
+    selected.model <- result.full$model
+  } else {
+    cv.full <- result.full
+    selected.model <- NULL
+  }
 
   loss <- getLossFn(cv) # casewise loss function
   if (!is.null(loss)) {
@@ -223,7 +243,9 @@ cvSelect <- function(procedure, data, criterion=mse,
                  "k" = if (k == n) "n" else k, "seed" = seed,
                  # coefficients = if (save.coef) coefs else NULL
                  "details" = list(criterion=crit.i,
-                                  coefficients=coef.i))
+                                  coefficients=coef.i,
+                                  model.name=model.name.i),
+                 "selected.model" = selected.model)
   class(result) <- c("cvSelect", "cv")
   if (reps == 1) {
     return(result)
@@ -231,6 +253,7 @@ cvSelect <- function(procedure, data, criterion=mse,
     if (missing(y.expression)) y.expression <- NULL
     res <- cvSelect(procedure=procedure, data=data, k=k,
                     reps = reps - 1, save.coef = save.coef,
+                    details = details, save.model = save.model,
                     ncores=ncores, model=model,
                     y.expression=y.expression, ...)
     if (reps  > 2){
@@ -268,13 +291,15 @@ selectStepAIC <- function(data, indices,
                           model, criterion=mse, AIC=TRUE,
                           # save.coef=TRUE,
                           details=TRUE,
+                          save.model=FALSE,
                           ...){
   y <- GetResponse(model)
   if (missing(indices)) {
     k. = if (AIC) 2 else log(nrow(data))
-    model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
-    fit.all.i <- predict(model.i, newdata=data, type="response")
-    return(criterion(y, fit.all.i))
+    model <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
+    yhat <- predict(model, newdata=data, type="response")
+    return(list(criterion=criterion(y, yhat),
+                model= if (save.model) model else NULL))
   }
   k. <- if (AIC) 2 else log(nrow(data) - length(indices))
   model <- update(model, data=data[-indices, ])
@@ -373,6 +398,7 @@ yjPowerInverse <- function(y, lambda) {
 selectTrans <- function(data, indices,
                         # save.coef=TRUE,
                         details=TRUE,
+                        save.model=FALSE,
                         model,
                         criterion=mse, predictors, response,
                         family=c("bcPower", "bcnPower", "yjPower", "basicPower"),
@@ -467,7 +493,10 @@ selectTrans <- function(data, indices,
     predict(model, newdata = data)
   }
 
-  if (full.sample) return(criterion(y, fit.o.i))
+  if (full.sample) {
+    return(list(criterion=criterion(y, fit.o.i),
+                model=if (save.model) model else NULL))
+  }
   # ... and for current fold only:
   # compute and return CV info and transformation parameters:
   list(fit.i=fit.o.i[indices], crit.all.i=criterion(y, fit.o.i),
@@ -497,6 +526,7 @@ selectTransStepAIC <- function(data,
                                indices,
                                # save.coef = TRUE,
                                details = TRUE,
+                               save.model = FALSE,
                                model,
                                criterion = mse,
                                predictors,
@@ -651,7 +681,10 @@ selectTransStepAIC <- function(data,
   }
 
   # for full sample:
-  if (missing(indices)) return(criterion(y, fit.all.i))
+  if (missing(indices)) {
+    return(list(criterion=criterion(y, fit.all.i),
+                model = if (save.model) model.i else NULL))
+  }
 
   # ... and for current fold only:
   # compute and return CV info, transformation parameters,
@@ -661,6 +694,39 @@ selectTransStepAIC <- function(data,
   )
 }
 
+#' @describeIn cvSelect select a model using (nested) CV.
+#' @param quietly if \code{TRUE} (the default), simple messages (for example about the
+#' value to which the random-number generator seed is set), but not warnings or
+#' errors, are suppressed.
+#' @export
+selectModelList <- function(data, indices, model, criterion=mse, k=10,
+                            details =  k <= 10, save.model=FALSE,
+                            quietly=TRUE, seed, ...){
+  if (missing(indices)) {
+    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
+    set.seed(seed)
+    result <- cv(model, data, criterion=criterion, k=k, details=FALSE,
+                 quietly=quietly, ...)
+    cv.min <- which.min(sapply(result, function(x) x$"CV crit"))
+    return(list(
+      criterion = result[[cv.min]][["CV crit"]],
+      model = if (save.model) model[[cv.min]] else NULL
+      ))
+  }
+  y <- GetResponse(model[[1]])
+  for (i in seq_along(model)){
+    mod <- model[[i]]
+    model[[i]] <- update(mod, data=data[-indices, ])
+  }
+  result <- cv(model, data[-indices, ], criterion=criterion, k=k, details=details, quietly=quietly, ...)
+  cv.min <- which.min(sapply(result, function(x) x$"CV crit"))
+  model.name <- names(result)[cv.min]
+  fit.all.i <- predict(model[[cv.min]], newdata=data, type="response")
+  fit.i <- fit.all.i[indices]
+  list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+       coefficients=if (details) coef(model[[cv.min]]) else NULL,
+       model.name = model.name)
+}
 
 #' @describeIn cvSelect print the coefficients from the selected models
 #' for the several folds.
@@ -719,6 +785,7 @@ cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
                         confint = n >= 400, level=0.95,
                         # save.coef = n >= 400,
                         details = k <= 10,
+                        save.model=FALSE,
                         ncores = 1, ...){
   n <- nrow(data)
   cvSelect(procedure=model,
@@ -732,6 +799,7 @@ cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
            reps=reps,
            # save.coef=save.coef,
            details = details,
+           save.model = save.model,
            seed=seed,
            ncores=ncores,
            ...)
@@ -741,4 +809,3 @@ cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
 #' The \code{cvSelect()} function is deprecated in favor of the \code{cv()}
 #' \code{"function"} method, which has the same functionality. \code{cvSelect()}
 #' will eventually be removed from the \pkg{cv} package.
-#'

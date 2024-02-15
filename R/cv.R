@@ -35,6 +35,9 @@
 #' \code{type} argument of \code{predict()};
 #' the default is `type="response"`, which is appropriate, e.g., for a `"glm"` model
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
+#' @param start if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
+#' set to the vector of regression coefficients for the model fit to the full data is passed
+#' to \code{update()} possibly making the CV updates faster, e.g. for a GLM.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
 #'
 #' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
@@ -134,12 +137,17 @@ cv.default <- function(model, data=insight::get_data(model),
                        details = k <= 10,
                        confint = n >= 400, level=0.95,
                        ncores=1,
-                       type="response", ...){
+                       type="response",
+                       start=FALSE, ...){
 
   f <- function(i){
     # helper function to compute cv criterion for each fold
     indices.i <- indices[starts[i]:ends[i]]
-    model.i <- update(model, data=data[ - indices.i, ])
+    model.i <- if (start) {
+      update(model, data=data[ - indices.i, ], start=b)
+    } else {
+      update(model, data=data[ - indices.i, ])
+      }
     fit.all.i <- predict(model.i, newdata=data, type=type, ...)
     fit.i <- fit.all.i[indices.i]
     list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
@@ -152,7 +160,12 @@ cv.default <- function(model, data=insight::get_data(model),
     indices.i <- indices[starts[i]:ends[i]]
     # the following deals with a scoping issue that can
     #   occur with args passed via ... (which is saved in dots)
-    predict.args <- c(list(object=update(model, data=data[ - indices.i, ]),
+    predict.args <- c(list(
+      object= if (start) {
+          update(model, data=data[ - indices.i, ], start=b)
+        } else {
+          update(model, data=data[ - indices.i, ])
+        },
       newdata=data, type=type), dots)
     fit.all.i <- do.call(predict, predict.args)
     fit.i <- fit.all.i[indices.i]
@@ -161,6 +174,7 @@ cv.default <- function(model, data=insight::get_data(model),
   }
 
   y <- GetResponse(model)
+  b <- coef(model)
   n <- nrow(data)
   if (is.character(k)){
     if (k == "n" || k == "loo") {
@@ -518,6 +532,7 @@ cv.glm <- function(model, data=insight::get_data(model),
                    confint = n >= 400, level=0.95,
                    method=c("exact", "hatvalues", "Woodbury"),
                    ncores=1,
+                   start=FALSE,
                    ...){
   UpdateIWLS <- function(omit){
     # compute coefficients with omit cases deleted
@@ -563,7 +578,7 @@ cv.glm <- function(model, data=insight::get_data(model),
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
     result <- cv.default(model=model, data=data, criterion=criterion, k=k, reps=reps, seed=seed,
-               ncores=ncores, method=method, details=details, ...)
+               ncores=ncores, method=method, details=details, start=start, ...)
     if (inherits(result, "cv")) result$"criterion" <- deparse(substitute(criterion))
     return(result)
   } else if (method == "hatvalues") {

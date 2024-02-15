@@ -6,6 +6,7 @@
 \alias{GetResponse.merMod}
 \alias{GetResponse.lme}
 \alias{GetResponse.glmmTMB}
+\alias{GetResponse.modList}
 \title{Extract Response Variable}
 \usage{
 GetResponse(model, ...)
@@ -17,6 +18,8 @@ GetResponse(model, ...)
 \method{GetResponse}{lme}(model, ...)
 
 \method{GetResponse}{glmmTMB}(model, ...)
+
+\method{GetResponse}{modList}(model, ...)
 }
 \arguments{
 \item{model}{a fitted model}
@@ -51,6 +54,8 @@ for a generalized linear mixed model with a binary response.
 \item \code{GetResponse(lme)}: \code{merMod} method
 
 \item \code{GetResponse(glmmTMB)}: \code{glmmTMB} method
+
+\item \code{GetResponse(modList)}: \code{modList} method
 
 }}
 \examples{

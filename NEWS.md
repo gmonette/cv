@@ -2,7 +2,9 @@
 
 - New cv.function() method meant to replace cvSelect(), which is deprecated.
 
-- cv.default() and other cv() methods acauire a details argument, which if TRUE includes information about the folds in the returned object.
+- New selectModelList() to be used with cv.function (or with cvSelect()), which selected a model by CV and hence implements a version of nested CV.
+
+- cv.default() and other cv() methods acquire a details argument, which if TRUE includes information about the folds in the returned object.
 
 # cv 1.1.0
 

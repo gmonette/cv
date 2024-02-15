@@ -193,7 +193,10 @@ selectSubsets <- function(data=insight::get_data(model),
                           model,
                           indices,
                           criterion=mse,
-                          details=TRUE, ...){
+                          details=TRUE, 
+                          seed,
+                          save.model=FALSE, 
+                          ...){
   
   if (inherits(model, "lm", which=TRUE) != 1)
     stop("selectSubsets is appropriate only for 'lm' models")
@@ -203,6 +206,7 @@ selectSubsets <- function(data=insight::get_data(model),
   X <- model.matrix(model)
 
   if (missing(indices)) {
+    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
     # select the best model from the full data by BIC
     sel <- leaps::regsubsets(formula, data=data, ...)
     bics <- summary(sel)$bic
@@ -211,7 +215,10 @@ selectSubsets <- function(data=insight::get_data(model),
     # fit the best model; intercept is already in X, hence - 1:
     m.best <- lm(y ~ X[, x.names] - 1) 
     fit.all <- predict(m.best, newdata=data)
-    return(criterion(y, fit.all)) # return the CV criterion
+    return(list(
+      criterion = criterion(y, fit.all),
+      model = if (save.model) m.best else NULL
+      ))
   }
 
   # select the best model omitting the i-th fold (given by indices)

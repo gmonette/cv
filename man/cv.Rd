@@ -24,6 +24,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   level = 0.95,
   ncores = 1,
   type = "response",
+  start = FALSE,
   ...
 )
 
@@ -58,6 +59,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   level = 0.95,
   method = c("exact", "hatvalues", "Woodbury"),
   ncores = 1,
+  start = FALSE,
   ...
 )
 
@@ -103,6 +105,10 @@ criterion, if the criterion is the average of casewise components.}
 \code{type} argument of \code{predict()};
 the default is \code{type="response"}, which is appropriate, e.g., for a \code{"glm"} model
 and may be recognized or ignored by \code{predict()} methods for other model classes.}
+
+\item{start}{if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
+set to the vector of regression coefficients for the model fit to the full data is passed
+to \code{update()} possibly making the CV updates faster, e.g. for a GLM.}
 
 \item{x}{a \code{"cv"} or \code{"cvList"} object to be printed}
 

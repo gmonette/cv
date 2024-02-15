@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-02-05" />
+<meta name="date" content="2024-02-14" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-02-05</h4>
+<h4 class="date">2024-02-14</h4>
 
 
 
@@ -476,7 +476,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x11af53320&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x125b65270&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -1138,53 +1138,60 @@ model-selection process:</p>
 <span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>                          model,</span>
 <span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>                          indices,</span>
 <span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>                          <span class="at">criterion=</span>mse,</span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>                          <span class="at">details=</span><span class="cn">TRUE</span>, ...){</span>
-<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>  </span>
-<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">inherits</span>(model, <span class="st">&quot;lm&quot;</span>, <span class="at">which=</span><span class="cn">TRUE</span>) <span class="sc">!=</span> <span class="dv">1</span>)</span>
-<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;selectSubsets is appropriate only for &#39;lm&#39; models&quot;</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>                          <span class="at">details=</span><span class="cn">TRUE</span>, </span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>                          seed,</span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>                          <span class="at">save.model=</span><span class="cn">FALSE</span>, </span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>                          ...){</span>
 <span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a>  </span>
-<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">GetResponse</span>(model)</span>
-<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">formula</span>(model)</span>
-<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(model)</span>
-<span id="cb26-13"><a href="#cb26-13" tabindex="-1"></a></span>
-<span id="cb26-14"><a href="#cb26-14" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">missing</span>(indices)) {</span>
-<span id="cb26-15"><a href="#cb26-15" tabindex="-1"></a>    <span class="co"># select the best model from the full data by BIC</span></span>
-<span id="cb26-16"><a href="#cb26-16" tabindex="-1"></a>    sel <span class="ot">&lt;-</span> leaps<span class="sc">::</span><span class="fu">regsubsets</span>(formula, <span class="at">data=</span>data, ...)</span>
-<span id="cb26-17"><a href="#cb26-17" tabindex="-1"></a>    bics <span class="ot">&lt;-</span> <span class="fu">summary</span>(sel)<span class="sc">$</span>bic</span>
-<span id="cb26-18"><a href="#cb26-18" tabindex="-1"></a>    best <span class="ot">&lt;-</span> <span class="fu">coef</span>(sel, <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(bics))[[<span class="fu">which.min</span>(bics)]]</span>
-<span id="cb26-19"><a href="#cb26-19" tabindex="-1"></a>    x.names <span class="ot">&lt;-</span> <span class="fu">names</span>(best)</span>
-<span id="cb26-20"><a href="#cb26-20" tabindex="-1"></a>    <span class="co"># fit the best model; intercept is already in X, hence - 1:</span></span>
-<span id="cb26-21"><a href="#cb26-21" tabindex="-1"></a>    m.best <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> X[, x.names] <span class="sc">-</span> <span class="dv">1</span>) </span>
-<span id="cb26-22"><a href="#cb26-22" tabindex="-1"></a>    fit.all <span class="ot">&lt;-</span> <span class="fu">predict</span>(m.best, <span class="at">newdata=</span>data)</span>
-<span id="cb26-23"><a href="#cb26-23" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">criterion</span>(y, fit.all)) <span class="co"># return the CV criterion</span></span>
-<span id="cb26-24"><a href="#cb26-24" tabindex="-1"></a>  }</span>
-<span id="cb26-25"><a href="#cb26-25" tabindex="-1"></a></span>
-<span id="cb26-26"><a href="#cb26-26" tabindex="-1"></a>  <span class="co"># select the best model omitting the i-th fold (given by indices)</span></span>
-<span id="cb26-27"><a href="#cb26-27" tabindex="-1"></a>  sel.i <span class="ot">&lt;-</span> leaps<span class="sc">::</span><span class="fu">regsubsets</span>(formula, data[<span class="sc">-</span>indices, ], ...)</span>
-<span id="cb26-28"><a href="#cb26-28" tabindex="-1"></a>  bics.i <span class="ot">&lt;-</span> <span class="fu">summary</span>(sel.i)<span class="sc">$</span>bic</span>
-<span id="cb26-29"><a href="#cb26-29" tabindex="-1"></a>  best.i <span class="ot">&lt;-</span> <span class="fu">coef</span>(sel.i, <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(bics.i))[[<span class="fu">which.min</span>(bics.i)]]</span>
-<span id="cb26-30"><a href="#cb26-30" tabindex="-1"></a>  x.names.i <span class="ot">&lt;-</span> <span class="fu">names</span>(best.i)</span>
-<span id="cb26-31"><a href="#cb26-31" tabindex="-1"></a>  m.best.i <span class="ot">&lt;-</span> <span class="fu">lm</span>(y[<span class="sc">-</span>indices] <span class="sc">~</span> X[<span class="sc">-</span>indices, x.names.i] <span class="sc">-</span> <span class="dv">1</span>)</span>
-<span id="cb26-32"><a href="#cb26-32" tabindex="-1"></a>              <span class="co"># predict() doesn&#39;t work here:</span></span>
-<span id="cb26-33"><a href="#cb26-33" tabindex="-1"></a>  fit.all.i <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(X[, x.names.i] <span class="sc">%*%</span> <span class="fu">coef</span>(m.best.i))</span>
-<span id="cb26-34"><a href="#cb26-34" tabindex="-1"></a>  fit.i <span class="ot">&lt;-</span> fit.all.i[indices]</span>
-<span id="cb26-35"><a href="#cb26-35" tabindex="-1"></a>  <span class="co"># return the fitted values for i-th fold, CV criterion for all cases, </span></span>
-<span id="cb26-36"><a href="#cb26-36" tabindex="-1"></a>  <span class="co">#   and the regression coefficients</span></span>
-<span id="cb26-37"><a href="#cb26-37" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">fit.i=</span>fit.i, <span class="co"># fitted values for i-th fold</span></span>
-<span id="cb26-38"><a href="#cb26-38" tabindex="-1"></a>       <span class="at">crit.all.i=</span><span class="fu">criterion</span>(y, fit.all.i), <span class="co"># CV crit for all cases</span></span>
-<span id="cb26-39"><a href="#cb26-39" tabindex="-1"></a>       <span class="at">coefficients =</span> <span class="cf">if</span> (details){ <span class="co"># regression coefficients</span></span>
-<span id="cb26-40"><a href="#cb26-40" tabindex="-1"></a>         coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(m.best.i)</span>
-<span id="cb26-41"><a href="#cb26-41" tabindex="-1"></a>         </span>
-<span id="cb26-42"><a href="#cb26-42" tabindex="-1"></a>         <span class="co"># fix coefficient names</span></span>
-<span id="cb26-43"><a href="#cb26-43" tabindex="-1"></a>         <span class="fu">names</span>(coefs) <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">&quot;X</span><span class="sc">\\</span><span class="st">[-indices, x.names.i</span><span class="sc">\\</span><span class="st">]&quot;</span>, <span class="st">&quot;&quot;</span>,</span>
-<span id="cb26-44"><a href="#cb26-44" tabindex="-1"></a>                             <span class="fu">names</span>(coefs))</span>
-<span id="cb26-45"><a href="#cb26-45" tabindex="-1"></a>         </span>
-<span id="cb26-46"><a href="#cb26-46" tabindex="-1"></a>         coefs</span>
-<span id="cb26-47"><a href="#cb26-47" tabindex="-1"></a>       }  <span class="cf">else</span> {</span>
-<span id="cb26-48"><a href="#cb26-48" tabindex="-1"></a>         <span class="cn">NULL</span></span>
-<span id="cb26-49"><a href="#cb26-49" tabindex="-1"></a>       }</span>
-<span id="cb26-50"><a href="#cb26-50" tabindex="-1"></a>  )</span>
-<span id="cb26-51"><a href="#cb26-51" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">inherits</span>(model, <span class="st">&quot;lm&quot;</span>, <span class="at">which=</span><span class="cn">TRUE</span>) <span class="sc">!=</span> <span class="dv">1</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;selectSubsets is appropriate only for &#39;lm&#39; models&quot;</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a>  </span>
+<span id="cb26-13"><a href="#cb26-13" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">GetResponse</span>(model)</span>
+<span id="cb26-14"><a href="#cb26-14" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">formula</span>(model)</span>
+<span id="cb26-15"><a href="#cb26-15" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(model)</span>
+<span id="cb26-16"><a href="#cb26-16" tabindex="-1"></a></span>
+<span id="cb26-17"><a href="#cb26-17" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">missing</span>(indices)) {</span>
+<span id="cb26-18"><a href="#cb26-18" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">missing</span>(seed) <span class="sc">||</span> <span class="fu">is.null</span>(seed)) seed <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fl">1e6</span>, 1L)</span>
+<span id="cb26-19"><a href="#cb26-19" tabindex="-1"></a>    <span class="co"># select the best model from the full data by BIC</span></span>
+<span id="cb26-20"><a href="#cb26-20" tabindex="-1"></a>    sel <span class="ot">&lt;-</span> leaps<span class="sc">::</span><span class="fu">regsubsets</span>(formula, <span class="at">data=</span>data, ...)</span>
+<span id="cb26-21"><a href="#cb26-21" tabindex="-1"></a>    bics <span class="ot">&lt;-</span> <span class="fu">summary</span>(sel)<span class="sc">$</span>bic</span>
+<span id="cb26-22"><a href="#cb26-22" tabindex="-1"></a>    best <span class="ot">&lt;-</span> <span class="fu">coef</span>(sel, <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(bics))[[<span class="fu">which.min</span>(bics)]]</span>
+<span id="cb26-23"><a href="#cb26-23" tabindex="-1"></a>    x.names <span class="ot">&lt;-</span> <span class="fu">names</span>(best)</span>
+<span id="cb26-24"><a href="#cb26-24" tabindex="-1"></a>    <span class="co"># fit the best model; intercept is already in X, hence - 1:</span></span>
+<span id="cb26-25"><a href="#cb26-25" tabindex="-1"></a>    m.best <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> X[, x.names] <span class="sc">-</span> <span class="dv">1</span>) </span>
+<span id="cb26-26"><a href="#cb26-26" tabindex="-1"></a>    fit.all <span class="ot">&lt;-</span> <span class="fu">predict</span>(m.best, <span class="at">newdata=</span>data)</span>
+<span id="cb26-27"><a href="#cb26-27" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb26-28"><a href="#cb26-28" tabindex="-1"></a>      <span class="at">criterion =</span> <span class="fu">criterion</span>(y, fit.all),</span>
+<span id="cb26-29"><a href="#cb26-29" tabindex="-1"></a>      <span class="at">model =</span> <span class="cf">if</span> (save.model) m.best <span class="cf">else</span> <span class="cn">NULL</span></span>
+<span id="cb26-30"><a href="#cb26-30" tabindex="-1"></a>      ))</span>
+<span id="cb26-31"><a href="#cb26-31" tabindex="-1"></a>  }</span>
+<span id="cb26-32"><a href="#cb26-32" tabindex="-1"></a></span>
+<span id="cb26-33"><a href="#cb26-33" tabindex="-1"></a>  <span class="co"># select the best model omitting the i-th fold (given by indices)</span></span>
+<span id="cb26-34"><a href="#cb26-34" tabindex="-1"></a>  sel.i <span class="ot">&lt;-</span> leaps<span class="sc">::</span><span class="fu">regsubsets</span>(formula, data[<span class="sc">-</span>indices, ], ...)</span>
+<span id="cb26-35"><a href="#cb26-35" tabindex="-1"></a>  bics.i <span class="ot">&lt;-</span> <span class="fu">summary</span>(sel.i)<span class="sc">$</span>bic</span>
+<span id="cb26-36"><a href="#cb26-36" tabindex="-1"></a>  best.i <span class="ot">&lt;-</span> <span class="fu">coef</span>(sel.i, <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(bics.i))[[<span class="fu">which.min</span>(bics.i)]]</span>
+<span id="cb26-37"><a href="#cb26-37" tabindex="-1"></a>  x.names.i <span class="ot">&lt;-</span> <span class="fu">names</span>(best.i)</span>
+<span id="cb26-38"><a href="#cb26-38" tabindex="-1"></a>  m.best.i <span class="ot">&lt;-</span> <span class="fu">lm</span>(y[<span class="sc">-</span>indices] <span class="sc">~</span> X[<span class="sc">-</span>indices, x.names.i] <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb26-39"><a href="#cb26-39" tabindex="-1"></a>              <span class="co"># predict() doesn&#39;t work here:</span></span>
+<span id="cb26-40"><a href="#cb26-40" tabindex="-1"></a>  fit.all.i <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(X[, x.names.i] <span class="sc">%*%</span> <span class="fu">coef</span>(m.best.i))</span>
+<span id="cb26-41"><a href="#cb26-41" tabindex="-1"></a>  fit.i <span class="ot">&lt;-</span> fit.all.i[indices]</span>
+<span id="cb26-42"><a href="#cb26-42" tabindex="-1"></a>  <span class="co"># return the fitted values for i-th fold, CV criterion for all cases, </span></span>
+<span id="cb26-43"><a href="#cb26-43" tabindex="-1"></a>  <span class="co">#   and the regression coefficients</span></span>
+<span id="cb26-44"><a href="#cb26-44" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">fit.i=</span>fit.i, <span class="co"># fitted values for i-th fold</span></span>
+<span id="cb26-45"><a href="#cb26-45" tabindex="-1"></a>       <span class="at">crit.all.i=</span><span class="fu">criterion</span>(y, fit.all.i), <span class="co"># CV crit for all cases</span></span>
+<span id="cb26-46"><a href="#cb26-46" tabindex="-1"></a>       <span class="at">coefficients =</span> <span class="cf">if</span> (details){ <span class="co"># regression coefficients</span></span>
+<span id="cb26-47"><a href="#cb26-47" tabindex="-1"></a>         coefs <span class="ot">&lt;-</span> <span class="fu">coef</span>(m.best.i)</span>
+<span id="cb26-48"><a href="#cb26-48" tabindex="-1"></a>         </span>
+<span id="cb26-49"><a href="#cb26-49" tabindex="-1"></a>         <span class="co"># fix coefficient names</span></span>
+<span id="cb26-50"><a href="#cb26-50" tabindex="-1"></a>         <span class="fu">names</span>(coefs) <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">&quot;X</span><span class="sc">\\</span><span class="st">[-indices, x.names.i</span><span class="sc">\\</span><span class="st">]&quot;</span>, <span class="st">&quot;&quot;</span>,</span>
+<span id="cb26-51"><a href="#cb26-51" tabindex="-1"></a>                             <span class="fu">names</span>(coefs))</span>
+<span id="cb26-52"><a href="#cb26-52" tabindex="-1"></a>         </span>
+<span id="cb26-53"><a href="#cb26-53" tabindex="-1"></a>         coefs</span>
+<span id="cb26-54"><a href="#cb26-54" tabindex="-1"></a>       }  <span class="cf">else</span> {</span>
+<span id="cb26-55"><a href="#cb26-55" tabindex="-1"></a>         <span class="cn">NULL</span></span>
+<span id="cb26-56"><a href="#cb26-56" tabindex="-1"></a>       }</span>
+<span id="cb26-57"><a href="#cb26-57" tabindex="-1"></a>  )</span>
+<span id="cb26-58"><a href="#cb26-58" tabindex="-1"></a>}</span></code></pre></div>
 <p>A slightly tricky point is that because of scoping issues,
 <code>predict()</code> doesn’t work with the model fit omitting the
 <span class="math inline">\(i\)</span>th fold, and so the fitted values
@@ -1205,9 +1212,13 @@ these awkward names, removing the extraneous text,
 <p>Applying <code>selectSubsets()</code> to the full data produces the
 full-data cross-validated MSE (which we obtained previously):</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">selectSubsets</span>(<span class="at">model=</span>m.swiss)</span>
-<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt; [1] 45.916</span></span>
-<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
-<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span></code></pre></div>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt; $criterion</span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt; [1] 45.916</span></span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;casewise loss&quot;)</span></span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;(y - yhat)^2&quot;</span></span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a><span class="co">#&gt; $model</span></span>
+<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
 <p>Similarly, applying the function to an imaginary “fold” of 5 cases
 returns the MSE for the cases in the fold, based on the model selected
 and fit to the cases omitting the fold; the MSE for all of the cases,

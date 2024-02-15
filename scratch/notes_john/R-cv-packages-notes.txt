@@ -48,6 +48,9 @@ focuses on creating folds; user supplies a function to compute
 not model-based
 has vignette
 
+https://cran.r-project.org/web/packages/rsample/
+** evaluate further
+
 https://cran.r-project.org/web/packages/surveyCV/
 for complex surveys, using survey package
 essentially limited to linear and logistic regression

@@ -5,6 +5,7 @@
 \alias{selectStepAIC}
 \alias{selectTrans}
 \alias{selectTransStepAIC}
+\alias{selectModelList}
 \alias{compareFolds}
 \alias{coef.cvSelect}
 \alias{cv.function}
@@ -22,6 +23,7 @@ cvSelect(
   reps = 1,
   save.coef,
   details = k <= 10,
+  save.model = FALSE,
   seed,
   ncores = 1,
   ...
@@ -34,6 +36,7 @@ selectStepAIC(
   criterion = mse,
   AIC = TRUE,
   details = TRUE,
+  save.model = FALSE,
   ...
 )
 
@@ -41,6 +44,7 @@ selectTrans(
   data,
   indices,
   details = TRUE,
+  save.model = FALSE,
   model,
   criterion = mse,
   predictors,
@@ -55,6 +59,7 @@ selectTransStepAIC(
   data,
   indices,
   details = TRUE,
+  save.model = FALSE,
   model,
   criterion = mse,
   predictors,
@@ -63,6 +68,19 @@ selectTransStepAIC(
   family.y = c("bcPower", "bcnPower", "yjPower", "basicPower"),
   rounded = TRUE,
   AIC = TRUE,
+  ...
+)
+
+selectModelList(
+  data,
+  indices,
+  model,
+  criterion = mse,
+  k = 10,
+  details = k <= 10,
+  save.model = FALSE,
+  quietly = TRUE,
+  seed,
   ...
 )
 
@@ -82,6 +100,7 @@ compareFolds(object, digits = 3, ...)
   confint = n >= 400,
   level = 0.95,
   details = k <= 10,
+  save.model = FALSE,
   ncores = 1,
   ...
 )
@@ -125,6 +144,8 @@ CV criterion for the cases in each fold and the regression coefficients
 with that fold deleted; default is \code{TRUE} if \code{k} is 10 or smaller,
 \code{FALSE} otherwise.}
 
+\item{save.model}{save the model that's selected using the \emph{full} data set.}
+
 \item{seed}{for R's random number generator; not used for n-fold cross-validation.}
 
 \item{ncores}{number of cores to use for parallel computations
@@ -158,6 +179,10 @@ with \code{"bcPower"} as the default.}
 
 \item{rounded}{if \code{TRUE} (the default) use nicely rounded versions
 of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).}
+
+\item{quietly}{if \code{TRUE} (the default), simple messages (for example about the
+value to which the random-number generator seed is set), but not warnings or
+errors, are suppressed.}
 
 \item{object}{an object of class \code{"cvSelect"}.}
 
@@ -198,8 +223,11 @@ are general functions to cross-validate a model-selection procedure;
 model-selection function in the \pkg{MASS} package; \code{selectTrans()} is a procedure
 for selecting predictor and response transformations in regression, which
 uses the \code{\link[car]{powerTransform}()} function in the
-\pkg{car} package; and \code{selectTransAndStepAIC()} combines predictor and response
-transformation with predictor selection.
+\pkg{car} package; \code{selectTransAndStepAIC()} combines predictor and response
+transformation with predictor selection; and \code{selectModelList()}
+uses cross-validation to select a model from a list of models created by
+\code{\link{models}()} and employs (nested) cross-validation to assess the predictive
+accuracy of this procedure.
 }
 \details{
 The model-selection function supplied as the \code{procedure} (for \code{cvSelect()})
@@ -248,6 +276,8 @@ for the several folds and possibly average them.
 
 \item \code{selectTransStepAIC()}: select transformations of the predictors and response,
 and then select predictors.
+
+\item \code{selectModelList()}: select a model using (nested) CV.
 
 \item \code{compareFolds()}: print the coefficients from the selected models
 for the several folds.
