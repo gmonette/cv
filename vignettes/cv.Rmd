@@ -177,12 +177,15 @@ The `cv()` function also has a method that can be applied to a list of regressio
 We illustrate with the polynomial regression models of varying degree for the `Auto` data (discussed previously), beginning by fitting and saving the 10 models:
 ```{r polyomial-models}
 for (p in 1:10){
-  assign(paste0("m.", p),
-         lm(mpg ~ poly(horsepower, p), data=Auto))
+  command <- paste0("m.", p, "<- lm(mpg ~ poly(horsepower, ", p,
+                    "), data=Auto)")
+  eval(parse(text=command))
 }
 objects(pattern="m\\.[0-9]")
 summary(m.2) # for example, the quadratic fit
 ```
+The convoluted code within the loop to produce the 10 models insures that the model formula are of the form, e.g., `mpg ~ poly(horsepower, 2)` rather than `mpg ~ poly(horsepower, p)`, which will be useful to us later, when we consider cross-validating the model-selection process.
+
 We then apply `cv()` to the list of 10 models (the `data` argument is required):
 ```{r polynomial-regression-CV}
 # 10-fold CV
@@ -773,31 +776,65 @@ If we cross-validate the selected model, we also obtain an optimistic estimate o
 cv(m.select, seed=2529)
 ```
 
-The `cvSelect()` function in the **cv** package allows us to cross-validate the whole model-selection procedure. The first argument to `cvSelect()` is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The `selectStepAIC()` function, also in **cv** and based on `stepAIC()`, is suitable for use with `cvSelect()`:
+The `"function"` method of `cv()` allows us to cross-validate the whole model-selection procedure, where first argument to `cv()` is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The `selectStepAIC()` function, in the **cv** package and based on `stepAIC()`, is suitable for use with `cv()`:
 ```{r cvSelect-artificial-data, cache=TRUE}
-cv.select <- cvSelect(selectStepAIC, data=D, seed=3791,
-                      model=m.null, direction="forward",
-                      scope=list(lower=~1, 
-                                 upper=formula(m.full)))
+cv.select <- cv(selectStepAIC, data=D, seed=3791,
+                working.model=m.null, direction="forward",
+                scope=list(lower=~1, upper=formula(m.full)))
 cv.select
 ```
 
-The other arguments to `cvSelect()` are:
+The other arguments to `cv()` are:
 
 * `data`, the data set to which the model is fit;
 * `seed`, an optional seed for R's pseudo-random-number generator; as for `cv()`, if the seed isn't supplied by the user, a seed is randomly selected and saved;
-* additional arguments required by the model-selection function, here the starting `model` argument, the `direction` of model selection, and the `scope` of models considered (from the model with only a regression constant to the model with all 100 predictors).
+* additional arguments required by the model-selection function, here the starting `working.model` argument, the `direction` of model selection, and the `scope` of models considered (from the model with only a regression constant to the model with all 100 predictors).
 
 
-By default, `cvSelect()` performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
+By default, `cv()` performs 10-fold CV, and produces an estimate of MSE for the model-selection procedure even *larger* than the true error variance, $\sigma^2 = 1$.
 
-Also by default, when the number of folds is 10 or fewer, `cvSelect()` saves details data about the folds. In this example, the `compareFolds()` function reveals that the variables retained by the model-selection process in the several folds are quite different:
+Also by default, when the number of folds is 10 or fewer, `cv()` saves details data about the folds. In this example, the `compareFolds()` function reveals that the variables retained by the model-selection process in the several folds are quite different:
 ```{r compare-selected-models}
 compareFolds(cv.select)
 ```
+
+### Polynomial regression for the Auto data revisited
+
+Previously, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of `mpg` to `horsepower` for the `Auto` data, saving the results in `m.1` through `m.10`. We then used `cv()` to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin); repeating the relevant graph: 
+```{r polynomial-regression-CV-graph-duplicated, echo=FALSE}
+#| out.width = "100%",
+#| fig.height = 5,
+#| fig.cap = "Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$ (repeated)"
+cv.mse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
+cv.mse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
+plot(c(1, 10), range(cv.mse.10, cv.mse.loo), type="n",
+     xlab="Degree of polynomial, p",
+     ylab="Cross-Validated MSE")
+lines(1:10, cv.mse.10, lwd=2, lty=1, col=2, pch=16, type="b")
+lines(1:10, cv.mse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
+legend("topright", inset=0.02,
+       legend=c("10-Fold CV", "LOO CV"),
+       lwd=2, lty=2:1, col=3:2, pch=17:16)
+```
+
+If we then select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
+
+Applying `selectModelList()` to the `Auto` polynomial-regression models, and using 10-fold CV, we obtain:
+```{r nested-CV-polynomials}
+nestedCV.auto <- cv(selectModelList, Auto,
+                    working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                        m.6, m.7, m.8, m.9, m.10),
+                    save.model=TRUE,
+                    seed=2120)
+nestedCV.auto
+nestedCV.auto$selected.model
+cv(m.7, seed=2120) # same seed for same folds
+```
+As expected, nested CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model.
+
 ### Mroz's logistic regression revisited
 
-For a contrasting example we apply model selection to Mroz's logistic regression for married women's labor-force participation. First, recall the logistic regression model that we fit to the `Mroz` data:
+Next, let's apply model selection to Mroz's logistic regression for married women's labor-force participation. First, recall the logistic regression model that we fit to the `Mroz` data:
 ```{r recall-Mroz-regression}
 summary(m.mroz)
 ```
@@ -820,14 +857,14 @@ Is this estimate of predictive performance optimistic?
 
 We proceed to apply the model-selection procedure by cross-validation, producing more or less the same result:
 ```{r cv-mroz-selection}
-m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz, 
-                          seed=6681,
-                          criterion=BayesRule,
-                          model=m.mroz,
-                          AIC=FALSE)
+m.mroz.sel.cv <- cv(selectStepAIC, Mroz, 
+                    seed=6681,
+                    criterion=BayesRule,
+                    working.model=m.mroz,
+                    AIC=FALSE)
 m.mroz.sel.cv
 ```
-Setting `AIC=FALSE` in the call to `cvSelect()` uses the BIC rather than the AIC as the model-selection criterion. As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using `compareFolds()`:
+Setting `AIC=FALSE` in the call to `cv()` uses the BIC rather than the AIC as the model-selection criterion. As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using `compareFolds()`:
 ```{r compare-selected-models-mroz}
 compareFolds(m.mroz.sel.cv)
 ```
@@ -835,7 +872,7 @@ In this example, therefore, we appear to obtain a realistic estimate of model pe
 
 ### Cross-validating choice of transformations in regression
 
-The **cv** package also provides a `cvSelect()` procedure, `selectTrans()`, for choosing transformations of the predictors and the response in regression. 
+The **cv** package also provides a `cv()` procedure, `selectTrans()`, for choosing transformations of the predictors and the response in regression. 
 
 Some background: As @Weisberg:2014 [Sec. 8.2] explains, there are technical advantages to having (numeric) predictors in linear regression analysis that are themselves linearly related. If the predictors *aren't* linearly related, then the relationships between them can often be straightened by power transformations. Transformations can be selected after graphical examination of the data, or by analytic methods. Once the relationships between the predictors are linearized, it can be advantageous similarly to transform the response variable towards normality.
 
@@ -916,13 +953,13 @@ selectTrans(data=Prestige, model=m.pres,
             predictors=c("income", "education", "women"),
             response="prestige", family="yjPower")
 ```
-`selectTrans()` also takes an optional `indices` argument, making it suitable for doing computations on a subset of the data (i.e., a CV fold), and hence for use with `cvSelect()` (see `?selectTrans` for details):
+`selectTrans()` also takes an optional `indices` argument, making it suitable for doing computations on a subset of the data (i.e., a CV fold), and hence for use with `cv()` (see `?selectTrans` for details):
 
 ```{r cv-select-transformations}
-cvs <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=1463,
-                predictors=c("income", "education", "women"),
-                response="prestige",
-                family="yjPower")
+cvs <- cv(selectTrans, data=Prestige, 
+          working.model=m.pres, seed=1463,
+          predictors=c("income", "education", "women"),
+          response="prestige", family="yjPower")
 cvs
 
 cv(m.pres, seed=1463) # untransformed model with same folds
@@ -938,7 +975,7 @@ The results suggest that the predictive power of the transformed regression is r
 
 As we mentioned, @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"] explain that honest cross-validation has to take account of model specification and selection. Statistical modeling is at least partly a craft, and one could imagine applying that craft to successive partial data sets, each with a fold removed. The resulting procedure would be tedious, though possibly worth the effort, but it would also be difficult to realize in practice: After all, we can hardly erase our memory of statistical modeling choices between analyzing partial data sets.
 
-Alternatively, if we're able to automate the process of model selection, then we can more realistically apply CV mechanically. That's what we did in the preceding two sections, first for predictor selection and then for selection of transformations in regression. In this section, we consider the case where we both select variable transformations and then proceed to select predictors. It's insufficient to apply these steps sequentially, first, for example, using `cvSelect()` with `selectTrans()` and then with `selectStepAIC()`; rather we should apply the whole model-selection procedure with each fold omitted. The `selectTransAndStepAIC()` function, also supplied by the **cv** package, does exactly that.
+Alternatively, if we're able to automate the process of model selection, then we can more realistically apply CV mechanically. That's what we did in the preceding two sections, first for predictor selection and then for selection of transformations in regression. In this section, we consider the case where we both select variable transformations and then proceed to select predictors. It's insufficient to apply these steps sequentially, first, for example, using `cv()` with `selectTrans()` and then with `selectStepAIC()`; rather we should apply the whole model-selection procedure with each fold omitted. The `selectTransAndStepAIC()` function, also supplied by the **cv** package, does exactly that.
 
 To illustrate this process, we return to the `Auto` data set:
 ```{r Auto-redux}
@@ -1046,12 +1083,12 @@ medAbsErr(Auto$mpg, exp(fitted(m.step)))
 medAbsErr(Auto$mpg, fitted(m.auto))
 ```
 
-Now let's use `cvSelect()` with `selectTransAndStepAIC()` to automate and cross-validate the whole model-specification process:
+Now let's use `cv()` with `selectTransAndStepAIC()` to automate and cross-validate the whole model-specification process:
 ```{r Auto-transform-and-select}
 num.predictors
-cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
-                predictors=num.predictors,
-                response="mpg", AIC=FALSE, criterion=medAbsErr)
+cvs <- cv(selectTransStepAIC, data=Auto, seed=76692, 
+          working.model=m.auto, predictors=num.predictors,
+          response="mpg", AIC=FALSE, criterion=medAbsErr)
 cvs
 
 compareFolds(cvs)
@@ -1072,16 +1109,16 @@ The CV functions in the **cv** package are all capable of performing parallel co
 
 To illustrate, let's time model selection in Mroz's logistic regression, repeating the computation as performed previously and then doing it in parallel using 2 cores:
 ```{r parallel-computation}
-system.time(m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
+system.time(m.mroz.sel.cv <- cv(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
-                          model=m.mroz,
+                          working.model=m.mroz,
                           AIC=FALSE))
 
-system.time(m.mroz.sel.cv.p <- cvSelect(selectStepAIC, Mroz,
+system.time(m.mroz.sel.cv.p <- cv(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
-                          model=m.mroz,
+                          working.model=m.mroz,
                           AIC=FALSE,
                           ncores=2))
 all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)

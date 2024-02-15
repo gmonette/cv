@@ -85,8 +85,9 @@ cv(m.auto, k="loo", method="Woodbury")
 
 ## ----polyomial-models---------------------------------------------------------
 for (p in 1:10){
-  assign(paste0("m.", p),
-         lm(mpg ~ poly(horsepower, p), data=Auto))
+  command <- paste0("m.", p, "<- lm(mpg ~ poly(horsepower, ", p,
+                    "), data=Auto)")
+  eval(parse(text=command))
 }
 objects(pattern="m\\.[0-9]")
 summary(m.2) # for example, the quadratic fit
@@ -383,6 +384,28 @@ cv(m.select, seed=2529)
 ## ----compare-selected-models--------------------------------------------------
 compareFolds(cv.select)
 
+## ----polynomial-regression-CV-graph-duplicated, echo=FALSE--------------------
+cv.mse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
+cv.mse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
+plot(c(1, 10), range(cv.mse.10, cv.mse.loo), type="n",
+     xlab="Degree of polynomial, p",
+     ylab="Cross-Validated MSE")
+lines(1:10, cv.mse.10, lwd=2, lty=1, col=2, pch=16, type="b")
+lines(1:10, cv.mse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
+legend("topright", inset=0.02,
+       legend=c("10-Fold CV", "LOO CV"),
+       lwd=2, lty=2:1, col=3:2, pch=17:16)
+
+## ----nested-CV-polynomials----------------------------------------------------
+nestedCV.auto <- cv(selectModelList, Auto,
+                    working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                        m.6, m.7, m.8, m.9, m.10),
+                    save.model=TRUE,
+                    seed=2120)
+nestedCV.auto
+nestedCV.auto$selected.model
+cv(m.7, seed=2120) # same seed for same folds
+
 ## ----recall-Mroz-regression---------------------------------------------------
 summary(m.mroz)
 
@@ -397,11 +420,11 @@ BayesRule(Mroz$lfp == "yes",
 cv(m.mroz.sel, criterion=BayesRule, seed=345266)
 
 ## ----cv-mroz-selection--------------------------------------------------------
-m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz, 
-                          seed=6681,
-                          criterion=BayesRule,
-                          model=m.mroz,
-                          AIC=FALSE)
+m.mroz.sel.cv <- cv(selectStepAIC, Mroz, 
+                    seed=6681,
+                    criterion=BayesRule,
+                    working.model=m.mroz,
+                    AIC=FALSE)
 m.mroz.sel.cv
 
 ## ----compare-selected-models-mroz---------------------------------------------
@@ -455,10 +478,10 @@ selectTrans(data=Prestige, model=m.pres,
             response="prestige", family="yjPower")
 
 ## ----cv-select-transformations------------------------------------------------
-cvs <- cvSelect(selectTrans, data=Prestige, model=m.pres, seed=1463,
-                predictors=c("income", "education", "women"),
-                response="prestige",
-                family="yjPower")
+cvs <- cv(selectTrans, data=Prestige, 
+          working.model=m.pres, seed=1463,
+          predictors=c("income", "education", "women"),
+          response="prestige", family="yjPower")
 cvs
 
 cv(m.pres, seed=1463) # untransformed model with same folds
@@ -540,24 +563,24 @@ medAbsErr(Auto$mpg, fitted(m.auto))
 
 ## ----Auto-transform-and-select------------------------------------------------
 num.predictors
-cvs <- cvSelect(selectTransStepAIC, data=Auto, seed=76692, model=m.auto,
-                predictors=num.predictors,
-                response="mpg", AIC=FALSE, criterion=medAbsErr)
+cvs <- cv(selectTransStepAIC, data=Auto, seed=76692, 
+          working.model=m.auto, predictors=num.predictors,
+          response="mpg", AIC=FALSE, criterion=medAbsErr)
 cvs
 
 compareFolds(cvs)
 
 ## ----parallel-computation-----------------------------------------------------
-system.time(m.mroz.sel.cv <- cvSelect(selectStepAIC, Mroz,
+system.time(m.mroz.sel.cv <- cv(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
-                          model=m.mroz,
+                          working.model=m.mroz,
                           AIC=FALSE))
 
-system.time(m.mroz.sel.cv.p <- cvSelect(selectStepAIC, Mroz,
+system.time(m.mroz.sel.cv.p <- cv(selectStepAIC, Mroz,
                           seed=6681,
                           criterion=BayesRule,
-                          model=m.mroz,
+                          working.model=m.mroz,
                           AIC=FALSE,
                           ncores=2))
 all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)

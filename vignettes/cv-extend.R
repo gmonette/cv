@@ -217,7 +217,7 @@ selectSubsets <- function(data=insight::get_data(model),
     fit.all <- predict(m.best, newdata=data)
     return(list(
       criterion = criterion(y, fit.all),
-      model = if (save.model) m.best else NULL
+      model = if (save.model) m.best else NULL # return best model
       ))
   }
 

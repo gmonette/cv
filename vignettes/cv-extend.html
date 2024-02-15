@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-02-14" />
+<meta name="date" content="2024-02-15" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-02-14</h4>
+<h4 class="date">2024-02-15</h4>
 
 
 
@@ -476,7 +476,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x125b65270&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x10ebb8240&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -1091,9 +1091,9 @@ Selecting the best model of each size.
 </div>
 <p>The graph, produced by the <code>subsets()</code> function in the
 <strong>car</strong> package, shows that the model with the smallest BIC
-is the best model with 4 predictors, including <code>Agriculture</code>,
-<code>Education</code>, <code>Catholic</code>, and
-<code>Infant.Mortality</code>, but not <code>Examination</code>:</p>
+is the “best” model with 4 predictors, including
+<code>Agriculture</code>, <code>Education</code>, <code>Catholic</code>,
+and <code>Infant.Mortality</code>, but not <code>Examination</code>:</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>m.best <span class="ot">&lt;-</span> <span class="fu">update</span>(m.swiss, . <span class="sc">~</span> . <span class="sc">-</span> Examination)</span>
 <span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="fu">summary</span>(m.best)</span>
 <span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="co">#&gt; </span></span>
@@ -1162,7 +1162,7 @@ model-selection process:</p>
 <span id="cb26-26"><a href="#cb26-26" tabindex="-1"></a>    fit.all <span class="ot">&lt;-</span> <span class="fu">predict</span>(m.best, <span class="at">newdata=</span>data)</span>
 <span id="cb26-27"><a href="#cb26-27" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">list</span>(</span>
 <span id="cb26-28"><a href="#cb26-28" tabindex="-1"></a>      <span class="at">criterion =</span> <span class="fu">criterion</span>(y, fit.all),</span>
-<span id="cb26-29"><a href="#cb26-29" tabindex="-1"></a>      <span class="at">model =</span> <span class="cf">if</span> (save.model) m.best <span class="cf">else</span> <span class="cn">NULL</span></span>
+<span id="cb26-29"><a href="#cb26-29" tabindex="-1"></a>      <span class="at">model =</span> <span class="cf">if</span> (save.model) m.best <span class="cf">else</span> <span class="cn">NULL</span> <span class="co"># return best model</span></span>
 <span id="cb26-30"><a href="#cb26-30" tabindex="-1"></a>      ))</span>
 <span id="cb26-31"><a href="#cb26-31" tabindex="-1"></a>  }</span>
 <span id="cb26-32"><a href="#cb26-32" tabindex="-1"></a></span>

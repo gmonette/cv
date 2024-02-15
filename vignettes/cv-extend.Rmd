@@ -343,7 +343,7 @@ which.min(bics)
 
 car::subsets(swiss.sub, legend="topright")
 ```
-The graph, produced by the `subsets()` function in the **car** package, shows that the model with the smallest BIC is the best model with 4 predictors, including `Agriculture`, `Education`, `Catholic`, and `Infant.Mortality`, but not `Examination`:
+The graph, produced by the `subsets()` function in the **car** package, shows that the model with the smallest BIC is the "best" model with 4 predictors, including `Agriculture`, `Education`, `Catholic`, and `Infant.Mortality`, but not `Examination`:
 ```{r best-model}
 m.best <- update(m.swiss, . ~ . - Examination)
 summary(m.best)
@@ -382,7 +382,7 @@ selectSubsets <- function(data=insight::get_data(model),
     fit.all <- predict(m.best, newdata=data)
     return(list(
       criterion = criterion(y, fit.all),
-      model = if (save.model) m.best else NULL
+      model = if (save.model) m.best else NULL # return best model
       ))
   }
 
