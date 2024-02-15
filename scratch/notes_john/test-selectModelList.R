@@ -37,3 +37,21 @@ res
 unclass(res)
 cv(m.7, seed=2120)
 
+res.par <- cv(selectModelList, Auto,
+              working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                   m.6, m.7, m.8, m.9, m.10),
+              save.model=TRUE,
+              seed=2120,
+              ncores=2)
+
+all.equal(res, res.par)
+res
+res.par
+
+res.repl <- cv(selectModelList, Auto,
+              working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                   m.6, m.7, m.8, m.9, m.10),
+              save.model=TRUE,
+              seed=2120,
+              reps=5)
+res.repl

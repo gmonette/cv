@@ -787,6 +787,11 @@ cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
                         details = k <= 10,
                         save.model=FALSE,
                         ncores = 1, ...){
+  if (ncores > 1 && deparse(substitute(model)) == "selectModelList"){
+    ncores <- 1
+    warning("ncores > 1 not supported for selectModelList()",
+            "\n  ncores set to 1")
+  }
   n <- nrow(data)
   cvSelect(procedure=model,
            data=data,
