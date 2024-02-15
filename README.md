@@ -16,13 +16,15 @@ The **cv** package for R provides a consistent and extensible framework for cros
 
 -   `mse()` (mean-squared error), `rmse()` (root-mean-squared error), `medAbsErr()` (median absolute error), and `BayesRule()` are cross-validation criteria ("cost functions"), suitable for use with `cv()`.
 
--   `cvSelect()` cross-validates a selection procedure for a regression model. `cvSelect()` also supports parallel computations.
+-   `cv()` also can cross-validate a selection procedure (such as the following) for a regression model:
 
--   `selectStepAIC()` is a model-selection procedure, suitable for use with `cvSelect()`, based on the `stepAIC()` function in the **MASS** package.
+    - `cvModelList()` employs CV to select a model from among a number of candidates, and then cross-validates this model-selection procedure.
 
--   `selectTrans()` is a procedure for selecting predictor and response transformations in regression, suitable for use with `cvSelect()`, based on the `powerTransform()` function in the **car** package.
+    -   `selectStepAIC()` is a predictor-selection procedure based on the `stepAIC()` function in the **MASS** package.
 
--   `selectTransStepAIC()` is a procedure also suitable for use with `cvSelect()`,  that first selects predictor and response transformations and then selects predictors.
+    -   `selectTrans()` is a procedure for selecting predictor and response transformations in regression, based on the `powerTransform()` function in the **car** package.
+
+    -   `selectTransStepAIC()` is a procedure that first selects predictor and response transformations and then selects predictors.
 
 For additional information on using the **cv** package, see the "[Cross-validation of regression models](https://gmonette.github.io/cv/articles/cv.html)" vignette (`vignette("cv", package="cv")`). The **cv** package is designed to be extensible to other classes of regression models, other CV criteria, and other model-selection procedures; for details, see the "[Extending the cv package](https://gmonette.github.io/cv/articles/cv-extend.html)" vignette (`vignette("cv-extend", package="cv")`).
 
