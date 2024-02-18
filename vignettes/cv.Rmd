@@ -798,7 +798,7 @@ Also by default, when the number of folds is 10 or fewer, `cv()` saves details d
 compareFolds(cv.select)
 ```
 
-### Polynomial regression for the Auto data revisited
+### Polynomial regression for the Auto data revisited: recursive cross-validation
 
 Previously, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of `mpg` to `horsepower` for the `Auto` data, saving the results in `m.1` through `m.10`. We then used `cv()` to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin); repeating the relevant graph: 
 ```{r polynomial-regression-CV-graph-duplicated, echo=FALSE}
@@ -817,20 +817,32 @@ legend("topright", inset=0.02,
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 ```
 
-If we then select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
+If we then select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
 
 Applying `selectModelList()` to the `Auto` polynomial-regression models, and using 10-fold CV, we obtain:
-```{r nested-CV-polynomials}
-nestedCV.auto <- cv(selectModelList, Auto,
-                    working.model=models(m.1, m.2, m.3, m.4, m.5,
-                                        m.6, m.7, m.8, m.9, m.10),
-                    save.model=TRUE,
-                    seed=2120)
-nestedCV.auto
-nestedCV.auto$selected.model
+```{r recursive-CV-polynomials}
+recursiveCV.auto <- cv(selectModelList, Auto,
+                       working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                            m.6, m.7, m.8, m.9, m.10),
+                       save.model=TRUE,
+                       seed=2120)
+recursiveCV.auto
+recursiveCV.auto$selected.model
 cv(m.7, seed=2120) # same seed for same folds
 ```
-As expected, nested CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model.
+As expected, recursive CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model.
+
+We can equivalently call `cv()` with the list of models as the first argument and set `recursive=TRUE`:
+```{r recursive-cv-alt}
+recursiveCV.auto.alt <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                                  m.6, m.7, m.8, m.9, m.10),
+                           data=Auto,
+                           seed=2120,
+                           recursive=TRUE,
+                           save.model=TRUE)
+all.equal(recursiveCV.auto, recursiveCV.auto.alt)
+```
+
 
 ### Mroz's logistic regression revisited
 

@@ -19,6 +19,11 @@
 #' @param seed (optional) seed for R's pseudo-random-number generator,
 #' to be used to create the same set of CV folds for all of the models;
 #' if omitted, a seed will be randomly generated and saved.
+#' @param recursive if \code{TRUE} (the default is \code{FALSE}), cross-validation
+#' is performed recursively to select a "best" model deleting each fold in turn
+#' by calculating the CV estimate of the criterion for the remaining folds;
+#' this is equivalent to employing the \code{\link{selectModelList}()} model-selection
+#' procedure.
 #' @param quietly if \code{TRUE} (the default), simple messages (for example about the
 #' value to which the random-number generator seed is set), but not warnings or
 #' errors, are suppressed.
@@ -53,8 +58,10 @@
 #' element of the color palette; see \code{\link{palette}()}.
 #' @param lwd line width for the line (defaults to 2).
 #' @return \code{models()} returns a \code{"modList"} object, the
-#' \code{cv()} method for which returns a \code{"cvModList"} object.
-#' @seealso \code{\link{cv}}, \code{\link{cvMixed}}.
+#' \code{cv()} method for which returns a \code{"cvModList"} object,
+#' or, when \code{recursive=TRUE}, and object of class \code{c("cvSelect", "cv")}.
+#' @seealso \code{\link{cv}}, \code{\link{cvMixed}},
+#' \code{\link{selectModelList}}.
 #' @examples
 #' data("Duncan", package="carData")
 #' m1 <- lm(prestige ~ income + education, data=Duncan)
@@ -67,6 +74,10 @@
 #'                     data=Duncan, seed=5962, confint=TRUE, level=0.50))
 #'                  # nb: n too small for accurate CIs
 #' plot(cv.models.ci)
+#' (cv.models.recursive <- cv(models(m1=m1, m2=m2, m3=m3),
+#'                            data=Duncan, seed=5962,
+#'                            recursive=TRUE, save.model=TRUE))
+#' cv.models.recursive$selected.model
 #' @describeIn models create a list of models
 #' @export
 models <- function(...){
@@ -99,9 +110,16 @@ models <- function(...){
 
 #' @describeIn models \code{cv()} method for \code{"modList"} objects
 #' @exportS3Method
-cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE, ...){
-  n.models <- length(model)
+cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE,
+                       recursive=FALSE, ...){
   if (missing(seed)) seed <- sample(1e6, 1L)
+  if (recursive){
+    if (missing(k)) k <- 10
+    if (missing(data)) data <- insight::get_data(model[[1]])
+    return(cv(selectModelList, data=data, criterion=criterion, k=k, reps=reps,
+       seed=seed, working.model=model, ...))
+  }
+  n.models <- length(model)
   result <- vector(n.models, mode="list")
   names(result) <- names(model)
   class(result) <- "cvModList"

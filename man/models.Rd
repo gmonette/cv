@@ -9,7 +9,17 @@
 \usage{
 models(...)
 
-\method{cv}{modList}(model, data, criterion = mse, k, reps = 1, seed, quietly = TRUE, ...)
+\method{cv}{modList}(
+  model,
+  data,
+  criterion = mse,
+  k,
+  reps = 1,
+  seed,
+  quietly = TRUE,
+  recursive = FALSE,
+  ...
+)
 
 \method{print}{cvModList}(x, ...)
 
@@ -60,6 +70,12 @@ if omitted, a seed will be randomly generated and saved.}
 value to which the random-number generator seed is set), but not warnings or
 errors, are suppressed.}
 
+\item{recursive}{if \code{TRUE} (the default is \code{FALSE}), cross-validation
+is performed recursively to select a "best" model deleting each fold in turn
+by calculating the CV estimate of the criterion for the remaining folds;
+this is equivalent to employing the \code{\link{selectModelList}()} model-selection
+procedure.}
+
 \item{x}{an object of class \code{"cvModList"} to be printed or plotted.}
 
 \item{y}{the name of the element in each \code{"cv"} object to be
@@ -95,7 +111,8 @@ element of the color palette; see \code{\link{palette}()}.}
 }
 \value{
 \code{models()} returns a \code{"modList"} object, the
-\code{cv()} method for which returns a \code{"cvModList"} object.
+\code{cv()} method for which returns a \code{"cvModList"} object,
+or, when \code{recursive=TRUE}, and object of class \code{c("cvSelect", "cv")}.
 }
 \description{
 A \code{\link{cv}()} method for an object of class  \code{"modlist"},
@@ -129,7 +146,12 @@ plot(cv.models)
                     data=Duncan, seed=5962, confint=TRUE, level=0.50))
                  # nb: n too small for accurate CIs
 plot(cv.models.ci)
+(cv.models.recursive <- cv(models(m1=m1, m2=m2, m3=m3),
+                           data=Duncan, seed=5962,
+                           recursive=TRUE, save.model=TRUE))
+cv.models.recursive$selected.model
 }
 \seealso{
-\code{\link{cv}}, \code{\link{cvMixed}}.
+\code{\link{cv}}, \code{\link{cvMixed}},
+\code{\link{selectModelList}}.
 }

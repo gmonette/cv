@@ -37,6 +37,16 @@ res
 unclass(res)
 cv(m.7, seed=2120)
 
+res.alt <- cv(models(m.1, m.2, m.3, m.4, m.5,
+          m.6, m.7, m.8, m.9, m.10),
+   data=Auto,
+   seed=2120,
+   recursive=TRUE,
+   save.model=TRUE)
+res.alt$selected.model
+res.alt
+all.equal(res, res.alt)
+
 res.par <- cv(selectModelList, Auto,
               working.model=models(m.1, m.2, m.3, m.4, m.5,
                                    m.6, m.7, m.8, m.9, m.10),

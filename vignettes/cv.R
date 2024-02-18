@@ -396,15 +396,24 @@ legend("topright", inset=0.02,
        legend=c("10-Fold CV", "LOO CV"),
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 
-## ----nested-CV-polynomials----------------------------------------------------
-nestedCV.auto <- cv(selectModelList, Auto,
-                    working.model=models(m.1, m.2, m.3, m.4, m.5,
-                                        m.6, m.7, m.8, m.9, m.10),
-                    save.model=TRUE,
-                    seed=2120)
-nestedCV.auto
-nestedCV.auto$selected.model
+## ----recursive-CV-polynomials-------------------------------------------------
+recursiveCV.auto <- cv(selectModelList, Auto,
+                       working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                            m.6, m.7, m.8, m.9, m.10),
+                       save.model=TRUE,
+                       seed=2120)
+recursiveCV.auto
+recursiveCV.auto$selected.model
 cv(m.7, seed=2120) # same seed for same folds
+
+## ----recursive-cv-alt---------------------------------------------------------
+recursiveCV.auto.alt <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                                  m.6, m.7, m.8, m.9, m.10),
+                           data=Auto,
+                           seed=2120,
+                           recursive=TRUE,
+                           save.model=TRUE)
+all.equal(recursiveCV.auto, recursiveCV.auto.alt)
 
 ## ----recall-Mroz-regression---------------------------------------------------
 summary(m.mroz)
