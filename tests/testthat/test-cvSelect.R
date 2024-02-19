@@ -1,7 +1,7 @@
 ## The tests in this file run only if the environment variable
 ##   RUN_ALL_CV_TESTS is set to true, in which case the tests create
-##   three data sets in the global environment, Auto, Cara, and
-##   Caravan.
+##   three data sets in the global environment, Auto, Cara,
+##   Caravan, and Prestige.
 
 if (Sys.getenv("RUN_ALL_CV_TESTS") == "true"){
 
@@ -78,4 +78,43 @@ test_that("cvSelect parallel glm", {
   )
 })
 
+data("Prestige", package="carData")
+m.pres <- lm(prestige ~ income + education + women, data=Prestige)
+
+test_that("cvSelect parallel selectTrans", {
+  expect_equal(
+    cv(selectTrans, data=Prestige,
+       working.model=m.pres, seed=1463,
+       predictors=c("income", "education", "women"),
+       response="prestige", family="yjPower"),
+    cv(selectTrans, data=Prestige,
+       working.model=m.pres, seed=1463,
+       predictors=c("income", "education", "women"),
+       response="prestige", family="yjPower",
+       ncores=2)
+  )
+})
+
+data("Auto", package="ISLR2")
+Auto$cylinders <- factor(Auto$cylinders,
+                         labels=c("3.4", "3.4", "5.6", "5.6", "8"))
+Auto$year <- as.factor(Auto$year)
+Auto$origin <- factor(Auto$origin,
+                      labels=c("America", "Europe", "Japan"))
+rownames(Auto) <- make.names(Auto$name, unique=TRUE)
+Auto$name <- NULL
+m.auto <- lm(mpg ~ ., data = Auto)
+num.predictors <- c("displacement", "horsepower", "weight", "acceleration")
+
+test_that("cvSelect parallel selectTransStepAIC", {
+  expect_equal(
+    cv(selectTransStepAIC, data=Auto, seed=76692,
+       working.model=m.auto, predictors=num.predictors,
+       response="mpg", AIC=FALSE, criterion=medAbsErr),
+    cv(selectTransStepAIC, data=Auto, seed=76692,
+       working.model=m.auto, predictors=num.predictors,
+       response="mpg", AIC=FALSE, criterion=medAbsErr,
+       ncores=2)
+  )
+})
 }

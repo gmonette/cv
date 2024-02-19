@@ -115,3 +115,21 @@ if (require(boot)){
                  as.vector(unlist(cv(m.caravan, k="loo", criterion=mse)[1:2])))
   })
 }
+
+# test that parallel computations work on model list
+
+if (Sys.getenv("RUN_ALL_CV_TESTS") == "true"){
+
+data("Duncan", package="carData")
+m1 <- lm(prestige ~ income + education, data=Duncan)
+m2 <- lm(prestige ~ income + education + type, data=Duncan)
+m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
+
+test_that("parallel computations work for cv.modList()", {
+  expect_equal(cv(models(m1=m1, m2=m2, m3=m3),
+                  data=Duncan, seed=7949),
+               cv(models(m1=m1, m2=m2, m3=m3),
+                  data=Duncan, seed=7949, ncores=2))
+})
+
+}
