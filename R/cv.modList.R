@@ -115,6 +115,7 @@ cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE
   if (missing(seed)) seed <- sample(1e6, 1L)
   if (recursive){
     if (missing(k)) k <- 10
+    if (k == "loo" || k == "n") seed <- NULL
     if (missing(data)) data <- insight::get_data(model[[1]])
     return(cv(selectModelList, data=data, criterion=criterion, k=k, reps=reps,
        seed=seed, working.model=model, ...))

@@ -65,3 +65,70 @@ res.repl <- cv(selectModelList, Auto,
               seed=2120,
               reps=5)
 res.repl
+
+res <- cv(selectModelList, Auto,
+          working.model=models(m.1, m.2, m.3, m.4, m.5,
+                               m.6, m.7, m.8, m.9, m.10),
+          save.model=TRUE,
+          seed=2120)
+res
+
+res10 <- cv(selectModelList, Auto, k=10,
+          working.model=models(m.1, m.2, m.3, m.4, m.5,
+                               m.6, m.7, m.8, m.9, m.10),
+          save.model=TRUE,
+          seed=2120)
+res10
+all.equal(res, res10)
+
+res10.10 <- cv(selectModelList, Auto, k=10, k.recurse=10,
+            working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                 m.6, m.7, m.8, m.9, m.10),
+            save.model=TRUE,
+            seed=2120)
+res10.10
+all.equal(res, res10.10)
+
+res.cv.10 <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                       m.6, m.7, m.8, m.9, m.10),
+                Auto, k=10,
+                recursive=TRUE,
+                save.model=TRUE,
+                seed=2120)
+all.equal(res, res.cv.10)
+
+res.loo <- cv(selectModelList, Auto, k="loo",
+               working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                    m.6, m.7, m.8, m.9, m.10),
+               save.model=TRUE)
+res.loo
+
+res.loo.loo <- cv(selectModelList, Auto, k="loo", k.recurse="loo",
+              working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                   m.6, m.7, m.8, m.9, m.10),
+              save.model=TRUE)
+all.equal(res.loo, res.loo.loo)
+
+res.cv.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                        m.6, m.7, m.8, m.9, m.10),
+                 recursive=TRUE,
+                 k="loo",
+                 save.model=TRUE)
+all.equal(res.loo, res.cv.loo)
+
+
+res.10.loo <- cv(selectModelList, Auto, k=10, k.recurse="loo",
+              working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                   m.6, m.7, m.8, m.9, m.10),
+              save.model=TRUE,
+              seed=123)
+res.10.loo
+
+res.cv.10.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                        m.6, m.7, m.8, m.9, m.10),
+                 recursive=TRUE,
+                 k=10, k.recurse="loo",
+                 save.model=TRUE,
+                 seed=123)
+all.equal(res.10.loo, res.cv.10.loo)
+

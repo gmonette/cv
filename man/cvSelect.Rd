@@ -77,6 +77,7 @@ selectModelList(
   model,
   criterion = mse,
   k = 10,
+  k.recurse = k,
   details = k <= 10,
   save.model = FALSE,
   quietly = TRUE,
@@ -179,6 +180,10 @@ with \code{"bcPower"} as the default.}
 
 \item{rounded}{if \code{TRUE} (the default) use nicely rounded versions
 of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).}
+
+\item{k.recurse}{the number of folds for the recursive CVs; defaults
+to the value of \code{k}; may be specified as \code{"loo"} or
+\code{"n"} as well as an integer.}
 
 \item{quietly}{if \code{TRUE} (the default), simple messages (for example about the
 value to which the random-number generator seed is set), but not warnings or

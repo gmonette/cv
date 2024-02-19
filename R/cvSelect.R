@@ -99,6 +99,7 @@ cvSelect <- function(procedure, data, criterion=mse,
                      details = k <= 10,
                      save.model=FALSE,
                      seed, ncores=1, ...){
+  selectModelListP <- isTRUE(all.equal(procedure, selectModelList))
   if (!missing(save.coef)) details <- save.coef
   n <- nrow(data)
   y <- if (!missing(model)) {
@@ -107,6 +108,7 @@ cvSelect <- function(procedure, data, criterion=mse,
       eval(y.expression, envir=data)
     }
   if (missing(model)) model <- NULL
+  k.save <- k
   if (is.character(k)){
     if (k == "n" || k == "loo") {
       k <- n
@@ -194,10 +196,19 @@ cvSelect <- function(procedure, data, criterion=mse,
  #   coefs <- vector(k, mode="list")
     for (i in 1L:k){
       indices.i <- indices[starts[i]:ends[i]]
-      selection <- procedure(data, indices.i,
+      selection <- if(selectModelListP){
+        procedure(data, indices.i,
                              # save.coef=save.coef,
                              details = k <= 10,
-                             criterion=criterion, model=model, ...)
+                             criterion=criterion, model=model,
+                             k=k.save, ...)
+      } else {
+        procedure(data, indices.i,
+                  # save.coef=save.coef,
+                  details = k <= 10,
+                  criterion=criterion, model=model,
+                  ...)
+      }
       crit.all.i[i] <- selection$crit.all.i
       yhat[indices.i] <- selection$fit.i
 #      if (save.coef) coefs[[i]] <- selection$coefficients
@@ -212,10 +223,18 @@ cvSelect <- function(procedure, data, criterion=mse,
     }
   }
   cv <- criterion(y, yhat)
-  result.full <- procedure(data, model=model, criterion=criterion,
+  result.full <- if (selectModelListP){
+    procedure(data, model=model, criterion=criterion,
                        seed = seed, # to use same folds if necessary
                        save.model=save.model,
+                       k=k.save,
                        ...)
+  } else {
+    procedure(data, model=model, criterion=criterion,
+              seed = seed, # to use same folds if necessary
+              save.model=save.model,
+              ...)
+  }
   if (is.list(result.full)){
     cv.full <- result.full$criterion
     selected.model <- result.full$model
@@ -698,14 +717,17 @@ selectTransStepAIC <- function(data,
 #' @param quietly if \code{TRUE} (the default), simple messages (for example about the
 #' value to which the random-number generator seed is set), but not warnings or
 #' errors, are suppressed.
+#' @param k.recurse the number of folds for the recursive CVs; defaults
+#' to the value of \code{k}; may be specified as \code{"loo"} or
+#' \code{"n"} as well as an integer.
 #' @export
-selectModelList <- function(data, indices, model, criterion=mse, k=10,
+selectModelList <- function(data, indices, model, criterion=mse, k=10, k.recurse=k,
                             details =  k <= 10, save.model=FALSE,
                             quietly=TRUE, seed, ...){
   if (missing(indices)) {
     if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
     set.seed(seed)
-    result <- cv(model, data, criterion=criterion, k=k, details=FALSE,
+    result <- cv(model, data, criterion=criterion, k=k.recurse, details=FALSE,
                  quietly=quietly, ...)
     cv.min <- which.min(sapply(result, function(x) x$"CV crit"))
     return(list(
@@ -718,7 +740,7 @@ selectModelList <- function(data, indices, model, criterion=mse, k=10,
     mod <- model[[i]]
     model[[i]] <- update(mod, data=data[-indices, ])
   }
-  result <- cv(model, data[-indices, ], criterion=criterion, k=k, details=details, quietly=quietly, ...)
+  result <- cv(model, data[-indices, ], criterion=criterion, k=k.recurse, details=details, quietly=quietly, ...)
   cv.min <- which.min(sapply(result, function(x) x$"CV crit"))
   model.name <- names(result)[cv.min]
   fit.all.i <- predict(model[[cv.min]], newdata=data, type="response")
