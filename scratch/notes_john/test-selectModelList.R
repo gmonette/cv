@@ -163,3 +163,19 @@ system.time(res.par.loo <- cv(selectModelList, Auto, k="loo",
               save.model=TRUE,
               ncores=2))
 all.equal(res.loo, res.par.loo)
+
+
+system.time(res.cv.10.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                           m.6, m.7, m.8, m.9, m.10),
+                    recursive=TRUE,
+                    k=10, k.recurse="loo",
+                    save.model=TRUE,
+                    seed=123))
+system.time(res.cv.10.loo.par <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                           m.6, m.7, m.8, m.9, m.10),
+                    recursive=TRUE,
+                    k=10, k.recurse="loo",
+                    save.model=TRUE,
+                    seed=123,
+                    ncores=2))
+all.equal(res.cv.10.loo, res.cv.10.loo.par)

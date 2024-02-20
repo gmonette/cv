@@ -2,7 +2,7 @@
 
 - New cv.function() method meant to replace cvSelect(), which is deprecated.
 
-- New selectModelList() to be used with cv.function() (or with cvSelect()), which selected a model by CV and hence implements a version of nested CV. The same procedure is also implemented by setting recursive=TRUE in a call to cv.modList().
+- New selectModelList() to be used with cv.function() (or with cvSelect()). selectModelList() implements recursive cross-validation, where the fit of a model selected by CV is assessed by CV. The same procedure is also available by setting recursive=TRUE in a call to cv.modList().
 
 - cv.default() and other cv() methods acquire a details argument, which if TRUE includes information about the folds in the returned object.
 
