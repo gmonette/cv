@@ -37,6 +37,9 @@
 #' @param save.model save the model that's selected using the \emph{full} data set.
 #' @param reps number of times to replicate k-fold CV (default is \code{1})
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
+#' If not explicitly set, a seed is randomly generated and saved to make the results
+#' reproducible. In some cases, for internal use only, \code{seed} is set to
+#' \code{FALSE} to suppress automatically setting the seed.
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel)
 #' @param ... for \code{cvSelect()} and the \code{cv()} \code{"function"} method,
@@ -125,7 +128,7 @@ cvSelect <- function(procedure, data, criterion=mse,
     if (reps > 1) stop("reps should not be > 1 for n-fold CV")
     if (k == n){
       if (reps > 1) stop("reps should not be > 1 for n-fold CV")
-      if (!missing(seed) && !is.null(seed)) message("Note: seed ignored for n-fold CV")
+      if (!missing(seed) && !is.null(seed) && !isFALSE(seed)) message("Note: seed ignored for n-fold CV")
       seed <- NULL
     }
     seed <- NULL
@@ -165,6 +168,7 @@ cvSelect <- function(procedure, data, criterion=mse,
                       details = k <= 10,
                       criterion=criterion, model=model),
                  list(...))
+    if (selectModelListP) arglist <- c(arglist, list(k=k.save))
     selection <- foreach(i = 1L:k) %dopar% {
       # the following deals with a scoping issue that can
       #   occur with args passed via ...
@@ -181,37 +185,28 @@ cvSelect <- function(procedure, data, criterion=mse,
         crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
                                yhat[indices[starts[i]:ends[i]]])
         coef.i[[i]] <- selection[[i]]$coefficients
-        model.name.i[[i]] <- if (!is.null(selection$model.name)) selection$model.name else ""
+        model.name.i[[i]] <- if (!is.null(selection[[i]]$model.name)) selection[[i]]$model.name else ""
       }
 
     }
 
-    # coefs <- if (save.coef){
-    #   lapply(selection, function(x) x$coefficients)
-    # } else {
-    #   NULL
-    # }
-
   } else {
- #   coefs <- vector(k, mode="list")
+
     for (i in 1L:k){
       indices.i <- indices[starts[i]:ends[i]]
       selection <- if(selectModelListP){
         procedure(data, indices.i,
-                             # save.coef=save.coef,
                              details = k <= 10,
                              criterion=criterion, model=model,
                              k=k.save, ...)
       } else {
         procedure(data, indices.i,
-                  # save.coef=save.coef,
                   details = k <= 10,
                   criterion=criterion, model=model,
                   ...)
       }
       crit.all.i[i] <- selection$crit.all.i
       yhat[indices.i] <- selection$fit.i
-#      if (save.coef) coefs[[i]] <- selection$coefficients
 
       if (details){
         crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
@@ -225,7 +220,7 @@ cvSelect <- function(procedure, data, criterion=mse,
   cv <- criterion(y, yhat)
   result.full <- if (selectModelListP){
     procedure(data, model=model, criterion=criterion,
-                       seed = seed, # to use same folds if necessary
+                    #   seed = seed, # to use same folds if necessary
                        save.model=save.model,
                        k=k.save,
                        ...)
@@ -255,12 +250,9 @@ cvSelect <- function(procedure, data, criterion=mse,
     ci <- NULL
   }
 
-  # adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
-
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
                  "confint" = ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 # coefficients = if (save.coef) coefs else NULL
                  "details" = list(criterion=crit.i,
                                   coefficients=coef.i,
                                   model.name=model.name.i),
@@ -722,13 +714,16 @@ selectTransStepAIC <- function(data,
 #' \code{"n"} as well as an integer.
 #' @export
 selectModelList <- function(data, indices, model, criterion=mse, k=10, k.recurse=k,
-                            details =  k <= 10, save.model=FALSE,
-                            quietly=TRUE, seed, ...){
+                            details =  k <= 10, save.model=FALSE, seed=FALSE,
+                            quietly=TRUE, ...){
   if (missing(indices)) {
-    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
-    set.seed(seed)
+    if ((!isFALSE(seed)) && is.null(seed)) {
+      seed <- sample(1e6, 1L)
+      set.seed(seed)
+      message("R RNG seed set to ", seed)
+    }
     result <- cv(model, data, criterion=criterion, k=k.recurse, details=FALSE,
-                 quietly=quietly, ...)
+                 quietly=quietly, seed=FALSE, ...)
     cv.min <- which.min(sapply(result, function(x) x$"CV crit"))
     return(list(
       criterion = result[[cv.min]][["CV crit"]],
@@ -740,7 +735,7 @@ selectModelList <- function(data, indices, model, criterion=mse, k=10, k.recurse
     mod <- model[[i]]
     model[[i]] <- update(mod, data=data[-indices, ])
   }
-  result <- cv(model, data[-indices, ], criterion=criterion, k=k.recurse, details=details, quietly=quietly, ...)
+  result <- cv(model, data[-indices, ], criterion=criterion, k=k.recurse, details=details, quietly=quietly, seed=FALSE, ...)
   cv.min <- which.min(sapply(result, function(x) x$"CV crit"))
   model.name <- names(result)[cv.min]
   fit.all.i <- predict(model[[cv.min]], newdata=data, type="response")
@@ -809,11 +804,7 @@ cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
                         details = k <= 10,
                         save.model=FALSE,
                         ncores = 1, ...){
-  if (ncores > 1 && deparse(substitute(model)) == "selectModelList"){
-    ncores <- 1
-    warning("ncores > 1 not supported for selectModelList()",
-            "\n  ncores set to 1")
-  }
+
   n <- nrow(data)
   cvSelect(procedure=model,
            data=data,
@@ -824,7 +815,6 @@ cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
            confint=confint,
            level=level,
            reps=reps,
-           # save.coef=save.coef,
            details = details,
            save.model = save.model,
            seed=seed,

@@ -157,4 +157,33 @@ test_that("cv(SelectModelList()) and cv.modList() produce same recursive CV/k-fo
        seed=123)
   )
 })
+
+test_that("recursive SelectModelList() works with parallel computation loo", {
+  expect_equal(
+    cv(selectModelList, Auto, k="loo",
+       working.model=models(m.1, m.2, m.3, m.4, m.5,
+                            m.6, m.7, m.8, m.9, m.10),
+       save.model=TRUE),
+    cv(selectModelList, Auto, k="loo",
+       working.model=models(m.1, m.2, m.3, m.4, m.5,
+                            m.6, m.7, m.8, m.9, m.10),
+       save.model=TRUE,
+       ncores=2)
+  )
+})
+
+test_that("recursive SelectModelList() works with parallel computation k-fold", {
+  expect_equal(
+    cv(selectModelList, Auto,
+       working.model=models(m.1, m.2, m.3, m.4, m.5,
+                            m.6, m.7, m.8, m.9, m.10),
+       save.model=TRUE),
+    cv(selectModelList, Auto,
+       working.model=models(m.1, m.2, m.3, m.4, m.5,
+                            m.6, m.7, m.8, m.9, m.10),
+       save.model=TRUE,
+       ncores=2)
+  )
+})
+
 }

@@ -112,13 +112,17 @@ models <- function(...){
 #' @exportS3Method
 cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE,
                        recursive=FALSE, ...){
-  if (missing(seed)) seed <- sample(1e6, 1L)
+  if (missing(seed) && !(k == "loo" || k == "n")) {
+    seed <- sample(1e6, 1L)
+    message("R RNG seed set to ", seed)
+  }
   if (recursive){
     if (missing(k)) k <- 10
     if (k == "loo" || k == "n") seed <- NULL
     if (missing(data)) data <- insight::get_data(model[[1]])
     return(cv(selectModelList, data=data, criterion=criterion, k=k, reps=reps,
-       seed=seed, working.model=model, ...))
+       seed=seed,
+       working.model=model, ...))
   }
   n.models <- length(model)
   result <- vector(n.models, mode="list")

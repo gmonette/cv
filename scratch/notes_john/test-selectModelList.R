@@ -1,3 +1,5 @@
+library(cv)
+
 debug(selectModelList)
 undebug(selectModelList)
 
@@ -132,3 +134,32 @@ res.cv.10.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
                  seed=123)
 all.equal(res.10.loo, res.cv.10.loo)
 
+
+system.time(res <- cv(selectModelList, Auto,
+          working.model=models(m.1, m.2, m.3, m.4, m.5,
+                               m.6, m.7, m.8, m.9, m.10),
+          save.model=TRUE,
+          seed=2120))
+res
+
+system.time(res.par <- cv(selectModelList, Auto,
+              working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                   m.6, m.7, m.8, m.9, m.10),
+              save.model=TRUE,
+              seed=2120,
+              ncores=2))
+all.equal(res, res.par)
+
+
+system.time(res.loo <- cv(selectModelList, Auto, k="loo",
+          working.model=models(m.1, m.2, m.3, m.4, m.5,
+                               m.6, m.7, m.8, m.9, m.10),
+          save.model=TRUE))
+res.loo
+
+system.time(res.par.loo <- cv(selectModelList, Auto, k="loo",
+              working.model=models(m.1, m.2, m.3, m.4, m.5,
+                                   m.6, m.7, m.8, m.9, m.10),
+              save.model=TRUE,
+              ncores=2))
+all.equal(res.loo, res.par.loo)

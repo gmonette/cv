@@ -80,8 +80,8 @@ selectModelList(
   k.recurse = k,
   details = k <= 10,
   save.model = FALSE,
+  seed = FALSE,
   quietly = TRUE,
-  seed,
   ...
 )
 
@@ -147,7 +147,10 @@ with that fold deleted; default is \code{TRUE} if \code{k} is 10 or smaller,
 
 \item{save.model}{save the model that's selected using the \emph{full} data set.}
 
-\item{seed}{for R's random number generator; not used for n-fold cross-validation.}
+\item{seed}{for R's random number generator; not used for n-fold cross-validation.
+If not explicitly set, a seed is randomly generated and saved to make the results
+reproducible. In some cases, for internal use only, \code{seed} is set to
+\code{FALSE} to suppress automatically setting the seed.}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}
