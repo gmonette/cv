@@ -117,4 +117,44 @@ test_that("cvSelect parallel selectTransStepAIC", {
        ncores=2)
   )
 })
+
+# test recursive CV
+
+data("Auto", package="ISLR2")
+for (p in 1:10){
+  command <- paste0("m.", p, "<- lm(mpg ~ poly(horsepower, ", p,
+                    "), data=Auto)")
+  eval(parse(text=command))
+}
+
+test_that("cv(SelectModelList()) and cv.modList() produce same recursive CV/k-LOO", {
+  expect_equal(
+    cv(selectModelList, Auto, k=10, k.recurse="loo",
+       working.model=models(m.1, m.2, m.3, m.4, m.5,
+                            m.6, m.7, m.8, m.9, m.10),
+       save.model=TRUE,
+       seed=123),
+    cv(models(m.1, m.2, m.3, m.4, m.5,
+              m.6, m.7, m.8, m.9, m.10),
+       recursive=TRUE,
+       k=10, k.recurse="loo",
+       save.model=TRUE,
+       seed=123)
+  )
+})
+
+test_that("cv(SelectModelList()) and cv.modList() produce same recursive CV/k-fold", {
+  expect_equal(
+    cv(selectModelList, Auto,
+       working.model=models(m.1, m.2, m.3, m.4, m.5,
+                            m.6, m.7, m.8, m.9, m.10),
+       save.model=TRUE,
+       seed=123),
+    cv(models(m.1, m.2, m.3, m.4, m.5,
+              m.6, m.7, m.8, m.9, m.10),
+       recursive=TRUE,
+       save.model=TRUE,
+       seed=123)
+  )
+})
 }
