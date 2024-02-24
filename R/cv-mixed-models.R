@@ -178,7 +178,6 @@ cvMixed <- function(model,
   }
 
   folds <- folds(n, k)
-  indices <- if (n > k) sample(n, n)  else 1:n # permute clusters/cases
   yhat <- if (is.factor(y)){
     factor(rep(NA, n), levels=levels(y))
   } else if (is.character(y)) {
