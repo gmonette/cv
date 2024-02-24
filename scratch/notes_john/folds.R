@@ -325,7 +325,7 @@ cv.lm2 <- function(model, data=insight::get_data(model),
   loss <- getLossFn(cv) # casewise loss function
   if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
-      weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+      weighted.mean(sapply(result, function(x) x$crit.all.i), folds$fold)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
     halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
     ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
@@ -361,10 +361,6 @@ cv.lm2 <- function(model, data=insight::get_data(model),
   }
 }
 
-
-
-
-ffs <- folds(102, 10)
 
 fold <- function(folds, ...) UseMethod("fold")
 

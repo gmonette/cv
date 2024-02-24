@@ -8,6 +8,10 @@
 \alias{cv.lm}
 \alias{cv.glm}
 \alias{cv.rlm}
+\alias{folds}
+\alias{fold}
+\alias{fold.folds}
+\alias{print.folds}
 \title{Cross-Validate Regression Models}
 \usage{
 cv(model, data, criterion, k, reps = 1, seed, ...)
@@ -64,6 +68,14 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 )
 
 \method{cv}{rlm}(model, data, criterion, k, reps = 1, seed, ...)
+
+folds(n, k)
+
+fold(folds, i, ...)
+
+\method{fold}{folds}(folds, i, ...)
+
+\method{print}{folds}(x, ...)
 }
 \arguments{
 \item{model}{a regression model object (see Details).}
@@ -77,7 +89,7 @@ where \code{y} is the observed values of the response and
 
 \item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
-cross-validation.}
+cross-validation; for \code{folds()}, \code{k} must be a number.}
 
 \item{reps}{number of times to replicate k-fold CV (default is \code{1}).}
 
@@ -118,6 +130,12 @@ default taken from the \code{"digits"} option}
 \item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 of the available options.}
+
+\item{n}{number of cases, for constructed folds.}
+
+\item{folds}{an object of class \code{"folds"}.}
+
+\item{i}{a fold number for an object of class \code{"folds"}.}
 }
 \value{
 The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
@@ -133,6 +151,8 @@ for the model with each fold deleted.  Some methods may return a
 subset of these components and may add additional information.
 If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
 which is literally a list of \code{"cv"} objects.
+\code{folds()} returns an object of class folds, for which
+there are \code{fold()} and \code{print()} methods.
 }
 \description{
 A parallelized generic k-fold (including n-fold, i.e., leave-one-out)
@@ -200,6 +220,15 @@ models; see the "Extending the cv package" vignette
 \itemize{
 \item \code{print(cvList)}: \code{print()} method
 
+\item \code{folds()}: used internally by \code{cv()} methods (not for direct use);
+exported to support new \code{cv()} methods.
+
+\item \code{fold()}: to extract a fold from a \code{"folds"} object.
+
+\item \code{fold(folds)}: \code{fold()} method for \code{"folds"} objects.
+
+\item \code{print(folds)}: \code{print()} method for \code{"folds"} objects.
+
 }}
 \examples{
 data("Auto", package="ISLR2")
@@ -219,6 +248,10 @@ m.rlm <- MASS::rlm(prestige ~ income + education,
                    data=Duncan)
 cv(m.lm, k="loo", method="Woodbury")
 cv(m.rlm, k="loo")
+
+(ffs <- folds(102, 5))
+fold(ffs, 2)
+
 }
 \seealso{
 \code{\link{cvMixed}}, \code{\link{cvSelect}}.

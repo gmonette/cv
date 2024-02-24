@@ -109,7 +109,7 @@ cvMixed <- function(model,
   pkg.env <- getNamespace(package)
 
   f.clusters <- function(i, predict.clusters.args, predict.cases.args, ...){
-    indices.i <- indices[starts[i]:ends[i]]
+    indices.i <- fold(folds, i)
     index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
     update.args <- list(...)
     update.args$object <- model
@@ -123,7 +123,7 @@ cvMixed <- function(model,
   }
 
   f.cases <- function(i, predict.clusters.args, predict.cases.args, ...){
-    indices.i <- indices[starts[i]:ends[i]]
+    indices.i <- fold(folds, i)
     update.args <- list(...)
     update.args$object <- model
     update.args$data <- data[ - indices.i, ]
@@ -177,11 +177,7 @@ cvMixed <- function(model,
     coef.i <- NULL
   }
 
-  nk <-  n %/% k # number in each fold
-  rem <- n %% k  # remainder
-  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
-  ends <- cumsum(folds) # end of each fold
-  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+  folds <- folds(n, k)
   indices <- if (n > k) sample(n, n)  else 1:n # permute clusters/cases
   yhat <- if (is.factor(y)){
     factor(rep(NA, n), levels=levels(y))
@@ -201,8 +197,8 @@ cvMixed <- function(model,
     for (i in 1L:k){
       yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
       if (details){
-        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                               yhat[indices[starts[i]:ends[i]]])
+        crit.i[i] <- criterion(y[fold(folds, i)],
+                               yhat[fold(folds, i)])
         coef.i[[i]] <- result[[i]]$coef.i
       }
     }
@@ -212,14 +208,13 @@ cvMixed <- function(model,
       result[[i]] <- f(i, predict.clusters.args, predict.cases.args, ...)
       yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
       if (details){
-        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                               yhat[indices[starts[i]:ends[i]]])
+        crit.i[i] <- criterion(y[fold(folds, i)],
+                               yhat[fold(folds, i)])
         coef.i[[i]] <- result[[i]]$coef.i
       }
     }
   }
   cv <- criterion(y, yhat)
- # args <-
     cv.full <- criterion(y,
                          do.call(predict,
                                  if (is.null(clusterVariables)) {
@@ -233,7 +228,7 @@ cvMixed <- function(model,
     loss <- getLossFn(cv) # casewise loss function
     if (!is.null(loss)) {
       adj.cv <- cv + cv.full -
-        weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+        weighted.mean(sapply(result, function(x) x$crit.all.i), folds$folds)
       se.cv <- sd(loss(y, yhat))/sqrt(length(y))
       halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
       ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,

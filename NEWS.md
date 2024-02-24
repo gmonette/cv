@@ -6,6 +6,8 @@
 
 - cv.default() and other cv() methods acquire a details argument, which if TRUE includes information about the folds in the returned object.
 
+- Improvements to code, introducing folds(), fold(), and related functions.
+
 # cv 1.1.0
 
 - cv() et al. now work properly with "non-casewise average" CV criteria such as the new rmse() and medAbsErr(), not just with "casewise-average" fit criteria such as mse() and BayesRule().

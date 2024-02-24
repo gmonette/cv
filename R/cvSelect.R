@@ -133,11 +133,7 @@ cvSelect <- function(procedure, data, criterion=mse,
     }
     seed <- NULL
   }
-  nk <-  n %/% k # number of cases in each fold
-  rem <- n %% k  # remainder
-  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
-  ends <- cumsum(folds) # end of each fold
-  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+  folds <- folds(n, k)
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
   yhat <- if (is.factor(y)){
     factor(rep(NA, n), levels=levels(y))
@@ -164,7 +160,6 @@ cvSelect <- function(procedure, data, criterion=mse,
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     arglist <- c(list(data=data, indices=1,
-                      # save.coef=save.coef,
                       details = k <= 10,
                       criterion=criterion, model=model),
                  list(...))
@@ -172,18 +167,18 @@ cvSelect <- function(procedure, data, criterion=mse,
     selection <- foreach(i = 1L:k) %dopar% {
       # the following deals with a scoping issue that can
       #   occur with args passed via ...
-      arglist$indices <- indices[starts[i]:ends[i]]
+      arglist$indices <- fold(folds, i)
       do.call(procedure, arglist)
     }
     stopCluster(cl)
 
     for (i in 1L:k){
-      yhat[indices[starts[i]:ends[i]]] <- selection[[i]]$fit.i
+      yhat[fold(folds, i)] <- selection[[i]]$fit.i
       crit.all.i[i] <- selection[[i]]$crit.all.i
 
       if (details){
-        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                               yhat[indices[starts[i]:ends[i]]])
+        crit.i[i] <- criterion(y[fold(folds, i)],
+                               yhat[fold(folds, i)])
         coef.i[[i]] <- selection[[i]]$coefficients
         model.name.i[[i]] <- if (!is.null(selection[[i]]$model.name)) selection[[i]]$model.name else ""
       }
@@ -193,7 +188,7 @@ cvSelect <- function(procedure, data, criterion=mse,
   } else {
 
     for (i in 1L:k){
-      indices.i <- indices[starts[i]:ends[i]]
+      indices.i <- fold(folds, i)
       selection <- if(selectModelListP){
         procedure(data, indices.i,
                              details = k <= 10,
@@ -209,8 +204,8 @@ cvSelect <- function(procedure, data, criterion=mse,
       yhat[indices.i] <- selection$fit.i
 
       if (details){
-        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                               yhat[indices[starts[i]:ends[i]]])
+        crit.i[i] <- criterion(y[fold(folds, i)],
+                               yhat[fold(folds, i)])
         coef.i[[i]] <- selection$coefficients
         model.name.i[[i]] <- if (!is.null(selection$model.name)) selection$model.name else ""
       }
@@ -240,7 +235,7 @@ cvSelect <- function(procedure, data, criterion=mse,
 
   loss <- getLossFn(cv) # casewise loss function
   if (!is.null(loss)) {
-    adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds)
+    adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds$folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
     halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
     ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,

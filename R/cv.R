@@ -13,7 +13,7 @@
 #'        (the mean-squared error).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
-#' cross-validation.
+#' cross-validation; for \code{folds()}, \code{k} must be a number.
 #' @param reps number of times to replicate k-fold CV (default is \code{1}).
 #' @param confint if \code{TRUE} (the default if the number of cases is 400
 #' or greater), compute a confidence interval for the bias-corrected CV
@@ -38,6 +38,9 @@
 #' @param start if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
 #' set to the vector of regression coefficients for the model fit to the full data is passed
 #' to \code{update()} possibly making the CV updates faster, e.g. for a GLM.
+#' @param n number of cases, for constructed folds.
+#' @param folds an object of class \code{"folds"}.
+#' @param i a fold number for an object of class \code{"folds"}.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
 #'
 #' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
@@ -53,6 +56,8 @@
 #' subset of these components and may add additional information.
 #' If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
 #' which is literally a list of \code{"cv"} objects.
+#' \code{folds()} returns an object of class folds, for which
+#' there are \code{fold()} and \code{print()} methods.
 #'
 #' @seealso \code{\link{cvMixed}}, \code{\link{cvSelect}}.
 #'
@@ -114,6 +119,10 @@
 #'                    data=Duncan)
 #' cv(m.lm, k="loo", method="Woodbury")
 #' cv(m.rlm, k="loo")
+#'
+#' (ffs <- folds(102, 5))
+#' fold(ffs, 2)
+#'
 #' @export
 cv <- function(model, data, criterion, k, reps=1, seed, ...){
   UseMethod("cv")
@@ -142,7 +151,7 @@ cv.default <- function(model, data=insight::get_data(model),
 
   f <- function(i){
     # helper function to compute cv criterion for each fold
-    indices.i <- indices[starts[i]:ends[i]]
+    indices.i <- fold(folds, i)
     model.i <- if (start) {
       update(model, data=data[ - indices.i, ], start=b)
     } else {
@@ -157,7 +166,7 @@ cv.default <- function(model, data=insight::get_data(model),
   fPara <- function(i){
     # helper function to compute cv criterion for each fold
     #  with parallel computations
-    indices.i <- indices[starts[i]:ends[i]]
+    indices.i <- fold(folds, i)
     # the following deals with a scoping issue that can
     #   occur with args passed via ... (which is saved in dots)
     predict.args <- c(list(
@@ -193,11 +202,7 @@ cv.default <- function(model, data=insight::get_data(model),
     if (!missing(seed) && !is.null(seed)) message("Note: seed ignored for n-fold CV")
     seed <- NULL
   }
-  nk <-  n %/% k # number of cases in each fold
-  rem <- n %% k  # remainder
-  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
-  ends <- cumsum(folds) # end of each fold
-  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+  folds <- folds(n, k)
   indices <- if (n > k) sample(n, n)  else 1:n # permute cases
   yhat <- if (is.factor(y)){
     factor(rep(NA, n), levels=levels(y))
@@ -225,10 +230,10 @@ cv.default <- function(model, data=insight::get_data(model),
     }
     stopCluster(cl)
     for (i in 1L:k){
-      yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      yhat[fold(folds, i)] <- result[[i]]$fit.i
       if (details){
-        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                               yhat[indices[starts[i]:ends[i]]])
+        crit.i[i] <- criterion(y[fold(folds, i)],
+                               yhat[fold(folds, i)])
         coef.i[[i]] <- result[[i]]$coef.i
       }
     }
@@ -236,10 +241,10 @@ cv.default <- function(model, data=insight::get_data(model),
     result <- vector(k, mode="list")
     for (i in 1L:k){
       result[[i]] <- f(i)
-      yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      yhat[fold(folds, i)] <- result[[i]]$fit.i
       if (details){
-        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                               yhat[indices[starts[i]:ends[i]]])
+        crit.i[i] <- criterion(y[fold(folds, i)],
+                               yhat[fold(folds, i)])
         coef.i[[i]] <- result[[i]]$coef.i
       }
     }
@@ -249,7 +254,7 @@ cv.default <- function(model, data=insight::get_data(model),
   loss <- getLossFn(cv) # casewise loss function
   if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
-      weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+      weighted.mean(sapply(result, function(x) x$crit.all.i), folds$folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
     halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
     ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
@@ -368,7 +373,7 @@ cv.lm <- function(model, data=insight::get_data(model),
   }
   f <- function(i){
     # helper function to compute cv criterion for each fold
-    indices.i <- indices[starts[i]:ends[i]]
+    indices.i <- fold(folds, i)
     b.i <- UpdateLM(indices.i)
     fit.all.i <- X %*% b.i
     fit.i <- fit.all.i[indices.i]
@@ -445,12 +450,7 @@ cv.lm <- function(model, data=insight::get_data(model),
   } else {
     seed <- NULL
   }
-  nk <-  n %/% k # number of cases in each fold
-  rem <- n %% k  # remainder
-  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
-  ends <- cumsum(folds) # end of each fold
-  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
-  indices <- if (n > k) sample(n, n)  else 1:n # permute cases
+  folds <- folds(n, k)
   yhat <- numeric(n)
   if (ncores > 1L){
     cl <- makeCluster(ncores)
@@ -460,10 +460,10 @@ cv.lm <- function(model, data=insight::get_data(model),
     }
     stopCluster(cl)
     for (i in 1L:k){
-      yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      yhat[fold(folds, i)] <- result[[i]]$fit.i
       if (details){
-        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                               yhat[indices[starts[i]:ends[i]]])
+        crit.i[i] <- criterion(y[fold(folds, i)],
+                               yhat[fold(folds, i)])
         b.i <- result[[i]]$coef.i
         names(b.i) <- names.b
         coef.i[[i]] <- b.i
@@ -473,10 +473,10 @@ cv.lm <- function(model, data=insight::get_data(model),
     result <- vector(k, mode="list")
     for (i in 1L:k){
       result[[i]] <- f(i)
-      yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+      yhat[fold(folds, i)] <- result[[i]]$fit.i
       if (details){
-        crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                               yhat[indices[starts[i]:ends[i]]])
+        crit.i[i] <- criterion(y[fold(folds, i)],
+                               yhat[fold(folds, i)])
         b.i <- result[[i]]$coef.i
         names(b.i) <- names.b
         coef.i[[i]] <- b.i
@@ -488,7 +488,7 @@ cv.lm <- function(model, data=insight::get_data(model),
   loss <- getLossFn(cv) # casewise loss function
   if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
-      weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+      weighted.mean(sapply(result, function(x) x$crit.all.i), folds$folds)
     se.cv <- sd(loss(y, yhat))/sqrt(n)
     halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
     ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
@@ -546,7 +546,7 @@ cv.glm <- function(model, data=insight::get_data(model),
   }
   f <- function(i){
     # helper function to compute cv criterion for each fold
-    indices.i <- indices[starts[i]:ends[i]]
+    indices.i <- fold(folds, i)
     b.i <- UpdateIWLS(indices.i)
     fit.all.i <- linkinv(X %*% b.i)
     fit.i <- fit.all.i[indices.i]
@@ -616,11 +616,7 @@ cv.glm <- function(model, data=insight::get_data(model),
     if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
       stop("k must be an integer between 2 and n")
     }
-    nk <-  n %/% k # number of cases in each fold
-    rem <- n %% k  # remainder
-    folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
-    ends <- cumsum(folds) # end of each fold
-    starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+    folds <- folds(n, k)
     indices <- if (n > k) sample(n, n)  else 1:n # permute cases
     yhat <- numeric(n)
 
@@ -642,10 +638,10 @@ cv.glm <- function(model, data=insight::get_data(model),
       }
       stopCluster(cl)
       for (i in 1L:k){
-        yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+        yhat[fold(folds, i)] <- result[[i]]$fit.i
         if (details){
-          crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                                 yhat[indices[starts[i]:ends[i]]])
+          crit.i[i] <- criterion(y[fold[folds, i]],
+                                 yhat[fold(folds, i)])
           b.i <- result[[i]]$coef.i
           names(b.i) <- names.b
           coef.i[[i]] <- b.i
@@ -655,10 +651,10 @@ cv.glm <- function(model, data=insight::get_data(model),
       result <- vector(k, mode="list")
       for (i in 1L:k){
         result[[i]] <- f(i)
-        yhat[indices[starts[i]:ends[i]]] <- result[[i]]$fit.i
+        yhat[fold(folds, i)] <- result[[i]]$fit.i
         if (details){
-          crit.i[i] <- criterion(y[indices[starts[i]:ends[i]]],
-                                 yhat[indices[starts[i]:ends[i]]])
+          crit.i[i] <- criterion(y[fold(folds, i)],
+                                 yhat[fold(folds, i)])
           b.i <- result[[i]]$coef.i
           names(b.i) <- names.b
           coef.i[[i]] <- b.i
@@ -670,7 +666,7 @@ cv.glm <- function(model, data=insight::get_data(model),
     loss <- getLossFn(cv) # casewise loss function
     if (!is.null(loss)) {
       adj.cv <- cv + cv.full -
-        weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
+        weighted.mean(sapply(result, function(x) x$crit.all.i), folds$folds)
       se.cv <- sd(loss(y, yhat))/sqrt(n)
       halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
       ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
@@ -714,6 +710,49 @@ cv.rlm <- function(model, data, criterion, k, reps = 1, seed, ...){
   result
 }
 
+#' @describeIn cv used internally by \code{cv()} methods (not for direct use);
+#' exported to support new \code{cv()} methods.
+#' @export
+folds <- function(n, k){
+  nk <-  n %/% k # number of cases in each fold
+  rem <- n %% k  # remainder
+  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
+  ends <- cumsum(folds) # end of each fold
+  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+  indices <- if (n > k) sample(n, n)  else 1:n # permute cases
+  result <- list(n=n, k=k, folds=folds, starts=starts,
+                 ends=ends, indices=indices)
+  class(result) <- "folds"
+  result
+}
+
+#' @describeIn cv to extract a fold from a \code{"folds"} object.
+#' @export
+fold <- function(folds, i, ...) UseMethod("fold")
+
+#' @describeIn cv \code{fold()} method for \code{"folds"} objects.
+#' @export
+fold.folds <- function(folds, i, ...) folds$indices[folds$starts[i]:folds$ends[i]]
+
+#' @describeIn cv \code{print()} method for \code{"folds"} objects.
+#' @export
+print.folds <- function(x, ...){
+  if (x$k == x$n){
+    cat("LOO:", x$k, "folds for", x$n, "cases")
+    return(invisible(x))
+  }
+  cat(x$k, "folds of approximately", floor(x$n/x$k),
+      "cases each")
+  for (i in 1:min(x$k, 10)){
+    cat("\n fold", paste0(i, ": "))
+    fld <- fold(x, i)
+    if (length(fld) <= 10)  cat(fld)
+    else cat(fld[1:10], "...")
+  }
+  if (x$k > 10) cat("\n ...")
+  cat("\n")
+  invisible(x)
+}
 
 
 # not exported

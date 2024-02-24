@@ -42,3 +42,21 @@ microbenchmark::microbenchmark(
   cv2 = cv.lm2(m, k="loo"),
   times=10
 )
+
+set.seed(123)
+n <- 1e4
+p <- 100
+X <- matrix(rnorm(n*p), n, p)
+y <- X %*% rep(1, p) + rnorm(n)
+D <- data.frame(X, y)
+m <- lm(y ~ X, data=D)
+getLossFn <- cv:::getLossFn
+system.time(cvk1 <- cv.lm1(m, k=10, seed=1234)) # current code
+system.time(cvk2 <- cv.lm2(m, k=10, seed=1234)) # uses folds()
+all.equal(cvk1, cvk2)
+
+
+ffs <- folds(102, 5)
+ffs
+fold(ffs, 1)
+fold(ffs, 2)
