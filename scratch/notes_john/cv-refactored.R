@@ -133,7 +133,7 @@ cvCompute <- function(model, data=insight::get_data(model),
   }
 }
 
-cvDefault <- function(model, data=insight::get_data(model),
+cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10, reps=1, seed=NULL,
                        details = k <= 10,
                        confint = n >= 400, level=0.95,
@@ -183,7 +183,7 @@ cvDefault <- function(model, data=insight::get_data(model),
 }
 
 
-cvLm <- function(model, data=insight::get_data(model),
+cv.lm <- function(model, data=insight::get_data(model),
                   criterion=mse, k=10, reps=1, seed,
                   details = k <= 10,
                   confint = n >= 400, level=0.95,
@@ -274,7 +274,7 @@ cvLm <- function(model, data=insight::get_data(model),
 
 
 
-cvGlm <- function(model, data=insight::get_data(model),
+cv.glm <- function(model, data=insight::get_data(model),
                    criterion=mse, k=10, reps=1, seed,
                    details = k <= 10,
                    confint = n >= 400, level=0.95,
