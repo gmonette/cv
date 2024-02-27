@@ -640,7 +640,7 @@ cv.glm <- function(model, data=insight::get_data(model),
       for (i in 1L:k){
         yhat[fold(folds, i)] <- result[[i]]$fit.i
         if (details){
-          crit.i[i] <- criterion(y[fold[folds, i]],
+          crit.i[i] <- criterion(y[fold(folds, i)],
                                  yhat[fold(folds, i)])
           b.i <- result[[i]]$coef.i
           names(b.i) <- names.b
