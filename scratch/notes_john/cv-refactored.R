@@ -1,30 +1,29 @@
 getLossFn <- cv:::getLossFn
 
 cvCompute <- function(model, data=insight::get_data(model),
-                       criterion=mse, k=10, reps=1, seed,
-                       details = k <= 10,
-                       confint, level=0.95,
-                       ncores=1,
-                       type="response",
-                       start=FALSE,
-                       f,
-                       fPara=f,
-                       localFunctions=list(),
-                       localVariables=list(),
-                       ...){
+                      criterion=mse, criterion.name,
+                      k=10, reps=1, seed,
+                      details = k <= 10,
+                      confint, level=0.95,
+                      method=NULL,
+                      ncores=1,
+                      type="response",
+                      start=FALSE,
+                      f,
+                      fPara=f,
+                      locals=list(),
+                      ...){
 
   # put function and variable args in the local environment
   env <- environment()
   environment(f) <- env
   environment(fPara) <- env
-  fnNames <- names(localFunctions)
-  for (i in seq_along(localFunctions)){
-    assign(fnNames[i], localFunctions[[i]])
+  localsNames <- names(locals)
+  for (i in seq_along(locals)){
+    assign(localsNames[i], locals[[i]])
   }
-  varNames <- names(localVariables)
-  for (i in seq_along(localVariables)){
-    assign(varNames[i], localVariables[[i]])
-  }
+
+  if (missing(criterion.name) || is.null(criterion.name)) criterion.name <- deparse(substitute(criterion))
 
   y <- GetResponse(model)
   b <- coef(model)
@@ -110,16 +109,30 @@ cvCompute <- function(model, data=insight::get_data(model),
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
                  "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 "criterion" = deparse(substitute(criterion)),
+                 "method" = method,
+                 "criterion" = criterion.name,
                  "details"=list(criterion=crit.i,
                                 coefficients=coef.i))
+  if (missing(method) || is.null(method)) result$method <- NULL
   class(result) <- "cv"
   if (reps == 1) {
     return(result)
   } else {
-    res <- cv(model=model, data=data, criterion=criterion,
-              k=k, ncores=ncores, reps=reps - 1,
-              details=details, ...)
+
+    res <- cvCompute(model=model, data=data,
+                     criterion=criterion, criterion.name=criterion.name,
+                     k=k, reps=reps - 1,
+                     details=details,
+                     confint=confint, level=level,
+                     method=method,
+                     ncores=ncores,
+                     type=type,
+                     start=start,
+                     f=f,
+                     fPara=fPara,
+                     locals=locals,
+                     ...)
+
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {
@@ -176,15 +189,17 @@ cv.default <- function(model, data=insight::get_data(model),
 
   n <- nrow(data)
 
-  cvCompute(model=model, data=data, criterion=criterion, k=k,
-            reps=reps, seed=seed, details=details, confint=confint,
+  cvCompute(model=model, data=data, criterion=criterion,
+            criterion.name=deparse(substitute(criterion)),
+            k=k, reps=reps, seed=seed, details=details, confint=confint,
             level=level, ncores=ncores, type=type, start=start,
             f=f, fPara=fPara, ...)
 }
 
 
 cv.lm <- function(model, data=insight::get_data(model),
-                  criterion=mse, k=10, reps=1, seed,
+                  criterion=mse,
+                  k=10, reps=1, seed=NULL,
                   details = k <= 10,
                   confint = n >= 400, level=0.95,
                   method=c("auto", "hatvalues", "Woodbury", "naive"),
@@ -261,13 +276,13 @@ cv.lm <- function(model, data=insight::get_data(model),
   XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
   Xy <- t(X) %*% (w * y)
 
-  cvCompute(model=model, data=data, criterion=criterion, k=k,
-            reps=reps, seed=seed, details=details, confint=confint,
-            level=level, ncores=ncores, method=method,
-            f=f,
-            localFunctions=list(UpdateLM=UpdateLM),
-            localVariables=list(X=X, w=w, XXi=XXi, Xy=Xy, b=b, p=p,
-                                coef.names=coef.names),
+  cvCompute(model=model, data=data, criterion=criterion,
+            criterion.name=deparse(substitute(criterion)),
+            k=k, reps=reps, seed=seed, details=details, confint=confint,
+            level=level, ncores=ncores, start=FALSE, method=method, f=f,
+            locals=list(UpdateLM=UpdateLM,
+                        X=X, w=w, XXi=XXi, Xy=Xy, b=b, p=p,
+                        coef.names=coef.names),
             ...)
 
 }
@@ -275,7 +290,7 @@ cv.lm <- function(model, data=insight::get_data(model),
 
 
 cv.glm <- function(model, data=insight::get_data(model),
-                   criterion=mse, k=10, reps=1, seed,
+                   criterion=mse, k=10, reps=1, seed=NULL,
                    details = k <= 10,
                    confint = n >= 400, level=0.95,
                    method=c("exact", "hatvalues", "Woodbury"),
@@ -321,7 +336,7 @@ cv.glm <- function(model, data=insight::get_data(model),
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
     result <- cv:::cv.default(model=model, data=data, criterion=criterion, k=k, reps=reps, seed=seed,
-                         ncores=ncores, method=method, details=details, start=start, ...)
+                              ncores=ncores, method=method, details=details, start=start, ...)
     if (inherits(result, "cv")) result$"criterion" <- deparse(substitute(criterion))
     return(result)
   } else if (method == "hatvalues") {
@@ -364,13 +379,13 @@ cv.glm <- function(model, data=insight::get_data(model),
     indices <- if (n > k) sample(n, n)  else 1:n # permute cases
     yhat <- numeric(n)
 
-    cvCompute(model=model, data=data, criterion=criterion, k=k,
-              reps=reps, seed=seed, details=details, confint=confint,
-              level=level, ncores=ncores, start=start, method=method,
-              f=f,
-              localFunctions=list(UpdateIWLS=UpdateIWLS, linkinv=linkinv),
-              localVariables=list(X=X, w=w, z=z, XXi=XXi, b=b, p=p,
-                                  coef.names=coef.names),
+    cvCompute(model=model, data=data, criterion=criterion,
+              criterion.name=deparse(substitute(criterion)),
+              k=k, reps=reps, seed=seed, details=details, confint=confint,
+              level=level, ncores=ncores, start=start, method=method, f=f,
+              locals=list(UpdateIWLS=UpdateIWLS, linkinv=linkinv,
+                          X=X, w=w, z=z, XXi=XXi, b=b, p=p,
+                          coef.names=coef.names),
               ...)
   }
 }
