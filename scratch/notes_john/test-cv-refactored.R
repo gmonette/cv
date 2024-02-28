@@ -38,10 +38,12 @@ new
 all.equal(old, new)
 
 old <- cv:::cv.lm(m, seed=123, reps=2)
-new <- cv.lm(m, seed=123, reps=2)
+new <- cv.lm(m, seed=123, reps=2) # fixme ***
 old
 new
-all.equal(old, new) # fixme ***
+isTRUE(all.equal(old, new))
+all.equal(old[[2]], new[[2]])
+all.equal(old[[1]], new[[1]])
 
 microbenchmark::microbenchmark(
   old = cv:::cv.lm(m),
