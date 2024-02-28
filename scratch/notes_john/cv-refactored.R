@@ -375,9 +375,6 @@ cv.glm <- function(model, data=insight::get_data(model),
     if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
       stop("k must be an integer between 2 and n")
     }
-    folds <- folds(n, k)
-    indices <- if (n > k) sample(n, n)  else 1:n # permute cases
-    yhat <- numeric(n)
 
     cvCompute(model=model, data=data, criterion=criterion,
               criterion.name=deparse(substitute(criterion)),
