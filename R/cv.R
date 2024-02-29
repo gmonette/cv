@@ -203,7 +203,6 @@ cv.default <- function(model, data=insight::get_data(model),
     seed <- NULL
   }
   folds <- folds(n, k)
-  indices <- if (n > k) sample(n, n)  else 1:n # permute cases
   yhat <- if (is.factor(y)){
     factor(rep(NA, n), levels=levels(y))
   } else if (is.character(y)) {
@@ -617,7 +616,6 @@ cv.glm <- function(model, data=insight::get_data(model),
       stop("k must be an integer between 2 and n")
     }
     folds <- folds(n, k)
-    indices <- if (n > k) sample(n, n)  else 1:n # permute cases
     yhat <- numeric(n)
 
     if (details){

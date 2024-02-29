@@ -46,7 +46,6 @@ cvCompute <- function(model, data=insight::get_data(model),
     seed <- NULL
   }
   folds <- folds(n, k)
-  indices <- if (n > k) sample(n, n)  else 1:n # permute cases
   yhat <- if (is.factor(y)){
     factor(rep(NA, n), levels=levels(y))
   } else if (is.character(y)) {
