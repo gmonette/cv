@@ -26,7 +26,7 @@ It can be used to extend cv() to other classes of mixed-effects models.'><!-- ma
     
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,10 +94,13 @@ It can be used to extend <code><a href="cv.html">cv()</a></code> to other classe
 <span>  <span class="va">confint</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  <span class="va">seed</span>,</span>
+<span>  details <span class="op">=</span> <span class="va">k</span> <span class="op">&lt;=</span> <span class="fl">10</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">clusterVariables</span>,</span>
 <span>  predict.clusters.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model</span>, newdata <span class="op">=</span> <span class="va">data</span><span class="op">)</span>,</span>
 <span>  predict.cases.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model</span>, newdata <span class="op">=</span> <span class="va">data</span><span class="op">)</span>,</span>
+<span>  <span class="va">blups</span>,</span>
+<span>  <span class="va">fixed.effects</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -111,6 +114,8 @@ It can be used to extend <code><a href="cv.html">cv()</a></code> to other classe
 <span>  <span class="va">seed</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">clusterVariables</span>,</span>
+<span>  blups <span class="op">=</span> <span class="va">coef</span>,</span>
+<span>  fixed.effects <span class="op">=</span> <span class="fu">lme4</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -124,6 +129,8 @@ It can be used to extend <code><a href="cv.html">cv()</a></code> to other classe
 <span>  <span class="va">seed</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">clusterVariables</span>,</span>
+<span>  blups <span class="op">=</span> <span class="va">coef</span>,</span>
+<span>  fixed.effects <span class="op">=</span> <span class="fu">nlme</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -137,6 +144,8 @@ It can be used to extend <code><a href="cv.html">cv()</a></code> to other classe
 <span>  <span class="va">seed</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">clusterVariables</span>,</span>
+<span>  blups <span class="op">=</span> <span class="va">coef</span>,</span>
+<span>  fixed.effects <span class="op">=</span> <span class="fu">glmmTMB</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -190,6 +199,13 @@ supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation</p></dd>
 
 
+<dt>details</dt>
+<dd><p>if <code>TRUE</code> (the default if the number of
+folds <code>k &lt;= 10</code>), save detailed information about the value of the
+CV criterion for the cases in each fold and coefficients
+with that fold deleted.</p></dd>
+
+
 <dt>ncores</dt>
 <dd><p>number of cores to use for parallel computations
 (default is <code>1</code>, i.e., computations aren't done in parallel)</p></dd>
@@ -216,6 +232,16 @@ the whole data set from a mixed model when performing CV on cases;
 the first two elements should be
 <code>model</code> and <code>newdata</code>; see the "Extending the cv package" vignette
 (<code><a href="../articles/cv-extend.html">vignette("cv-extend", package="cv")</a></code>).</p></dd>
+
+
+<dt>blups</dt>
+<dd><p>a function to be used to compute BLUPs for
+case-based CV when <code>details = TRUE</code>.</p></dd>
+
+
+<dt>fixed.effects</dt>
+<dd><p>a function to be used to compute fixed-effect
+coefficients for cluster-based CV when <code>details = TRUE</code>.</p></dd>
 
 
 <dt>...</dt>

@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-02-18</h4>
+            <h4 data-toc-skip class="date">2024-02-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-extend.Rmd" class="external-link"><code>vignettes/cv-extend.Rmd</code></a></small>
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -199,7 +199,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt;     attr(result, "casewise loss") &lt;- "(y - yhat)^2"</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x56024b3bc520&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55b931ce3fd8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span>
 <span></span>
 <span><span class="fu">cv</span><span class="fu">:::</span><span class="fu">getLossFn</span><span class="op">(</span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -207,7 +207,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x56024b2eeee0&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x55b931baa2d0&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>"(y - yhat)^2"</code>, that evaluates to an expression that is a
@@ -443,15 +443,17 @@ facilitate this process, and to see how that works, consider the
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cv</span><span class="fu">:::</span><span class="va"><a href="../reference/cvMixed.html">cv.lme</a></span></span>
 <span><span class="co">#&gt; function (model, data = insight::get_data(model), criterion = mse, </span></span>
-<span><span class="co">#&gt;     k, reps = 1, seed, ncores = 1, clusterVariables, ...) </span></span>
+<span><span class="co">#&gt;     k, reps = 1, seed, ncores = 1, clusterVariables, blups = coef, </span></span>
+<span><span class="co">#&gt;     fixed.effects = nlme::fixef, ...) </span></span>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     cvMixed(model, package = "nlme", data = data, criterion = criterion, </span></span>
 <span><span class="co">#&gt;         k = k, reps = reps, seed = seed, ncores = ncores, clusterVariables = clusterVariables, </span></span>
 <span><span class="co">#&gt;         predict.clusters.args = list(object = model, newdata = data, </span></span>
 <span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
-<span><span class="co">#&gt;             newdata = data, level = 1), ...)</span></span>
+<span><span class="co">#&gt;             newdata = data, level = 1), blups = blups, fixed.effects = fixed.effects, </span></span>
+<span><span class="co">#&gt;         ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x560253f50c10&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55b93a737c40&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
@@ -496,6 +498,9 @@ setting <code>level = 0</code>.</p></li>
 arguments to be passed to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> for case-based CV.
 Setting <code>level = 1</code> includes random effects in the
 predictions.</p></li>
+<li><p><code>blups</code> and <code>fixed.effects</code> are used to
+compute detailed fold-based statistics for case-based and cluster-based
+CV, respectively.</p></li>
 </ul>
 <p>Finally, any additional arguments, absorbed by <code>...</code>, are
 passed to <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> when the model is refit with each fold
@@ -537,7 +542,8 @@ suppress warning messages about non-convergence:</p>
 <p>Writing the <code><a href="../reference/cv.html">cv()</a></code> method is then straightforward:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span> <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">data</span>, <span class="va">criterion</span> <span class="op">=</span> <span class="va">mse</span>,</span>
-<span>                     <span class="va">k</span>, <span class="va">reps</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, <span class="va">ncores</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">clusterVariables</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
+<span>                     <span class="va">k</span>, <span class="va">reps</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, <span class="va">ncores</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">clusterVariables</span>, </span>
+<span>                     <span class="va">blups</span><span class="op">=</span><span class="va">coef</span>, <span class="va">fixed.effects</span><span class="op">=</span><span class="fu">nlme</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/cvMixed.html">cvMixed</a></span><span class="op">(</span></span>
 <span>    <span class="va">model</span>,</span>
 <span>    package<span class="op">=</span><span class="st">"MASS"</span>,</span>
@@ -556,6 +562,8 @@ suppress warning messages about non-convergence:</p>
 <span>                            newdata<span class="op">=</span><span class="va">data</span>,</span>
 <span>                            level<span class="op">=</span><span class="fl">1</span>,</span>
 <span>                            type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span>,</span>
+<span>    blups<span class="op">=</span><span class="va">blups</span>,</span>
+<span>    fixed.effects<span class="op">=</span><span class="va">fixed.effects</span>,</span>
 <span>    verbose<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>    <span class="va">...</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -808,9 +816,9 @@ as predictors in a linear least-squares regression:</p>
 <span><span class="co">#&gt; cross-validation criterion = 59.683</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 58.846</span></span>
 <span><span class="co">#&gt; full-sample criterion = 44.788</span></span></code></pre></div>
-<p>Thus, the RMSE for the model fit to the complete data is considerably
-smaller than the CV estimate of the RMSE. Can we do better by selecting
-a subset of the predictors, taking account of the additional uncertainty
+<p>Thus, the MSE for the model fit to the complete data is considerably
+smaller than the CV estimate of the MSE. Can we do better by selecting a
+subset of the predictors, taking account of the additional uncertainty
 induced by model selection?</p>
 <p>First, let’s apply best-subset selection to the complete data
 set:</p>
@@ -848,9 +856,9 @@ Selecting the best model of each size.
 </div>
 <p>The graph, produced by the <code>subsets()</code> function in the
 <strong>car</strong> package, shows that the model with the smallest BIC
-is the best model with 4 predictors, including <code>Agriculture</code>,
-<code>Education</code>, <code>Catholic</code>, and
-<code>Infant.Mortality</code>, but not <code>Examination</code>:</p>
+is the “best” model with 4 predictors, including
+<code>Agriculture</code>, <code>Education</code>, <code>Catholic</code>,
+and <code>Infant.Mortality</code>, but not <code>Examination</code>:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m.swiss</span>, <span class="va">.</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="va">Examination</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.best</span><span class="op">)</span></span>
@@ -885,8 +893,8 @@ is the best model with 4 predictors, including <code>Agriculture</code>,
 <span><span class="co">#&gt; cross-validation criterion = 58.467</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 57.778</span></span>
 <span><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
-<p>The RMSE for the selected model is (of course) slightly higher than
-for the full model fit previously, but the cross-validated RMSE is a bit
+<p>The MSE for the selected model is (of course) slightly higher than
+for the full model fit previously, but the cross-validated MSE is a bit
 lower; as we explain in the main vignette, however, it isn’t kosher to
 select and cross-validate a model on the same data.</p>
 <p>Here’s a function named <code>selectSubsets()</code>, meant to be
@@ -897,7 +905,10 @@ model-selection process:</p>
 <span>                          <span class="va">model</span>,</span>
 <span>                          <span class="va">indices</span>,</span>
 <span>                          <span class="va">criterion</span><span class="op">=</span><span class="va">mse</span>,</span>
-<span>                          <span class="va">save.coef</span><span class="op">=</span><span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
+<span>                          <span class="va">details</span><span class="op">=</span><span class="cn">TRUE</span>, </span>
+<span>                          <span class="va">seed</span>,</span>
+<span>                          <span class="va">save.model</span><span class="op">=</span><span class="cn">FALSE</span>, </span>
+<span>                          <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">model</span>, <span class="st">"lm"</span>, which<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"selectSubsets is appropriate only for 'lm' models"</span><span class="op">)</span></span>
@@ -907,6 +918,7 @@ model-selection process:</p>
 <span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">indices</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span><span class="op">)</span> <span class="va">seed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1e6</span>, <span class="fl">1L</span><span class="op">)</span></span>
 <span>    <span class="co"># select the best model from the full data by BIC</span></span>
 <span>    <span class="va">sel</span> <span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">formula</span>, data<span class="op">=</span><span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
 <span>    <span class="va">bics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sel</span><span class="op">)</span><span class="op">$</span><span class="va">bic</span></span>
@@ -915,7 +927,10 @@ model-selection process:</p>
 <span>    <span class="co"># fit the best model; intercept is already in X, hence - 1:</span></span>
 <span>    <span class="va">m.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">X</span><span class="op">[</span>, <span class="va">x.names</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> </span>
 <span>    <span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.best</span>, newdata<span class="op">=</span><span class="va">data</span><span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all</span><span class="op">)</span><span class="op">)</span> <span class="co"># return the CV criterion</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      criterion <span class="op">=</span> <span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all</span><span class="op">)</span>,</span>
+<span>      model <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">save.model</span><span class="op">)</span> <span class="va">m.best</span> <span class="kw">else</span> <span class="cn">NULL</span> <span class="co"># return best model</span></span>
+<span>      <span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
 <span>  <span class="co"># select the best model omitting the i-th fold (given by indices)</span></span>
@@ -931,7 +946,7 @@ model-selection process:</p>
 <span>  <span class="co">#   and the regression coefficients</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fit.i<span class="op">=</span><span class="va">fit.i</span>, <span class="co"># fitted values for i-th fold</span></span>
 <span>       crit.all.i<span class="op">=</span><span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all.i</span><span class="op">)</span>, <span class="co"># CV crit for all cases</span></span>
-<span>       coefficients <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">save.coef</span><span class="op">)</span><span class="op">{</span> <span class="co"># regression coefficients</span></span>
+<span>       coefficients <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">details</span><span class="op">)</span><span class="op">{</span> <span class="co"># regression coefficients</span></span>
 <span>         <span class="va">coefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m.best.i</span><span class="op">)</span></span>
 <span>         </span>
 <span>         <span class="co"># fix coefficient names</span></span>
@@ -962,15 +977,19 @@ aesthetic reasons, the command
 these awkward names, removing the extraneous text,
 <code>"X[-indices, x.names.i]"</code>.</p>
 <p>Applying <code>selectSubsets()</code> to the full data produces the
-full-data cross-validated RMSE (which we obtained previously):</p>
+full-data cross-validated MSE (which we obtained previously):</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">selectSubsets</span><span class="op">(</span>model<span class="op">=</span><span class="va">m.swiss</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $criterion</span></span>
 <span><span class="co">#&gt; [1] 45.916</span></span>
 <span><span class="co">#&gt; attr(,"casewise loss")</span></span>
-<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $model</span></span>
+<span><span class="co">#&gt; NULL</span></span></code></pre></div>
 <p>Similarly, applying the function to an imaginary “fold” of 5 cases
-returns the RMSE for the cases in the fold, based on the model selected
-and fit to the cases omitting the fold; the RMSE for all of the cases,
+returns the MSE for the cases in the fold, based on the model selected
+and fit to the cases omitting the fold; the MSE for all of the cases,
 based on the same model; and the coefficients of the selected model,
 which includes 4 or the 5 predictors (and the intercept):</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
@@ -998,12 +1017,19 @@ get:</p>
 <span><span class="co">#&gt; cross-validation criterion = 65.835</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.644</span></span>
 <span><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
-<p>Cross-validation shows that model selection exacts a penalty in RMSE.
+<p>Cross-validation shows that model selection exacts a penalty in MSE.
 Examining the models selected for the 10 folds reveals that there is
 some uncertainty in identifying the predictors in the “best” model, with
 <code>Agriculture</code> sometimes appearing and sometimes not:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.swiss</span><span class="op">)</span></span>
+<span><span class="co">#&gt; CV criterion by folds:</span></span>
+<span><span class="co">#&gt;   fold.1   fold.2   fold.3   fold.4   fold.5   fold.6   fold.7   fold.8 </span></span>
+<span><span class="co">#&gt;  76.6964  61.3105 131.1616   9.0662  52.9403  41.0853  51.8768 136.9498 </span></span>
+<span><span class="co">#&gt;   fold.9  fold.10 </span></span>
+<span><span class="co">#&gt;  24.1808  82.2587 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients by folds:</span></span>
 <span><span class="co">#&gt;         (Intercept) Catholic Education Infant.Mortality Agriculture</span></span>
 <span><span class="co">#&gt; Fold 1      59.0852   0.1397   -1.0203           1.2985       -0.17</span></span>
 <span><span class="co">#&gt; Fold 2      67.0335   0.1367   -1.0499           0.9413       -0.20</span></span>
@@ -1015,6 +1041,8 @@ some uncertainty in identifying the predictors in the “best” model, with
 <span><span class="co">#&gt; Fold 8      46.3507   0.0776   -0.7637           1.4463            </span></span>
 <span><span class="co">#&gt; Fold 9      62.2632   0.1230   -1.0067           1.1000       -0.17</span></span>
 <span><span class="co">#&gt; Fold 10     52.5112   0.1005   -0.7232           1.0809</span></span></code></pre></div>
+<p>As well, the fold-wise MSE varies considerably, reflecting the small
+size of the <code>swiss</code> data set (47 cases),</p>
 </div>
 <div class="section level2">
 <h2 id="appendix-why-the-complement-of-auc-isnt-a-casewise-cv-criterion">Appendix: Why the complement of AUC isn’t a casewise CV
@@ -1136,9 +1164,11 @@ can be written as solutions of the following system of <span class="math inline"
 matrix of 1s conformable with <span class="math inline">\(\mathbf{Y}\)</span>; <span class="math inline">\(\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ...,
 \mathrm{cv}(n_v,0)]^T\)</span>; <span class="math inline">\(\mathbf{c}_1
 = [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T\)</span>; <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v}
-\times 2n_v)}\)</span> and <span class="math inline">\(\begin{bmatrix}\begin{aligned} \mathbf{c}_0 \\
-\mathbf{c}_1 \end{aligned} \end{bmatrix}_{(2n_v \times 1)}\)</span> are
-partitioned matrices; and <span class="math inline">\(\mathbf{\widehat{Y}}_{(2^{n_v} \times
+\times 2n_v)}\)</span> and <span class="math inline">\(\begin{bmatrix}\begin{aligned}
+\mathbf{c}_0 \\ \mathbf{c}_1
+\end{aligned}
+\end{bmatrix}_{(2n_v \times 1)}\)</span> are partitioned matrices; and
+<span class="math inline">\(\mathbf{\widehat{Y}}_{(2^{n_v} \times
 n_v)}\)</span> is a matrix each of whose rows consists of the integers 1
 to <span class="math inline">\(n_v\)</span>.</p>
 <p>We can test whether equation (<span class="math inline">\(\ref{eq:lin}\)</span>) has a solution for any
@@ -1193,7 +1223,7 @@ criterion.</p>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" line-spacing="2">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
 <div id="ref-Fox:2016" class="csl-entry">
 Fox, J. (2016). <em>Applied regression analysis and generalized linear
 models</em> (Second edition). Thousand Oaks <span>CA</span>: Sage.

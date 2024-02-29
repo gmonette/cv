@@ -16,7 +16,7 @@ more computationally efficient."><!-- mathjax --><script src="https://cdnjs.clou
     
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,10 +79,12 @@ more computationally efficient.</p>
 <span>  k <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  reps <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">seed</span>,</span>
+<span>  details <span class="op">=</span> <span class="va">k</span> <span class="op">&lt;=</span> <span class="fl">10</span>,</span>
 <span>  confint <span class="op">=</span> <span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">400</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"response"</span>,</span>
+<span>  start <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -100,6 +102,7 @@ more computationally efficient.</p>
 <span>  k <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  reps <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">seed</span>,</span>
+<span>  details <span class="op">=</span> <span class="va">k</span> <span class="op">&lt;=</span> <span class="fl">10</span>,</span>
 <span>  confint <span class="op">=</span> <span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">400</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"hatvalues"</span>, <span class="st">"Woodbury"</span>, <span class="st">"naive"</span><span class="op">)</span>,</span>
@@ -115,15 +118,27 @@ more computationally efficient.</p>
 <span>  k <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  reps <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  <span class="va">seed</span>,</span>
+<span>  details <span class="op">=</span> <span class="va">k</span> <span class="op">&lt;=</span> <span class="fl">10</span>,</span>
 <span>  confint <span class="op">=</span> <span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">400</span>,</span>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"exact"</span>, <span class="st">"hatvalues"</span>, <span class="st">"Woodbury"</span><span class="op">)</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  start <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for rlm</span></span>
-<span><span class="fu">cv</span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, <span class="va">criterion</span>, <span class="va">k</span>, reps <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">cv</span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, <span class="va">criterion</span>, <span class="va">k</span>, reps <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">folds</span><span class="op">(</span><span class="va">n</span>, <span class="va">k</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">fold</span><span class="op">(</span><span class="va">folds</span>, <span class="va">i</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for folds</span></span>
+<span><span class="fu">fold</span><span class="op">(</span><span class="va">folds</span>, <span class="va">i</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for folds</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -146,21 +161,28 @@ where <code>y</code> is the observed values of the response and
 <dt>k</dt>
 <dd><p>perform k-fold cross-validation (default is <code>10</code>); <code>k</code>
 may be a number or <code>"loo"</code> or <code>"n"</code> for n-fold (leave-one-out)
-cross-validation.</p></dd>
+cross-validation; for <code>folds()</code>, <code>k</code> must be a number.</p></dd>
 
 
 <dt>reps</dt>
-<dd><p>number of times to replicate k-fold CV (default is <code>1</code>)</p></dd>
+<dd><p>number of times to replicate k-fold CV (default is <code>1</code>).</p></dd>
 
 
 <dt>seed</dt>
 <dd><p>for R's random number generator; optional, if not
 supplied a random seed will be selected and saved; not needed
-for n-fold cross-validation</p></dd>
+for n-fold cross-validation.</p></dd>
 
 
 <dt>...</dt>
 <dd><p>to match generic; passed to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> for the default method.</p></dd>
+
+
+<dt>details</dt>
+<dd><p>if <code>TRUE</code> (the default if the number of
+folds <code>k &lt;= 10</code>), save detailed information about the value of the
+CV criterion for the cases in each fold and the regression coefficients
+with that fold deleted.</p></dd>
 
 
 <dt>confint</dt>
@@ -175,7 +197,7 @@ criterion, if the criterion is the average of casewise components.</p></dd>
 
 <dt>ncores</dt>
 <dd><p>number of cores to use for parallel computations
-(default is <code>1</code>, i.e., computations aren't done in parallel)</p></dd>
+(default is <code>1</code>, i.e., computations aren't done in parallel).</p></dd>
 
 
 <dt>type</dt>
@@ -183,6 +205,12 @@ criterion, if the criterion is the average of casewise components.</p></dd>
 <code>type</code> argument of <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>;
 the default is <code>type="response"</code>, which is appropriate, e.g., for a <code>"glm"</code> model
 and may be recognized or ignored by <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> methods for other model classes.</p></dd>
+
+
+<dt>start</dt>
+<dd><p>if <code>TRUE</code> (the default is <code>FALSE</code>), the <code>start</code> argument
+set to the vector of regression coefficients for the model fit to the full data is passed
+to <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> possibly making the CV updates faster, e.g. for a GLM.</p></dd>
 
 
 <dt>x</dt>
@@ -199,6 +227,18 @@ default taken from the <code>"digits"</code> option</p></dd>
 or to a generalized linear (i.e., <code>"glm"</code>) model. See Details for an explanation
 of the available options.</p></dd>
 
+
+<dt>n</dt>
+<dd><p>number of cases, for constructed folds.</p></dd>
+
+
+<dt>folds</dt>
+<dd><p>an object of class <code>"folds"</code>.</p></dd>
+
+
+<dt>i</dt>
+<dd><p>a fold number for an object of class <code>"folds"</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -209,10 +249,16 @@ of the available options.</p></dd>
 the criterion for the model applied to the full data (<code>"full crit"</code>),
 the confidence interval and level for the bias-adjusted CV criterion (<code>"confint"</code>),
 the number of folds (<code>"k"</code>), and the seed for R's random-number
-generator (<code>"seed"</code>). Some methods may return a
+generator (<code>"seed"</code>). If <code>details=TRUE</code>, then the returned object
+will also include a <code>"details"</code> component, which is a list of two
+elements: <code>"criterion"</code>, containing the CV criterion computed for the
+cases in each fold; and <code>"coefficients"</code>, regression coefficients computed
+for the model with each fold deleted.  Some methods may return a
 subset of these components and may add additional information.
 If <code>reps</code> &gt; <code>1</code>, then an object of class <code>"cvList"</code> is returned,
-which is literally a list of <code>"cv"</code> objects.</p>
+which is literally a list of <code>"cv"</code> objects.
+<code>folds()</code> returns an object of class folds, for which
+there are <code>fold()</code> and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> methods.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -265,6 +311,11 @@ models; see the "Extending the cv package" vignette
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
     
 <ul><li><p><code>print(cvList)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method</p></li>
+<li><p><code>folds()</code>: used internally by <code>cv()</code> methods (not for direct use);
+exported to support new <code>cv()</code> methods.</p></li>
+<li><p><code>fold()</code>: to extract a fold from a <code>"folds"</code> object.</p></li>
+<li><p><code>fold(folds)</code>: <code>fold()</code> method for <code>"folds"</code> objects.</p></li>
+<li><p><code>print(folds)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code>"folds"</code> objects.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -280,7 +331,7 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: hatvalues</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 24.23151</span>
-<span class="r-in"><span><span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">cv.auto</span> <span class="op">&lt;-</span> <span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 1234</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
@@ -288,6 +339,25 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 24.3794</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 24.35646</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 23.94366 </span>
+<span class="r-in"><span><span class="fu"><a href="cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.auto</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CV criterion by folds:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   fold.1   fold.2   fold.3   fold.4   fold.5   fold.6   fold.7   fold.8 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24.31128 18.54939 33.52760 22.09623 25.09248 19.56235 29.05875 16.84553 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   fold.9  fold.10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19.62079 35.28078 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients by folds:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         (Intercept) horsepower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 1         39.9      -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 2         40.3      -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 3         39.9      -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 4         40.1      -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 5         40.0      -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 6         39.4      -0.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 7         40.2      -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 8         40.1      -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 9         39.6      -0.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Fold 10        39.9      -0.16</span>
 <span class="r-in"><span><span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span>, reps<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 1234</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 469908</span>
@@ -353,6 +423,18 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 193.3949</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 192.9083</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 169.7487 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">ffs</span> <span class="op">&lt;-</span> <span class="fu">folds</span><span class="op">(</span><span class="fl">102</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 folds of approximately 20 cases each</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fold 1: 46 9 79 17 7 94 8 65 101 25 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fold 2: 39 23 100 89 33 37 60 29 70 93 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fold 3: 43 3 61 22 99 88 35 84 76 50 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fold 4: 21 82 73 71 41 38 13 62 28 19 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  fold 5: 51 5 27 32 48 53 6 66 87 98 ...</span>
+<span class="r-in"><span><span class="fu">fold</span><span class="op">(</span><span class="va">ffs</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  39  23 100  89  33  37  60  29  70  93  42  26  44  96  16  81  95  30  58</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20]  72  56</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
