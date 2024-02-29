@@ -3,7 +3,8 @@
 #' A parallelized generic k-fold (including n-fold, i.e., leave-one-out)
 #' cross-validation function, with a default method, and
 #' specific methods for linear and generalized-linear models that can be much
-#' more computationally efficient.
+#' more computationally efficient. The \code{cvCompute()} function is called by
+#' \code{cv()} methods and isn't for direct use.
 #'
 #' @param model a regression model object (see Details).
 #' @param data data frame to which the model was fit (not usually necessary).
@@ -42,6 +43,13 @@
 #' @param folds an object of class \code{"folds"}.
 #' @param i a fold number for an object of class \code{"folds"}.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
+#' @param f function to be called by \code{cvCompute()} for each fold.
+#' @param fPara function to be called by \code{cvCompute()} for each fold
+#' using parallel computation.
+#' @param locals a named list of objects that are required in the local environment
+#' of \code{cvCompute()} for \code{f()} or \code{fPara()}.
+#' @param criterion.name a character string giving the name of the CV criterion function
+#' (used by \code{cvCompute()} in the returned \code{"cv"} object).
 #'
 #' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
 #' (\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
@@ -128,59 +136,33 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
   UseMethod("cv")
 }
 
-#' @describeIn cv \code{default} method
-#' @importFrom stats coef family fitted lm.wfit lsfit model.frame
-#' model.matrix model.response predict qnorm
-#' update weighted.mean weights
-#' residuals hatvalues printCoefmat sd
-#' @importFrom parallel makeCluster stopCluster
-#' @importFrom doParallel registerDoParallel
-#' @importFrom foreach foreach %dopar%
-#' @importFrom lme4 lmer
-#' @importFrom nlme lme
-#' @importFrom MASS rlm
-#' @importFrom methods functionBody
+#' @describeIn cv used internally by \code{cv()} methods (not for direct use);
+#' exported to support new \code{cv()} methods.
 #' @export
-cv.default <- function(model, data=insight::get_data(model),
-                       criterion=mse, k=10, reps=1, seed,
-                       details = k <= 10,
-                       confint = n >= 400, level=0.95,
-                       ncores=1,
-                       type="response",
-                       start=FALSE, ...){
+cvCompute <- function(model, data=insight::get_data(model),
+                      criterion=mse, criterion.name,
+                      k=10, reps=1, seed,
+                      details = k <= 10,
+                      confint, level=0.95,
+                      method=NULL,
+                      ncores=1,
+                      type="response",
+                      start=FALSE,
+                      f,
+                      fPara=f,
+                      locals=list(),
+                      ...){
 
-  f <- function(i){
-    # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i)
-    model.i <- if (start) {
-      update(model, data=data[ - indices.i, ], start=b)
-    } else {
-      update(model, data=data[ - indices.i, ])
-      }
-    fit.all.i <- predict(model.i, newdata=data, type=type, ...)
-    fit.i <- fit.all.i[indices.i]
-    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-         coef.i=coef(model.i))
+  # put function and variable args in the local environment
+  env <- environment()
+  environment(f) <- env
+  environment(fPara) <- env
+  localsNames <- names(locals)
+  for (i in seq_along(locals)){
+    assign(localsNames[i], locals[[i]])
   }
 
-  fPara <- function(i){
-    # helper function to compute cv criterion for each fold
-    #  with parallel computations
-    indices.i <- fold(folds, i)
-    # the following deals with a scoping issue that can
-    #   occur with args passed via ... (which is saved in dots)
-    predict.args <- c(list(
-      object= if (start) {
-          update(model, data=data[ - indices.i, ], start=b)
-        } else {
-          update(model, data=data[ - indices.i, ])
-        },
-      newdata=data, type=type), dots)
-    fit.all.i <- do.call(predict, predict.args)
-    fit.i <- fit.all.i[indices.i]
-    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-         coef.i=coef(predict.args$object))
-  }
+  if (missing(criterion.name) || is.null(criterion.name)) criterion.name <- deparse(substitute(criterion))
 
   y <- GetResponse(model)
   b <- coef(model)
@@ -194,7 +176,7 @@ cv.default <- function(model, data=insight::get_data(model),
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
   if (k != n){
-    if (missing(seed)) seed <- sample(1e6, 1L)
+    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
@@ -265,16 +247,30 @@ cv.default <- function(model, data=insight::get_data(model),
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
                  "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,
-                 "criterion" = deparse(substitute(criterion)),
+                 "method" = method,
+                 "criterion" = criterion.name,
                  "details"=list(criterion=crit.i,
-                              coefficients=coef.i))
+                                coefficients=coef.i))
+  if (missing(method) || is.null(method)) result$method <- NULL
   class(result) <- "cv"
   if (reps == 1) {
     return(result)
   } else {
-    res <- cv(model=model, data=data, criterion=criterion,
-              k=k, ncores=ncores, reps=reps - 1,
-              details=details, ...)
+
+    res <- cvCompute(model=model, data=data,
+                     criterion=criterion, criterion.name=criterion.name,
+                     k=k, reps=reps - 1,
+                     details=details,
+                     confint=confint, level=level,
+                     method=method,
+                     ncores=ncores,
+                     type=type,
+                     start=start,
+                     f=f,
+                     fPara=fPara,
+                     locals=locals,
+                     ...)
+
     if (reps  > 2){
       res[[length(res) + 1]] <- result
     } else {
@@ -287,6 +283,71 @@ cv.default <- function(model, data=insight::get_data(model),
     return(res)
   }
 }
+
+
+#' @describeIn cv \code{default} method
+#' @importFrom stats coef family fitted lm.wfit lsfit model.frame
+#' model.matrix model.response predict qnorm
+#' update weighted.mean weights
+#' residuals hatvalues printCoefmat sd
+#' @importFrom parallel makeCluster stopCluster
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach %dopar%
+#' @importFrom lme4 lmer
+#' @importFrom nlme lme
+#' @importFrom MASS rlm
+#' @importFrom methods functionBody
+#' @export
+cv.default <- function(model, data=insight::get_data(model),
+                       criterion=mse, k=10, reps=1, seed=NULL,
+                       details = k <= 10,
+                       confint = n >= 400, level=0.95,
+                       ncores=1,
+                       type="response",
+                       start=FALSE, ...){
+
+  f <- function(i){
+    # helper function to compute cv criterion for each fold
+    indices.i <- fold(folds, i)
+    model.i <- if (start) {
+      update(model, data=data[ - indices.i, ], start=b)
+    } else {
+      update(model, data=data[ - indices.i, ])
+    }
+    fit.all.i <- predict(model.i, newdata=data, type=type, ...)
+    fit.i <- fit.all.i[indices.i]
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+         coef.i=coef(model.i))
+  }
+
+  fPara <- function(i){
+    # helper function to compute cv criterion for each fold
+    #  with parallel computations
+    indices.i <- fold(folds, i)
+    # the following deals with a scoping issue that can
+    #   occur with args passed via ... (which is saved in dots)
+    predict.args <- c(list(
+      object= if (start) {
+        update(model, data=data[ - indices.i, ], start=b)
+      } else {
+        update(model, data=data[ - indices.i, ])
+      },
+      newdata=data, type=type), dots)
+    fit.all.i <- do.call(predict, predict.args)
+    fit.i <- fit.all.i[indices.i]
+    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
+         coef.i=coef(predict.args$object))
+  }
+
+  n <- nrow(data)
+
+  cvCompute(model=model, data=data, criterion=criterion,
+            criterion.name=deparse(substitute(criterion)),
+            k=k, reps=reps, seed=seed, details=details, confint=confint,
+            level=level, ncores=ncores, type=type, start=start,
+            f=f, fPara=fPara, ...)
+}
+
 
 #' @describeIn cv \code{print()} method
 #' @param x a \code{"cv"} or \code{"cvList"} object to be printed
@@ -355,7 +416,8 @@ print.cvList <- function(x, ...){
 #' @describeIn cv \code{"lm"} method
 #' @export
 cv.lm <- function(model, data=insight::get_data(model),
-                  criterion=mse, k=10, reps=1, seed,
+                  criterion=mse,
+                  k=10, reps=1, seed=NULL,
                   details = k <= 10,
                   confint = n >= 400, level=0.95,
                   method=c("auto", "hatvalues", "Woodbury", "naive"),
@@ -374,6 +436,7 @@ cv.lm <- function(model, data=insight::get_data(model),
     # helper function to compute cv criterion for each fold
     indices.i <- fold(folds, i)
     b.i <- UpdateLM(indices.i)
+    names(b.i) <- coef.names
     fit.all.i <- X %*% b.i
     fit.i <- fit.all.i[indices.i]
     list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
@@ -400,6 +463,7 @@ cv.lm <- function(model, data=insight::get_data(model),
 
   b <- coef(model)
   p <- length(b)
+  coef.names <- names(b)
   if (p > model$rank) {
     message(paste0("The model has ", if (sum(is.na(b)) == 1L) "an ",
                    "aliased coefficient", if (sum(is.na(b)) > 1L) "s", ":"))
@@ -427,106 +491,25 @@ cv.lm <- function(model, data=insight::get_data(model),
     return(result)
   }
 
-  if (details){
-    names.b <- names(b)
-    crit.i <- numeric(k)
-    coef.i <- vector(k, mode="list")
-    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
-  } else {
-    crit.i <- NULL
-    coef.i <- NULL
-  }
-
   XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
   Xy <- t(X) %*% (w * y)
-  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
-    stop("k must be an integer between 2 and n")
-  }
-  if (k != n){
-    if (missing(seed)) seed <- sample(1e6, 1L)
-    set.seed(seed)
-    message("R RNG seed set to ", seed)
-  } else {
-    seed <- NULL
-  }
-  folds <- folds(n, k)
-  yhat <- numeric(n)
-  if (ncores > 1L){
-    cl <- makeCluster(ncores)
-    registerDoParallel(cl)
-    result <- foreach(i = 1L:k) %dopar% {
-      f(i)
-    }
-    stopCluster(cl)
-    for (i in 1L:k){
-      yhat[fold(folds, i)] <- result[[i]]$fit.i
-      if (details){
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
-        b.i <- result[[i]]$coef.i
-        names(b.i) <- names.b
-        coef.i[[i]] <- b.i
-      }
-    }
-  } else {
-    result <- vector(k, mode="list")
-    for (i in 1L:k){
-      result[[i]] <- f(i)
-      yhat[fold(folds, i)] <- result[[i]]$fit.i
-      if (details){
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
-        b.i <- result[[i]]$coef.i
-        names(b.i) <- names.b
-        coef.i[[i]] <- b.i
-      }
-    }
-  }
-  cv <- criterion(y, yhat)
-  cv.full <- criterion(y, fitted(model))
-  loss <- getLossFn(cv) # casewise loss function
-  if (!is.null(loss)) {
-    adj.cv <- cv + cv.full -
-      weighted.mean(sapply(result, function(x) x$crit.all.i), folds$folds)
-    se.cv <- sd(loss(y, yhat))/sqrt(n)
-    halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
-    ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
-                         level=round(level*100)) else NULL
-  } else {
-    adj.cv <- NULL
-    ci <- NULL
-  }
-  result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
-                 "full crit" = cv.full, "confint"=ci,
-                 "k" = if (k == n) "n" else k, "seed" = seed,
-                 "method"=method,
-                 "criterion" = deparse(substitute(criterion)),
-                 "details"=list(criterion=crit.i,
-                                coefficients=coef.i))
-  class(result) <- "cv"
-  if (reps == 1) {
-    return(result)
-  } else {
-    res <- cv(model=model, data=data, criterion=criterion,
-              k=k, ncores=ncores, method=method, reps=reps - 1,
-              details=details, ...)
-    if (reps  > 2){
-      res[[length(res) + 1]] <- result
-    } else {
-      res <- list(res, result)
-    }
-    for (i in 1:(length(res) - 1)){
-      res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
-    }
-    class(res) <- "cvList"
-    return(res)
-  }
+
+  cvCompute(model=model, data=data, criterion=criterion,
+            criterion.name=deparse(substitute(criterion)),
+            k=k, reps=reps, seed=seed, details=details, confint=confint,
+            level=level, ncores=ncores, start=FALSE, method=method, f=f,
+            locals=list(UpdateLM=UpdateLM,
+                        X=X, w=w, XXi=XXi, Xy=Xy, b=b, p=p,
+                        coef.names=coef.names),
+            ...)
+
 }
+
 
 #' @describeIn cv \code{"glm"} method
 #' @export
 cv.glm <- function(model, data=insight::get_data(model),
-                   criterion=mse, k=10, reps=1, seed,
+                   criterion=mse, k=10, reps=1, seed=NULL,
                    details = k <= 10,
                    confint = n >= 400, level=0.95,
                    method=c("exact", "hatvalues", "Woodbury"),
@@ -541,7 +524,9 @@ cv.glm <- function(model, data=insight::get_data(model),
     dg <- if (length(omit) > 1L) diag(1/w[omit]) else 1/w[omit]
     XXi.u <- XXi + (XXi %*% t(x) %*% solve(dg - x %*% XXi %*% t(x)) %*% x %*% XXi)
     b.u <- XXi.u %*% (Xz - t(X[omit, , drop=FALSE]) %*% (w[omit] * z[omit]))
-    as.vector(b.u)
+    b.u <- as.vector(b.u)
+    names(b.u) <- coef.names
+    b.u
   }
   f <- function(i){
     # helper function to compute cv criterion for each fold
@@ -567,17 +552,10 @@ cv.glm <- function(model, data=insight::get_data(model),
     seed <- NULL
   }
   method <- match.arg(method)
-  if (k != n){
-    if (missing(seed)) seed <- sample(1e6, 1L)
-    set.seed(seed)
-    if (method != "exact") message("R RNG seed set to ", seed)
-  } else {
-    seed <- NULL
-  }
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
     result <- cv.default(model=model, data=data, criterion=criterion, k=k, reps=reps, seed=seed,
-               ncores=ncores, method=method, details=details, start=start, ...)
+                         ncores=ncores, method=method, details=details, start=start, ...)
     if (inherits(result, "cv")) result$"criterion" <- deparse(substitute(criterion))
     return(result)
   } else if (method == "hatvalues") {
@@ -593,6 +571,7 @@ cv.glm <- function(model, data=insight::get_data(model),
     return(result)
   } else {
     b <- coef(model)
+    coef.names <- names(b)
     p <- length(b)
     w <- weights(model, type="working")
     X <- model.matrix(model)
@@ -615,88 +594,15 @@ cv.glm <- function(model, data=insight::get_data(model),
     if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
       stop("k must be an integer between 2 and n")
     }
-    folds <- folds(n, k)
-    yhat <- numeric(n)
 
-    if (details){
-      names.b <- names(b)
-      crit.i <- numeric(k)
-      coef.i <- vector(k, mode="list")
-      names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
-    } else {
-      crit.i <- NULL
-      coef.i <- NULL
-    }
-
-    if (ncores > 1L){
-      cl <- makeCluster(ncores)
-      registerDoParallel(cl)
-      result <- foreach(i = 1L:k) %dopar% {
-        f(i)
-      }
-      stopCluster(cl)
-      for (i in 1L:k){
-        yhat[fold(folds, i)] <- result[[i]]$fit.i
-        if (details){
-          crit.i[i] <- criterion(y[fold(folds, i)],
-                                 yhat[fold(folds, i)])
-          b.i <- result[[i]]$coef.i
-          names(b.i) <- names.b
-          coef.i[[i]] <- b.i
-        }
-      }
-    } else {
-      result <- vector(k, mode="list")
-      for (i in 1L:k){
-        result[[i]] <- f(i)
-        yhat[fold(folds, i)] <- result[[i]]$fit.i
-        if (details){
-          crit.i[i] <- criterion(y[fold(folds, i)],
-                                 yhat[fold(folds, i)])
-          b.i <- result[[i]]$coef.i
-          names(b.i) <- names.b
-          coef.i[[i]] <- b.i
-        }
-      }
-    }
-    cv <- criterion(y, yhat)
-    cv.full <- criterion(y, fitted(model))
-    loss <- getLossFn(cv) # casewise loss function
-    if (!is.null(loss)) {
-      adj.cv <- cv + cv.full -
-        weighted.mean(sapply(result, function(x) x$crit.all.i), folds$folds)
-      se.cv <- sd(loss(y, yhat))/sqrt(n)
-      halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
-      ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
-                           level=round(level*100)) else NULL
-    } else {
-      adj.cv <- NULL
-      ci <- NULL
-    }
-    result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
-                   "full crit" = cv.full, confint=ci,
-                   "k" = if (k == n) "n" else k, "seed" = seed,
-                   "method"=method,
-                   "criterion" = deparse(substitute(criterion)),
-                   "details"=list(criterion=crit.i,
-                                  coefficients=coef.i))
-    class(result) <- "cv"
-    if (reps == 1) {
-      return(result)
-    } else {
-      res <- cv(model=model, data=data, criterion=criterion,
-                k=k, ncores=ncores, method=method, reps=reps - 1, ...)
-      if (reps  > 2){
-        res[[length(res) + 1]] <- result
-      } else {
-        res <- list(res, result)
-      }
-      for (i in 1:(length(res) - 1)){
-        res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
-      }
-      class(res) <- "cvList"
-      return(res)
-    }
+    cvCompute(model=model, data=data, criterion=criterion,
+              criterion.name=deparse(substitute(criterion)),
+              k=k, reps=reps, seed=seed, details=details, confint=confint,
+              level=level, ncores=ncores, start=start, method=method, f=f,
+              locals=list(UpdateIWLS=UpdateIWLS, linkinv=linkinv,
+                          X=X, w=w, z=z, XXi=XXi, b=b, p=p,
+                          coef.names=coef.names),
+              ...)
   }
 }
 
@@ -780,3 +686,4 @@ getLossFn <- function(cv){
                          "\n}")))
 }
 
+utils::globalVariables(c("b", "y", "dots"))

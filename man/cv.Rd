@@ -2,6 +2,7 @@
 % Please edit documentation in R/cv.R
 \name{cv}
 \alias{cv}
+\alias{cvCompute}
 \alias{cv.default}
 \alias{print.cv}
 \alias{print.cvList}
@@ -16,13 +17,34 @@
 \usage{
 cv(model, data, criterion, k, reps = 1, seed, ...)
 
+cvCompute(
+  model,
+  data = insight::get_data(model),
+  criterion = mse,
+  criterion.name,
+  k = 10,
+  reps = 1,
+  seed,
+  details = k <= 10,
+  confint,
+  level = 0.95,
+  method = NULL,
+  ncores = 1,
+  type = "response",
+  start = FALSE,
+  f,
+  fPara = f,
+  locals = list(),
+  ...
+)
+
 \method{cv}{default}(
   model,
   data = insight::get_data(model),
   criterion = mse,
   k = 10,
   reps = 1,
-  seed,
+  seed = NULL,
   details = k <= 10,
   confint = n >= 400,
   level = 0.95,
@@ -42,7 +64,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   criterion = mse,
   k = 10,
   reps = 1,
-  seed,
+  seed = NULL,
   details = k <= 10,
   confint = n >= 400,
   level = 0.95,
@@ -57,7 +79,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   criterion = mse,
   k = 10,
   reps = 1,
-  seed,
+  seed = NULL,
   details = k <= 10,
   confint = n >= 400,
   level = 0.95,
@@ -99,6 +121,9 @@ for n-fold cross-validation.}
 
 \item{...}{to match generic; passed to \code{predict()} for the default method.}
 
+\item{criterion.name}{a character string giving the name of the CV criterion function
+(used by \code{cvCompute()} in the returned \code{"cv"} object).}
+
 \item{details}{if \code{TRUE} (the default if the number of
 folds \code{k <= 10}), save detailed information about the value of the
 CV criterion for the cases in each fold and the regression coefficients
@@ -109,6 +134,10 @@ or greater), compute a confidence interval for the bias-corrected CV
 criterion, if the criterion is the average of casewise components.}
 
 \item{level}{confidence level (default \code{0.95}).}
+
+\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
+or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
+of the available options.}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel).}
@@ -122,14 +151,18 @@ and may be recognized or ignored by \code{predict()} methods for other model cla
 set to the vector of regression coefficients for the model fit to the full data is passed
 to \code{update()} possibly making the CV updates faster, e.g. for a GLM.}
 
+\item{f}{function to be called by \code{cvCompute()} for each fold.}
+
+\item{fPara}{function to be called by \code{cvCompute()} for each fold
+using parallel computation.}
+
+\item{locals}{a named list of objects that are required in the local environment
+of \code{cvCompute()} for \code{f()} or \code{fPara()}.}
+
 \item{x}{a \code{"cv"} or \code{"cvList"} object to be printed}
 
 \item{digits}{significant digits for printing,
 default taken from the \code{"digits"} option}
-
-\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
-or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
-of the available options.}
 
 \item{n}{number of cases, for constructed folds.}
 
@@ -158,7 +191,8 @@ there are \code{fold()} and \code{print()} methods.
 A parallelized generic k-fold (including n-fold, i.e., leave-one-out)
 cross-validation function, with a default method, and
 specific methods for linear and generalized-linear models that can be much
-more computationally efficient.
+more computationally efficient. The \code{cvCompute()} function is called by
+\code{cv()} methods and isn't for direct use.
 }
 \details{
 The default \code{cv()} method uses \code{\link{update}()} to refit the model
@@ -218,6 +252,9 @@ models; see the "Extending the cv package" vignette
 }}
 \section{Functions}{
 \itemize{
+\item \code{cvCompute()}: used internally by \code{cv()} methods (not for direct use);
+exported to support new \code{cv()} methods.
+
 \item \code{print(cvList)}: \code{print()} method
 
 \item \code{folds()}: used internally by \code{cv()} methods (not for direct use);
