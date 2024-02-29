@@ -237,9 +237,6 @@ cvMixed <- function(model,
       ci <- NULL
     }
 
-  # adj.cv <- cv + cv.full -
-  #   weighted.mean(sapply(result, function(x) x$crit.all.i), folds)
-
   result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
                  "full crit" = cv.full, "confint"=ci,
                  "k" = if (k == n) "n" else k, "seed" = seed,

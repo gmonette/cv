@@ -134,7 +134,6 @@ cvSelect <- function(procedure, data, criterion=mse,
     seed <- NULL
   }
   folds <- folds(n, k)
-  indices <- if (n > k) sample(n, n)  else 1:n # permute cases
   yhat <- if (is.factor(y)){
     factor(rep(NA, n), levels=levels(y))
   } else if (is.character(y)) {
@@ -295,7 +294,6 @@ cvSelect <- function(procedure, data, criterion=mse,
 #' @export
 selectStepAIC <- function(data, indices,
                           model, criterion=mse, AIC=TRUE,
-                          # save.coef=TRUE,
                           details=TRUE,
                           save.model=FALSE,
                           ...){
@@ -402,7 +400,6 @@ yjPowerInverse <- function(y, lambda) {
 #' cv(m.pres, seed=123)
 #' @export
 selectTrans <- function(data, indices,
-                        # save.coef=TRUE,
                         details=TRUE,
                         save.model=FALSE,
                         model,
@@ -530,7 +527,6 @@ selectTrans <- function(data, indices,
 #' @export
 selectTransStepAIC <- function(data,
                                indices,
-                               # save.coef = TRUE,
                                details = TRUE,
                                save.model = FALSE,
                                model,
@@ -795,7 +791,6 @@ coef.cvSelect <- function(object, average, NAs=0, ...){
 cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
                         seed=NULL, working.model=NULL, y.expression=NULL,
                         confint = n >= 400, level=0.95,
-                        # save.coef = n >= 400,
                         details = k <= 10,
                         save.model=FALSE,
                         ncores = 1, ...){
