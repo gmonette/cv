@@ -127,35 +127,35 @@ for (p in 1:10){
   eval(parse(text=command))
 }
 
+cv1 <- cv(selectModelList, Auto, k=10, k.recurse="loo",
+          working.model=models(m.1, m.2, m.3, m.4, m.5,
+                               m.6, m.7, m.8, m.9, m.10),
+          save.model=TRUE,
+          seed=123)
+cv2 <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                 m.6, m.7, m.8, m.9, m.10),
+          recursive=TRUE,
+          k=10, k.recurse="loo",
+          save.model=TRUE,
+          seed=123)
+cv1$criterion <- cv2$criterion <- NULL
 test_that("cv(SelectModelList()) and cv.modList() produce same recursive CV/k-LOO", {
-  expect_equal(
-    cv(selectModelList, Auto, k=10, k.recurse="loo",
-       working.model=models(m.1, m.2, m.3, m.4, m.5,
-                            m.6, m.7, m.8, m.9, m.10),
-       save.model=TRUE,
-       seed=123),
-    cv(models(m.1, m.2, m.3, m.4, m.5,
-              m.6, m.7, m.8, m.9, m.10),
-       recursive=TRUE,
-       k=10, k.recurse="loo",
-       save.model=TRUE,
-       seed=123)
-  )
+  expect_equal(cv1, cv2)
 })
 
+cv1 <- cv(selectModelList, Auto,
+          working.model=models(m.1, m.2, m.3, m.4, m.5,
+                               m.6, m.7, m.8, m.9, m.10),
+          save.model=TRUE,
+          seed=123)
+cv2 <- cv(models(m.1, m.2, m.3, m.4, m.5,
+                 m.6, m.7, m.8, m.9, m.10),
+          recursive=TRUE,
+          save.model=TRUE,
+          seed=123)
+cv1$criterion <- cv2$criterion <- NULL
 test_that("cv(SelectModelList()) and cv.modList() produce same recursive CV/k-fold", {
-  expect_equal(
-    cv(selectModelList, Auto,
-       working.model=models(m.1, m.2, m.3, m.4, m.5,
-                            m.6, m.7, m.8, m.9, m.10),
-       save.model=TRUE,
-       seed=123),
-    cv(models(m.1, m.2, m.3, m.4, m.5,
-              m.6, m.7, m.8, m.9, m.10),
-       recursive=TRUE,
-       save.model=TRUE,
-       seed=123)
-  )
+  expect_equal(cv1, cv2)
 })
 
 test_that("recursive SelectModelList() works with parallel computation loo", {

@@ -2,41 +2,15 @@
 % Please edit documentation in R/cv.R
 \name{cv}
 \alias{cv}
-\alias{cvCompute}
 \alias{cv.default}
-\alias{print.cv}
-\alias{print.cvList}
 \alias{cv.lm}
 \alias{cv.glm}
 \alias{cv.rlm}
-\alias{folds}
-\alias{fold}
-\alias{fold.folds}
-\alias{print.folds}
+\alias{print.cv}
+\alias{print.cvList}
 \title{Cross-Validate Regression Models}
 \usage{
 cv(model, data, criterion, k, reps = 1, seed, ...)
-
-cvCompute(
-  model,
-  data = insight::get_data(model),
-  criterion = mse,
-  criterion.name,
-  k = 10,
-  reps = 1,
-  seed,
-  details = k <= 10,
-  confint,
-  level = 0.95,
-  method = NULL,
-  ncores = 1,
-  type = "response",
-  start = FALSE,
-  f,
-  fPara = f,
-  locals = list(),
-  ...
-)
 
 \method{cv}{default}(
   model,
@@ -53,10 +27,6 @@ cvCompute(
   start = FALSE,
   ...
 )
-
-\method{print}{cv}(x, digits = getOption("digits"), ...)
-
-\method{print}{cvList}(x, ...)
 
 \method{cv}{lm}(
   model,
@@ -91,13 +61,9 @@ cvCompute(
 
 \method{cv}{rlm}(model, data, criterion, k, reps = 1, seed, ...)
 
-folds(n, k)
+\method{print}{cv}(x, digits = getOption("digits"), ...)
 
-fold(folds, i, ...)
-
-\method{fold}{folds}(folds, i, ...)
-
-\method{print}{folds}(x, ...)
+\method{print}{cvList}(x, ...)
 }
 \arguments{
 \item{model}{a regression model object (see Details).}
@@ -111,7 +77,7 @@ where \code{y} is the observed values of the response and
 
 \item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
-cross-validation; for \code{folds()}, \code{k} must be a number.}
+cross-validation.}
 
 \item{reps}{number of times to replicate k-fold CV (default is \code{1}).}
 
@@ -120,9 +86,6 @@ supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation.}
 
 \item{...}{to match generic; passed to \code{predict()} for the default method.}
-
-\item{criterion.name}{a character string giving the name of the CV criterion function
-(used by \code{cvCompute()} in the returned \code{"cv"} object).}
 
 \item{details}{if \code{TRUE} (the default if the number of
 folds \code{k <= 10}), save detailed information about the value of the
@@ -135,10 +98,6 @@ criterion, if the criterion is the average of casewise components.}
 
 \item{level}{confidence level (default \code{0.95}).}
 
-\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
-or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
-of the available options.}
-
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel).}
 
@@ -148,27 +107,17 @@ the default is \code{type="response"}, which is appropriate, e.g., for a \code{"
 and may be recognized or ignored by \code{predict()} methods for other model classes.}
 
 \item{start}{if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
-set to the vector of regression coefficients for the model fit to the full data is passed
-to \code{update()} possibly making the CV updates faster, e.g. for a GLM.}
+to \code{update()} is set to the vector of regression coefficients for the model fit
+to the full data is passed possibly making the CV updates faster, e.g. for a GLM.}
 
-\item{f}{function to be called by \code{cvCompute()} for each fold.}
+\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
+or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
+of the available options.}
 
-\item{fPara}{function to be called by \code{cvCompute()} for each fold
-using parallel computation.}
-
-\item{locals}{a named list of objects that are required in the local environment
-of \code{cvCompute()} for \code{f()} or \code{fPara()}.}
-
-\item{x}{a \code{"cv"} or \code{"cvList"} object to be printed}
+\item{x}{a \code{"cv"} or \code{"cvList"} object to be printed.}
 
 \item{digits}{significant digits for printing,
-default taken from the \code{"digits"} option}
-
-\item{n}{number of cases, for constructed folds.}
-
-\item{folds}{an object of class \code{"folds"}.}
-
-\item{i}{a fold number for an object of class \code{"folds"}.}
+default taken from the \code{"digits"} option.}
 }
 \value{
 The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
@@ -184,21 +133,18 @@ for the model with each fold deleted.  Some methods may return a
 subset of these components and may add additional information.
 If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
 which is literally a list of \code{"cv"} objects.
-\code{folds()} returns an object of class folds, for which
-there are \code{fold()} and \code{print()} methods.
 }
 \description{
-A parallelized generic k-fold (including n-fold, i.e., leave-one-out)
-cross-validation function, with a default method, and
+\code{cv()} is a parallelized generic k-fold (including n-fold, i.e., leave-one-out)
+cross-validation function, with a default method,
 specific methods for linear and generalized-linear models that can be much
-more computationally efficient. The \code{cvCompute()} function is called by
-\code{cv()} methods and isn't for direct use.
+more computationally efficient, and a method for robust linear models.
 }
 \details{
 The default \code{cv()} method uses \code{\link{update}()} to refit the model
 to each fold, and should work if there are appropriate \code{update()}
 and \code{\link{predict}()} methods, and if the default method for \code{\link{GetResponse}()}
-works or if a \code{GetResponse()} method is supplied.
+works or if a \code{\link{GetResponse}()} method is supplied.
 
 The \code{"lm"} and \code{"glm"} methods can use much faster computational
 algorithms, as selected by the \code{method} argument. The linear-model
@@ -247,24 +193,12 @@ models; see the "Extending the cv package" vignette
 }}
 \section{Methods (by generic)}{
 \itemize{
-\item \code{print(cv)}: \code{print()} method
+\item \code{print(cv)}: \code{print()} method for \code{"cv"} objects.
 
 }}
 \section{Functions}{
 \itemize{
-\item \code{cvCompute()}: used internally by \code{cv()} methods (not for direct use);
-exported to support new \code{cv()} methods.
-
-\item \code{print(cvList)}: \code{print()} method
-
-\item \code{folds()}: used internally by \code{cv()} methods (not for direct use);
-exported to support new \code{cv()} methods.
-
-\item \code{fold()}: to extract a fold from a \code{"folds"} object.
-
-\item \code{fold(folds)}: \code{fold()} method for \code{"folds"} objects.
-
-\item \code{print(folds)}: \code{print()} method for \code{"folds"} objects.
+\item \code{print(cvList)}: \code{print()} method for \code{"cvList"} objects.
 
 }}
 \examples{
@@ -285,9 +219,6 @@ m.rlm <- MASS::rlm(prestige ~ income + education,
                    data=Duncan)
 cv(m.lm, k="loo", method="Woodbury")
 cv(m.rlm, k="loo")
-
-(ffs <- folds(102, 5))
-fold(ffs, 2)
 
 }
 \seealso{

@@ -1,12 +1,16 @@
-# cv 1.2.0
+# cv 2.0.0
 
-- New cv.function() method meant to replace cvSelect(), which is deprecated.
+- New cv.function() method meant to replace cvSelect(), direct use of which is deprecated.
 
 - New selectModelList() to be used with cv.function() (or with cvSelect()). selectModelList() implements recursive cross-validation, where the fit of a model selected by CV is assessed by CV. The same procedure is also available by setting recursive=TRUE in a call to cv.modList().
 
 - cv.default() and other cv() methods acquire a details argument, which if TRUE includes information about the folds in the returned object.
 
 - Improvements to code, introducing folds(), fold(), and related functions.
+
+- Refactoring of code; cv() methods now all call cvCompute() (which is new), cvMixed(), or cvSelect().
+
+- Reorganization of package file structure and of documentation.
 
 # cv 1.1.0
 

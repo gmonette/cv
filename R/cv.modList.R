@@ -28,13 +28,16 @@
 #' value to which the random-number generator seed is set), but not warnings or
 #' errors, are suppressed.
 #' @param grid if \code{TRUE} (the default), include grid lines on the graph.
-#' @param ... for \code{models()}, two or more competing models fit to the
+#' @param ... for \code{cv.modList()}, additional arguments to be passed to the \code{cv()} method
+#' applied to each model.
+#'
+#' For \code{models()}, two or more competing models fit to the
 #' the same data; the several models may be named.
-#' For \code{cv()}, additional arguments to be passed to the \code{cv()} method
-#' applied to each model. For the \code{print()}
-#' method, arguments to be passed to the \code{print()} method for
-#' the individual model cross-validations. For the \code{plot()},
-#' method, arguments to be passed to the base \code{\link[base]{plot}()}
+#'
+#' For the \code{print()} method, arguments to be passed to the \code{print()} method for
+#' the individual model cross-validations.
+#'
+#' For the \code{plot()}, method, arguments to be passed to the base \code{\link[base]{plot}()}
 #' function.
 #' @param x an object of class \code{"cvModList"} to be printed or plotted.
 #' @param y the name of the element in each \code{"cv"} object to be
@@ -59,7 +62,7 @@
 #' @param lwd line width for the line (defaults to 2).
 #' @return \code{models()} returns a \code{"modList"} object, the
 #' \code{cv()} method for which returns a \code{"cvModList"} object,
-#' or, when \code{recursive=TRUE}, and object of class \code{c("cvSelect", "cv")}.
+#' or, when \code{recursive=TRUE}, an object of class \code{c("cvSelect", "cv")}.
 #' @seealso \code{\link{cv}}, \code{\link{cvMixed}},
 #' \code{\link{selectModelList}}.
 #' @examples
@@ -78,37 +81,8 @@
 #'                            data=Duncan, seed=5962,
 #'                            recursive=TRUE, save.model=TRUE))
 #' cv.models.recursive$selected.model
-#' @describeIn models create a list of models
-#' @export
-models <- function(...){
-  models <- list(...)
-  if (length(models) < 2L) stop("fewer than 2 models to be compared")
-  classes <- sapply(models, function(m) class(m)[1L])
-  n <- sapply(models, function(m) nrow(insight::get_data(m)))
-  if (!all(n[1L] == n[-1L])) {
-    stop("models are fit to data sets of differing numbers of cases")
-  }
-  response <- GetResponse(models[[1L]])
-  for (i in 2L:length(models)){
-    if (!isTRUE(all.equal(response, GetResponse(models[[i]]),
-                          check.attributes=FALSE))){
-      stop("models are not all fit to the same response variable")
-    }
-  }
-  if (length(unique(classes)) > 1L)
-    warning("models are not all of the same primary class")
-  nms <- names(models)
-  if (is.null(nms)) {
-    names(models) <- paste0("model.", seq_along(models))
-  } else {
-    unnamed <- which(nms == "")
-    names(models)[unnamed] <- paste0("model.", seq_along(unnamed))
-  }
-  class(models) <- "modList"
-  models
-}
 
-#' @describeIn models \code{cv()} method for \code{"modList"} objects
+#' @describeIn cv.modList \code{cv()} method for \code{"modList"} objects.
 #' @exportS3Method
 cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE,
                        recursive=FALSE, ...){
@@ -150,7 +124,37 @@ cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE
   result
 }
 
-#' @describeIn models \code{print()} method for \code{"cvModList"} objects
+#' @describeIn cv.modList create a list of models.
+#' @export
+models <- function(...){
+  models <- list(...)
+  if (length(models) < 2L) stop("fewer than 2 models to be compared")
+  classes <- sapply(models, function(m) class(m)[1L])
+  n <- sapply(models, function(m) nrow(insight::get_data(m)))
+  if (!all(n[1L] == n[-1L])) {
+    stop("models are fit to data sets of differing numbers of cases")
+  }
+  response <- GetResponse(models[[1L]])
+  for (i in 2L:length(models)){
+    if (!isTRUE(all.equal(response, GetResponse(models[[i]]),
+                          check.attributes=FALSE))){
+      stop("models are not all fit to the same response variable")
+    }
+  }
+  if (length(unique(classes)) > 1L)
+    warning("models are not all of the same primary class")
+  nms <- names(models)
+  if (is.null(nms)) {
+    names(models) <- paste0("model.", seq_along(models))
+  } else {
+    unnamed <- which(nms == "")
+    names(models)[unnamed] <- paste0("model.", seq_along(unnamed))
+  }
+  class(models) <- "modList"
+  models
+}
+
+#' @describeIn cv.modList \code{print()} method for \code{"cvModList"} objects.
 #' @exportS3Method
 print.cvModList <- function(x, ...){
   nms <- names(x)
@@ -173,7 +177,7 @@ print.cvModList <- function(x, ...){
   return(invisible(x))
 }
 
-#' @describeIn models \code{plot()} method for \code{"cvModList"} objects
+#' @describeIn cv.modList \code{plot()} method for \code{"cvModList"} objects.
 #' @importFrom grDevices palette
 #' @importFrom graphics abline arrows axis box par points strwidth
 #' @importFrom stats na.omit

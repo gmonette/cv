@@ -1,7 +1,7 @@
 #' Cross-Validate a Model-Selection Procedure
 #'
-#' \code{cvSelect()} and the \code{cv()} \code{"function"} method
-#' are general functions to cross-validate a model-selection procedure;
+#' The \code{cv()} \code{"function"} method
+#' is a general function to cross-validate a model-selection procedure;
 #' \code{selectStepAIC()} is a procedure that applies the \code{\link[MASS]{stepAIC}()}
 #' model-selection function in the \pkg{MASS} package; \code{selectTrans()} is a procedure
 #' for selecting predictor and response transformations in regression, which
@@ -9,10 +9,9 @@
 #' \pkg{car} package; \code{selectTransAndStepAIC()} combines predictor and response
 #' transformation with predictor selection; and \code{selectModelList()}
 #' uses cross-validation to select a model from a list of models created by
-#' \code{\link{models}()} and employs (nested) cross-validation to assess the predictive
+#' \code{\link{models}()} and employs (recursive) cross-validation to assess the predictive
 #' accuracy of this procedure.
 #'
-#' @param procedure a model-selection procedure function (see Details).
 #' @param data full data frame for model selection.
 #' @param y.expression normally the response variable is found from the
 #' \code{model} or \code{working.model} argument; but if, for a particular selection procedure, the
@@ -26,9 +25,6 @@
 #' or greater), compute a confidence interval for the bias-corrected CV
 #' criterion, if the criterion is the average of casewise components.
 #' @param level confidence level (default \code{0.95}).
-#' @param save.coef save the coefficients from the selected models? Deprecated
-#' in favor of the \code{details} argument; if specified, \code{details} is set
-#' is set to the value of \code{save.coef}.
 #' @param details if \code{TRUE}, save detailed information about the value of the
 #' CV criterion for the cases in each fold and the regression coefficients
 #' (and possibly other information)
@@ -46,7 +42,6 @@
 #' arguments to be passed to \code{procedure()};
 #' for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.
 #' @importFrom MASS stepAIC
-#' @describeIn cvSelect apply cross-validation to a model-selection procedure.
 #' @returns An object of class \code{"cvSelect"},
 #' inheriting from class \code{"cv"}, with the CV criterion
 #' (\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
@@ -93,192 +88,13 @@
 #' @seealso \code{\link[MASS]{stepAIC}}, \code{\link[car]{bcPower}},
 #' \code{\link[car]{powerTransform}}, \code{\link{cv}}.
 #'
-#' @export
-cvSelect <- function(procedure, data, criterion=mse,
-                     model, y.expression,
-                     k=10, confint = n >= 400, level=0.95,
-                     reps=1,
-                     save.coef,
-                     details = k <= 10,
-                     save.model=FALSE,
-                     seed, ncores=1, ...){
-  selectModelListP <- isTRUE(all.equal(procedure, selectModelList))
-  if (!missing(save.coef)) details <- save.coef
-  n <- nrow(data)
-  y <- if (!missing(model)) {
-    GetResponse(model)
-    } else {
-      eval(y.expression, envir=data)
-    }
-  if (missing(model)) model <- NULL
-  k.save <- k
-  if (is.character(k)){
-    if (k == "n" || k == "loo") {
-      k <- n
-    }
-  }
-  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
-    stop('k must be an integer between 2 and n or "n" or "loo"')
-  }
-  if (k != n){
-    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
-    set.seed(seed)
-    message("R RNG seed set to ", seed)
-  } else {
-    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
-    if (k == n){
-      if (reps > 1) stop("reps should not be > 1 for n-fold CV")
-      if (!missing(seed) && !is.null(seed) && !isFALSE(seed)) message("Note: seed ignored for n-fold CV")
-      seed <- NULL
-    }
-    seed <- NULL
-  }
-  folds <- folds(n, k)
-  yhat <- if (is.factor(y)){
-    factor(rep(NA, n), levels=levels(y))
-  } else if (is.character(y)) {
-    character(n)
-  } else {
-    numeric(n)
-  }
-  crit.all.i <- numeric(k)
-
-  if (details){
-    crit.i <- numeric(k)
-    coef.i <- vector(k, mode="list")
-    model.name.i <- character(k)
-    names(crit.i) <- names(coef.i) <- names(model.name.i) <-
-      paste("fold", 1:k, sep=".")
-  } else {
-    crit.i <- NULL
-    coef.i <- NULL
-    model.name.i <- NULL
-  }
-
-  if (ncores > 1){
-    cl <- makeCluster(ncores)
-    registerDoParallel(cl)
-    arglist <- c(list(data=data, indices=1,
-                      details = k <= 10,
-                      criterion=criterion, model=model),
-                 list(...))
-    if (selectModelListP) arglist <- c(arglist, list(k=k.save))
-    selection <- foreach(i = 1L:k) %dopar% {
-      # the following deals with a scoping issue that can
-      #   occur with args passed via ...
-      arglist$indices <- fold(folds, i)
-      do.call(procedure, arglist)
-    }
-    stopCluster(cl)
-
-    for (i in 1L:k){
-      yhat[fold(folds, i)] <- selection[[i]]$fit.i
-      crit.all.i[i] <- selection[[i]]$crit.all.i
-
-      if (details){
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
-        coef.i[[i]] <- selection[[i]]$coefficients
-        model.name.i[[i]] <- if (!is.null(selection[[i]]$model.name)) selection[[i]]$model.name else ""
-      }
-
-    }
-
-  } else {
-
-    for (i in 1L:k){
-      indices.i <- fold(folds, i)
-      selection <- if(selectModelListP){
-        procedure(data, indices.i,
-                             details = k <= 10,
-                             criterion=criterion, model=model,
-                             k=k.save, ...)
-      } else {
-        procedure(data, indices.i,
-                  details = k <= 10,
-                  criterion=criterion, model=model,
-                  ...)
-      }
-      crit.all.i[i] <- selection$crit.all.i
-      yhat[indices.i] <- selection$fit.i
-
-      if (details){
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
-        coef.i[[i]] <- selection$coefficients
-        model.name.i[[i]] <- if (!is.null(selection$model.name)) selection$model.name else ""
-      }
-
-    }
-  }
-  cv <- criterion(y, yhat)
-  result.full <- if (selectModelListP){
-    procedure(data, model=model, criterion=criterion,
-                    #   seed = seed, # to use same folds if necessary
-                       save.model=save.model,
-                       k=k.save,
-                       ...)
-  } else {
-    procedure(data, model=model, criterion=criterion,
-              seed = seed, # to use same folds if necessary
-              save.model=save.model,
-              ...)
-  }
-  if (is.list(result.full)){
-    cv.full <- result.full$criterion
-    selected.model <- result.full$model
-  } else {
-    cv.full <- result.full
-    selected.model <- NULL
-  }
-
-  loss <- getLossFn(cv) # casewise loss function
-  if (!is.null(loss)) {
-    adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds$folds)
-    se.cv <- sd(loss(y, yhat))/sqrt(n)
-    halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
-    ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
-                         level=round(level*100)) else NULL
-  } else {
-    adj.cv <- NULL
-    ci <- NULL
-  }
-
-  result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
-                 "confint" = ci,
-                 "k" = if (k == n) "n" else k, "seed" = seed,
-                 "details" = list(criterion=crit.i,
-                                  coefficients=coef.i,
-                                  model.name=model.name.i),
-                 "selected.model" = selected.model)
-  class(result) <- c("cvSelect", "cv")
-  if (reps == 1) {
-    return(result)
-  } else {
-    if (missing(y.expression)) y.expression <- NULL
-    res <- cvSelect(procedure=procedure, data=data, k=k,
-                    reps = reps - 1, save.coef = save.coef,
-                    details = details, save.model = save.model,
-                    ncores=ncores, model=model,
-                    y.expression=y.expression, ...)
-    if (reps  > 2){
-      res[[length(res) + 1]] <- result
-    } else {
-      res <- list(res, result)
-    }
-    class(res) <- c("cvSelectList", "cvList")
-    return(res)
-  }
-}
-
-#' @describeIn cvSelect select a model using the \code{\link[MASS]{stepAIC}()} function in the
-#' \pkg{MASS} package.
 #' @param indices indices of cases in data defining the current fold.
 #' @param model a regression model object fit to data, or for the
-#' \code{cv()} \code{"function"} method,  model-selection procedure function
+#' \code{cv()} \code{"function"} method, a model-selection procedure function
 #' (see Details).
 #' @param working.model a regression model object fit to data, typically
-#' to begin a model-selection process.
+#' to begin a model-selection process; for use with \code{selectModelList()},
+#' a list of competing models created by \code{\link{models}()}.
 #' @param criterion a CV criterion ("cost" or lack-of-fit) function.
 #' @param AIC if \code{TRUE} (the default) use the AIC as the
 #' model-selection criterion; if \code{FALSE}, use the BIC.
@@ -291,6 +107,37 @@ cvSelect <- function(procedure, data, criterion=mse,
 #' cv(selectStepAIC, Auto, seed=123, working.model=m.auto)
 #' cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
 #'          AIC=FALSE, k=5, reps=3) # via BIC
+
+#' @describeIn cv.function \code{cv()} method for applying a model
+#' model-selection (or specification) procedure.
+#' @export
+cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
+                        seed=NULL, working.model=NULL, y.expression=NULL,
+                        confint = n >= 400, level=0.95,
+                        details = k <= 10,
+                        save.model=FALSE,
+                        ncores = 1, ...){
+
+  n <- nrow(data)
+  cvSelect(procedure=model,
+           data=data,
+           criterion=criterion,
+           criterion.name=deparse(substitute(criterion)),
+           model=working.model,
+           y.expression=y.expression,
+           k=k,
+           confint=confint,
+           level=level,
+           reps=reps,
+           details = details,
+           save.model = save.model,
+           seed=seed,
+           ncores=ncores,
+           ...)
+}
+
+#' @describeIn cv.function select a regression model using the
+#' \code{\link[MASS]{stepAIC}()} function in the \pkg{MASS} package.
 #' @export
 selectStepAIC <- function(data, indices,
                           model, criterion=mse, AIC=TRUE,
@@ -374,7 +221,6 @@ yjPowerInverse <- function(y, lambda) {
   y
 }
 
-#' @describeIn cvSelect select transformations of the predictors and response.
 #' @param predictors character vector of names of the predictors in the model
 #' to transform; if missing, no predictors will be transformed.
 #' @param response name of the response variable; if missing, the response
@@ -398,6 +244,7 @@ yjPowerInverse <- function(y, lambda) {
 #' compareFolds(cvt)
 #' coef(cvt, average=median, NAs=1) # NAs not really needed here
 #' cv(m.pres, seed=123)
+#' @describeIn cv.function select transformations of the predictors and response.
 #' @export
 selectTrans <- function(data, indices,
                         details=TRUE,
@@ -508,7 +355,7 @@ selectTrans <- function(data, indices,
 }
 
 
-#' @describeIn cvSelect select transformations of the predictors and response,
+#' @describeIn cv.function select transformations of the predictors and response,
 #' and then select predictors.
 #' @examples
 #' Auto$year <- as.factor(Auto$year)
@@ -696,7 +543,7 @@ selectTransStepAIC <- function(data,
   )
 }
 
-#' @describeIn cvSelect select a model using (nested) CV.
+#' @describeIn cv.function select a model using (recursive) CV.
 #' @param quietly if \code{TRUE} (the default), simple messages (for example about the
 #' value to which the random-number generator seed is set), but not warnings or
 #' errors, are suppressed.
@@ -735,8 +582,15 @@ selectModelList <- function(data, indices, model, criterion=mse, k=10, k.recurse
        coefficients=if (details) coef(model[[cv.min]]) else NULL,
        model.name = model.name)
 }
-
-#' @describeIn cvSelect print the coefficients from the selected models
+#' @examples
+#' data("Duncan", package="carData")
+#' m1 <- lm(prestige ~ income + education, data=Duncan)
+#' m2 <- lm(prestige ~ income + education + type, data=Duncan)
+#' m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
+#' cv(selectModelList, data=Duncan, seed=5962,
+#'    working.model=models(m1, m2, m3)) # recursive CV
+#'
+#' @describeIn cv.function print the coefficients from the selected models
 #' for the several folds.
 #' @param object an object of class \code{"cvSelect"}.
 #' @param digits significant digits for printing coefficients
@@ -766,7 +620,7 @@ compareFolds.default <- function(object, digits=3, ...){
   printCoefmat(table, na.print="", digits=digits)
 }
 
-#' @describeIn cvSelect extract the coefficients from the selected models
+#' @describeIn cv.function extract the coefficients from the selected models
 #' for the several folds and possibly average them.
 #' @param average if supplied, a function, such as \code{mean} or \code{median},
 #' to use us in averaging estimates across folds; if missing, the
@@ -785,34 +639,3 @@ coef.cvSelect <- function(object, average, NAs=0, ...){
   coef[is.na(coef)] <- NAs
   apply(coef, 2, average)
 }
-
-#' @describeIn cvSelect \code{cv()} method
-#' @export
-cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
-                        seed=NULL, working.model=NULL, y.expression=NULL,
-                        confint = n >= 400, level=0.95,
-                        details = k <= 10,
-                        save.model=FALSE,
-                        ncores = 1, ...){
-
-  n <- nrow(data)
-  cvSelect(procedure=model,
-           data=data,
-           criterion=criterion,
-           model=working.model,
-           y.expression=y.expression,
-           k=k,
-           confint=confint,
-           level=level,
-           reps=reps,
-           details = details,
-           save.model = save.model,
-           seed=seed,
-           ncores=ncores,
-           ...)
-}
-
-#' @section Deprecated:
-#' The \code{cvSelect()} function is deprecated in favor of the \code{cv()}
-#' \code{"function"} method, which has the same functionality. \code{cvSelect()}
-#' will eventually be removed from the \pkg{cv} package.
