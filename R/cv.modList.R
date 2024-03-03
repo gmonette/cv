@@ -2,8 +2,9 @@
 #'
 #' A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 #' created by the \code{models()} function. This \code{cv()} method simplifies
-#' the process of cross-validating several models on the same set of CV folds.
-#' \code{models()} performs some
+#' the process of cross-validating several models on the same set of CV folds
+#' and may also be used recursive CV, where CV is used to select one from among
+#' several models. \code{models()} performs some
 #' "sanity" checks, warning if the models are of different classes, and
 #' reporting an error if they are fit to apparently different data sets or
 #' different response variables.
@@ -15,10 +16,11 @@
 #' @param k the number of CV folds; may be omitted, in which case the value
 #' will depend on the default for the \code{cv()} method invoked for the
 #' individual models.
-#' @param reps number of replications of CV for each model.
+#' @param reps number of replications of CV for each model (default is 1).
 #' @param seed (optional) seed for R's pseudo-random-number generator,
 #' to be used to create the same set of CV folds for all of the models;
-#' if omitted, a seed will be randomly generated and saved.
+#' if omitted, a seed will be randomly generated and saved. Not used for
+#' leave-one-out CV.
 #' @param recursive if \code{TRUE} (the default is \code{FALSE}), cross-validation
 #' is performed recursively to select a "best" model deleting each fold in turn
 #' by calculating the CV estimate of the criterion for the remaining folds;
@@ -63,7 +65,7 @@
 #' @return \code{models()} returns a \code{"modList"} object, the
 #' \code{cv()} method for which returns a \code{"cvModList"} object,
 #' or, when \code{recursive=TRUE}, an object of class \code{c("cvSelect", "cv")}.
-#' @seealso \code{\link{cv}}, \code{\link{cvMixed}},
+#' @seealso \code{\link{cv}}, \code{\link{cv.merMod}},
 #' \code{\link{selectModelList}}.
 #' @examples
 #' data("Duncan", package="carData")

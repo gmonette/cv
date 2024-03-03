@@ -117,11 +117,14 @@ best linear unbiased predictors or "BLUPS").
 }
 \section{Functions}{
 \itemize{
-\item \code{cv(merMod)}: \code{cv()} method
+\item \code{cv(merMod)}: \code{cv()} method for \code{\link[lme4]{lmer}()} and
+\code{\link[lme4]{glmer}()} models from the \pkg{lme4} package.
 
-\item \code{cv(lme)}: \code{cv()} method
+\item \code{cv(lme)}: \code{cv()} method for \code{\link[nlme]{lme}()}
+models from the \pkg{nlme} package.
 
-\item \code{cv(glmmTMB)}: \code{cv()} method
+\item \code{cv(glmmTMB)}: \code{cv()} method for \code{\link[glmmTMB]{glmmTMB}()}
+models from the \pkg{glmmTMB} package.
 
 }}
 \examples{

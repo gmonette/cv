@@ -100,7 +100,8 @@ GetResponse(model, ...)
 \arguments{
 \item{model}{a regression model object.}
 
-\item{data}{data frame to which the model was fit (not usually necessary).}
+\item{data}{data frame to which the model was fit (not usually necessary,
+except for \code{cvSelect()}).}
 
 \item{criterion}{cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 where \code{y} is the observed values of the response and
@@ -132,7 +133,7 @@ criterion, if the criterion is the average of casewise components.}
 \item{level}{confidence level (default \code{0.95}).}
 
 \item{method}{computational method to apply; use by some \code{\link{cv}()}
-method functions.}
+methods.}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel).}
@@ -187,8 +188,8 @@ coefficients for cluster-based CV when \code{details = TRUE}.}
 \item{procedure}{a model-selection procedure function (see Details).}
 
 \item{y.expression}{normally the response variable is found from the
-\code{model} or \code{working.model} argument; but if, for a particular selection procedure, the
-\code{model} or \code{working.model} argument is absent, or if the response can't be inferred from the
+\code{model} argument; but if, for a particular selection procedure, the
+\code{model} argument is absent, or if the response can't be inferred from the
 model, the response can be specified by an expression, such as \code{expression(log(income))},
 to be evaluated within the data set provided by the \code{data} argument.}
 
@@ -204,7 +205,7 @@ is set to the value of \code{save.coef}.}
 
 \item{i}{a fold number for an object of class \code{"folds"}.}
 
-\item{x}{a \code{"cv"} or \code{"cvList"} object to be printed}
+\item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed}
 }
 \value{
 The utility functions return various kinds of objects:
@@ -218,7 +219,7 @@ generator (\code{"seed"}). If \code{details=TRUE}, then the returned object
 will also include a \code{"details"} component, which is a list of two
 elements: \code{"criterion"}, containing the CV criterion computed for the
 cases in each fold; and \code{"coefficients"}, regression coefficients computed
-for the model with each fold deleted.  Some \code{cv} methods calling \code{cvCompute()}
+for the model with each fold deleted.  Some \code{cv()} methods calling \code{cvCompute()}
 may return a subset of these components and may add additional information.
 If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
 which is literally a list of \code{"cv"} objects.
@@ -288,7 +289,7 @@ from a regression model.
 
 \item \code{GetResponse(glmmTMB)}: \code{"glmmTMB"} method.
 
-\item \code{GetResponse(modList)}: \code{modList} method.
+\item \code{GetResponse(modList)}: \code{"modList"} method.
 
 }}
 \examples{
@@ -302,5 +303,5 @@ fold(ffs, 2)
 }
 \seealso{
 \code{\link{cv}}, \code{\link{cv.merMod}},
-\code{\link{selectStepAIC}}.
+\code{\link{cv.function}}.
 }

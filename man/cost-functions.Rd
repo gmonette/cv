@@ -29,7 +29,8 @@ In general, cost functions should return a single numeric
 value measuring lack-of-fit. \code{mse()} returns the mean-squared error;
 \code{rmse()} returns the root-mean-squared error;
 \code{medAbsErr()} returns the median absolute error;
-and BayesRule()\code{and}BayesRule2()` return the proportion of misclassified cases.
+and \code{BayesRule()} and
+\code{BayesRule2()} return the proportion of misclassified cases.
 }
 \description{
 Compute cost functions (cross-validation criteria) for fitted
@@ -56,15 +57,15 @@ the latter doesn't and is therefore faster.
 }
 \section{Functions}{
 \itemize{
-\item \code{mse()}: Mean-square error
+\item \code{mse()}: Mean-square error.
 
-\item \code{rmse()}: Root-mean-square error
+\item \code{rmse()}: Root-mean-square error.
 
-\item \code{medAbsErr()}: Median absolute error
+\item \code{medAbsErr()}: Median absolute error.
 
-\item \code{BayesRule()}: Bayes Rule for a binary response
+\item \code{BayesRule()}: Bayes Rule for a binary response.
 
-\item \code{BayesRule2()}: Bayes rule for a binary response (without bounds checking)
+\item \code{BayesRule2()}: Bayes rule for a binary response (without bounds checking).
 
 }}
 \examples{
@@ -77,5 +78,6 @@ m.glm <- glm(lfp ~ ., data=Mroz, family=binomial)
 BayesRule(Mroz$lfp == "yes", fitted(m.glm))
 }
 \seealso{
-\code{\link{cv}}, \code{\link{cvSelect}}
+\code{\link{cv}}, \code{\link{cv.merMod}},
+\code{\link{cv.function}}.
 }

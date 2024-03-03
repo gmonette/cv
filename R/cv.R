@@ -28,16 +28,16 @@
 #' with that fold deleted.
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel).
-#' @param method computational method to apply to a linear (i.e. \code{"lm"}) model
+#' @param method computational method to apply to a linear (i.e., \code{"lm"}) model
 #' or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 #' of the available options.
 #' @param type for the default method, value to be passed to the
 #' \code{type} argument of \code{predict()};
-#' the default is `type="response"`, which is appropriate, e.g., for a `"glm"` model
+#' the default is `type="response"`, which is appropriate, e.g., for a \code{"glm"} model
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
 #' @param start if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
 #' to \code{update()} is set to the vector of regression coefficients for the model fit
-#' to the full data is passed possibly making the CV updates faster, e.g. for a GLM.
+#' to the full data, possibly making the CV updates faster, e.g., for a GLM.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
 #'
 #' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
@@ -54,7 +54,8 @@
 #' If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
 #' which is literally a list of \code{"cv"} objects.
 #'
-#' @seealso \code{\link{cvMixed}}, \code{\link{cvSelect}}.
+#' @seealso \code{\link{cv.merMod}}, \code{\link{cv.function}},
+#' \code{\link{cv.modList}}.
 #'
 #' @details
 #' The default \code{cv()} method uses \code{\link{update}()} to refit the model
@@ -120,7 +121,7 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
   UseMethod("cv")
 }
 
-#' @describeIn cv \code{default} method
+#' @describeIn cv \code{"default"} method.
 #' @importFrom stats coef family fitted lm.wfit lsfit model.frame
 #' model.matrix model.response predict qnorm
 #' update weighted.mean weights
@@ -183,7 +184,7 @@ cv.default <- function(model, data=insight::get_data(model),
             f=f, fPara=fPara, ...)
 }
 
-#' @describeIn cv \code{"lm"} method
+#' @describeIn cv \code{"lm"} method.
 #' @export
 cv.lm <- function(model, data=insight::get_data(model),
                   criterion=mse,
@@ -276,7 +277,7 @@ cv.lm <- function(model, data=insight::get_data(model),
 }
 
 
-#' @describeIn cv \code{"glm"} method
+#' @describeIn cv \code{"glm"} method.
 #' @export
 cv.glm <- function(model, data=insight::get_data(model),
                    criterion=mse, k=10, reps=1, seed=NULL,
@@ -376,7 +377,7 @@ cv.glm <- function(model, data=insight::get_data(model),
   }
 }
 
-#' @describeIn cv \code{"rlm"} method (to avoid inheriting the \code{"lm"} method)
+#' @describeIn cv \code{"rlm"} method (to avoid inheriting the \code{"lm"} method).
 #' @export
 cv.rlm <- function(model, data, criterion, k, reps = 1, seed, ...){
   result <- NextMethod(method="naive")

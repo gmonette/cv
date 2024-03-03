@@ -155,7 +155,7 @@ won't be transformed.}
 \item{family}{transformation family for the predictors, one of
 \code{"bcPower", "bcnPower", "yjPower", "basicPower"},
 with \code{"bcPower"} as the default. These are the names of transformation
-functions in the \pkg{car} package; see \code{\link[car]{bcPower}()}}
+functions in the \pkg{car} package; see \code{\link[car]{bcPower}()}.}
 
 \item{family.y}{transformation family for the response,
 with \code{"bcPower"} as the default.}
@@ -251,7 +251,8 @@ model-selection (or specification) procedure.
 \item \code{selectStepAIC()}: select a regression model using the
 \code{\link[MASS]{stepAIC}()} function in the \pkg{MASS} package.
 
-\item \code{selectTrans()}: select transformations of the predictors and response.
+\item \code{selectTrans()}: select transformations of the predictors and response
+using \code{\link[car]{powerTransform}()} in the \pkg{car} package.
 
 \item \code{selectTransStepAIC()}: select transformations of the predictors and response,
 and then select predictors.

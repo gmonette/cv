@@ -77,7 +77,8 @@
 #' return objects of class \code{"cv"}, or,
 #' if \code{reps > 1}, of class \code{"cvList"} (see \code{\link{cv}()}).
 
-#' @describeIn cv.merMod \code{cv()} method
+#' @describeIn cv.merMod \code{cv()} method for \code{\link[lme4]{lmer}()} and
+#' \code{\link[lme4]{glmer}()} models from the \pkg{lme4} package.
 #' @export
 cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
                       k=NULL, reps = 1, seed, details=NULL,
@@ -109,7 +110,8 @@ cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
     ...)
 }
 
-#' @describeIn cv.merMod \code{cv()} method
+#' @describeIn cv.merMod \code{cv()} method for \code{\link[nlme]{lme}()}
+#' models from the \pkg{nlme} package.
 #' @export
 cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
                    k=NULL, reps = 1, seed, details=NULL,
@@ -138,7 +140,8 @@ cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
     ...)
 }
 
-#' @describeIn cv.merMod \code{cv()} method
+#' @describeIn cv.merMod \code{cv()} method for \code{\link[glmmTMB]{glmmTMB}()}
+#' models from the \pkg{glmmTMB} package.
 #' @export
 cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
                        k=NULL, reps = 1, seed, details=NULL,

@@ -51,11 +51,12 @@ created by \code{models()}.}
 will depend on the default for the \code{cv()} method invoked for the
 individual models.}
 
-\item{reps}{number of replications of CV for each model.}
+\item{reps}{number of replications of CV for each model (default is 1).}
 
 \item{seed}{(optional) seed for R's pseudo-random-number generator,
 to be used to create the same set of CV folds for all of the models;
-if omitted, a seed will be randomly generated and saved.}
+if omitted, a seed will be randomly generated and saved. Not used for
+leave-one-out CV.}
 
 \item{quietly}{if \code{TRUE} (the default), simple messages (for example about the
 value to which the random-number generator seed is set), but not warnings or
@@ -120,8 +121,9 @@ or, when \code{recursive=TRUE}, an object of class \code{c("cvSelect", "cv")}.
 \description{
 A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 created by the \code{models()} function. This \code{cv()} method simplifies
-the process of cross-validating several models on the same set of CV folds.
-\code{models()} performs some
+the process of cross-validating several models on the same set of CV folds
+and may also be used recursive CV, where CV is used to select one from among
+several models. \code{models()} performs some
 "sanity" checks, warning if the models are of different classes, and
 reporting an error if they are fit to apparently different data sets or
 different response variables.
@@ -155,6 +157,6 @@ plot(cv.models.ci)
 cv.models.recursive$selected.model
 }
 \seealso{
-\code{\link{cv}}, \code{\link{cvMixed}},
+\code{\link{cv}}, \code{\link{cv.merMod}},
 \code{\link{selectModelList}}.
 }

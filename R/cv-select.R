@@ -228,7 +228,7 @@ yjPowerInverse <- function(y, lambda) {
 #' @param family transformation family for the predictors, one of
 #' \code{"bcPower", "bcnPower", "yjPower", "basicPower"},
 #' with \code{"bcPower"} as the default. These are the names of transformation
-#' functions in the \pkg{car} package; see \code{\link[car]{bcPower}()}
+#' functions in the \pkg{car} package; see \code{\link[car]{bcPower}()}.
 #' @param family.y transformation family for the response,
 #' with \code{"bcPower"} as the default.
 #' @param rounded if \code{TRUE} (the default) use nicely rounded versions
@@ -244,7 +244,8 @@ yjPowerInverse <- function(y, lambda) {
 #' compareFolds(cvt)
 #' coef(cvt, average=median, NAs=1) # NAs not really needed here
 #' cv(m.pres, seed=123)
-#' @describeIn cv.function select transformations of the predictors and response.
+#' @describeIn cv.function select transformations of the predictors and response
+#' using \code{\link[car]{powerTransform}()} in the \pkg{car} package.
 #' @export
 selectTrans <- function(data, indices,
                         details=TRUE,

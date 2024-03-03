@@ -108,9 +108,9 @@ and may be recognized or ignored by \code{predict()} methods for other model cla
 
 \item{start}{if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
 to \code{update()} is set to the vector of regression coefficients for the model fit
-to the full data is passed possibly making the CV updates faster, e.g. for a GLM.}
+to the full data, possibly making the CV updates faster, e.g., for a GLM.}
 
-\item{method}{computational method to apply to a linear (i.e. \code{"lm"}) model
+\item{method}{computational method to apply to a linear (i.e., \code{"lm"}) model
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 of the available options.}
 
@@ -182,13 +182,13 @@ models; see the "Extending the cv package" vignette
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{cv(default)}: \code{default} method
+\item \code{cv(default)}: \code{"default"} method.
 
-\item \code{cv(lm)}: \code{"lm"} method
+\item \code{cv(lm)}: \code{"lm"} method.
 
-\item \code{cv(glm)}: \code{"glm"} method
+\item \code{cv(glm)}: \code{"glm"} method.
 
-\item \code{cv(rlm)}: \code{"rlm"} method (to avoid inheriting the \code{"lm"} method)
+\item \code{cv(rlm)}: \code{"rlm"} method (to avoid inheriting the \code{"lm"} method).
 
 }}
 \section{Methods (by generic)}{
@@ -222,5 +222,6 @@ cv(m.rlm, k="loo")
 
 }
 \seealso{
-\code{\link{cvMixed}}, \code{\link{cvSelect}}.
+\code{\link{cv.merMod}}, \code{\link{cv.function}},
+\code{\link{cv.modList}}.
 }

@@ -6,7 +6,8 @@
 #' \code{vignette("cv-extend", package="cv")}).
 #'
 #' @param model a regression model object.
-#' @param data data frame to which the model was fit (not usually necessary).
+#' @param data data frame to which the model was fit (not usually necessary,
+#' except for \code{cvSelect()}).
 #' @param criterion cross-validation criterion ("cost" or lack-of-fit) function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
 #'        \code{yhat} the predicted values; the default is \code{\link{mse}}
@@ -29,7 +30,7 @@
 #' @param ncores number of cores to use for parallel computations
 #'        (default is \code{1}, i.e., computations aren't done in parallel).
 #' @param method computational method to apply; use by some \code{\link{cv}()}
-#' method functions.
+#' methods.
 #' @param type used by some \code{\link{cv}()} methods, such as the default method,
 #' where \code{type} is passed to the \code{type} argument of \code{predict()};
 #' the default is \code{type="response"}, which is appropriate, e.g., for a \code{"glm"} model
@@ -75,12 +76,12 @@
 #' in favor of the \code{details} argument; if specified, \code{details} is set
 #' is set to the value of \code{save.coef}.
 #' @param y.expression normally the response variable is found from the
-#' \code{model} or \code{working.model} argument; but if, for a particular selection procedure, the
-#' \code{model} or \code{working.model} argument is absent, or if the response can't be inferred from the
+#' \code{model} argument; but if, for a particular selection procedure, the
+#' \code{model} argument is absent, or if the response can't be inferred from the
 #' model, the response can be specified by an expression, such as \code{expression(log(income))},
 #' to be evaluated within the data set provided by the \code{data} argument.
 #' @param save.model save the model that's selected using the \emph{full} data set.
-#' @param x a \code{"cv"} or \code{"cvList"} object to be printed
+#' @param x a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed
 
 #' @returns
 #' The utility functions return various kinds of objects:
@@ -94,7 +95,7 @@
 #' will also include a \code{"details"} component, which is a list of two
 #' elements: \code{"criterion"}, containing the CV criterion computed for the
 #' cases in each fold; and \code{"coefficients"}, regression coefficients computed
-#' for the model with each fold deleted.  Some \code{cv} methods calling \code{cvCompute()}
+#' for the model with each fold deleted.  Some \code{cv()} methods calling \code{cvCompute()}
 #' may return a subset of these components and may add additional information.
 #' If \code{reps} > \code{1}, then an object of class \code{"cvList"} is returned,
 #' which is literally a list of \code{"cv"} objects.
@@ -133,7 +134,7 @@
 #' fold(ffs, 2)
 #'
 #' @seealso \code{\link{cv}}, \code{\link{cv.merMod}},
-#' \code{\link{selectStepAIC}}.
+#' \code{\link{cv.function}}.
 #'
 #' @describeIn cvCompute used internally by \code{cv()} methods (not for direct use);
 #' exported to support new \code{cv()} methods.
@@ -744,7 +745,7 @@ GetResponse.lme <- function(model, ...) insight::get_response(model)
 #' @export
 GetResponse.glmmTMB <- GetResponse.merMod
 
-#' @describeIn cvCompute \code{modList} method.
+#' @describeIn cvCompute \code{"modList"} method.
 #' @export
 GetResponse.modList <- function(model, ...) GetResponse(model[[1]])
 
