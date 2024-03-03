@@ -1,3 +1,4 @@
+library(cv)
 library(nnet)
 data("BEPS", package="carData")
 m.beps <- multinom(vote ~ age + gender + economic.cond.national +
@@ -16,9 +17,9 @@ GetResponse.multinom <- function(model, ...) {
 m.beps <- update(m.beps, trace=FALSE)
 
 (cv1 <- cv(m.beps, seed=3465))
-(cv2 <- cv(m.beps, seed=3465, ncores=2))
+(cv2 <- cv(m.beps, seed=3465, ncores=8))
 all.equal(cv1, cv2)
 
 system.time(print(cv1 <- cv(m.beps, k="loo")))
-system.time(print(cv2 <- cv(m.beps, k="loo", ncores=2)))
+system.time(print(cv2 <- cv(m.beps, k="loo", ncores=8)))
 all.equal(cv1, cv2)

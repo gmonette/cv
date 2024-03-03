@@ -1,3 +1,10 @@
+# version in vignette
+cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
+                         seed, ...){
+  NextMethod(type="class", criterion=criterion)
+}
+
+# new version
 cv.multinom <- function(model, data=insight::get_data(model),
          criterion=BayesRuleMulti, k=10, reps=1, seed=NULL,
          details = k <= 10,
