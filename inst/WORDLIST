@@ -102,3 +102,4 @@ getResponse
 selectTransStepAIC
 selectModelList
 CVs
+cvCompute

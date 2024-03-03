@@ -89,7 +89,7 @@ compareFolds(object, digits = 3, ...)
 }
 \arguments{
 \item{model}{a regression model object fit to data, or for the
-\code{cv()} \code{"function"} method,  model-selection procedure function
+\code{cv()} \code{"function"} method, a model-selection procedure function
 (see Details).}
 
 \item{data}{full data frame for model selection.}
@@ -108,7 +108,8 @@ reproducible. In some cases, for internal use only, \code{seed} is set to
 \code{FALSE} to suppress automatically setting the seed.}
 
 \item{working.model}{a regression model object fit to data, typically
-to begin a model-selection process.}
+to begin a model-selection process; for use with \code{selectModelList()},
+a list of competing models created by \code{\link{models}()}.}
 
 \item{y.expression}{normally the response variable is found from the
 \code{model} or \code{working.model} argument; but if, for a particular selection procedure, the
@@ -209,7 +210,7 @@ uses the \code{\link[car]{powerTransform}()} function in the
 \pkg{car} package; \code{selectTransAndStepAIC()} combines predictor and response
 transformation with predictor selection; and \code{selectModelList()}
 uses cross-validation to select a model from a list of models created by
-\code{\link{models}()} and employs (nested) cross-validation to assess the predictive
+\code{\link{models}()} and employs (recursive) cross-validation to assess the predictive
 accuracy of this procedure.
 }
 \details{

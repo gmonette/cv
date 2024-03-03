@@ -155,7 +155,8 @@ using parallel computation.}
 \item{locals}{a named list of objects that are required in the local environment
 of \code{cvCompute()} for \code{f()} or \code{fPara()}.}
 
-\item{...}{to match generic; passed to \code{predict()} for the default method.}
+\item{...}{to match generic; passed to \code{predict()} for the default method,
+and to \code{fPara()} (for parallel computations) in \code{cvCompute()}.}
 
 \item{package}{the name of the package in which mixed-modeling function (or functions) employed resides;
 used to get the namespace of the package.}

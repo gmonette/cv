@@ -41,7 +41,8 @@
 #' @param n number of cases, for constructed folds.
 #' @param folds an object of class \code{"folds"}.
 #' @param i a fold number for an object of class \code{"folds"}.
-#' @param ... to match generic; passed to \code{predict()} for the default method.
+#' @param ... to match generic; passed to \code{predict()} for the default method,
+#' and to \code{fPara()} (for parallel computations) in \code{cvCompute()}.
 #' @param f function to be called by \code{cvCompute()} for each fold.
 #' @param fPara function to be called by \code{cvCompute()} for each fold
 #' using parallel computation.
@@ -205,7 +206,7 @@ cvCompute <- function(model, data=insight::get_data(model),
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k) %dopar% {
-      fPara(i)
+      fPara(i, ...)
     }
     stopCluster(cl)
     for (i in 1L:k){
