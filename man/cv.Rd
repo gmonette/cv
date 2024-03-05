@@ -19,12 +19,15 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   k = 10,
   reps = 1,
   seed = NULL,
+  criterion.name = deparse(substitute(criterion)),
   details = k <= 10,
   confint = n >= 400,
   level = 0.95,
   ncores = 1,
   type = "response",
   start = FALSE,
+  reg.fn = NULL,
+  reg.fn.name = NULL,
   ...
 )
 
@@ -87,6 +90,9 @@ for n-fold cross-validation.}
 
 \item{...}{to match generic; passed to \code{predict()} for the default method.}
 
+\item{criterion.name}{a character string giving the name of the CV criterion function
+in the returned \code{"cv"} object).}
+
 \item{details}{if \code{TRUE} (the default if the number of
 folds \code{k <= 10}), save detailed information about the value of the
 CV criterion for the cases in each fold and the regression coefficients
@@ -109,6 +115,14 @@ and may be recognized or ignored by \code{predict()} methods for other model cla
 \item{start}{if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
 to \code{update()} is set to the vector of regression coefficients for the model fit
 to the full data, possibly making the CV updates faster, e.g., for a GLM.}
+
+\item{reg.fn}{a regression function, typically for a new \code{cv()} method that
+that calls \code{cv(default())} via \code{NextMethod()},
+residing in a package that's not a declared dependency of the \pkg{cv} package,
+e.g., \code{nnet::multinom}.}
+
+\item{reg.fn.name}{the name of the regression function as a character string, e.g.,
+\code{"multinom"}.}
 
 \item{method}{computational method to apply to a linear (i.e., \code{"lm"}) model
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation

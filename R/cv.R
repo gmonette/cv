@@ -11,6 +11,8 @@
 #'        where \code{y} is the observed values of the response and
 #'        \code{yhat} the predicted values; the default is \code{\link{mse}}
 #'        (the mean-squared error).
+#' @param criterion.name a character string giving the name of the CV criterion function
+#' in the returned \code{"cv"} object).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
@@ -39,6 +41,12 @@
 #' to \code{update()} is set to the vector of regression coefficients for the model fit
 #' to the full data, possibly making the CV updates faster, e.g., for a GLM.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
+#' @param reg.fn a regression function, typically for a new \code{cv()} method that
+#' that calls \code{cv(default())} via \code{NextMethod()},
+#' residing in a package that's not a declared dependency of the \pkg{cv} package,
+#' e.g., \code{nnet::multinom}.
+#' @param reg.fn.name the name of the regression function as a character string, e.g.,
+#' \code{"multinom"}.
 #'
 #' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
 #' (\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
@@ -136,13 +144,17 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 #' @export
 cv.default <- function(model, data=insight::get_data(model),
                        criterion=mse, k=10, reps=1, seed=NULL,
+                       criterion.name=deparse(substitute(criterion)),
                        details = k <= 10,
                        confint = n >= 400, level=0.95,
                        ncores=1,
                        type="response",
-                       start=FALSE, ...){
+                       start=FALSE,
+                       reg.fn=NULL,
+                       reg.fn.name=NULL,
+                       ...){
 
-  f <- function(i){
+  f <- function(i, ...){
     # helper function to compute cv criterion for each fold
     indices.i <- fold(folds, i)
     model.i <- if (start) {
@@ -156,10 +168,11 @@ cv.default <- function(model, data=insight::get_data(model),
          coef.i=coef(model.i))
   }
 
-  fPara <- function(i){
+  fPara <- function(i, reg.fn=reg.fn, reg.fn.name, ...){
     # helper function to compute cv criterion for each fold
     #  with parallel computations
     indices.i <- fold(folds, i)
+    if (!is.null(reg.fn)) assign(reg.fn.name, reg.fn)
     # the following deals with a scoping issue that can
     #   occur with args passed via ... (which is saved in dots)
     predict.args <- c(list(
@@ -178,10 +191,11 @@ cv.default <- function(model, data=insight::get_data(model),
   n <- nrow(data)
 
   cvCompute(model=model, data=data, criterion=criterion,
-            criterion.name=deparse(substitute(criterion)),
+            criterion.name=criterion.name,
             k=k, reps=reps, seed=seed, details=details, confint=confint,
             level=level, ncores=ncores, type=type, start=start,
-            f=f, fPara=fPara, ...)
+            f=f, fPara=fPara, reg.fn=reg.fn, reg.fn.name=reg.fn.name,
+            ...)
 }
 
 #' @describeIn cv \code{"lm"} method.
@@ -203,7 +217,7 @@ cv.lm <- function(model, data=insight::get_data(model),
     b.u <- XXi.u %*% (Xy - t(X[omit, , drop=FALSE]) %*% (w[omit] * y[omit]))
     as.vector(b.u)
   }
-  f <- function(i){
+  f <- function(i, ...){
     # helper function to compute cv criterion for each fold
     indices.i <- fold(folds, i)
     b.i <- UpdateLM(indices.i)
@@ -299,7 +313,7 @@ cv.glm <- function(model, data=insight::get_data(model),
     names(b.u) <- coef.names
     b.u
   }
-  f <- function(i){
+  f <- function(i, ...){
     # helper function to compute cv criterion for each fold
     indices.i <- fold(folds, i)
     b.i <- UpdateIWLS(indices.i)

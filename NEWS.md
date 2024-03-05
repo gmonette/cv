@@ -12,6 +12,10 @@
 
 - Reorganization of package file structure and of documentation.
 
+- Make the cv.default() method more robust.
+
+- Other small improvements.
+
 # cv 1.1.0
 
 - cv() et al. now work properly with "non-casewise average" CV criteria such as the new rmse() and medAbsErr(), not just with "casewise-average" fit criteria such as mse() and BayesRule().

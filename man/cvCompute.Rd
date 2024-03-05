@@ -34,6 +34,8 @@ cvCompute(
   f,
   fPara = f,
   locals = list(),
+  reg.fn = NULL,
+  reg.fn.name = NULL,
   ...
 )
 
@@ -155,6 +157,13 @@ using parallel computation.}
 
 \item{locals}{a named list of objects that are required in the local environment
 of \code{cvCompute()} for \code{f()} or \code{fPara()}.}
+
+\item{reg.fn}{a regression function, typically for a new \code{cv()} method,
+residing in a package that's not a declared dependency of the \pkg{cv} package,
+e.g., \code{nnet::multinom}.}
+
+\item{reg.fn.name}{the quoted name of the regression function, e.g.,
+\code{"multinom"}.}
 
 \item{...}{to match generic; passed to \code{predict()} for the default method,
 and to \code{fPara()} (for parallel computations) in \code{cvCompute()}.}

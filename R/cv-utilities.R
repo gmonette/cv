@@ -82,6 +82,11 @@
 #' to be evaluated within the data set provided by the \code{data} argument.
 #' @param save.model save the model that's selected using the \emph{full} data set.
 #' @param x a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed
+#' @param reg.fn a regression function, typically for a new \code{cv()} method,
+#' residing in a package that's not a declared dependency of the \pkg{cv} package,
+#' e.g., \code{nnet::multinom}.
+#' @param reg.fn.name the quoted name of the regression function, e.g.,
+#' \code{"multinom"}.
 
 #' @returns
 #' The utility functions return various kinds of objects:
@@ -151,6 +156,8 @@ cvCompute <- function(model, data=insight::get_data(model),
                       f,
                       fPara=f,
                       locals=list(),
+                      reg.fn=NULL,
+                      reg.fn.name=NULL,
                       ...){
 
   # put function and variable args in the local environment
@@ -207,7 +214,7 @@ cvCompute <- function(model, data=insight::get_data(model),
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k) %dopar% {
-      fPara(i, ...)
+      fPara(i, reg.fn=reg.fn, reg.fn.name=reg.fn.name, ...)
     }
     stopCluster(cl)
     for (i in 1L:k){
@@ -269,6 +276,8 @@ cvCompute <- function(model, data=insight::get_data(model),
                      f=f,
                      fPara=fPara,
                      locals=locals,
+                     reg.fn=reg.fn,
+                     reg.fn.name=reg.fn.name,
                      ...)
 
     if (reps  > 2){
