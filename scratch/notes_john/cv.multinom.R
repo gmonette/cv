@@ -3,7 +3,7 @@ cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
                          seed, ...){
   NextMethod(type="class", criterion=criterion,
              criterion.name=deparse(substitute(criterion)),
-             reg.fn=nnet::multinom, reg.fn.name="multinom")
+             model.function=nnet::multinom)
 }
 
 # new version

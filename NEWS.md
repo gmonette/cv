@@ -1,6 +1,6 @@
 # cv 2.0.0
 
-- New cv.function() method meant to replace cvSelect(), direct use of which is deprecated.
+- New cv.function() method meant to replace cvSelect(), direct use of which is now discouraged.
 
 - New selectModelList() to be used with cv.function() (or with cvSelect()). selectModelList() implements recursive cross-validation, where the fit of a model selected by CV is assessed by CV. The same procedure is also available by setting recursive=TRUE in a call to cv.modList().
 
@@ -12,7 +12,7 @@
 
 - Reorganization of package file structure and of documentation.
 
-- Make the cv.default() method more robust.
+- Make the cv.default() method more robust, particularly for parallel computations.
 
 - Other small improvements.
 

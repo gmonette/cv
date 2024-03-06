@@ -41,12 +41,10 @@
 #' to \code{update()} is set to the vector of regression coefficients for the model fit
 #' to the full data, possibly making the CV updates faster, e.g., for a GLM.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
-#' @param reg.fn a regression function, typically for a new \code{cv()} method that
+#' @param model.function a regression function, typically for a new \code{cv()} method that
 #' that calls \code{cv(default())} via \code{NextMethod()},
 #' residing in a package that's not a declared dependency of the \pkg{cv} package,
 #' e.g., \code{nnet::multinom}.
-#' @param reg.fn.name the name of the regression function as a character string, e.g.,
-#' \code{"multinom"}.
 #'
 #' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
 #' (\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
@@ -150,8 +148,7 @@ cv.default <- function(model, data=insight::get_data(model),
                        ncores=1,
                        type="response",
                        start=FALSE,
-                       reg.fn=NULL,
-                       reg.fn.name=NULL,
+                       model.function=NULL,
                        ...){
 
   f <- function(i, ...){
@@ -168,11 +165,11 @@ cv.default <- function(model, data=insight::get_data(model),
          coef.i=coef(model.i))
   }
 
-  fPara <- function(i, reg.fn=reg.fn, reg.fn.name, ...){
+  fPara <- function(i, model.function=model.function, model.function.name, ...){
     # helper function to compute cv criterion for each fold
     #  with parallel computations
     indices.i <- fold(folds, i)
-    if (!is.null(reg.fn)) assign(reg.fn.name, reg.fn)
+    if (!is.null(model.function)) assign(model.function.name, model.function)
     # the following deals with a scoping issue that can
     #   occur with args passed via ... (which is saved in dots)
     predict.args <- c(list(
@@ -188,13 +185,16 @@ cv.default <- function(model, data=insight::get_data(model),
          coef.i=coef(predict.args$object))
   }
 
+    model.function.name <- sub("^.*\\:\\:", "",
+                       deparse(substitute(model.function)))
+
   n <- nrow(data)
 
   cvCompute(model=model, data=data, criterion=criterion,
             criterion.name=criterion.name,
             k=k, reps=reps, seed=seed, details=details, confint=confint,
             level=level, ncores=ncores, type=type, start=start,
-            f=f, fPara=fPara, reg.fn=reg.fn, reg.fn.name=reg.fn.name,
+            f=f, fPara=fPara, model.function=model.function, model.function.name=model.function.name,
             ...)
 }
 
