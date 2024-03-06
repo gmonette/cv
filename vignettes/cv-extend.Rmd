@@ -167,10 +167,11 @@ A `traceback()` (not shown) reveals that the problem is that the default method 
 ```{r cv.nultinom}
 cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
                          seed, ...){
-  NextMethod(type="class", criterion=criterion)
+  NextMethod(type="class", criterion=criterion,
+             criterion.name=deparse(substitute(criterion)))
 }
 ```
-That is, we simply call the default `cv()` method with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`. 
+That is, we simply call the default `cv()` method with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`. Adding the argument `criterion.name=deparse(substitute(criterion))` is inessential, but it insures that printed output will include the name of the criterion function that's employed, whether it's the default `BayesRuleMulti` or something else.
 
 Then:
 ```{r BEPS-cv}

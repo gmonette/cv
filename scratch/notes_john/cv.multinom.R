@@ -2,8 +2,7 @@
 cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
                          seed, ...){
   NextMethod(type="class", criterion=criterion,
-             criterion.name=deparse(substitute(criterion)),
-             model.function=nnet::multinom)
+             criterion.name=deparse(substitute(criterion)))
 }
 
 # new version

@@ -42,9 +42,10 @@
 #' to the full data, possibly making the CV updates faster, e.g., for a GLM.
 #' @param ... to match generic; passed to \code{predict()} for the default method.
 #' @param model.function a regression function, typically for a new \code{cv()} method that
-#' that calls \code{cv(default())} via \code{NextMethod()},
+#' that calls \code{cv.default()} via \code{NextMethod()},
 #' residing in a package that's not a declared dependency of the \pkg{cv} package,
-#' e.g., \code{nnet::multinom}.
+#' e.g., \code{nnet::multinom}. It's usually not necessary to specify
+#' \code{model.function} to make \code{cv.default()} work.
 #'
 #' @returns The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
 #' (\code{"CV crit"}), the bias-adjusted CV criterion (\code{"adj CV crit"}),
@@ -128,7 +129,8 @@ cv <- function(model, data, criterion, k, reps=1, seed, ...){
 }
 
 #' @describeIn cv \code{"default"} method.
-#' @importFrom stats coef family fitted lm.wfit lsfit model.frame
+#' @importFrom stats coef family fitted getCall
+#' lm.wfit lsfit model.frame
 #' model.matrix model.response predict qnorm
 #' update weighted.mean weights
 #' residuals hatvalues printCoefmat sd
@@ -148,7 +150,7 @@ cv.default <- function(model, data=insight::get_data(model),
                        ncores=1,
                        type="response",
                        start=FALSE,
-                       model.function=NULL,
+                       model.function,
                        ...){
 
   f <- function(i, ...){
@@ -185,8 +187,14 @@ cv.default <- function(model, data=insight::get_data(model),
          coef.i=coef(predict.args$object))
   }
 
+  if (missing(model.function)){
+    model.function <- getCall(model)[[1]]
+    model.function.name <- as.character(model.function)
+    model.function <- eval(model.function)
+  } else {
     model.function.name <- sub("^.*\\:\\:", "",
-                       deparse(substitute(model.function)))
+                               deparse(substitute(model.function)))
+  }
 
   n <- nrow(data)
 
@@ -263,7 +271,7 @@ cv.lm <- function(model, data=insight::get_data(model),
   if (method == "auto"){
     method <- if (k == n) "hatvalues" else "Woodbury"
   }
-  if (method == "naive") return(NextMethod())
+  if (method == "naive") return(NextMethod(model.function=NULL))
   if (method == "hatvalues"){
     h <- hatvalues(model)
     if (any(abs(h - 1) < sqrt(.Machine$double.eps)))
@@ -340,7 +348,8 @@ cv.glm <- function(model, data=insight::get_data(model),
   if (method == "hatvalues" && k !=n ) stop('method="hatvalues" available only when k=n')
   if (method == "exact"){
     result <- cv.default(model=model, data=data, criterion=criterion, k=k, reps=reps, seed=seed,
-                         ncores=ncores, method=method, details=details, start=start, ...)
+                         ncores=ncores, method=method, details=details, start=start,
+                         model.function=NULL, ...)
     if (inherits(result, "cv")) result$"criterion" <- deparse(substitute(criterion))
     return(result)
   } else if (method == "hatvalues") {
@@ -394,7 +403,7 @@ cv.glm <- function(model, data=insight::get_data(model),
 #' @describeIn cv \code{"rlm"} method (to avoid inheriting the \code{"lm"} method).
 #' @export
 cv.rlm <- function(model, data, criterion, k, reps = 1, seed, ...){
-  result <- NextMethod(method="naive")
+  result <- NextMethod(method="naive", model.function=NULL)
   result$method <- NULL
   result
 }

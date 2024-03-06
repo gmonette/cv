@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-02-15" />
+<meta name="date" content="2024-03-06" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-02-15</h4>
+<h4 class="date">2024-03-06</h4>
 
 
 
@@ -443,9 +443,10 @@ Weisberg, 2019)</span>:</p>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="at">criterion=</span>AUCcomp, <span class="at">seed=</span><span class="dv">3639</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3639</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; criterion: AUCcomp</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.27471</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.26362</span></span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; method: exact</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; criterion: AUCcomp</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.27471</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.26362</span></span></code></pre></div>
 <p>As expected, the cross-validated complement to the AUC is somewhat
 less optimistic than the criterion computed from the model fit to the
 whole data set.</p>
@@ -476,7 +477,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x10ebb8240&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x11732f270&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -660,22 +661,28 @@ be <code>type=&quot;class&quot;</code>. We therefore must write a
 be very simple:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>cv.multinom <span class="ot">&lt;-</span> <span class="cf">function</span> (model, data, <span class="at">criterion=</span>BayesRuleMulti, k, reps,</span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>                         seed, ...){</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">NextMethod</span>(<span class="at">type=</span><span class="st">&quot;class&quot;</span>, <span class="at">criterion=</span>criterion)</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">NextMethod</span>(<span class="at">type=</span><span class="st">&quot;class&quot;</span>, <span class="at">criterion=</span>criterion,</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>             <span class="at">criterion.name=</span><span class="fu">deparse</span>(<span class="fu">substitute</span>(criterion)))</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>}</span></code></pre></div>
 <p>That is, we simply call the default <code>cv()</code> method with the
 <code>type</code> argument properly set. In addition to supplying the
 correct <code>type</code> argument, our method sets the default
 <code>criterion</code> for the <code>cv.multinom()</code> method to
-<code>BayesRuleMulti</code>.</p>
+<code>BayesRuleMulti</code>. Adding the argument
+<code>criterion.name=deparse(substitute(criterion))</code> is
+inessential, but it insures that printed output will include the name of
+the criterion function that’s employed, whether it’s the default
+<code>BayesRuleMulti</code> or something else.</p>
 <p>Then:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>m.beps <span class="ot">&lt;-</span> <span class="fu">update</span>(m.beps, <span class="at">trace=</span><span class="cn">FALSE</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">cv</span>(m.beps, <span class="at">seed=</span><span class="dv">3465</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3465</span></span>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRuleMulti</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
 <p>Prior to invoking <code>cv()</code>, we called <code>update()</code>
 with <code>trace=FALSE</code> to suppress the iteration history reported
 by default by <code>multinom()</code>—it would be tedious to see the
@@ -692,7 +699,7 @@ facilitate this process, and to see how that works, consider the
 <code>&quot;lme&quot;</code> method from the <strong>cv</strong> package:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>cv<span class="sc">:::</span>cv.lme</span>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt; function(model, data = insight::get_data(model), criterion = mse,</span></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt;                    k, reps = 1, seed,</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt;                    k=NULL, reps = 1, seed, details=NULL,</span></span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt;                    ncores = 1, clusterVariables,</span></span>
 <span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt;                    blups=coef, fixed.effects=nlme::fixef, ...){</span></span>
 <span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt;   cvMixed(</span></span>
@@ -700,22 +707,24 @@ facilitate this process, and to see how that works, consider the
 <span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt;     package=&quot;nlme&quot;,</span></span>
 <span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt;     data=data,</span></span>
 <span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt;     criterion=criterion,</span></span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt;     k=k,</span></span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt;     reps=reps,</span></span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt;     seed=seed,</span></span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt;     ncores=ncores,</span></span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt;     clusterVariables=clusterVariables,</span></span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt;     predict.clusters.args=list(object=model,</span></span>
-<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="co">#&gt;                                newdata=data,</span></span>
-<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co">#&gt;                                level=0),</span></span>
-<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="co">#&gt;     predict.cases.args=list(object=model,</span></span>
-<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="co">#&gt;                             newdata=data,</span></span>
-<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="co">#&gt;                             level=1),</span></span>
-<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="co">#&gt;     blups=blups,</span></span>
-<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="co">#&gt;     fixed.effects=fixed.effects,</span></span>
-<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="co">#&gt;     ...)</span></span>
-<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt;     criterion.name=deparse(substitute(criterion)),</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt;     k=k,</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt;     reps=reps,</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt;     seed=seed,</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="co">#&gt;     details=details,</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="co">#&gt;     ncores=ncores,</span></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="co">#&gt;     clusterVariables=clusterVariables,</span></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="co">#&gt;     predict.clusters.args=list(object=model,</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="co">#&gt;                                newdata=data,</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="co">#&gt;                                level=0),</span></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="co">#&gt;     predict.cases.args=list(object=model,</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="co">#&gt;                             newdata=data,</span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="co">#&gt;                             level=1),</span></span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="co">#&gt;     blups=blups,</span></span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="co">#&gt;     fixed.effects=fixed.effects,</span></span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a><span class="co">#&gt;     ...)</span></span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a><span class="co">#&gt; }</span></span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code>cv.lme()</code> sets up a call to
 <code>cvMixed()</code>, which does the computational work.</p>
 <p>Most of the arguments of <code>cvMixed()</code> are familiar:</p>
@@ -1244,9 +1253,10 @@ get:</p>
 <span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>                      <span class="at">data=</span>swiss, <span class="at">seed=</span><span class="dv">8433</span>)) <span class="co"># use same folds</span></span>
 <span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 8433</span></span>
 <span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 65.835</span></span>
-<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.644</span></span>
-<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 65.835</span></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.644</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
 <p>Cross-validation shows that model selection exacts a penalty in MSE.
 Examining the models selected for the 10 folds reveals that there is
 some uncertainty in identifying the predictors in the “best” model, with

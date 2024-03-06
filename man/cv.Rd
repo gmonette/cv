@@ -26,7 +26,7 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   ncores = 1,
   type = "response",
   start = FALSE,
-  model.function = NULL,
+  model.function,
   ...
 )
 
@@ -116,9 +116,10 @@ to \code{update()} is set to the vector of regression coefficients for the model
 to the full data, possibly making the CV updates faster, e.g., for a GLM.}
 
 \item{model.function}{a regression function, typically for a new \code{cv()} method that
-that calls \code{cv(default())} via \code{NextMethod()},
+that calls \code{cv.default()} via \code{NextMethod()},
 residing in a package that's not a declared dependency of the \pkg{cv} package,
-e.g., \code{nnet::multinom}.}
+e.g., \code{nnet::multinom}. It's usually not necessary to specify
+\code{model.function} to make \code{cv.default()} work.}
 
 \item{method}{computational method to apply to a linear (i.e., \code{"lm"}) model
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
