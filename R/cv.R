@@ -188,8 +188,17 @@ cv.default <- function(model, data=insight::get_data(model),
   }
 
   if (missing(model.function)){
-    model.function <- getCall(model)[[1]]
+    model.function <- try(getCall(model)[[1]])
+    if (inherits(model.function, "try-error")){
+      stop("cv.default() cannot extract the call from the model\n",
+           "try specifying the model.function argument")
+    }
     model.function.name <- as.character(model.function)
+    if (make.names(model.function.name) != model.function.name){
+      stop(model.function.name, " is not a valid object name.\n",
+           "try specifying the model.function argument\n",
+           " to cv.default()")
+    }
     model.function <- eval(model.function)
   } else {
     model.function.name <- sub("^.*\\:\\:", "",
