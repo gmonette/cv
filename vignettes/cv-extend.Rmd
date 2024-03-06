@@ -167,18 +167,18 @@ A `traceback()` (not shown) reveals that the problem is that the default method 
 ```{r cv.nultinom}
 cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
                          seed, ...){
+  model <- update(model, trace=FALSE)
   NextMethod(type="class", criterion=criterion,
              criterion.name=deparse(substitute(criterion)))
 }
 ```
-That is, we simply call the default `cv()` method with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`. Adding the argument `criterion.name=deparse(substitute(criterion))` is inessential, but it insures that printed output will include the name of the criterion function that's employed, whether it's the default `BayesRuleMulti` or something else.
+That is, we simply call the default `cv()` method with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`. Adding the argument `criterion.name=deparse(substitute(criterion))` is inessential, but it insures that printed output will include the name of the criterion function that's employed, whether it's the default `BayesRuleMulti` or something else. Prior to invoking `NextMethod()`, we called `update()` with `trace=FALSE` to suppress the iteration history reported by default by `multinom()`---it would be tedious to see the iteration history for each fold. 
 
 Then:
 ```{r BEPS-cv}
-m.beps <- update(m.beps, trace=FALSE)
 cv(m.beps, seed=3465)
 ```
-Prior to invoking `cv()`, we called `update()` with `trace=FALSE` to suppress the iteration history reported by default by `multinom()`---it would be tedious to see the iteration history for each fold. The cross-validated polytomous Bayes-rule criterion confirms that the fitted model does substantially better than the marginal Bayes-rule prediction that everyone votes for Labour.
+The cross-validated polytomous Bayes-rule criterion confirms that the fitted model does substantially better than the marginal Bayes-rule prediction that everyone votes for Labour.
 
 ### Mixed-effects models
 

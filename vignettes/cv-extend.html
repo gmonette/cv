@@ -477,7 +477,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x11732f270&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x12b456608&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -661,9 +661,10 @@ be <code>type=&quot;class&quot;</code>. We therefore must write a
 be very simple:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>cv.multinom <span class="ot">&lt;-</span> <span class="cf">function</span> (model, data, <span class="at">criterion=</span>BayesRuleMulti, k, reps,</span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>                         seed, ...){</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="fu">NextMethod</span>(<span class="at">type=</span><span class="st">&quot;class&quot;</span>, <span class="at">criterion=</span>criterion,</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>             <span class="at">criterion.name=</span><span class="fu">deparse</span>(<span class="fu">substitute</span>(criterion)))</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">update</span>(model, <span class="at">trace=</span><span class="cn">FALSE</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="fu">NextMethod</span>(<span class="at">type=</span><span class="st">&quot;class&quot;</span>, <span class="at">criterion=</span>criterion,</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>             <span class="at">criterion.name=</span><span class="fu">deparse</span>(<span class="fu">substitute</span>(criterion)))</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>}</span></code></pre></div>
 <p>That is, we simply call the default <code>cv()</code> method with the
 <code>type</code> argument properly set. In addition to supplying the
 correct <code>type</code> argument, our method sets the default
@@ -672,24 +673,23 @@ correct <code>type</code> argument, our method sets the default
 <code>criterion.name=deparse(substitute(criterion))</code> is
 inessential, but it insures that printed output will include the name of
 the criterion function that’s employed, whether it’s the default
-<code>BayesRuleMulti</code> or something else.</p>
+<code>BayesRuleMulti</code> or something else. Prior to invoking
+<code>NextMethod()</code>, we called <code>update()</code> with
+<code>trace=FALSE</code> to suppress the iteration history reported by
+default by <code>multinom()</code>—it would be tedious to see the
+iteration history for each fold.</p>
 <p>Then:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>m.beps <span class="ot">&lt;-</span> <span class="fu">update</span>(m.beps, <span class="at">trace=</span><span class="cn">FALSE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">cv</span>(m.beps, <span class="at">seed=</span><span class="dv">3465</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3465</span></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRuleMulti</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
-<p>Prior to invoking <code>cv()</code>, we called <code>update()</code>
-with <code>trace=FALSE</code> to suppress the iteration history reported
-by default by <code>multinom()</code>—it would be tedious to see the
-iteration history for each fold. The cross-validated polytomous
-Bayes-rule criterion confirms that the fitted model does substantially
-better than the marginal Bayes-rule prediction that everyone votes for
-Labour.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">cv</span>(m.beps, <span class="at">seed=</span><span class="dv">3465</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3465</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRuleMulti</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
+<p>The cross-validated polytomous Bayes-rule criterion confirms that the
+fitted model does substantially better than the marginal Bayes-rule
+prediction that everyone votes for Labour.</p>
 </div>
 <div id="mixed-effects-models" class="section level3">
 <h3>Mixed-effects models</h3>
@@ -957,16 +957,18 @@ cross-validating both by clusters and by cases,</p>
 <p>and again compare to <code>glmer()</code>:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">cv</span>(m.glmer, <span class="at">clusterVariables=</span><span class="st">&quot;ID&quot;</span>, <span class="at">criterion=</span>BayesRule)</span>
 <span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation based on 50 {ID} clusters</span></span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19545</span></span>
-<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.19545</span></span>
-<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="fu">cv</span>(m.glmer, <span class="at">data=</span>bacteria, <span class="at">criterion=</span>BayesRule, <span class="at">seed=</span><span class="dv">1490</span>)</span>
-<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 1490</span></span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
-<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19364</span></span>
-<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.15</span></span></code></pre></div>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19545</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.19545</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a><span class="fu">cv</span>(m.glmer, <span class="at">data=</span>bacteria, <span class="at">criterion=</span>BayesRule, <span class="at">seed=</span><span class="dv">1490</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 1490</span></span>
+<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
+<span id="cb21-12"><a href="#cb21-12" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
+<span id="cb21-13"><a href="#cb21-13" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19364</span></span>
+<span id="cb21-14"><a href="#cb21-14" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.15</span></span></code></pre></div>
 </div>
 </div>
 <div id="adding-a-model-selection-procedure" class="section level2">

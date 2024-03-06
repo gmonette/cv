@@ -100,12 +100,12 @@ cv(m.beps, seed=3465, criterion=BayesRuleMulti)
 ## ----cv.nultinom--------------------------------------------------------------
 cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
                          seed, ...){
+  model <- update(model, trace=FALSE)
   NextMethod(type="class", criterion=criterion,
              criterion.name=deparse(substitute(criterion)))
 }
 
 ## ----BEPS-cv------------------------------------------------------------------
-m.beps <- update(m.beps, trace=FALSE)
 cv(m.beps, seed=3465)
 
 ## ----cv.lme-------------------------------------------------------------------
