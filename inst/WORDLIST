@@ -103,3 +103,4 @@ selectTransStepAIC
 selectModelList
 CVs
 cvCompute
+multinom
