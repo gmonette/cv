@@ -182,7 +182,7 @@ The cross-validated polytomous Bayes-rule criterion confirms that the fitted mod
 
 #### Calling cvCompute()
 
-`cv()` methods for independently sampled cases, such as `cv.default()`, `cv.lm()`, and `cv.glm()`, work by setting up calls to the `cvCompute()` function, which is exported from the **cv** package to support development of `cv()` methods for additional classes of regression models. In most cases, however, such as the preceding `cv.multinom()` example, it will suffice and be much simpler to set up a suitable call to `cv.default` via `NextMethod()`.
+`cv()` methods for independently sampled cases, such as `cv.default()`, `cv.lm()`, and `cv.glm()`, work by setting up calls to the `cvCompute()` function, which is exported from the **cv** package to support development of `cv()` methods for additional classes of regression models. In most cases, however, such as the preceding `cv.multinom()` example, it will suffice and be much simpler to set up a suitable call to `cv.default()` via `NextMethod()`.
 
 To illustrate how to use `cvCompute()` directly, we write an alternative, and necessarily more complicated, version of `cv.multinom()`.
 ```{r cv.multinom-alternative}
@@ -257,7 +257,7 @@ cv.multinom <- function(model,
             multinom=nnet::multinom)
 }
 ```
-Notice that separate "helper" functions are defined for non-parallel and parallel computations.[^multinom-parallel] The new version of `cv.multinom()` produces the same results as the  version that calls `cv.default()`:
+Notice that separate "helper" functions are defined for non-parallel and parallel computations.[^multinom-parallel] The new version of `cv.multinom()` produces the same results as the  version that calls `cv.default()`:[^multinom-scoping]
 ```{r BEPS-cv-alt-version}
 cv(m.beps, seed=3465)
 ```
@@ -270,6 +270,7 @@ system.time(print(cv2 <- cv(m.beps, k="loo", ncores=2)))
 all.equal(cv1, cv2)
 ```
 
+[^multinom-scoping]: A subtle point is that we added a `multinom` argument to the local function `fPara()`, which is passed to the `fPara` argument of `cvCompute()`. There is also a `multinom` argument to `cvCompute()`, which is set to the `multinom` function in the **nnet** package. The `multinom` argument isn't directly defined in `cvCompute()` (examine the definition of this function), but is passed through the `...` argument. `cvCompute()`, in turn, will pass `multinom` to `fPara()` via `...`, allowing `fPara()` to find this function when it calls `update()` to refit the model with each fold `i` omitted. This scoping issue arises because `cvCompute()` uses `foreach()` for parallel computations, even though the **nnet** package is attached to the search path in the current R session via `library("nnet")`. `cv.default()` is able to handle the scoping issue transparently by automatically locating `multinom()`.
 
 ### Mixed-effects models
 

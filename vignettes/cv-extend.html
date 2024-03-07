@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-03-06" />
+<meta name="date" content="2024-03-07" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-03-06</h4>
+<h4 class="date">2024-03-07</h4>
 
 
 
@@ -477,7 +477,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x1338916b8&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x1161064e0&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -692,7 +692,7 @@ fitted model does substantially better than the marginal Bayes-rule
 prediction that everyone votes for Labour.</p>
 <div id="calling-cvcompute" class="section level4">
 <h4>Calling cvCompute()</h4>
-<p><code>cv()</code> methods for independenly sampled cases, such as
+<p><code>cv()</code> methods for independently sampled cases, such as
 <code>cv.default()</code>, <code>cv.lm()</code>, and
 <code>cv.glm()</code>, work by setting up calls to the
 <code>cvCompute()</code> function, which is exported from the
@@ -700,7 +700,7 @@ prediction that everyone votes for Labour.</p>
 methods for additional classes of regression models. In most cases,
 however, such as the preceding <code>cv.multinom()</code> example, it
 will suffice and be much simpler to set up a suitable call to
-<code>cv.default</code> via <code>NextMethod()</code>.</p>
+<code>cv.default()</code> via <code>NextMethod()</code>.</p>
 <p>To illustrate how to use <code>cvCompute()</code> directly, we write
 an alternative, and necessarily more complicated, version of
 <code>cv.multinom()</code>.</p>
@@ -777,7 +777,7 @@ an alternative, and necessarily more complicated, version of
 <p>Notice that separate “helper” functions are defined for non-parallel
 and parallel computations.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> The new version of
 <code>cv.multinom()</code> produces the same results as the version that
-calls <code>cv.default()</code>:</p>
+calls <code>cv.default()</code>:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">cv</span>(m.beps, <span class="at">seed=</span><span class="dv">3465</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 3465</span></span>
 <span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -876,7 +876,7 @@ omitted. <code>cvMixed()</code> returns an object of class
 <p>Now imagine that we want to support a new class of mixed-effects
 models. To be concrete, we illustrate with the <code>glmmPQL()</code>
 function in the <strong>MASS</strong> package <span class="citation">(Venables &amp; Ripley, 2002)</span>, which fits
-generalized-linear mixed-effects models by penalized quasi-likelihood.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> Not
+generalized-linear mixed-effects models by penalized quasi-likelihood.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> Not
 coincidentally, the arguments of <code>glmmPQL()</code> are similar to
 those of <code>lme()</code> (with an additional <code>family</code>
 argument), because the former iteratively invokes the latter; so
@@ -1087,7 +1087,7 @@ sources for the <strong>cv</strong> package at <a href="https://github.com/gmone
 <span class="citation">(Lumley &amp; Miller, 2020)</span> implements an
 efficient algorithm for selecting the best-fitting linear least-squares
 regressions for subsets of predictors of all sizes, from 1 through the
-maximum number of candidate predictors.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> To illustrate the use
+maximum number of candidate predictors.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a> To illustrate the use
 of <code>regsubsets()</code>, we employ the <code>swiss</code> data
 frame supplied by the <strong>leaps</strong> package:</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;leaps&quot;</span>)</span>
@@ -1593,19 +1593,37 @@ with a larger number):</p>
 system.time(print(cv2 &lt;- cv(m.beps, k=&quot;loo&quot;, ncores=2)))
 all.equal(cv1, cv2)</code></pre>
 <a href="#fnref1" class="footnote-back">↩︎</a></li>
-<li id="fn2"><p>This example is somewhat artificial in that
+<li id="fn2"><p>A subtle point is that we added a <code>multinom</code>
+argument to the local function <code>fPara()</code>, which is passed to
+the <code>fPara</code> argument of <code>cvCompute()</code>. There is
+also a <code>multinom</code> argument to <code>cvCompute()</code>, which
+is set to the <code>multinom</code> function in the
+<strong>nnet</strong> package. The <code>multinom</code> argument isn’t
+directly defined in <code>cvCompute()</code> (examine the definition of
+this function), but is passed through the <code>...</code> argument.
+<code>cvCompute()</code>, in turn, will pass <code>multinom</code> to
+<code>fPara()</code> via <code>...</code>, allowing <code>fPara()</code>
+to find this function when it calls <code>update()</code> to refit the
+model with each fold <code>i</code> omitted. This scoping issue arises
+because <code>cvCompute()</code> uses <code>foreach()</code> for
+parallel computations, even though the <strong>nnet</strong> package is
+attached to the search path in the current R session via
+<code>library(&quot;nnet&quot;)</code>. <code>cv.default()</code> is able to
+handle the scoping issue transparently by automatically locating
+<code>multinom()</code>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>This example is somewhat artificial in that
 <code>glmmPQL()</code> has largely been superseded by computationally
 superior functions, such the <code>glmer()</code> function in the
 <strong>lme4</strong> package. There is, however, one situation in which
 <code>glmmPQL()</code> might prove useful: to specify serial dependency
 in case-level errors within clusters for longitudinal data, which is not
-currently supported by <code>glmer()</code>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>The <code>regsubsets()</code> function computes several
+currently supported by <code>glmer()</code>.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>The <code>regsubsets()</code> function computes several
 measures of model predictive performance, including the <span class="math inline">\(R^2\)</span> and <span class="math inline">\(R^2\)</span> adjusted for degrees of freedom, the
 residual sums of squares, Mallows’s <span class="math inline">\(C_p\)</span>, and the BIC. Several of these are
 suitable for comparing models with differing numbers of coefficients—we
 use the BIC below—but all necessarily agree when comparing models with
-the <em>same</em> number of coefficients.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+the <em>same</em> number of coefficients.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 
