@@ -80,119 +80,170 @@
 #' @describeIn cv.merMod \code{cv()} method for \code{\link[lme4]{lmer}()} and
 #' \code{\link[lme4]{glmer}()} models from the \pkg{lme4} package.
 #' @export
-cv.merMod <- function(model, data = insight::get_data(model), criterion = mse,
-                      k=NULL, reps = 1, seed, details=NULL,
-                      ncores = 1, clusterVariables,
-                      blups=coef, fixed.effects=lme4::fixef, ...){
-  cvMixed(
-    model,
-    package="lme4",
-    data=data,
-    criterion=criterion,
-    criterion.name=deparse(substitute(criterion)),
-    k=k,
-    reps=reps,
-    seed=seed,
-    details=details,
-    ncores=ncores,
-    clusterVariables=clusterVariables,
-    predict.cases.args=list(object=model,
-                            newdata=data,
-                            type="response",
-                            allow.new.levels=TRUE),
-    predict.clusters.args=list(object=model,
-                               newdata=data,
-                               type="response",
-                               re.form=NA,
-                               allow.new.levels=TRUE),
-    blups=blups,
-    fixed.effects=fixed.effects,
-    ...)
-}
+cv.merMod <-
+  function(model,
+           data = insight::get_data(model),
+           criterion = mse,
+           k = NULL,
+           reps = 1,
+           seed,
+           details = NULL,
+           ncores = 1,
+           clusterVariables,
+           blups = coef,
+           fixed.effects = lme4::fixef,
+           ...) {
+    cvMixed(
+      model,
+      package = "lme4",
+      data = data,
+      criterion = criterion,
+      criterion.name = deparse(substitute(criterion)),
+      k = k,
+      reps = reps,
+      seed = seed,
+      details = details,
+      ncores = ncores,
+      clusterVariables = clusterVariables,
+      predict.cases.args = list(
+        object = model,
+        newdata = data,
+        type = "response",
+        allow.new.levels = TRUE
+      ),
+      predict.clusters.args = list(
+        object = model,
+        newdata = data,
+        type = "response",
+        re.form = NA,
+        allow.new.levels = TRUE
+      ),
+      blups = blups,
+      fixed.effects = fixed.effects,
+      ...
+    )
+  }
 
 #' @describeIn cv.merMod \code{cv()} method for \code{\link[nlme]{lme}()}
 #' models from the \pkg{nlme} package.
 #' @export
-cv.lme <- function(model, data = insight::get_data(model), criterion = mse,
-                   k=NULL, reps = 1, seed, details=NULL,
-                   ncores = 1, clusterVariables,
-                   blups=coef, fixed.effects=nlme::fixef, ...){
-  cvMixed(
-    model,
-    package="nlme",
-    data=data,
-    criterion=criterion,
-    criterion.name=deparse(substitute(criterion)),
-    k=k,
-    reps=reps,
-    seed=seed,
-    details=details,
-    ncores=ncores,
-    clusterVariables=clusterVariables,
-    predict.clusters.args=list(object=model,
-                               newdata=data,
-                               level=0),
-    predict.cases.args=list(object=model,
-                            newdata=data,
-                            level=1),
-    blups=blups,
-    fixed.effects=fixed.effects,
-    ...)
-}
+cv.lme <-
+  function(model,
+           data = insight::get_data(model),
+           criterion = mse,
+           k = NULL,
+           reps = 1,
+           seed,
+           details = NULL,
+           ncores = 1,
+           clusterVariables,
+           blups = coef,
+           fixed.effects = nlme::fixef,
+           ...) {
+    cvMixed(
+      model,
+      package = "nlme",
+      data = data,
+      criterion = criterion,
+      criterion.name = deparse(substitute(criterion)),
+      k = k,
+      reps = reps,
+      seed = seed,
+      details = details,
+      ncores = ncores,
+      clusterVariables = clusterVariables,
+      predict.clusters.args = list(
+        object = model,
+        newdata = data,
+        level = 0
+      ),
+      predict.cases.args = list(
+        object = model,
+        newdata = data,
+        level = 1
+      ),
+      blups = blups,
+      fixed.effects = fixed.effects,
+      ...
+    )
+  }
 
 #' @describeIn cv.merMod \code{cv()} method for \code{\link[glmmTMB]{glmmTMB}()}
 #' models from the \pkg{glmmTMB} package.
 #' @export
-cv.glmmTMB <- function(model, data = insight::get_data(model), criterion = mse,
-                       k=NULL, reps = 1, seed, details=NULL,
-                       ncores = 1, clusterVariables,
-                       blups=coef, fixed.effects=glmmTMB::fixef, ...){
-  cvMixed(
-    model,
-    package="glmmTMB",
-    data=data,
-    criterion=criterion,
-    criterion.name=deparse(substitute(criterion)),
-    k=k,
-    reps=reps,
-    seed=seed,
-    details=details,
-    ncores=ncores,
-    clusterVariables=clusterVariables,
-    predict.cases.args=list(object=model,
-                            newdata=data,
-                            type="response",
-                            allow.new.levels=TRUE),
-    predict.clusters.args=list(object=model,
-                               newdata=data,
-                               type="response",
-                               re.form=NA,
-                               allow.new.levels=TRUE),
-    blups=blups,
-    fixed.effects=fixed.effects,
-    ...)
-}
-
-
-defineClusters <- function(variables, data){
-  all.variables <- names(data)
-  if (any(bad <- !variables %in% all.variables)){
-    stop("The following cluster variable", if (sum(bad) > 1) "s are" else " is",
-         " not in the data: ", paste(variables[bad], collapse=", "))
+cv.glmmTMB <-
+  function(model,
+           data = insight::get_data(model),
+           criterion = mse,
+           k = NULL,
+           reps = 1,
+           seed,
+           details = NULL,
+           ncores = 1,
+           clusterVariables,
+           blups = coef,
+           fixed.effects = glmmTMB::fixef,
+           ...) {
+    cvMixed(
+      model,
+      package = "glmmTMB",
+      data = data,
+      criterion = criterion,
+      criterion.name = deparse(substitute(criterion)),
+      k = k,
+      reps = reps,
+      seed = seed,
+      details = details,
+      ncores = ncores,
+      clusterVariables = clusterVariables,
+      predict.cases.args = list(
+        object = model,
+        newdata = data,
+        type = "response",
+        allow.new.levels = TRUE
+      ),
+      predict.clusters.args = list(
+        object = model,
+        newdata = data,
+        type = "response",
+        re.form = NA,
+        allow.new.levels = TRUE
+      ),
+      blups = blups,
+      fixed.effects = fixed.effects,
+      ...
+    )
   }
-  unique(data[, variables, drop=FALSE])
+
+
+defineClusters <- function(variables, data) {
+  all.variables <- names(data)
+  if (any(bad <- !variables %in% all.variables)) {
+    stop(
+      "The following cluster variable",
+      if (sum(bad) > 1)
+        "s are"
+      else
+        " is",
+      " not in the data: ",
+      paste(variables[bad], collapse = ", ")
+    )
+  }
+  unique(data[, variables, drop = FALSE])
 }
 
-selectCluster <- function(cluster, data){
-  result <- apply(data[, names(cluster), drop=FALSE], 1,
-                  function(x) all(x == cluster))
-  if (!any(result)) stop("there is no such cluster: ",
-                         paste(paste0(names(cluster), "=", cluster), collapse=", "))
+selectCluster <- function(cluster, data) {
+  result <- apply(data[, names(cluster), drop = FALSE], 1,
+                  function(x)
+                    all(x == cluster))
+  if (!any(result))
+    stop("there is no such cluster: ",
+         paste(paste0(names(cluster), "=", cluster), collapse =
+                 ", "))
   result
 }
 
 selectClusters <- function(clusters, data) {
-  result <- apply(clusters, 1, selectCluster, data=data)
+  result <- apply(clusters, 1, selectCluster, data = data)
   apply(result, 1, any)
 }
-

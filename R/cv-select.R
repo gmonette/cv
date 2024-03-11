@@ -111,59 +111,91 @@
 #' @describeIn cv.function \code{cv()} method for applying a model
 #' model-selection (or specification) procedure.
 #' @export
-cv.function <- function(model, data, criterion=mse, k=10, reps = 1,
-                        seed=NULL, working.model=NULL, y.expression=NULL,
-                        confint = n >= 400, level=0.95,
+cv.function <- function(model,
+                        data,
+                        criterion = mse,
+                        k = 10,
+                        reps = 1,
+                        seed = NULL,
+                        working.model = NULL,
+                        y.expression = NULL,
+                        confint = n >= 400,
+                        level = 0.95,
                         details = k <= 10,
-                        save.model=FALSE,
-                        ncores = 1, ...){
-
+                        save.model = FALSE,
+                        ncores = 1,
+                        ...) {
   n <- nrow(data)
-  cvSelect(procedure=model,
-           data=data,
-           criterion=criterion,
-           criterion.name=deparse(substitute(criterion)),
-           model=working.model,
-           y.expression=y.expression,
-           k=k,
-           confint=confint,
-           level=level,
-           reps=reps,
-           details = details,
-           save.model = save.model,
-           seed=seed,
-           ncores=ncores,
-           ...)
+  cvSelect(
+    procedure = model,
+    data = data,
+    criterion = criterion,
+    criterion.name = deparse(substitute(criterion)),
+    model = working.model,
+    y.expression = y.expression,
+    k = k,
+    confint = confint,
+    level = level,
+    reps = reps,
+    details = details,
+    save.model = save.model,
+    seed = seed,
+    ncores = ncores,
+    ...
+  )
 }
 
 #' @describeIn cv.function select a regression model using the
 #' \code{\link[MASS]{stepAIC}()} function in the \pkg{MASS} package.
 #' @export
-selectStepAIC <- function(data, indices,
-                          model, criterion=mse, AIC=TRUE,
-                          details=TRUE,
-                          save.model=FALSE,
-                          ...){
+selectStepAIC <- function(data,
+                          indices,
+                          model,
+                          criterion = mse,
+                          AIC = TRUE,
+                          details = TRUE,
+                          save.model = FALSE,
+                          ...) {
   y <- GetResponse(model)
   if (missing(indices)) {
-    k. = if (AIC) 2 else log(nrow(data))
-    model <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
-    yhat <- predict(model, newdata=data, type="response")
-    return(list(criterion=criterion(y, yhat),
-                model= if (save.model) model else NULL))
+    k. = if (AIC)
+      2
+    else
+      log(nrow(data))
+    model <- MASS::stepAIC(model, trace = FALSE, k = k., ...)
+    yhat <- predict(model, newdata = data, type = "response")
+    return(list(
+      criterion = criterion(y, yhat),
+      model = if (save.model)
+        model
+      else
+        NULL
+    ))
   }
-  k. <- if (AIC) 2 else log(nrow(data) - length(indices))
-  model <- update(model, data=data[-indices, ])
-  model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
-  fit.all.i <- predict(model.i, newdata=data, type="response")
+  k. <- if (AIC)
+    2
+  else
+    log(nrow(data) - length(indices))
+  model <- update(model, data = data[-indices,])
+  model.i <- MASS::stepAIC(model, trace = FALSE, k = k., ...)
+  fit.all.i <- predict(model.i, newdata = data, type = "response")
   fit.i <- fit.all.i[indices]
-  list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-       coefficients=if (details) coef(model.i) else NULL)
+  list(
+    fit.i = fit.i,
+    crit.all.i = criterion(y, fit.all.i),
+    coefficients = if (details)
+      coef(model.i)
+    else
+      NULL
+  )
 }
 
 
-transX <- function(model, predictors, family="bcPower",
-                   rounded=TRUE, data=insight::get_data(model)){
+transX <- function(model,
+                   predictors,
+                   family = "bcPower",
+                   rounded = TRUE,
+                   data = insight::get_data(model)) {
   # Find transformations of predictors towards normality
   # Returns: a list of the selected transformations, with $lamdas and
   #          $gammas components (the latter may be NULL)
@@ -173,50 +205,58 @@ transX <- function(model, predictors, family="bcPower",
   #   rounded: use "rounded" transformations, see ?car::powerTransform
   #   family: transformation family recognized by car::powerTransform()
   #   data: data to which the model was fit
-  trans <- car::powerTransform(data[, predictors], family=family)
-  lambdas <- if(rounded) trans$roundlam else trans$lambda
+  trans <- car::powerTransform(data[, predictors], family = family)
+  lambdas <- if (rounded)
+    trans$roundlam
+  else
+    trans$lambda
   names(lambdas) <- paste0("lam.", predictors)
   gammas <- trans$gamma
-  if (!is.null(gammas)){
+  if (!is.null(gammas)) {
     names(gammas) <- paste0("gam.", predictors)
   }
-  list(lambdas=lambdas, gammas=gammas) # gammas may be NULL
+  list(lambdas = lambdas, gammas = gammas) # gammas may be NULL
 }
 
-transy <-  function(model, family="bcPower", rounded=TRUE){
-  trans <- car::powerTransform(model, family=family)
-  lambda <- if(rounded) trans$roundlam else trans$lambda
+transy <-  function(model,
+                    family = "bcPower",
+                    rounded = TRUE) {
+  trans <- car::powerTransform(model, family = family)
+  lambda <- if (rounded)
+    trans$roundlam
+  else
+    trans$lambda
   gamma <- trans$gamma
-  c(lambda=as.vector(lambda), gamma=as.vector(gamma))
+  c(lambda = as.vector(lambda), gamma = as.vector(gamma))
 }
 
-bcPowerInverse <- function (y, lambda){
+bcPowerInverse <- function (y, lambda) {
   if (abs(lambda) < sqrt(.Machine$double.eps)) {
     exp(y)
   } else {
-    (y*lambda + 1)^(1/lambda)
+    (y * lambda + 1) ^ (1 / lambda)
   }
 }
 
-basicPowerInverse <- function (y, lambda){
+basicPowerInverse <- function (y, lambda) {
   if (abs(lambda) < sqrt(.Machine$double.eps)) {
     exp(y)
   } else {
-    y^(1/lambda)
+    y ^ (1 / lambda)
   }
 }
 
 yjPowerInverse <- function(y, lambda) {
   neg <- y < 0
-  y[!neg] <- if(abs(lambda) < sqrt(.Machine$double.eps)) {
+  y[!neg] <- if (abs(lambda) < sqrt(.Machine$double.eps)) {
     exp(y[!neg]) - 1
   } else {
-    (y[!neg]*lambda + 1)^(1/lambda) - 1
+    (y[!neg] * lambda + 1) ^ (1 / lambda) - 1
   }
-  y[neg] <- if(abs(lambda - 2) < sqrt(.Machine$double.eps)) {
+  y[neg] <- if (abs(lambda - 2) < sqrt(.Machine$double.eps)) {
     -expm1(-y[neg])
   } else {
-    1 - (-(2 - lambda)*y[neg] + 1)^(1/(2 - lambda))
+    1 - (-(2 - lambda) * y[neg] + 1) ^ (1 / (2 - lambda))
   }
   y
 }
@@ -247,40 +287,48 @@ yjPowerInverse <- function(y, lambda) {
 #' @describeIn cv.function select transformations of the predictors and response
 #' using \code{\link[car]{powerTransform}()} in the \pkg{car} package.
 #' @export
-selectTrans <- function(data, indices,
-                        details=TRUE,
-                        save.model=FALSE,
+selectTrans <- function(data,
+                        indices,
+                        details = TRUE,
+                        save.model = FALSE,
                         model,
-                        criterion=mse, predictors, response,
-                        family=c("bcPower", "bcnPower", "yjPower", "basicPower"),
-                        family.y=c("bcPower", "bcnPower", "yjPower", "basicPower"),
-                        rounded=TRUE,
-                        ...){
+                        criterion = mse,
+                        predictors,
+                        response,
+                        family = c("bcPower", "bcnPower", "yjPower", "basicPower"),
+                        family.y = c("bcPower", "bcnPower", "yjPower", "basicPower"),
+                        rounded = TRUE,
+                        ...) {
   if (missing(predictors) && missing(response))
-    stop("'predictors' and 'response' arguments both missing;",
-         "\n no transformations specified")
+    stop(
+      "'predictors' and 'response' arguments both missing;",
+      "\n no transformations specified"
+    )
   y <- GetResponse(model)
   family <- match.arg(family)
   family.y <- match.arg(family.y)
-  powertrans <- switch(family,
-                       bcPower = car::bcPower,
-                       bcnPower = car::bcnPower,
-                       yjPower = car:: yjPower,
-                       basicPower = car::basicPower
+  powertrans <- switch(
+    family,
+    bcPower = car::bcPower,
+    bcnPower = car::bcnPower,
+    yjPower = car::yjPower,
+    basicPower = car::basicPower
   )
 
-  powertrans.y <- switch(family.y,
-                         bcPower = car::bcPower,
-                         bcnPower = car::bcnPower,
-                         yjPower = car:: yjPower,
-                         basicPower = car::basicPower
+  powertrans.y <- switch(
+    family.y,
+    bcPower = car::bcPower,
+    bcnPower = car::bcnPower,
+    yjPower = car::yjPower,
+    basicPower = car::basicPower
   )
 
-  inverse.pt.y <- switch(family.y,
-                         bcPower = bcPowerInverse,
-                         bcnPower = car::bcnPowerInverse,
-                         yjPower = yjPowerInverse,
-                         basicPower = basicPowerInverse
+  inverse.pt.y <- switch(
+    family.y,
+    bcPower = bcPowerInverse,
+    bcnPower = car::bcnPowerInverse,
+    yjPower = yjPowerInverse,
+    basicPower = basicPowerInverse
   )
 
   if (missing(indices)) {
@@ -288,70 +336,78 @@ selectTrans <- function(data, indices,
     full.sample <- TRUE
   } else {
     # refit model omitting current fold
-    model <- update(model, data = data[-indices, ])
+    model <- update(model, data = data[-indices,])
     full.sample <- FALSE
   }
 
   # find predictor transformations:
-  if (!missing(predictors)){
+  if (!missing(predictors)) {
     trans <- transX(model, predictors, family, rounded)
     lambdas <- trans$lambdas
     gammas <- trans$gammas # nb: there may be no gammas
     # transform predictors:
-    for (pred in predictors){
-      data[, pred] <- if (is.null(gammas)){
+    for (pred in predictors) {
+      data[, pred] <- if (is.null(gammas)) {
         powertrans(data[, pred], lambdas[paste0("lam.", pred)])
       } else {
         powertrans(data[, pred],
-                   lambda=lambdas[paste0("lam.", pred)],
-                   gamma=gammas[paste0("gam.", pred)])
+                   lambda = lambdas[paste0("lam.", pred)],
+                   gamma = gammas[paste0("gam.", pred)])
       }
     }
-    model <- update(model, data=data[-indices, ])
+    model <- update(model, data = data[-indices,])
   } else {
     lambdas <- gammas <- NULL
   }
 
   # transform response:
-  if (!missing(response)){
+  if (!missing(response)) {
     transy <- transy(model, family.y)
-    data[, response] <- if (is.na(transy["gamma"])){
-      powertrans.y(data[, response], lambda=transy["lambda"])
+    data[, response] <- if (is.na(transy["gamma"])) {
+      powertrans.y(data[, response], lambda = transy["lambda"])
     } else {
       powertrans.y(data[, response],
-                   lambda=transy["lambda"],
-                   gamma=transy["gamma"])
+                   lambda = transy["lambda"],
+                   gamma = transy["gamma"])
     }
     # refit model with transformed predictors and response,
     #   omitting current fold
-    model <- update(model, data=data[-indices, ])
+    model <- update(model, data = data[-indices,])
   } else {
     transy <- NULL
   }
 
   # get predicted values for *all* cases:
 
-  fit.o.i <- if (!missing(response)){
-    if (is.na(transy["gamma"])){
+  fit.o.i <- if (!missing(response)) {
+    if (is.na(transy["gamma"])) {
       inverse.pt.y(predict(model, newdata = data),
-                   lambda=transy["lambda"])
+                   lambda = transy["lambda"])
     } else {
       inverse.pt.y(predict(model, newdata = data),
-                   lambda=transy["lambda"],
-                   gamma=transy["gamma"])
+                   lambda = transy["lambda"],
+                   gamma = transy["gamma"])
     }
   } else {
     predict(model, newdata = data)
   }
 
   if (full.sample) {
-    return(list(criterion=criterion(y, fit.o.i),
-                model=if (save.model) model else NULL))
+    return(list(
+      criterion = criterion(y, fit.o.i),
+      model = if (save.model)
+        model
+      else
+        NULL
+    ))
   }
   # ... and for current fold only:
   # compute and return CV info and transformation parameters:
-  list(fit.i=fit.o.i[indices], crit.all.i=criterion(y, fit.o.i),
-       coefficients = if (details) c(lambdas, gammas, transy)
+  list(
+    fit.i = fit.o.i[indices],
+    crit.all.i = criterion(y, fit.o.i),
+    coefficients = if (details)
+      c(lambdas, gammas, transy)
   )
 }
 
@@ -386,29 +442,31 @@ selectTransStepAIC <- function(data,
                                rounded = TRUE,
                                AIC = TRUE,
                                ...) {
-
   family <- match.arg(family)
   family.y <- match.arg(family.y)
 
-  powertrans <- switch(family,
-                       bcPower = car::bcPower,
-                       bcnPower = car::bcnPower,
-                       yjPower = car:: yjPower,
-                       basicPower = car::basicPower
+  powertrans <- switch(
+    family,
+    bcPower = car::bcPower,
+    bcnPower = car::bcnPower,
+    yjPower = car::yjPower,
+    basicPower = car::basicPower
   )
 
-  powertrans.y <- switch(family.y,
-                         bcPower = car::bcPower,
-                         bcnPower = car::bcnPower,
-                         yjPower = car:: yjPower,
-                         basicPower = car::basicPower
+  powertrans.y <- switch(
+    family.y,
+    bcPower = car::bcPower,
+    bcnPower = car::bcnPower,
+    yjPower = car::yjPower,
+    basicPower = car::basicPower
   )
 
-  inverse.pt.y <- switch(family.y,
-                         bcPower = bcPowerInverse,
-                         bcnPower = car::bcnPowerInverse,
-                         yjPower = yjPowerInverse,
-                         basicPower = basicPowerInverse
+  inverse.pt.y <- switch(
+    family.y,
+    bcPower = bcPowerInverse,
+    bcnPower = car::bcnPowerInverse,
+    yjPower = yjPowerInverse,
+    basicPower = basicPowerInverse
   )
 
   y <- GetResponse(model) # untransformed response
@@ -417,7 +475,10 @@ selectTransStepAIC <- function(data,
 
   # if indices is missing, use full data set;
   # otherwise remove cases in current fold (indices)
-  inds <- if (missing(indices)) length(y) + 1 else indices
+  inds <- if (missing(indices))
+    length(y) + 1
+  else
+    indices
 
   trans <- if (!missing(predictors) && !missing(response)) {
     selectTrans(
@@ -483,8 +544,9 @@ selectTransStepAIC <- function(data,
     } else {
       for (predictor in predictors) {
         lambda <- powers[paste0("lam.", predictor)]
-        data[, predictor] <- do.call(powertrans, list(U = data[, predictor],
-                                                      lambda = lambda))
+        data[, predictor] <-
+          do.call(powertrans, list(U = data[, predictor],
+                                   lambda = lambda))
       }
     }
   }
@@ -497,8 +559,9 @@ selectTransStepAIC <- function(data,
                                         lambda = lambda, gamma = gamma)
     } else {
       lambda <- powers["lambda"]
-      data[, response] <- do.call(powertrans.y, list(U = data[, response],
-                                                     lambda = lambda))
+      data[, response] <-
+        do.call(powertrans.y, list(U = data[, response],
+                                   lambda = lambda))
     }
   }
 
@@ -508,39 +571,55 @@ selectTransStepAIC <- function(data,
   # perform variable selection:
 
   if (missing(indices)) {
-    k. = if (AIC) 2 else log(nrow(data))
-    model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
-    fit.all.i <- predict(model.i, newdata=data, type="response")
+    k. = if (AIC)
+      2
+    else
+      log(nrow(data))
+    model.i <- MASS::stepAIC(model, trace = FALSE, k = k., ...)
+    fit.all.i <- predict(model.i, newdata = data, type = "response")
   } else {
-    k. <- if (AIC) 2 else log(nrow(data) - length(indices))
-    model <- update(model, data=data[-indices, ])
-    model.i <- MASS::stepAIC(model, trace=FALSE, k=k., ...)
-    fit.all.i <- predict(model.i, newdata=data, type="response")
+    k. <- if (AIC)
+      2
+    else
+      log(nrow(data) - length(indices))
+    model <- update(model, data = data[-indices,])
+    model.i <- MASS::stepAIC(model, trace = FALSE, k = k., ...)
+    fit.all.i <- predict(model.i, newdata = data, type = "response")
   }
 
   # express fitted values on original response scale
-  if (!missing(response)){
-    if (is.na(powers["gamma"])){
+  if (!missing(response)) {
+    if (is.na(powers["gamma"])) {
       fit.all.i  <- inverse.pt.y(fit.all.i,
-                                 lambda=powers["lambda"])
+                                 lambda = powers["lambda"])
     } else {
       fit.all.i  <- inverse.pt.y(fit.all.i,
-                                 lambda=powers["lambda"],
-                                 gamma=powers["gamma"])
+                                 lambda = powers["lambda"],
+                                 gamma = powers["gamma"])
     }
   }
 
   # for full sample:
   if (missing(indices)) {
-    return(list(criterion=criterion(y, fit.all.i),
-                model = if (save.model) model.i else NULL))
+    return(list(
+      criterion = criterion(y, fit.all.i),
+      model = if (save.model)
+        model.i
+      else
+        NULL
+    ))
   }
 
   # ... and for current fold only:
   # compute and return CV info, transformation parameters,
   #   and regression coefficients:
-  list(fit.i=fit.all.i[indices], crit.all.i=criterion(y, fit.all.i),
-       coefficients=if (details) c(powers, coef(model.i)) else NULL
+  list(
+    fit.i = fit.all.i[indices],
+    crit.all.i = criterion(y, fit.all.i),
+    coefficients = if (details)
+      c(powers, coef(model.i))
+    else
+      NULL
   )
 }
 
@@ -552,37 +631,75 @@ selectTransStepAIC <- function(data,
 #' to the value of \code{k}; may be specified as \code{"loo"} or
 #' \code{"n"} as well as an integer.
 #' @export
-selectModelList <- function(data, indices, model, criterion=mse, k=10, k.recurse=k,
-                            details =  k <= 10, save.model=FALSE, seed=FALSE,
-                            quietly=TRUE, ...){
-  if (missing(indices)) {
-    if ((!isFALSE(seed)) && is.null(seed)) {
-      seed <- sample(1e6, 1L)
-      set.seed(seed)
-      message("R RNG seed set to ", seed)
+selectModelList <-
+  function(data,
+           indices,
+           model,
+           criterion = mse,
+           k = 10,
+           k.recurse = k,
+           details =  k <= 10,
+           save.model = FALSE,
+           seed = FALSE,
+           quietly = TRUE,
+           ...) {
+    if (missing(indices)) {
+      if ((!isFALSE(seed)) && is.null(seed)) {
+        seed <- sample(1e6, 1L)
+        set.seed(seed)
+        message("R RNG seed set to ", seed)
+      }
+      result <-
+        cv(
+          model,
+          data,
+          criterion = criterion,
+          k = k.recurse,
+          details = FALSE,
+          quietly = quietly,
+          seed = FALSE,
+          ...
+        )
+      cv.min <- which.min(sapply(result, function(x)
+        x$"CV crit"))
+      return(list(criterion = result[[cv.min]][["CV crit"]],
+                  model = if (save.model)
+                    model[[cv.min]]
+                  else
+                    NULL))
     }
-    result <- cv(model, data, criterion=criterion, k=k.recurse, details=FALSE,
-                 quietly=quietly, seed=FALSE, ...)
-    cv.min <- which.min(sapply(result, function(x) x$"CV crit"))
-    return(list(
-      criterion = result[[cv.min]][["CV crit"]],
-      model = if (save.model) model[[cv.min]] else NULL
-      ))
+    y <- GetResponse(model[[1]])
+    for (i in seq_along(model)) {
+      mod <- model[[i]]
+      model[[i]] <- update(mod, data = data[-indices,])
+    }
+    result <-
+      cv(
+        model,
+        data[-indices,],
+        criterion = criterion,
+        k = k.recurse,
+        details = details,
+        quietly = quietly,
+        seed = FALSE,
+        ...
+      )
+    cv.min <- which.min(sapply(result, function(x)
+      x$"CV crit"))
+    model.name <- names(result)[cv.min]
+    fit.all.i <-
+      predict(model[[cv.min]], newdata = data, type = "response")
+    fit.i <- fit.all.i[indices]
+    list(
+      fit.i = fit.i,
+      crit.all.i = criterion(y, fit.all.i),
+      coefficients = if (details)
+        coef(model[[cv.min]])
+      else
+        NULL,
+      model.name = model.name
+    )
   }
-  y <- GetResponse(model[[1]])
-  for (i in seq_along(model)){
-    mod <- model[[i]]
-    model[[i]] <- update(mod, data=data[-indices, ])
-  }
-  result <- cv(model, data[-indices, ], criterion=criterion, k=k.recurse, details=details, quietly=quietly, seed=FALSE, ...)
-  cv.min <- which.min(sapply(result, function(x) x$"CV crit"))
-  model.name <- names(result)[cv.min]
-  fit.all.i <- predict(model[[cv.min]], newdata=data, type="response")
-  fit.i <- fit.all.i[indices]
-  list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-       coefficients=if (details) coef(model[[cv.min]]) else NULL,
-       model.name = model.name)
-}
 #' @examples
 #' data("Duncan", package="carData")
 #' m1 <- lm(prestige ~ income + education, data=Duncan)
@@ -597,12 +714,12 @@ selectModelList <- function(data, indices, model, criterion=mse, k=10, k.recurse
 #' @param digits significant digits for printing coefficients
 #' (default \code{3}).
 #' @export
-compareFolds <- function(object, digits=3, ...){
+compareFolds <- function(object, digits = 3, ...) {
   UseMethod("compareFolds")
 }
 
 #' @export
-compareFolds.default <- function(object, digits=3, ...){
+compareFolds.default <- function(object, digits = 3, ...) {
   coefficients <- object$details$coefficients
   if (is.null(coefficients))
     stop("details for folds not available")
@@ -610,15 +727,15 @@ compareFolds.default <- function(object, digits=3, ...){
   print(object$details$criterion)
   names <- unlist(lapply(coefficients, names))
   counts <- table(names)
-  counts <- sort(counts, decreasing=TRUE)
+  counts <- sort(counts, decreasing = TRUE)
   table <- matrix(NA, length(coefficients), length(counts))
   colnames(table) <- names(counts)
-  rownames(table) <- paste("Fold", seq(along=coefficients))
-  for (i in seq(along=coefficients)){
+  rownames(table) <- paste("Fold", seq(along = coefficients))
+  for (i in seq(along = coefficients)) {
     table[i, names(coefficients[[i]])] <- coefficients[[i]]
   }
   cat("\nCoefficients by folds:\n")
-  printCoefmat(table, na.print="", digits=digits)
+  printCoefmat(table, na.print = "", digits = digits)
 }
 
 #' @describeIn cv.function extract the coefficients from the selected models
@@ -632,9 +749,9 @@ compareFolds.default <- function(object, digits=3, ...){
 #' for power-transformation estimates.
 #' @importFrom utils capture.output
 #' @export
-coef.cvSelect <- function(object, average, NAs=0, ...){
+coef.cvSelect <- function(object, average, NAs = 0, ...) {
   capture.output(coef <- compareFolds(object))
-  if (missing(average)){
+  if (missing(average)) {
     return(coef)
   }
   coef[is.na(coef)] <- NAs

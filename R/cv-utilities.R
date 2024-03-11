@@ -144,93 +144,107 @@
 #' @describeIn cvCompute used internally by \code{cv()} methods (not for direct use);
 #' exported to support new \code{cv()} methods.
 #' @export
-cvCompute <- function(model, data=insight::get_data(model),
-                      criterion=mse, criterion.name,
-                      k=10, reps=1, seed,
+cvCompute <- function(model,
+                      data = insight::get_data(model),
+                      criterion = mse,
+                      criterion.name,
+                      k = 10,
+                      reps = 1,
+                      seed,
                       details = k <= 10,
-                      confint, level=0.95,
-                      method=NULL,
-                      ncores=1,
-                      type="response",
-                      start=FALSE,
+                      confint,
+                      level = 0.95,
+                      method = NULL,
+                      ncores = 1,
+                      type = "response",
+                      start = FALSE,
                       f,
-                      fPara=f,
-                      locals=list(),
-                      model.function=NULL,
-                      model.function.name=NULL,
-                      ...){
-
+                      fPara = f,
+                      locals = list(),
+                      model.function = NULL,
+                      model.function.name = NULL,
+                      ...) {
   # put function and variable args in the local environment
   env <- environment()
   environment(f) <- env
   environment(fPara) <- env
   localsNames <- names(locals)
-  for (i in seq_along(locals)){
+  for (i in seq_along(locals)) {
     assign(localsNames[i], locals[[i]])
   }
 
-  if (missing(criterion.name) || is.null(criterion.name)) criterion.name <- deparse(substitute(criterion))
+  if (missing(criterion.name) ||
+      is.null(criterion.name))
+    criterion.name <- deparse(substitute(criterion))
 
   y <- GetResponse(model)
   b <- coef(model)
   n <- nrow(data)
-  if (is.character(k)){
+  if (is.character(k)) {
     if (k == "n" || k == "loo") {
       k <- n
     }
   }
-  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+  if (!is.numeric(k) ||
+      length(k) > 1L || k > n || k < 2 || k != round(k)) {
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
-  if (k != n){
-    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
+  if (k != n) {
+    if (missing(seed) || is.null(seed))
+      seed <- sample(1e6, 1L)
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
-    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
-    if (!missing(seed) && !is.null(seed)) message("Note: seed ignored for n-fold CV")
+    if (reps > 1)
+      stop("reps should not be > 1 for n-fold CV")
+    if (!missing(seed) &&
+        !is.null(seed))
+      message("Note: seed ignored for n-fold CV")
     seed <- NULL
   }
   folds <- folds(n, k)
-  yhat <- if (is.factor(y)){
-    factor(rep(NA, n), levels=levels(y))
+  yhat <- if (is.factor(y)) {
+    factor(rep(NA, n), levels = levels(y))
   } else if (is.character(y)) {
     character(n)
   } else {
     numeric(n)
   }
 
-  if (details){
+  if (details) {
     crit.i <- numeric(k)
-    coef.i <- vector(k, mode="list")
-    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
+    coef.i <- vector(k, mode = "list")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep = ".")
   } else {
     crit.i <- NULL
     coef.i <- NULL
   }
 
-  if (ncores > 1){
+  if (ncores > 1) {
     dots <- list(...)
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k) %dopar% {
-      fPara(i, model.function=model.function, model.function.name=model.function.name, ...)
+      fPara(i,
+            model.function = model.function,
+            model.function.name = model.function.name,
+            ...)
     }
     stopCluster(cl)
-    for (i in 1L:k){
+    for (i in 1L:k) {
       yhat[fold(folds, i)] <- result[[i]]$fit.i
-      if (details){
+      if (details) {
         crit.i[i] <- criterion(y[fold(folds, i)],
                                yhat[fold(folds, i)])
         coef.i[[i]] <- result[[i]]$coef.i
       }
     }
   } else {
-    result <- vector(k, mode="list")
-    for (i in 1L:k){
+    result <- vector(k, mode = "list")
+    for (i in 1L:k) {
       result[[i]] <- f(i)
       yhat[fold(folds, i)] <- result[[i]]$fit.i
-      if (details){
+      if (details) {
         crit.i[i] <- criterion(y[fold(folds, i)],
                                yhat[fold(folds, i)])
         coef.i[[i]] <- result[[i]]$coef.i
@@ -238,54 +252,76 @@ cvCompute <- function(model, data=insight::get_data(model),
     }
   }
   cv <- criterion(y, yhat)
-  cv.full <- criterion(y, predict(model, type=type, ...))
+  cv.full <- criterion(y, predict(model, type = type, ...))
   loss <- getLossFn(cv) # casewise loss function
   if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
-      weighted.mean(sapply(result, function(x) x$crit.all.i), folds$folds)
-    se.cv <- sd(loss(y, yhat))/sqrt(n)
-    halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
-    ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
-                         level=round(level*100)) else NULL
+      weighted.mean(sapply(result, function(x)
+        x$crit.all.i), folds$folds)
+    se.cv <- sd(loss(y, yhat)) / sqrt(n)
+    halfwidth <- qnorm(1 - (1 - level) / 2) * se.cv
+    ci <-
+      if (confint)
+        c(
+          lower = adj.cv - halfwidth,
+          upper = adj.cv + halfwidth,
+          level = round(level * 100)
+        )
+    else
+      NULL
   } else {
     adj.cv <- NULL
     ci <- NULL
   }
-  result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
-                 "full crit" = cv.full, "confint"=ci,
-                 "k" = if (k == n) "n" else k, "seed" = seed,
-                 "method" = method,
-                 "criterion" = criterion.name,
-                 "details"=list(criterion=crit.i,
-                                coefficients=coef.i))
-  if (missing(method) || is.null(method)) result$method <- NULL
+  result <- list(
+    "CV crit" = cv,
+    "adj CV crit" = adj.cv,
+    "full crit" = cv.full,
+    "confint" = ci,
+    "k" = if (k == n)
+      "n"
+    else
+      k,
+    "seed" = seed,
+    "method" = method,
+    "criterion" = criterion.name,
+    "details" = list(criterion = crit.i,
+                     coefficients = coef.i)
+  )
+  if (missing(method) || is.null(method))
+    result$method <- NULL
   class(result) <- "cv"
   if (reps == 1) {
     return(result)
   } else {
+    res <- cvCompute(
+      model = model,
+      data = data,
+      criterion = criterion,
+      criterion.name = criterion.name,
+      k = k,
+      reps = reps - 1,
+      details = details,
+      confint = confint,
+      level = level,
+      method = method,
+      ncores = ncores,
+      type = type,
+      start = start,
+      f = f,
+      fPara = fPara,
+      locals = locals,
+      model.function = model.function,
+      model.function.name = model.function.name,
+      ...
+    )
 
-    res <- cvCompute(model=model, data=data,
-                     criterion=criterion, criterion.name=criterion.name,
-                     k=k, reps=reps - 1,
-                     details=details,
-                     confint=confint, level=level,
-                     method=method,
-                     ncores=ncores,
-                     type=type,
-                     start=start,
-                     f=f,
-                     fPara=fPara,
-                     locals=locals,
-                     model.function=model.function,
-                     model.function.name=model.function.name,
-                     ...)
-
-    if (reps  > 2){
+    if (reps  > 2) {
       res[[length(res) + 1]] <- result
     } else {
       res <- list(res, result)
     }
-    for (i in 1:(length(res) - 1)){
+    for (i in 1:(length(res) - 1)) {
       res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
     }
     class(res) <- "cvList"
@@ -299,57 +335,82 @@ cvCompute <- function(model, data=insight::get_data(model),
 #' @export
 cvMixed <- function(model,
                     package,
-                    data=insight::get_data(model),
-                    criterion=mse, criterion.name,
+                    data = insight::get_data(model),
+                    criterion = mse,
+                    criterion.name,
                     k,
-                    reps=1,
-                    confint, level=0.95,
+                    reps = 1,
+                    confint,
+                    level = 0.95,
                     seed,
                     details,
-                    ncores=1,
+                    ncores = 1,
                     clusterVariables,
-                    predict.clusters.args=list(object=model, newdata=data),
-                    predict.cases.args=list(object=model, newdata=data),
-                    blups, fixed.effects,
-                    ...){
-
+                    predict.clusters.args = list(object = model, newdata =
+                                                   data),
+                    predict.cases.args = list(object = model, newdata =
+                                                data),
+                    blups,
+                    fixed.effects,
+                    ...) {
   pkg.env <- getNamespace(package)
 
-  if (missing(criterion.name) || is.null(criterion.name)) criterion.name <- deparse(substitute(criterion))
+  if (missing(criterion.name) ||
+      is.null(criterion.name))
+    criterion.name <- deparse(substitute(criterion))
 
-  f.clusters <- function(i, predict.clusters.args, predict.cases.args, ...){
-    indices.i <- fold(folds, i)
-    index <- selectClusters(clusters[- indices.i, , drop=FALSE], data=data)
-    update.args <- list(...)
-    update.args$object <- model
-    update.args$data <- data[index, ]
-    predict.clusters.args$object <- do.call(update, update.args, envir=pkg.env)
-    fit.all.i <- do.call(predict, predict.clusters.args)
-    fit.i <- fit.all.i[index <- !index]
-    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-         indices.i=index,
-         coef.i=fixed.effects(predict.clusters.args$object))
-  }
+  f.clusters <-
+    function(i,
+             predict.clusters.args,
+             predict.cases.args,
+             ...) {
+      indices.i <- fold(folds, i)
+      index <-
+        selectClusters(clusters[-indices.i, , drop = FALSE], data = data)
+      update.args <- list(...)
+      update.args$object <- model
+      update.args$data <- data[index,]
+      predict.clusters.args$object <-
+        do.call(update, update.args, envir = pkg.env)
+      fit.all.i <- do.call(predict, predict.clusters.args)
+      fit.i <- fit.all.i[index <- !index]
+      list(
+        fit.i = fit.i,
+        crit.all.i = criterion(y, fit.all.i),
+        indices.i = index,
+        coef.i = fixed.effects(predict.clusters.args$object)
+      )
+    }
 
-  f.cases <- function(i, predict.clusters.args, predict.cases.args, ...){
-    indices.i <- fold(folds, i)
-    update.args <- list(...)
-    update.args$object <- model
-    update.args$data <- data[ - indices.i, ]
-    predict.cases.args$object <- do.call(update, update.args, envir=pkg.env)
-    fit.all.i <- do.call(predict, predict.cases.args)
-    fit.i <- fit.all.i[indices.i]
-    list(fit.i=fit.i, crit.all.i=criterion(y, fit.all.i),
-         indices.i=indices.i,
-         coef.i=blups(predict.cases.args$object))
-  }
+  f.cases <-
+    function(i,
+             predict.clusters.args,
+             predict.cases.args,
+             ...) {
+      indices.i <- fold(folds, i)
+      update.args <- list(...)
+      update.args$object <- model
+      update.args$data <- data[-indices.i,]
+      predict.cases.args$object <-
+        do.call(update, update.args, envir = pkg.env)
+      fit.all.i <- do.call(predict, predict.cases.args)
+      fit.i <- fit.all.i[indices.i]
+      list(
+        fit.i = fit.i,
+        crit.all.i = criterion(y, fit.all.i),
+        indices.i = indices.i,
+        coef.i = blups(predict.cases.args$object)
+      )
+    }
   y <- GetResponse(model)
 
-  if (missing(clusterVariables)) clusterVariables <- NULL
-  if (is.null(clusterVariables)){
+  if (missing(clusterVariables))
+    clusterVariables <- NULL
+  if (is.null(clusterVariables)) {
     n <- nrow(data)
-    if (missing(k) || is.null(k)) k <- 10
-    if (is.character(k)){
+    if (missing(k) || is.null(k))
+      k <- 10
+    if (is.character(k)) {
       if (k == "n" || k == "loo") {
         k <- n
       }
@@ -358,66 +419,76 @@ cvMixed <- function(model,
   } else {
     clusters <- defineClusters(clusterVariables, data)
     n <- nrow(clusters)
-    if (missing(k) || is.null(k)) k <- nrow(clusters)
+    if (missing(k) || is.null(k))
+      k <- nrow(clusters)
     f <- f.clusters
   }
 
-  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+  if (!is.numeric(k) ||
+      length(k) > 1L || k > n || k < 2 || k != round(k)) {
     stop("k must be an integer between 2 and number of",
-         if (is.null(clusterVariables)) "cases" else "clusters")
+         if (is.null(clusterVariables))
+           "cases"
+         else
+           "clusters")
   }
 
-  if (k != n){
-    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
+  if (k != n) {
+    if (missing(seed) || is.null(seed))
+      seed <- sample(1e6, 1L)
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
-    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
-    if (!missing(seed) && !is.null(seed)) message("Note: seed ignored for n-fold CV")
+    if (reps > 1)
+      stop("reps should not be > 1 for n-fold CV")
+    if (!missing(seed) &&
+        !is.null(seed))
+      message("Note: seed ignored for n-fold CV")
     seed <- NULL
   }
 
-  if (missing(details) || is.null(details))  details <- k <= 10
+  if (missing(details) || is.null(details))
+    details <- k <= 10
 
-  if (details){
+  if (details) {
     crit.i <- numeric(k)
-    coef.i <- vector(k, mode="list")
-    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep=".")
+    coef.i <- vector(k, mode = "list")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep = ".")
   } else {
     crit.i <- NULL
     coef.i <- NULL
   }
 
   folds <- folds(n, k)
-  yhat <- if (is.factor(y)){
-    factor(rep(NA, n), levels=levels(y))
+  yhat <- if (is.factor(y)) {
+    factor(rep(NA, n), levels = levels(y))
   } else if (is.character(y)) {
     character(n)
   } else {
     numeric(n)
   }
 
-  if (ncores > 1L){
+  if (ncores > 1L) {
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:k) %dopar% {
       f(i, predict.clusters.args, predict.cases.args, ...)
     }
     stopCluster(cl)
-    for (i in 1L:k){
+    for (i in 1L:k) {
       yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
-      if (details){
+      if (details) {
         crit.i[i] <- criterion(y[fold(folds, i)],
                                yhat[fold(folds, i)])
         coef.i[[i]] <- result[[i]]$coef.i
       }
     }
   } else {
-    result <- vector(k, mode="list")
-    for (i in 1L:k){
+    result <- vector(k, mode = "list")
+    for (i in 1L:k) {
       result[[i]] <- f(i, predict.clusters.args, predict.cases.args, ...)
       yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
-      if (details){
+      if (details) {
         crit.i[i] <- criterion(y[fold(folds, i)],
                                yhat[fold(folds, i)])
         coef.i[[i]] <- result[[i]]$coef.i
@@ -428,48 +499,73 @@ cvMixed <- function(model,
   cv.full <- criterion(y,
                        do.call(predict,
                                if (is.null(clusterVariables)) {
-                                 predict.cases.args} else {
-                                   predict.clusters.args
-                                 }
-                       )
-  )
+                                 predict.cases.args
+                               } else {
+                                 predict.clusters.args
+                               }))
 
-  if (missing(confint)) confint <- length(y) >= 400
+  if (missing(confint))
+    confint <- length(y) >= 400
   loss <- getLossFn(cv) # casewise loss function
   if (!is.null(loss)) {
     adj.cv <- cv + cv.full -
-      weighted.mean(sapply(result, function(x) x$crit.all.i), folds$folds)
-    se.cv <- sd(loss(y, yhat))/sqrt(length(y))
-    halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
-    ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
-                         level=round(level*100)) else NULL
+      weighted.mean(sapply(result, function(x)
+        x$crit.all.i), folds$folds)
+    se.cv <- sd(loss(y, yhat)) / sqrt(length(y))
+    halfwidth <- qnorm(1 - (1 - level) / 2) * se.cv
+    ci <-
+      if (confint)
+        c(
+          lower = adj.cv - halfwidth,
+          upper = adj.cv + halfwidth,
+          level = round(level * 100)
+        )
+    else
+      NULL
   } else {
     adj.cv <- NULL
     ci <- NULL
   }
 
-  result <- list("CV crit" = cv, "adj CV crit" = adj.cv,
-                 "full crit" = cv.full, "confint"=ci,
-                 "k" = if (k == n) "n" else k, "seed" = seed,
-                 "criterion"=criterion.name,
-                 clusters = clusterVariables,
-                 "n clusters" = if (!is.null(clusterVariables)) n else NULL,
-                 "details"=list(criterion=crit.i,
-                                coefficients=coef.i))
+  result <- list(
+    "CV crit" = cv,
+    "adj CV crit" = adj.cv,
+    "full crit" = cv.full,
+    "confint" = ci,
+    "k" = if (k == n)
+      "n"
+    else
+      k,
+    "seed" = seed,
+    "criterion" = criterion.name,
+    clusters = clusterVariables,
+    "n clusters" = if (!is.null(clusterVariables))
+      n
+    else
+      NULL,
+    "details" = list(criterion = crit.i,
+                     coefficients = coef.i)
+  )
   class(result) <- "cv"
   if (reps == 1) {
     return(result)
   } else {
-    res <- cv(model=model, data=data, criterion=criterion,
-              k=k, ncores=ncores, reps=reps - 1,
-              clusterVariables=clusterVariables,
-              ...)
-    if (reps  > 2){
+    res <- cv(
+      model = model,
+      data = data,
+      criterion = criterion,
+      k = k,
+      ncores = ncores,
+      reps = reps - 1,
+      clusterVariables = clusterVariables,
+      ...
+    )
+    if (reps  > 2) {
       res[[length(res) + 1]] <- result
     } else {
       res <- list(res, result)
     }
-    for (i in 1:(length(res) - 1)){
+    for (i in 1:(length(res) - 1)) {
       res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
     }
     class(res) <- "cvList"
@@ -482,49 +578,68 @@ cvMixed <- function(model,
 #' directly for this purpose, but use via \code{cv()} is preferred.
 #' \code{cvSelect()} is exported primarily to support new model-selection procedures.
 #' @export
-cvSelect <- function(procedure, data, criterion=mse, criterion.name,
-                     model, y.expression,
-                     k=10, confint = n >= 400, level=0.95,
-                     reps=1,
+cvSelect <- function(procedure,
+                     data,
+                     criterion = mse,
+                     criterion.name,
+                     model,
+                     y.expression,
+                     k = 10,
+                     confint = n >= 400,
+                     level = 0.95,
+                     reps = 1,
                      save.coef,
                      details = k <= 10,
-                     save.model=FALSE,
-                     seed, ncores=1, ...){
-  if (missing(criterion.name) || is.null(criterion.name)) criterion.name <- deparse(substitute(criterion))
+                     save.model = FALSE,
+                     seed,
+                     ncores = 1,
+                     ...) {
+  if (missing(criterion.name) ||
+      is.null(criterion.name))
+    criterion.name <- deparse(substitute(criterion))
   selectModelListP <- isTRUE(all.equal(procedure, selectModelList))
-  if (!missing(save.coef)) details <- save.coef
+  if (!missing(save.coef))
+    details <- save.coef
   n <- nrow(data)
   y <- if (!missing(model)) {
     GetResponse(model)
   } else {
-    eval(y.expression, envir=data)
+    eval(y.expression, envir = data)
   }
-  if (missing(model)) model <- NULL
+  if (missing(model))
+    model <- NULL
   k.save <- k
-  if (is.character(k)){
+  if (is.character(k)) {
     if (k == "n" || k == "loo") {
       k <- n
     }
   }
-  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+  if (!is.numeric(k) ||
+      length(k) > 1L || k > n || k < 2 || k != round(k)) {
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
-  if (k != n){
-    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
+  if (k != n) {
+    if (missing(seed) || is.null(seed))
+      seed <- sample(1e6, 1L)
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
-    if (reps > 1) stop("reps should not be > 1 for n-fold CV")
-    if (k == n){
-      if (reps > 1) stop("reps should not be > 1 for n-fold CV")
-      if (!missing(seed) && !is.null(seed) && !isFALSE(seed)) message("Note: seed ignored for n-fold CV")
+    if (reps > 1)
+      stop("reps should not be > 1 for n-fold CV")
+    if (k == n) {
+      if (reps > 1)
+        stop("reps should not be > 1 for n-fold CV")
+      if (!missing(seed) &&
+          !is.null(seed) &&
+          !isFALSE(seed))
+        message("Note: seed ignored for n-fold CV")
       seed <- NULL
     }
     seed <- NULL
   }
   folds <- folds(n, k)
-  yhat <- if (is.factor(y)){
-    factor(rep(NA, n), levels=levels(y))
+  yhat <- if (is.factor(y)) {
+    factor(rep(NA, n), levels = levels(y))
   } else if (is.character(y)) {
     character(n)
   } else {
@@ -532,26 +647,33 @@ cvSelect <- function(procedure, data, criterion=mse, criterion.name,
   }
   crit.all.i <- numeric(k)
 
-  if (details){
+  if (details) {
     crit.i <- numeric(k)
-    coef.i <- vector(k, mode="list")
+    coef.i <- vector(k, mode = "list")
     model.name.i <- character(k)
     names(crit.i) <- names(coef.i) <- names(model.name.i) <-
-      paste("fold", 1:k, sep=".")
+      paste("fold", 1:k, sep = ".")
   } else {
     crit.i <- NULL
     coef.i <- NULL
     model.name.i <- NULL
   }
 
-  if (ncores > 1){
+  if (ncores > 1) {
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    arglist <- c(list(data=data, indices=1,
-                      details = k <= 10,
-                      criterion=criterion, model=model),
-                 list(...))
-    if (selectModelListP) arglist <- c(arglist, list(k=k.save))
+    arglist <- c(
+      list(
+        data = data,
+        indices = 1,
+        details = k <= 10,
+        criterion = criterion,
+        model = model
+      ),
+      list(...)
+    )
+    if (selectModelListP)
+      arglist <- c(arglist, list(k = k.save))
     selection <- foreach(i = 1L:k) %dopar% {
       # the following deals with a scoping issue that can
       #   occur with args passed via ...
@@ -560,60 +682,85 @@ cvSelect <- function(procedure, data, criterion=mse, criterion.name,
     }
     stopCluster(cl)
 
-    for (i in 1L:k){
+    for (i in 1L:k) {
       yhat[fold(folds, i)] <- selection[[i]]$fit.i
       crit.all.i[i] <- selection[[i]]$crit.all.i
 
-      if (details){
+      if (details) {
         crit.i[i] <- criterion(y[fold(folds, i)],
                                yhat[fold(folds, i)])
         coef.i[[i]] <- selection[[i]]$coefficients
-        model.name.i[[i]] <- if (!is.null(selection[[i]]$model.name)) selection[[i]]$model.name else ""
+        model.name.i[[i]] <-
+          if (!is.null(selection[[i]]$model.name))
+            selection[[i]]$model.name
+        else
+          ""
       }
 
     }
 
   } else {
-
-    for (i in 1L:k){
+    for (i in 1L:k) {
       indices.i <- fold(folds, i)
-      selection <- if(selectModelListP){
-        procedure(data, indices.i,
-                  details = k <= 10,
-                  criterion=criterion, model=model,
-                  k=k.save, ...)
+      selection <- if (selectModelListP) {
+        procedure(
+          data,
+          indices.i,
+          details = k <= 10,
+          criterion = criterion,
+          model = model,
+          k = k.save,
+          ...
+        )
       } else {
-        procedure(data, indices.i,
-                  details = k <= 10,
-                  criterion=criterion, model=model,
-                  ...)
+        procedure(
+          data,
+          indices.i,
+          details = k <= 10,
+          criterion = criterion,
+          model = model,
+          ...
+        )
       }
       crit.all.i[i] <- selection$crit.all.i
       yhat[indices.i] <- selection$fit.i
 
-      if (details){
+      if (details) {
         crit.i[i] <- criterion(y[fold(folds, i)],
                                yhat[fold(folds, i)])
         coef.i[[i]] <- selection$coefficients
-        model.name.i[[i]] <- if (!is.null(selection$model.name)) selection$model.name else ""
+        model.name.i[[i]] <-
+          if (!is.null(selection$model.name))
+            selection$model.name
+        else
+          ""
       }
 
     }
   }
   cv <- criterion(y, yhat)
-  result.full <- if (selectModelListP){
-    procedure(data, model=model, criterion=criterion,
-              #   seed = seed, # to use same folds if necessary
-              save.model=save.model,
-              k=k.save,
-              ...)
+  result.full <- if (selectModelListP) {
+    procedure(
+      data,
+      model = model,
+      criterion = criterion,
+      #   seed = seed, # to use same folds if necessary
+      save.model = save.model,
+      k = k.save,
+      ...
+    )
   } else {
-    procedure(data, model=model, criterion=criterion,
-              seed = seed, # to use same folds if necessary
-              save.model=save.model,
-              ...)
+    procedure(
+      data,
+      model = model,
+      criterion = criterion,
+      seed = seed,
+      # to use same folds if necessary
+      save.model = save.model,
+      ...
+    )
   }
-  if (is.list(result.full)){
+  if (is.list(result.full)) {
     cv.full <- result.full$criterion
     selected.model <- result.full$model
   } else {
@@ -624,39 +771,66 @@ cvSelect <- function(procedure, data, criterion=mse, criterion.name,
   loss <- getLossFn(cv) # casewise loss function
   if (!is.null(loss)) {
     adj.cv <- cv + cv.full - weighted.mean(crit.all.i, folds$folds)
-    se.cv <- sd(loss(y, yhat))/sqrt(n)
-    halfwidth <- qnorm(1 - (1 - level)/2)*se.cv
-    ci <- if (confint) c(lower = adj.cv - halfwidth, upper = adj.cv + halfwidth,
-                         level=round(level*100)) else NULL
+    se.cv <- sd(loss(y, yhat)) / sqrt(n)
+    halfwidth <- qnorm(1 - (1 - level) / 2) * se.cv
+    ci <-
+      if (confint)
+        c(
+          lower = adj.cv - halfwidth,
+          upper = adj.cv + halfwidth,
+          level = round(level * 100)
+        )
+    else
+      NULL
   } else {
     adj.cv <- NULL
     ci <- NULL
   }
 
-  result <- list("CV crit" = cv, "adj CV crit" = adj.cv, "full crit" = cv.full,
-                 "criterion" = criterion.name,
-                 "confint" = ci,
-                 "k" = if (k == n) "n" else k, "seed" = seed,
-                 "details" = list(criterion=crit.i,
-                                  coefficients=coef.i,
-                                  model.name=model.name.i),
-                 "selected.model" = selected.model)
+  result <-
+    list(
+      "CV crit" = cv,
+      "adj CV crit" = adj.cv,
+      "full crit" = cv.full,
+      "criterion" = criterion.name,
+      "confint" = ci,
+      "k" = if (k == n)
+        "n"
+      else
+        k,
+      "seed" = seed,
+      "details" = list(
+        criterion = crit.i,
+        coefficients = coef.i,
+        model.name = model.name.i
+      ),
+      "selected.model" = selected.model
+    )
   class(result) <- c("cvSelect", "cv")
   if (reps == 1) {
     return(result)
   } else {
-    if (missing(y.expression)) y.expression <- NULL
-    res <- cvSelect(procedure=procedure, data=data,
-                    criterion=criterion,
-                    criterion.name=criterion.name,
-                    model=model, y.expression=y.expression, k=k,
-                    confint=confint, level=level,
-                    reps = reps - 1, save.coef = save.coef,
-                    details = details, save.model = save.model,
-                    ncores=ncores,
-                     ...)
+    if (missing(y.expression))
+      y.expression <- NULL
+    res <- cvSelect(
+      procedure = procedure,
+      data = data,
+      criterion = criterion,
+      criterion.name = criterion.name,
+      model = model,
+      y.expression = y.expression,
+      k = k,
+      confint = confint,
+      level = level,
+      reps = reps - 1,
+      save.coef = save.coef,
+      details = details,
+      save.model = save.model,
+      ncores = ncores,
+      ...
+    )
 
-      if (reps  > 2){
+    if (reps  > 2) {
       res[[length(res) + 1]] <- result
     } else {
       res <- list(res, result)
@@ -668,43 +842,59 @@ cvSelect <- function(procedure, data, criterion=mse, criterion.name,
 
 #' @describeIn cvCompute used internally by \code{cv()} methods (not for direct use).
 #' @export
-folds <- function(n, k){
+folds <- function(n, k) {
   nk <-  n %/% k # number of cases in each fold
   rem <- n %% k  # remainder
-  folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
+  folds <-
+    rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
-  indices <- if (n > k) sample(n, n)  else 1:n # permute cases
-  result <- list(n=n, k=k, folds=folds, starts=starts,
-                 ends=ends, indices=indices)
+  indices <- if (n > k)
+    sample(n, n)
+  else
+    1:n # permute cases
+  result <- list(
+    n = n,
+    k = k,
+    folds = folds,
+    starts = starts,
+    ends = ends,
+    indices = indices
+  )
   class(result) <- "folds"
   result
 }
 
 #' @describeIn cvCompute to extract a fold from a \code{"folds"} object.
 #' @export
-fold <- function(folds, i, ...) UseMethod("fold")
+fold <- function(folds, i, ...)
+  UseMethod("fold")
 
 #' @describeIn cvCompute \code{fold()} method for \code{"folds"} objects.
 #' @export
-fold.folds <- function(folds, i, ...) folds$indices[folds$starts[i]:folds$ends[i]]
+fold.folds <-
+  function(folds, i, ...)
+    folds$indices[folds$starts[i]:folds$ends[i]]
 
 #' @describeIn cvCompute \code{print()} method for \code{"folds"} objects.
 #' @export
-print.folds <- function(x, ...){
-  if (x$k == x$n){
+print.folds <- function(x, ...) {
+  if (x$k == x$n) {
     cat("LOO:", x$k, "folds for", x$n, "cases")
     return(invisible(x))
   }
-  cat(x$k, "folds of approximately", floor(x$n/x$k),
+  cat(x$k, "folds of approximately", floor(x$n / x$k),
       "cases each")
-  for (i in 1:min(x$k, 10)){
+  for (i in 1:min(x$k, 10)) {
     cat("\n fold", paste0(i, ": "))
     fld <- fold(x, i)
-    if (length(fld) <= 10)  cat(fld)
-    else cat(fld[1:10], "...")
+    if (length(fld) <= 10)
+      cat(fld)
+    else
+      cat(fld[1:10], "...")
   }
-  if (x$k > 10) cat("\n ...")
+  if (x$k > 10)
+    cat("\n ...")
   cat("\n")
   invisible(x)
 }
@@ -712,43 +902,55 @@ print.folds <- function(x, ...){
 #' @export
 #' @describeIn cvCompute function to return the response variable
 #' from a regression model.
-GetResponse <- function(model, ...){
+GetResponse <- function(model, ...) {
   UseMethod("GetResponse")
 }
 
 #' @describeIn cvCompute default method.
 #' @export
-GetResponse.default <- function(model, ...){
-  y <- if (!isS4(model)) model$y else insight::get_response(model)
-  if (is.null(y)) y <- model.response(model.frame(model))
-  if (!is.vector(y)) stop("non-vector response")
-  if (!is.numeric(y)) stop("non-numeric response")
+GetResponse.default <- function(model, ...) {
+  y <- if (!isS4(model))
+    model$y
+  else
+    insight::get_response(model)
+  if (is.null(y))
+    y <- model.response(model.frame(model))
+  if (!is.vector(y))
+    stop("non-vector response")
+  if (!is.numeric(y))
+    stop("non-numeric response")
   y
 }
 
 #' @describeIn cvCompute \code{"merMod"} method.
 #' @export
-GetResponse.merMod <- function(model, ...){
+GetResponse.merMod <- function(model, ...) {
   y <- insight::get_response(model)
   if (is.factor(y)) {
     levels <- levels(y)
     failure <- levels[1]
-    if (length(levels) > 2){
-      message("Note: the response has more than 2 levels.\n",
-              " The first level ('", failure,
-              "') denotes failure (0),\n",
-              " the others success (1)")
+    if (length(levels) > 2) {
+      message(
+        "Note: the response has more than 2 levels.\n",
+        " The first level ('",
+        failure,
+        "') denotes failure (0),\n",
+        " the others success (1)"
+      )
     }
     y <- as.numeric(y != failure)
   }
-  if (!is.vector(y)) stop("non-vector response")
-  if (!is.numeric(y)) stop("non-numeric response")
+  if (!is.vector(y))
+    stop("non-vector response")
+  if (!is.numeric(y))
+    stop("non-numeric response")
   y
 }
 
 #' @describeIn cvCompute \code{"lme"} method.
 #' @export
-GetResponse.lme <- function(model, ...) insight::get_response(model)
+GetResponse.lme <- function(model, ...)
+  insight::get_response(model)
 
 #' @describeIn cvCompute \code{"glmmTMB"} method.
 #' @export
@@ -756,34 +958,49 @@ GetResponse.glmmTMB <- GetResponse.merMod
 
 #' @describeIn cvCompute \code{"modList"} method.
 #' @export
-GetResponse.modList <- function(model, ...) GetResponse(model[[1]])
+GetResponse.modList <- function(model, ...)
+  GetResponse(model[[1]])
 
 
 # not exported
 
-summarizeReps <- function(x){
-  CVcrit <- mean(sapply(x, function(x) x[["CV crit"]]))
-  CVcritSD <- sd(sapply(x, function(x) x[["CV crit"]]))
-  CVcritRange <- range(sapply(x, function(x) x[["CV crit"]]))
+summarizeReps <- function(x) {
+  CVcrit <- mean(sapply(x, function(x)
+    x[["CV crit"]]))
+  CVcritSD <- sd(sapply(x, function(x)
+    x[["CV crit"]]))
+  CVcritRange <- range(sapply(x, function(x)
+    x[["CV crit"]]))
   if (!is.null(x[[1]][["adj CV crit"]])) {
-    adjCVcrit <- mean(sapply(x, function(x) x[["adj CV crit"]]))
-    adjCVcritSD <- sd(sapply(x, function(x) x[["adj CV crit"]]))
-    adjCVcritRange <- range(sapply(x, function(x) x[["adj CV crit"]]))
+    adjCVcrit <- mean(sapply(x, function(x)
+      x[["adj CV crit"]]))
+    adjCVcritSD <- sd(sapply(x, function(x)
+      x[["adj CV crit"]]))
+    adjCVcritRange <-
+      range(sapply(x, function(x)
+        x[["adj CV crit"]]))
   } else {
     adjCVcrit <- adjCVcritSD <- adjCVcritRange <- NULL
   }
-  list("CV crit" = CVcrit, "adj CV crit" = adjCVcrit,
-       "CV crit range" = CVcritRange,
-       "SD CV crit" = CVcritSD, "SD adj CV crit" = adjCVcritSD,
-       "adj CV crit range" = adjCVcritRange)
+  list(
+    "CV crit" = CVcrit,
+    "adj CV crit" = adjCVcrit,
+    "CV crit range" = CVcritRange,
+    "SD CV crit" = CVcritSD,
+    "SD adj CV crit" = adjCVcritSD,
+    "adj CV crit range" = adjCVcritRange
+  )
 }
 
-getLossFn <- function(cv){
+getLossFn <- function(cv) {
   fn.body <- attr(cv, "casewise loss")
-  if (is.null(fn.body)) return(NULL)
-  eval(parse(text=paste0("function(y, yhat) {\n",
-                         paste(fn.body, collapse="\n"),
-                         "\n}")))
+  if (is.null(fn.body))
+    return(NULL)
+  eval(parse(text = paste0(
+    "function(y, yhat) {\n",
+    paste(fn.body, collapse = "\n"),
+    "\n}"
+  )))
 }
 
 utils::globalVariables(c("b", "y", "dots"))

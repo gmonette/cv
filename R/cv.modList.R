@@ -86,60 +86,109 @@
 
 #' @describeIn cv.modList \code{cv()} method for \code{"modList"} objects.
 #' @exportS3Method
-cv.modList <- function(model, data, criterion=mse, k, reps=1, seed, quietly=TRUE,
-                       recursive=FALSE, ...){
-  if (missing(seed) && !(k == "loo" || k == "n")) {
-    seed <- sample(1e6, 1L)
-    message("R RNG seed set to ", seed)
-  }
-  if (recursive){
-    if (missing(k)) k <- 10
-    if (k == "loo" || k == "n") seed <- NULL
-    if (missing(data)) data <- insight::get_data(model[[1]])
-    return(cv(selectModelList, data=data, criterion=criterion, k=k, reps=reps,
-       seed=seed,
-       working.model=model, ...))
-  }
-  n.models <- length(model)
-  result <- vector(n.models, mode="list")
-  names(result) <- names(model)
-  class(result) <- "cvModList"
-  for (i in 1L:n.models){
-    result[[i]] <- if (missing(k)){
-      if (quietly){
-        suppressMessages(cv(model[[i]], data=data, criterion=criterion,
-                            seed=seed, reps=reps, ...))
+cv.modList <-
+  function(model,
+           data,
+           criterion = mse,
+           k,
+           reps = 1,
+           seed,
+           quietly = TRUE,
+           recursive = FALSE,
+           ...) {
+    if (missing(seed) && !(k == "loo" || k == "n")) {
+      seed <- sample(1e6, 1L)
+      message("R RNG seed set to ", seed)
+    }
+    if (recursive) {
+      if (missing(k))
+        k <- 10
+      if (k == "loo" || k == "n")
+        seed <- NULL
+      if (missing(data))
+        data <- insight::get_data(model[[1]])
+      return(
+        cv(
+          selectModelList,
+          data = data,
+          criterion = criterion,
+          k = k,
+          reps = reps,
+          seed = seed,
+          working.model = model,
+          ...
+        )
+      )
+    }
+    n.models <- length(model)
+    result <- vector(n.models, mode = "list")
+    names(result) <- names(model)
+    class(result) <- "cvModList"
+    for (i in 1L:n.models) {
+      result[[i]] <- if (missing(k)) {
+        if (quietly) {
+          suppressMessages(cv(
+            model[[i]],
+            data = data,
+            criterion = criterion,
+            seed = seed,
+            reps = reps,
+            ...
+          ))
+        } else {
+          cv(
+            model[[i]],
+            data = data,
+            criterion = criterion,
+            seed = seed,
+            reps = reps,
+            ...
+          )
+        }
       } else {
-        cv(model[[i]], data=data, criterion=criterion, seed=seed,
-           reps=reps, ...)
-      }
-    } else {
-      if (quietly){
-        suppressMessages(cv(model[[i]], data=data, criterion=criterion,
-                            k=k, seed=seed, reps=reps, ...))
-      } else {
-        cv(model[[i]], data=data, criterion=criterion, k=k, seed=seed,
-           reps=reps, ...)
+        if (quietly) {
+          suppressMessages(cv(
+            model[[i]],
+            data = data,
+            criterion = criterion,
+            k = k,
+            seed = seed,
+            reps = reps,
+            ...
+          ))
+        } else {
+          cv(
+            model[[i]],
+            data = data,
+            criterion = criterion,
+            k = k,
+            seed = seed,
+            reps = reps,
+            ...
+          )
+        }
       }
     }
+    result
   }
-  result
-}
 
 #' @describeIn cv.modList create a list of models.
 #' @export
-models <- function(...){
+models <- function(...) {
   models <- list(...)
-  if (length(models) < 2L) stop("fewer than 2 models to be compared")
-  classes <- sapply(models, function(m) class(m)[1L])
-  n <- sapply(models, function(m) nrow(insight::get_data(m)))
+  if (length(models) < 2L)
+    stop("fewer than 2 models to be compared")
+  classes <- sapply(models, function(m)
+    class(m)[1L])
+  n <- sapply(models, function(m)
+    nrow(insight::get_data(m)))
   if (!all(n[1L] == n[-1L])) {
     stop("models are fit to data sets of differing numbers of cases")
   }
   response <- GetResponse(models[[1L]])
-  for (i in 2L:length(models)){
+  for (i in 2L:length(models)) {
     if (!isTRUE(all.equal(response, GetResponse(models[[i]]),
-                          check.attributes=FALSE))){
+                          check.attributes = FALSE))) {
       stop("models are not all fit to the same response variable")
     }
   }
@@ -158,15 +207,16 @@ models <- function(...){
 
 #' @describeIn cv.modList \code{print()} method for \code{"cvModList"} objects.
 #' @exportS3Method
-print.cvModList <- function(x, ...){
+print.cvModList <- function(x, ...) {
   nms <- names(x)
-  if (inherits(x[[1L]], "cvList")){
+  if (inherits(x[[1L]], "cvList")) {
     reps <- length(x[[1L]])
-    nms <- paste0(nms, " averaged across ", reps, " replications (with SDs)")
+    nms <-
+      paste0(nms, " averaged across ", reps, " replications (with SDs)")
   }
-  for (i in seq_along(x)){
+  for (i in seq_along(x)) {
     cat(paste0("\nModel ", nms[i], ":\n"))
-    if (inherits(x[[i]], "cvList")){
+    if (inherits(x[[i]], "cvList")) {
       sumry <- summarizeReps(x[[i]])
       xi <- x[[i]][[1L]]
       nms.sumry <- names(sumry)
@@ -184,96 +234,133 @@ print.cvModList <- function(x, ...){
 #' @importFrom graphics abline arrows axis box par points strwidth
 #' @importFrom stats na.omit
 #' @exportS3Method
-plot.cvModList <- function(x, y,
-                           spread=c("range", "sd"),
-                           confint=TRUE,
-                           xlab="",
+plot.cvModList <- function(x,
+                           y,
+                           spread = c("range", "sd"),
+                           confint = TRUE,
+                           xlab = "",
                            ylab,
                            main,
-                           axis.args = list(labels=names(x), las=3L),
-                           col=palette()[2L], lwd=2,
-                           grid=TRUE, ...){
+                           axis.args = list(labels = names(x), las = 3L),
+                           col = palette()[2L],
+                           lwd = 2,
+                           grid = TRUE,
+                           ...) {
   spread <- match.arg(spread)
-  if (missing(ylab)){
-    ylab <- if (inherits(x[[1L]], "cvList")){
-      if (spread == "range"){
+  if (missing(ylab)) {
+    ylab <- if (inherits(x[[1L]], "cvList")) {
+      if (spread == "range") {
         "Cross-Validation Criterion (Average and Range)"
       } else {
-        expression("Cross-Validation Criterion (Average"%+-%"SD)")
+        expression("Cross-Validation Criterion (Average" %+-% "SD)")
       }
     } else {
       "Cross-Validation Criterion"
     }
   }
-  if (miss.main <- missing(main)){
+  if (miss.main <- missing(main)) {
     main <- "Model Comparison"
-    if (inherits(x[[1L]], "cvList")){
+    if (inherits(x[[1L]], "cvList")) {
       main <- paste(main, "\nAveraged Across",
                     length(x[[1L]]), "Replications")
     }
   }
-  if (missing(y)){
-    nms <- if (inherits(x[[1L]], "cvList")){
+  if (missing(y)) {
+    nms <- if (inherits(x[[1L]], "cvList")) {
       names(x[[1L]][[1L]])
     } else {
       names(x[[1L]])
     }
     which.crit <- na.omit(match(c("adj CV crit", "CV crit"), nms))
-    if (length(which.crit) == 0L){
+    if (length(which.crit) == 0L) {
       stop('can\'t find "adj CV crit" or "CV crit"\n',
            'specify the y argument')
     }
     y <- nms[which.crit[1L]]
   }
-  if (isTRUE(axis.args$las == 3L)){
+  if (isTRUE(axis.args$las == 3L)) {
     mai <- par("mai")
-    mai[1] <- max(strwidth(axis.args$labels, units="inches")) + 0.5
+    mai[1] <- max(strwidth(axis.args$labels, units = "inches")) + 0.5
     save.mai <- par(mai = mai)
     on.exit(par(save.mai))
   }
-  if (inherits(x[[1L]], "cvList")){
+  if (inherits(x[[1L]], "cvList")) {
     ynm <- if (spread == "range") {
       paste(y, "range")
     } else {
       paste("SD", y)
     }
     sumry <- lapply(x, summarizeReps)
-    crit <- sapply(sumry, function (x) x[[y]])
-    if (spread == "sd"){
-      sds <- sapply(sumry, function(x) x[[ynm]])
+    crit <- sapply(sumry, function (x)
+      x[[y]])
+    if (spread == "sd") {
+      sds <- sapply(sumry, function(x)
+        x[[ynm]])
       min.y <- crit - sds
       max.y <- crit + sds
     } else {
-      min.y <- sapply(sumry, function(x) x[[ynm]][1])
-      max.y <- sapply(sumry, function(x) x[[ynm]][2])
+      min.y <- sapply(sumry, function(x)
+        x[[ynm]][1])
+      max.y <- sapply(sumry, function(x)
+        x[[ynm]][2])
     }
-    plot(c(1L, length(x)), c(min(min.y), max(max.y)),
-         xlab=xlab, ylab=ylab,
-         main=main, axes=FALSE, type="n")
-    if (grid) grid()
-    xs <- seq(along=x)
-    points(xs, crit, type="b", col=col, lwd=lwd)
-    arrows(xs, min.y, xs, max.y, length=0.125, angle=90,
-           col=col, code=3, lty=1, lwd=1)
+    plot(
+      c(1L, length(x)),
+      c(min(min.y), max(max.y)),
+      xlab = xlab,
+      ylab = ylab,
+      main = main,
+      axes = FALSE,
+      type = "n"
+    )
+    if (grid)
+      grid()
+    xs <- seq(along = x)
+    points(xs,
+           crit,
+           type = "b",
+           col = col,
+           lwd = lwd)
+    arrows(
+      xs,
+      min.y,
+      xs,
+      max.y,
+      length = 0.125,
+      angle = 90,
+      col = col,
+      code = 3,
+      lty = 1,
+      lwd = 1
+    )
   } else {
-    crit <- sapply(x, function (x) x[[y]])
-    if (y == "adj CV crit"){
-      cis <- lapply(x, function(x) x[["confint"]])
-      if (confint && !all(sapply(cis, function(ci) is.null(ci)))){
+    crit <- sapply(x, function (x)
+      x[[y]])
+    if (y == "adj CV crit") {
+      cis <- lapply(x, function(x)
+        x[["confint"]])
+      if (confint && !all(sapply(cis, function(ci)
+        is.null(ci)))) {
         plot.cis <- TRUE
-        if (miss.main){
+        if (miss.main) {
           main <- "Model Comparison\nwith Confidence Intervals"
         }
         lowers <- sapply(cis, function(ci) {
           low <- ci["lower"]
-          if (is.null(low)) NA else low
+          if (is.null(low))
+            NA
+          else
+            low
         })
         uppers <- sapply(cis, function(ci) {
           up <- ci["upper"]
-          if (is.null(up)) NA else up
+          if (is.null(up))
+            NA
+          else
+            up
         })
-        min.y <- min(lowers, na.rm=TRUE)
-        max.y <- max(uppers, na.rm=TRUE)
+        min.y <- min(lowers, na.rm = TRUE)
+        max.y <- max(uppers, na.rm = TRUE)
       }
       else {
         plot.cis <- FALSE
@@ -285,26 +372,49 @@ plot.cvModList <- function(x, y,
       min.y <- min(crit)
       max.y <- max(crit)
     }
-    plot(seq(along=crit), crit, xlab=xlab, ylab=ylab, main=main,
-         axes=FALSE, type="b", col=col, lwd=lwd,
-         ylim=c(min.y, max.y), ...)
-    if (grid) grid()
-    if (plot.cis){
+    plot(
+      seq(along = crit),
+      crit,
+      xlab = xlab,
+      ylab = ylab,
+      main = main,
+      axes = FALSE,
+      type = "b",
+      col = col,
+      lwd = lwd,
+      ylim = c(min.y, max.y),
+      ...
+    )
+    if (grid)
+      grid()
+    if (plot.cis) {
       xs <- seq_along(cis)
-      arrows(xs, lowers, xs, uppers, length=0.125, angle=90,
-             col=col, code=3, lty=1, lwd=1)
+      arrows(
+        xs,
+        lowers,
+        xs,
+        uppers,
+        length = 0.125,
+        angle = 90,
+        col = col,
+        code = 3,
+        lty = 1,
+        lwd = 1
+      )
     }
   }
-  abline(h=min(crit), lty=2L, col=col)
+  abline(h = min(crit),
+         lty = 2L,
+         col = col)
   box()
   axis(2)
   axis.args$side <- 1L
-  axis.args$at <- seq(along=x)
+  axis.args$at <- seq(along = x)
   do.call(axis, axis.args)
 }
 
 #' @export
-`[.cvModList` <- function(x, ...){
+`[.cvModList` <- function(x, ...) {
   result <- NextMethod()
   class(result) <- "cvModList"
   result

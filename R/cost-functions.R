@@ -45,30 +45,33 @@
 
 #' @describeIn cost-functions Mean-square error.
 #' @export
-mse <- function(y, yhat){
-  result <- mean((y - yhat)^2)
+mse <- function(y, yhat) {
+  result <- mean((y - yhat) ^ 2)
   attr(result, "casewise loss") <- "(y - yhat)^2"
   result
 }
 
 #' @describeIn cost-functions Root-mean-square error.
 #' @export
-rmse <- function(y, yhat){
-  sqrt(mean((y - yhat)^2))
+rmse <- function(y, yhat) {
+  sqrt(mean((y - yhat) ^ 2))
 }
 
 #' @describeIn cost-functions Median absolute error.
 #' @importFrom stats median
 #' @export
-medAbsErr <- function(y, yhat){
+medAbsErr <- function(y, yhat) {
   median(abs(y - yhat))
 }
 
 #' @describeIn cost-functions Bayes Rule for a binary response.
 #' @export
-BayesRule <- function(y, yhat){
-  if (!all(y %in% c(0, 1))) stop("response values not all 0 or 1")
-  if (any(yhat < 0) || any(yhat > 1)) stop("fitted values outside of interval [0, 1]")
+BayesRule <- function(y, yhat) {
+  if (!all(y %in% c(0, 1)))
+    stop("response values not all 0 or 1")
+  if (any(yhat < 0) ||
+      any(yhat > 1))
+    stop("fitted values outside of interval [0, 1]")
   yhat <- round(yhat)
   result <- mean(y != yhat) # proportion in error
   attr(result, "casewise loss") <- "y != round(yhat)"
@@ -77,7 +80,7 @@ BayesRule <- function(y, yhat){
 
 #' @describeIn cost-functions Bayes rule for a binary response (without bounds checking).
 #' @export
-BayesRule2 <- function(y, yhat){
+BayesRule2 <- function(y, yhat) {
   yhat <- round(yhat)
   result <- mean(y != yhat) # proportion in error
   attr(result, "casewise loss") <- "y != round(yhat)"
