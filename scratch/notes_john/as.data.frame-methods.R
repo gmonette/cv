@@ -59,6 +59,10 @@ as.data.frame.cv <- function(x, row.names, optional, ...) {
       paste0("adjusted.", criterion)
     colnames(D)[which(colnames(D) == "full.criterion")] <-
       paste0("full.", criterion)
+    colnames(D)[which(colnames(D) == "confint.lower")] <-
+      paste0("adj.", criterion, ".lower")
+    colnames(D)[which(colnames(D) == "confint.upper")] <-
+      paste0("adj.", criterion, ".upper")
   }
   class(D) <- c("cvDataFrame", class(D))
   D
