@@ -100,3 +100,21 @@ cvt <- cv(selectTrans, data=Prestige, working.model=m.pres, seed=123,
           response="prestige", family="yjPower", save.model=TRUE)
 D <- as.data.frame(cvt)
 D
+
+data("Duncan", package="carData")
+m1 <- lm(prestige ~ income + education, data=Duncan)
+m2 <- lm(prestige ~ income + education + type, data=Duncan)
+m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
+(cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
+                 data=Duncan, seed=7949, reps=5))
+D <- as.data.frame(cv.models)
+summary(D, adjusted.criterion ~ model)
+summary(D, adjusted.criterion ~ model, fun=sd)
+summary(D[D$rep == 1, ], adjusted.criterion ~ model)
+summary(D, criterion ~ model, include="folds")
+summary(D, criterion ~ model, include="cv")
+summary(D, criterion ~ model, include="cv", fun=sd)
+summary(D, criterion ~ model + rep)
+summary(D, criterion ~ model + rep, include="folds")
+summary(D, criterion ~ model, fun=sd, include="folds")
+summary(D, criterion ~ model, include="folds")

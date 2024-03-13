@@ -128,3 +128,36 @@ print.cvDataFrame <- function(x,
                               ...) {
   NextMethod(digits = digits)
 }
+
+summary.cvDataFrame <- function(object,
+                                formula,
+                                fun = mean,
+                                include=c("cv", "folds", "all"),
+                                ...) {
+  # object: inheriting from "cvDataFrame"
+  # formula: of the form some.criterion ~ classifying.variable(s)
+  # fun: summary funcction to apply
+  # include: what to include
+  #          "cv" = overall CV results
+  #          "folds" = results for individual folds
+  #          "all" = everything (usually not sensible)
+  include <- match.arg(include)
+  if (include == "cv") {
+    object <- object[object$fold == 0, ]
+  } else if (include == "folds") {
+    object <- object[object$fold != 0, ]
+  }
+  helper <- function(formula, data) {
+    cl <- match.call()
+    mf <- match.call(expand.dots = FALSE)
+    m <- match(c("formula", "data"),
+               names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf$drop.unused.levels <- TRUE
+    mf[[1L]] <- quote(stats::model.frame)
+    mf <- eval(mf, parent.frame())
+    mf
+  }
+  data <- helper(formula, data=object)
+  car::Tapply(formula, fun=fun, data = data)
+}
