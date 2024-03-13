@@ -58,6 +58,7 @@ as.data.frame.cv <- function(x, row.names, optional, ...) {
     colnames(D)[which(colnames(D) == "adjusted.criterion")] <- paste0("adjusted.", criterion)
     colnames(D)[which(colnames(D) == "full.criterion")] <- paste0("full.", criterion)
   }
+  class(D) <- c("cvDataFrame", class(D))
   D
 }
 
@@ -67,6 +68,7 @@ as.data.frame.cvList <- function(x, row.names, optional, ...) {
   for (i in 2:length((Ds))) {
     D <- Merge(D, cbind(rep = i, Ds[[i]]))
   }
+  class(D) <- c("cvListDataFrame", "cvDataFrame", class(D))
   D
 }
 
@@ -77,6 +79,7 @@ as.data.frame.cvModList <- function(x, row.names, optional, ...) {
   for (i in 2:length((Ds))) {
     D <- Merge(D, cbind(model = model.names[i], Ds[[i]]))
   }
+  class(D) <- c("cvModListDataFrame", "cvListDataFrame", "cvDataFrame", class(D))
   D
 }
 
