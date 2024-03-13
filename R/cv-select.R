@@ -395,8 +395,12 @@ selectTrans <- function(data,
   if (full.sample) {
     return(list(
       criterion = criterion(y, fit.o.i),
-      model = if (save.model)
+      model = if (save.model){
+        if (details){
+          model$additional.coefficients <- c(lambdas, gammas, transy)
+        }
         model
+      }
       else
         NULL
     ))
@@ -603,8 +607,10 @@ selectTransStepAIC <- function(data,
   if (missing(indices)) {
     return(list(
       criterion = criterion(y, fit.all.i),
-      model = if (save.model)
+      model = if (save.model){
+        model.i$additional.coefficients <- powers
         model.i
+      }
       else
         NULL
     ))

@@ -285,6 +285,7 @@ cvCompute <- function(model,
     "seed" = seed,
     "method" = method,
     "criterion" = criterion.name,
+    "coefficients" = if (details) coef(model) else NULL,
     "details" = list(criterion = crit.i,
                      coefficients = coef.i)
   )
@@ -538,6 +539,7 @@ cvMixed <- function(model,
       k,
     "seed" = seed,
     "criterion" = criterion.name,
+    "coefficients" = if (details)  fixed.effects(model) else NULL,
     clusters = clusterVariables,
     "n clusters" = if (!is.null(clusterVariables))
       n
@@ -763,9 +765,15 @@ cvSelect <- function(procedure,
   if (is.list(result.full)) {
     cv.full <- result.full$criterion
     selected.model <- result.full$model
+    coef.full <- coef(result.full$model)
+    if (!is.null(result.full$model$additional.coefficients)){
+      coef.full <- c(coef.full,
+                     result.full$model$additional.coefficients)
+    }
   } else {
     cv.full <- result.full
     selected.model <- NULL
+    coef.full <- NULL
   }
 
   loss <- getLossFn(cv) # casewise loss function
@@ -799,6 +807,7 @@ cvSelect <- function(procedure,
       else
         k,
       "seed" = seed,
+      "coefficients" = if (details) coef.full else NULL,
       "details" = list(
         criterion = crit.i,
         coefficients = coef.i,
