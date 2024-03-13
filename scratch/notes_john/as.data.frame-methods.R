@@ -10,8 +10,8 @@ as.data.frame.cv <- function(x, row.names, optional, ...) {
   if (!is.null(x$confint)) {
     D <-
       cbind(D,
-            confint.lower = x$confint[1],
-            confint.upper = x$confint[2])
+            confint.lower = x$confint[1L],
+            confint.upper = x$confint[2L])
   }
   if (!is.null(x$coefficients)) {
     coefs <- x$coefficients
@@ -30,14 +30,14 @@ as.data.frame.cv <- function(x, row.names, optional, ...) {
       criterion = x$details$criterion
     )
     if (!is.null(x$details$coefficients)) {
-      D3 <- t(x$details$coefficients[[1]])
+      D3 <- t(x$details$coefficients[[1L]])
       colnames <- colnames(D3)
       colnames[colnames == "(Intercept)"] <- "Intercept"
       colnames <- paste0("coef.", colnames)
       colnames <- make.names(colnames, unique = TRUE)
       colnames(D3) <- colnames
       rownames(D3) <- 1
-      for (i in 2:length(x$details$coefficients)) {
+      for (i in 2L:length(x$details$coefficients)) {
         D4 <- t(x$details$coefficients[[i]])
         colnames <- colnames(D4)
         colnames[colnames == "(Intercept)"] <- "Intercept"
@@ -53,10 +53,12 @@ as.data.frame.cv <- function(x, row.names, optional, ...) {
   }
   rownames(D) <- NULL
   criterion <- x$criterion
-  if (!is.null(criterion)){
+  if (!is.null(criterion)) {
     colnames(D)[which(colnames(D) == "criterion")] <- criterion
-    colnames(D)[which(colnames(D) == "adjusted.criterion")] <- paste0("adjusted.", criterion)
-    colnames(D)[which(colnames(D) == "full.criterion")] <- paste0("full.", criterion)
+    colnames(D)[which(colnames(D) == "adjusted.criterion")] <-
+      paste0("adjusted.", criterion)
+    colnames(D)[which(colnames(D) == "full.criterion")] <-
+      paste0("full.", criterion)
   }
   class(D) <- c("cvDataFrame", class(D))
   D
@@ -64,8 +66,8 @@ as.data.frame.cv <- function(x, row.names, optional, ...) {
 
 as.data.frame.cvList <- function(x, row.names, optional, ...) {
   Ds <- lapply(x, as.data.frame)
-  D <- cbind(rep = 1, Ds[[1]])
-  for (i in 2:length((Ds))) {
+  D <- cbind(rep = 1, Ds[[1L]])
+  for (i in 2L:length((Ds))) {
     D <- Merge(D, cbind(rep = i, Ds[[i]]))
   }
   class(D) <- c("cvListDataFrame", "cvDataFrame", class(D))
@@ -75,21 +77,25 @@ as.data.frame.cvList <- function(x, row.names, optional, ...) {
 as.data.frame.cvModList <- function(x, row.names, optional, ...) {
   Ds <- lapply(x, as.data.frame)
   model.names <- names(x)
-  D <- cbind(model = model.names[1], Ds[[1]])
-  for (i in 2:length((Ds))) {
+  D <- cbind(model = model.names[1L], Ds[[1L]])
+  for (i in 2L:length((Ds))) {
     D <- Merge(D, cbind(model = model.names[i], Ds[[i]]))
   }
-  class(D) <- c("cvModListDataFrame", "cvListDataFrame", "cvDataFrame", class(D))
+  class(D) <-
+    c("cvModListDataFrame",
+      "cvListDataFrame",
+      "cvDataFrame",
+      class(D))
   D
 }
 
 Merge <- function(...) {
   Ds <- lapply(list(...), as.data.frame)
   names <- unique(unlist(sapply(Ds, colnames)))
-  D <- Ds[[1]]
+  D <- Ds[[1L]]
   missing <- names[which(!(names %in% colnames(D)))]
   D[, missing] <- NA
-  for (i in 2:length(Ds)) {
+  for (i in 2L:length(Ds)) {
     DD <- Ds[[i]]
     missing <- names[which(!(names %in% colnames(DD)))]
     DD[, missing] <- NA
@@ -101,13 +107,13 @@ Merge <- function(...) {
 ## Georges: you might start by modifying this:
 as.data.frame.coef.mer <- function(x, row.names, optional, ...) {
   components <- names(x)
-  D <- x[[1]]
+  D <- x[[1L]]
   colnames <- colnames(D)
-  colnames(D) <- make.names(paste0(components[1], ".", colnames),
+  colnames(D) <- make.names(paste0(components[1L], ".", colnames),
                             unique = TRUE)
-  if (length(components) == 1)
+  if (length(components) == 1L)
     return(as.data.frame(D))
-  for (i in 1:length(components)) {
+  for (i in 1L:length(components)) {
     D1 <- x[[i]]
     colnames <- colnames(D1)
     colnames(D1) <- make.names(paste0(components[i], ".", colnames),
@@ -115,4 +121,10 @@ as.data.frame.coef.mer <- function(x, row.names, optional, ...) {
     D <- Merge(D, D1)
   }
   D
+}
+
+print.cvDataFrame <- function(x,
+                              digits = getOption("digits") - 2L,
+                              ...) {
+  NextMethod(digits = digits)
 }
