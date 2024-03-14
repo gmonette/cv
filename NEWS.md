@@ -6,6 +6,8 @@
 
 - cv.default() and other cv() methods acquire a details argument, which if TRUE includes information about the folds in the returned object.
 
+- New as.data.frame.cv() and related methods for turning the detailed results returned by cv() methods into a data frame, with new print() and summary() methods for the objects produced.
+
 - Improvements to code, introducing folds(), fold(), and related functions.
 
 - Refactoring of code; cv() methods now all call cvCompute() (which is new), cvMixed(), or cvSelect().
