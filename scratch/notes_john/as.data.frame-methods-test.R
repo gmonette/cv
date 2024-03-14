@@ -1,6 +1,6 @@
 library(cv)
-#source("~/Documents/R-package-sources/cv/scratch/notes_John/as.data.frame-methods.R")
-source(here::here("scratch/notes_John/as.data.frame-methods.R"))
+# source("~/Documents/R-package-sources/cv/scratch/notes_John/as.data.frame-methods.R")
+# source(here::here("scratch/notes_John/as.data.frame-methods.R"))
 
 data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ horsepower, data=Auto)
