@@ -1012,4 +1012,19 @@ getLossFn <- function(cv) {
   )))
 }
 
+Merge <- function(...) {
+  Ds <- lapply(list(...), as.data.frame)
+  names <- unique(unlist(sapply(Ds, colnames)))
+  D <- Ds[[1L]]
+  missing <- names[which(!(names %in% colnames(D)))]
+  D[, missing] <- NA
+  for (i in 2L:length(Ds)) {
+    DD <- Ds[[i]]
+    missing <- names[which(!(names %in% colnames(DD)))]
+    DD[, missing] <- NA
+    D <- rbind(D, DD)
+  }
+  D
+}
+
 utils::globalVariables(c("b", "y", "dots"))

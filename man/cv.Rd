@@ -8,6 +8,10 @@
 \alias{cv.rlm}
 \alias{print.cv}
 \alias{print.cvList}
+\alias{as.data.frame.cv}
+\alias{as.data.frame.cvList}
+\alias{print.cvDataFrame}
+\alias{summary.cvDataFrame}
 \title{Cross-Validate Regression Models}
 \usage{
 cv(model, data, criterion, k, reps = 1, seed, ...)
@@ -66,6 +70,14 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \method{print}{cv}(x, digits = getOption("digits"), ...)
 
 \method{print}{cvList}(x, ...)
+
+\method{as.data.frame}{cv}(x, row.names = NULL, optional, ...)
+
+\method{as.data.frame}{cvList}(x, row.names = NULL, optional, ...)
+
+\method{print}{cvDataFrame}(x, digits = getOption("digits") - 2L, ...)
+
+\method{summary}{cvDataFrame}(object, formula, fun = mean, include = c("cv", "folds", "all"), ...)
 }
 \arguments{
 \item{model}{a regression model object (see Details).}
@@ -125,10 +137,28 @@ e.g., \code{nnet::multinom}. It's usually not necessary to specify
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 of the available options.}
 
-\item{x}{a \code{"cv"} or \code{"cvList"} object to be printed.}
+\item{x}{a \code{"cv"}, \code{"cvList"}, or \code{cvDataFrame}
+object to be printed or coerced to a data frame.}
 
 \item{digits}{significant digits for printing,
 default taken from the \code{"digits"} option.}
+
+\item{row.names}{optional row names for the result,
+defaults to \code{NULL}.}
+
+\item{optional}{to match the \code{as.data.frame()} generic function;
+not used.}
+
+\item{object}{an object inheriting from \code{"cvDataFrame"} to summarize.}
+
+\item{formula}{of the form \code{some.criterion ~ classifying.variable(s)}.}
+
+\item{fun}{summary function to apply, defaulting to \code{mean}.}
+
+\item{include}{which rows of the \code{"cvDataFrame"} to include in the
+summary. One of \code{"cv"} (the default), rows representing the overall CV
+results; \code{"folds"}, rows for individual folds; \code{"all"}, all rows
+(generally not sensible).}
 }
 \value{
 The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
@@ -206,10 +236,18 @@ models; see the "Extending the cv package" vignette
 \itemize{
 \item \code{print(cv)}: \code{print()} method for \code{"cv"} objects.
 
+\item \code{as.data.frame(cv)}: \code{as.data.frame()} method for \code{"cv"} objects.
+
 }}
 \section{Functions}{
 \itemize{
 \item \code{print(cvList)}: \code{print()} method for \code{"cvList"} objects.
+
+\item \code{as.data.frame(cvList)}: \code{as.data.frame()} method for \code{"cvList"} objects.
+
+\item \code{print(cvDataFrame)}: \code{print()} method for \code{"cvDataFrame"} objects.
+
+\item \code{summary(cvDataFrame)}: \code{summary()} method for \code{"cvDataFrame"} objects.
 
 }}
 \examples{
@@ -218,7 +256,12 @@ m.auto <- lm(mpg ~ horsepower, data=Auto)
 cv(m.auto,  k="loo")
 (cv.auto <- cv(m.auto, seed=1234))
 compareFolds(cv.auto)
-cv(m.auto, seed=1234, reps=3)
+(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
+D.auto.reps <- as.data.frame(cv.auto.reps)
+head(D.auto.reps)
+summary(D.auto.reps, mse ~ rep + fold, include="folds")
+summary(D.auto.reps, mse ~ rep, include="folds")
+summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
 
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)

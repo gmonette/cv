@@ -74,6 +74,9 @@
 #' m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
 #' (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
 #'                  data=Duncan, seed=7949, reps=5))
+#' D.cv.models <- as.data.frame(cv.models)
+#' head(D.cv.models)
+#' summary(D.cv.models, criterion ~ model + rep, include="folds")
 #' plot(cv.models)
 #' (cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
 #'                     data=Duncan, seed=5962, confint=TRUE, level=0.50))
@@ -419,3 +422,27 @@ plot.cvModList <- function(x,
   class(result) <- "cvModList"
   result
 }
+
+#' @describeIn cv.modList \code{as.data.frame()} method for
+#' \code{"cvModList"} objects.
+#' @param row.names optional row names for the result,
+#' defaults to \code{NULL}.
+#' @param optional to match the \code{as.data.frame()} generic function;
+#' not used.
+#' @exportS3Method base::as.data.frame
+as.data.frame.cvModList <- function(x, row.names=NULL, optional, ...) {
+  Ds <- lapply(x, as.data.frame)
+  model.names <- names(x)
+  D <- cbind(model = model.names[1L], Ds[[1L]])
+  for (i in 2L:length((Ds))) {
+    D <- Merge(D, cbind(model = model.names[i], Ds[[i]]))
+  }
+  rownames(D) <- row.names
+  class(D) <-
+    c("cvModListDataFrame",
+      "cvListDataFrame",
+      "cvDataFrame",
+      class(D))
+  D
+}
+

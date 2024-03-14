@@ -110,7 +110,12 @@
 #' cv(m.auto,  k="loo")
 #' (cv.auto <- cv(m.auto, seed=1234))
 #' compareFolds(cv.auto)
-#' cv(m.auto, seed=1234, reps=3)
+#' (cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
+#' D.auto.reps <- as.data.frame(cv.auto.reps)
+#' head(D.auto.reps)
+#' summary(D.auto.reps, mse ~ rep + fold, include="folds")
+#' summary(D.auto.reps, mse ~ rep, include="folds")
+#' summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
 #'
 #' data("Mroz", package="carData")
 #' m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
@@ -568,7 +573,8 @@ cv.rlm <- function(model, data, criterion, k, reps = 1, seed, ...) {
 
 
 #' @describeIn cv \code{print()} method for \code{"cv"} objects.
-#' @param x a \code{"cv"} or \code{"cvList"} object to be printed.
+#' @param x a \code{"cv"}, \code{"cvList"}, or \code{cvDataFrame}
+#' object to be printed or coerced to a data frame.
 #' @param digits significant digits for printing,
 #' default taken from the \code{"digits"} option.
 #' @exportS3Method base::print
@@ -648,3 +654,136 @@ print.cvList <- function(x, ...) {
   }
   return(invisible(x))
 }
+
+#' @describeIn cv \code{as.data.frame()} method for \code{"cv"} objects.
+#' @param row.names optional row names for the result,
+#' defaults to \code{NULL}.
+#' @param optional to match the \code{as.data.frame()} generic function;
+#' not used.
+#' @exportS3Method base::as.data.frame
+as.data.frame.cv <- function(x, row.names=NULL, optional, ...) {
+  D <- data.frame(fold = 0,
+                  criterion = x$"CV crit")
+  if (!is.null(x$"adj CV crit")) {
+    D <- cbind(D, adjusted.criterion = x$"adj CV crit")
+  }
+  if (!is.null(x$"full crit")) {
+    D <- cbind(D, full.criterion = x$"full crit")
+  }
+  if (!is.null(x$confint)) {
+    D <-
+      cbind(D,
+            confint.lower = x$confint[1L],
+            confint.upper = x$confint[2L])
+  }
+  if (!is.null(x$coefficients)) {
+    coefs <- x$coefficients
+    if (!is.matrix(coefs)) {
+      coef.names <- names(coefs)
+      coef.names[coef.names == "(Intercept)"] <- "Intercept"
+      coef.names <- paste0("coef.", coef.names)
+      coef.names <- make.names(coef.names, unique = TRUE)
+      names(coefs) <- coef.names
+      D <- cbind(D, t(coefs))
+    }
+  }
+  if (!is.null(x$details)) {
+    D2 <- data.frame(
+      fold = seq_along(x$details$criterion),
+      criterion = x$details$criterion
+    )
+    if (!is.null(x$details$coefficients)) {
+      D3 <- t(x$details$coefficients[[1L]])
+      colnames <- colnames(D3)
+      colnames[colnames == "(Intercept)"] <- "Intercept"
+      colnames <- paste0("coef.", colnames)
+      colnames <- make.names(colnames, unique = TRUE)
+      colnames(D3) <- colnames
+      rownames(D3) <- 1
+      for (i in 2L:length(x$details$coefficients)) {
+        D4 <- t(x$details$coefficients[[i]])
+        colnames <- colnames(D4)
+        colnames[colnames == "(Intercept)"] <- "Intercept"
+        colnames <- paste0("coef.", colnames)
+        colnames <- make.names(colnames, unique = TRUE)
+        colnames(D4) <- colnames
+        rownames(D4) <- i
+        D3 <- Merge(D3, D4)
+      }
+      D2 <- cbind(D2, D3)
+    }
+    D <- Merge(D, D2)
+  }
+  criterion <- x$criterion
+  if (!is.null(criterion)) {
+    colnames(D)[which(colnames(D) == "criterion")] <- criterion
+    colnames(D)[which(colnames(D) == "adjusted.criterion")] <-
+      paste0("adjusted.", criterion)
+    colnames(D)[which(colnames(D) == "full.criterion")] <-
+      paste0("full.", criterion)
+    colnames(D)[which(colnames(D) == "confint.lower")] <-
+      paste0("adj.", criterion, ".lower")
+    colnames(D)[which(colnames(D) == "confint.upper")] <-
+      paste0("adj.", criterion, ".upper")
+  }
+  rownames(D) <- row.names
+  class(D) <- c("cvDataFrame", class(D))
+  D
+}
+
+#' @describeIn cv \code{as.data.frame()} method for \code{"cvList"} objects.
+#' @exportS3Method base::as.data.frame
+as.data.frame.cvList <- function(x, row.names=NULL, optional, ...) {
+  Ds <- lapply(x, as.data.frame)
+  D <- cbind(rep = 1, Ds[[1L]])
+  for (i in 2L:length((Ds))) {
+    D <- Merge(D, cbind(rep = i, Ds[[i]]))
+  }
+  rownames(D) <- row.names
+  class(D) <- c("cvListDataFrame", "cvDataFrame", class(D))
+  D
+}
+
+#' @describeIn cv \code{print()} method for \code{"cvDataFrame"} objects.
+#' @exportS3Method base::print
+print.cvDataFrame <- function(x,
+                              digits = getOption("digits") - 2L,
+                              ...) {
+  NextMethod(digits = digits)
+}
+
+#' @describeIn cv \code{summary()} method for \code{"cvDataFrame"} objects.
+#' @param object an object inheriting from \code{"cvDataFrame"} to summarize.
+#' @param formula of the form \code{some.criterion ~ classifying.variable(s)}.
+#' @param fun summary function to apply, defaulting to \code{mean}.
+#' @param include which rows of the \code{"cvDataFrame"} to include in the
+#' summary. One of \code{"cv"} (the default), rows representing the overall CV
+#' results; \code{"folds"}, rows for individual folds; \code{"all"}, all rows
+#' (generally not sensible).
+#' @exportS3Method base::summary
+summary.cvDataFrame <- function(object,
+                                formula,
+                                fun = mean,
+                                include=c("cv", "folds", "all"),
+                                ...) {
+  include <- match.arg(include)
+  if (include == "cv") {
+    object <- object[object$fold == 0, ]
+  } else if (include == "folds") {
+    object <- object[object$fold != 0, ]
+  }
+  helper <- function(formula, data) {
+    cl <- match.call()
+    mf <- match.call(expand.dots = FALSE)
+    m <- match(c("formula", "data"),
+               names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf$drop.unused.levels <- TRUE
+    mf[[1L]] <- quote(stats::model.frame)
+    mf <- eval(mf, parent.frame())
+    mf
+  }
+  data <- helper(formula, data=object)
+  car::Tapply(formula, fun=fun, data = data)
+}
+

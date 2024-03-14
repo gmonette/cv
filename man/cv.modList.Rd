@@ -5,6 +5,7 @@
 \alias{models}
 \alias{print.cvModList}
 \alias{plot.cvModList}
+\alias{as.data.frame.cvModList}
 \title{Cross-Validate Several Models Fit to the Same Data}
 \usage{
 \method{cv}{modList}(
@@ -37,6 +38,8 @@ models(...)
   grid = TRUE,
   ...
 )
+
+\method{as.data.frame}{cvModList}(x, row.names = NULL, optional, ...)
 }
 \arguments{
 \item{model}{a list of regression model objects,
@@ -112,6 +115,12 @@ element of the color palette; see \code{\link{palette}()}.}
 \item{lwd}{line width for the line (defaults to 2).}
 
 \item{grid}{if \code{TRUE} (the default), include grid lines on the graph.}
+
+\item{row.names}{optional row names for the result,
+defaults to \code{NULL}.}
+
+\item{optional}{to match the \code{as.data.frame()} generic function;
+not used.}
 }
 \value{
 \code{models()} returns a \code{"modList"} object, the
@@ -138,6 +147,9 @@ different response variables.
 
 \item \code{plot(cvModList)}: \code{plot()} method for \code{"cvModList"} objects.
 
+\item \code{as.data.frame(cvModList)}: \code{as.data.frame()} method for
+\code{"cvModList"} objects.
+
 }}
 \examples{
 data("Duncan", package="carData")
@@ -146,6 +158,9 @@ m2 <- lm(prestige ~ income + education + type, data=Duncan)
 m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
 (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
                  data=Duncan, seed=7949, reps=5))
+D.cv.models <- as.data.frame(cv.models)
+head(D.cv.models)
+summary(D.cv.models, criterion ~ model + rep, include="folds")
 plot(cv.models)
 (cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
                     data=Duncan, seed=5962, confint=TRUE, level=0.50))
