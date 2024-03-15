@@ -1016,7 +1016,7 @@ Merge <- function(...) {
   Ds <- lapply(list(...), as.data.frame)
   names <- unique(unlist(lapply(Ds, colnames)))
   for (i in 1L:length(Ds)) {
-    missing <- names[which(!(names %in% colnames(Ds[[i]])))]
+    missing <- setdiff(names, colnames(Ds[[i]]))
     Ds[[i]][, missing] <- NA
   }
   do.call("rbind", Ds)
