@@ -173,6 +173,8 @@ cvCompute <- function(model,
     assign(localsNames[i], locals[[i]])
   }
 
+  se.cv <- NA
+
   if (missing(criterion.name) ||
       is.null(criterion.name))
     criterion.name <- deparse(substitute(criterion))
@@ -278,6 +280,7 @@ cvCompute <- function(model,
     "adj CV crit" = adj.cv,
     "full crit" = cv.full,
     "confint" = ci,
+    "SE adj CV crit" = se.cv,
     "k" = if (k == n)
       "n"
     else
@@ -355,6 +358,8 @@ cvMixed <- function(model,
                     fixed.effects,
                     ...) {
   pkg.env <- getNamespace(package)
+
+  se.cv <- NA
 
   if (missing(criterion.name) ||
       is.null(criterion.name))
@@ -533,6 +538,7 @@ cvMixed <- function(model,
     "adj CV crit" = adj.cv,
     "full crit" = cv.full,
     "confint" = ci,
+    "SE adj CV crit" = se.cv,
     "k" = if (k == n)
       "n"
     else
@@ -602,6 +608,9 @@ cvSelect <- function(procedure,
   selectModelListP <- isTRUE(all.equal(procedure, selectModelList))
   if (!missing(save.coef))
     details <- save.coef
+
+  se.cv <- NA
+
   n <- nrow(data)
   y <- if (!missing(model)) {
     GetResponse(model)
@@ -802,6 +811,7 @@ cvSelect <- function(procedure,
       "full crit" = cv.full,
       "criterion" = criterion.name,
       "confint" = ci,
+      "SE adj CV crit" = se.cv,
       "k" = if (k == n)
         "n"
       else

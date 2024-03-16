@@ -674,7 +674,8 @@ as.data.frame.cv <- function(x, row.names=NULL, optional, ...) {
     D <-
       cbind(D,
             confint.lower = x$confint[1L],
-            confint.upper = x$confint[2L])
+            confint.upper = x$confint[2L],
+            se.cv = x$"SE adj CV crit")
   }
   if (!is.null(x$coefficients)) {
     coefs <- x$coefficients
@@ -725,6 +726,8 @@ as.data.frame.cv <- function(x, row.names=NULL, optional, ...) {
       paste0("adj.", criterion, ".lower")
     colnames(D)[which(colnames(D) == "confint.upper")] <-
       paste0("adj.", criterion, ".upper")
+    colnames(D)[which(colnames(D) == "se.cv")] <-
+      paste0("SE.adj.", criterion)
   }
   rownames(D) <- row.names
   class(D) <- c("cvDataFrame", class(D))
