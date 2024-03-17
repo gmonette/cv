@@ -71,7 +71,14 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 
 \method{print}{cvList}(x, ...)
 
-\method{as.data.frame}{cv}(x, row.names = NULL, optional, ...)
+\method{as.data.frame}{cv}(
+  x,
+  row.names = NULL,
+  optional,
+  rows = c("cv", "folds"),
+  columns = c("criteria", "coefficients"),
+  ...
+)
 
 \method{as.data.frame}{cvList}(x, row.names = NULL, optional, ...)
 
@@ -148,6 +155,20 @@ defaults to \code{NULL}.}
 
 \item{optional}{to match the \code{as.data.frame()} generic function;
 not used.}
+
+\item{rows}{the rows of the resulting data frame to retain: setting
+\code{rows="cv"} retains rows pertaining to the overall CV result
+(marked as "\code{fold 0}" ); setting \code{rows="folds"} retains
+rows pertaining to individual folds 1 through k; the default is
+\code{rows = c("cv", "folds")}, which retains all rows.}
+
+\item{columns}{the columns of the resulting data frame to retain:
+setting \code{columns="critera"} retains columns pertaining to CV
+criteria; letting \code{columns="coefficients"} retains columns pertaining
+to model coefficients (broadly construed); the default is
+\code{columns = c("criteria", "coefficients")}, which retains both;
+and the columns \code{"model"}, \code{"rep"}, and \code{"fold"}, if present,
+are always retained.}
 
 \item{object}{an object inheriting from \code{"cvDataFrame"} to summarize.}
 

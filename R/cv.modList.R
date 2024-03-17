@@ -431,7 +431,7 @@ plot.cvModList <- function(x,
 #' not used.
 #' @exportS3Method base::as.data.frame
 as.data.frame.cvModList <- function(x, row.names=NULL, optional, ...) {
-  Ds <- lapply(x, as.data.frame)
+  Ds <- lapply(x, as.data.frame, ...)
   model.names <- names(x)
   D <- cbind(model = model.names[1L], Ds[[1L]])
   for (i in 2L:length((Ds))) {
