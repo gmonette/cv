@@ -109,7 +109,7 @@ for n-fold cross-validation.}
 \item{...}{to match generic; passed to \code{predict()} for the default method.}
 
 \item{criterion.name}{a character string giving the name of the CV criterion function
-in the returned \code{"cv"} object).}
+in the returned \code{"cv"} object (not usually needed).}
 
 \item{details}{if \code{TRUE} (the default if the number of
 folds \code{k <= 10}), save detailed information about the value of the
@@ -144,7 +144,7 @@ e.g., \code{nnet::multinom}. It's usually not necessary to specify
 or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explanation
 of the available options.}
 
-\item{x}{a \code{"cv"}, \code{"cvList"}, or \code{cvDataFrame}
+\item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"cvDataFrame"}
 object to be printed or coerced to a data frame.}
 
 \item{digits}{significant digits for printing,
@@ -164,7 +164,7 @@ rows pertaining to individual folds 1 through k; the default is
 
 \item{columns}{the columns of the resulting data frame to retain:
 setting \code{columns="critera"} retains columns pertaining to CV
-criteria; letting \code{columns="coefficients"} retains columns pertaining
+criteria; setting \code{columns="coefficients"} retains columns pertaining
 to model coefficients (broadly construed); the default is
 \code{columns = c("criteria", "coefficients")}, which retains both;
 and the columns \code{"model"}, \code{"rep"}, and \code{"fold"}, if present,
@@ -172,7 +172,8 @@ are always retained.}
 
 \item{object}{an object inheriting from \code{"cvDataFrame"} to summarize.}
 
-\item{formula}{of the form \code{some.criterion ~ classifying.variable(s)}.}
+\item{formula}{of the form \code{some.criterion ~ classifying.variable(s)}
+(see examples).}
 
 \item{fun}{summary function to apply, defaulting to \code{mean}.}
 
@@ -201,6 +202,10 @@ which is literally a list of \code{"cv"} objects.
 cross-validation function, with a default method,
 specific methods for linear and generalized-linear models that can be much
 more computationally efficient, and a method for robust linear models.
+There are also \code{cv()} methods for \link[=cv.merMod]{mixed-effects models},
+for \link[=cv.function]{model-selection procedures},
+and for \link[=cv.modList]{several models fit to the same data},
+which are documented separately.
 }
 \details{
 The default \code{cv()} method uses \code{\link{update}()} to refit the model
@@ -228,7 +233,9 @@ which is equivalent to \code{method="hatvalues"} for n-fold cross-validation
 and \code{method="Woodbury"} otherwise; \code{method="naive"} refits
 the model via \code{update()} and is generally much slower. The
 default for generalized linear models is \code{method="exact"},
-which employs \code{update()}.
+which employs \code{update()}. This default is conservative, and
+it is usually safe to use \code{method="hatvalues"} for n-fold CV
+or \code{method="Woodbury"} for k-fold CV.
 
 There is also a method for robust linear models fit by
 \code{\link[MASS]{rlm}()} in the \pkg{MASS} package (to avoid

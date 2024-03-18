@@ -4,6 +4,10 @@
 #' cross-validation function, with a default method,
 #' specific methods for linear and generalized-linear models that can be much
 #' more computationally efficient, and a method for robust linear models.
+#' There are also \code{cv()} methods for \link[=cv.merMod]{mixed-effects models},
+#' for \link[=cv.function]{model-selection procedures},
+#' and for \link[=cv.modList]{several models fit to the same data},
+#'  which are documented separately.
 #'
 #' @param model a regression model object (see Details).
 #' @param data data frame to which the model was fit (not usually necessary).
@@ -12,7 +16,7 @@
 #'        \code{yhat} the predicted values; the default is \code{\link{mse}}
 #'        (the mean-squared error).
 #' @param criterion.name a character string giving the name of the CV criterion function
-#' in the returned \code{"cv"} object).
+#' in the returned \code{"cv"} object (not usually needed).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
@@ -90,7 +94,9 @@
 #' and \code{method="Woodbury"} otherwise; \code{method="naive"} refits
 #' the model via \code{update()} and is generally much slower. The
 #' default for generalized linear models is \code{method="exact"},
-#' which employs \code{update()}.
+#' which employs \code{update()}. This default is conservative, and
+#' it is usually safe to use \code{method="hatvalues"} for n-fold CV
+#' or \code{method="Woodbury"} for k-fold CV.
 #'
 #' There is also a method for robust linear models fit by
 #' \code{\link[MASS]{rlm}()} in the \pkg{MASS} package (to avoid
@@ -573,7 +579,7 @@ cv.rlm <- function(model, data, criterion, k, reps = 1, seed, ...) {
 
 
 #' @describeIn cv \code{print()} method for \code{"cv"} objects.
-#' @param x a \code{"cv"}, \code{"cvList"}, or \code{cvDataFrame}
+#' @param x a \code{"cv"}, \code{"cvList"}, or \code{"cvDataFrame"}
 #' object to be printed or coerced to a data frame.
 #' @param digits significant digits for printing,
 #' default taken from the \code{"digits"} option.
@@ -667,7 +673,7 @@ print.cvList <- function(x, ...) {
 #' \code{rows = c("cv", "folds")}, which retains all rows.
 #' @param columns the columns of the resulting data frame to retain:
 #' setting \code{columns="critera"} retains columns pertaining to CV
-#' criteria; letting \code{columns="coefficients"} retains columns pertaining
+#' criteria; setting \code{columns="coefficients"} retains columns pertaining
 #' to model coefficients (broadly construed); the default is
 #' \code{columns = c("criteria", "coefficients")}, which retains both;
 #' and the columns \code{"model"}, \code{"rep"}, and \code{"fold"}, if present,
@@ -786,7 +792,8 @@ print.cvDataFrame <- function(x,
 
 #' @describeIn cv \code{summary()} method for \code{"cvDataFrame"} objects.
 #' @param object an object inheriting from \code{"cvDataFrame"} to summarize.
-#' @param formula of the form \code{some.criterion ~ classifying.variable(s)}.
+#' @param formula of the form \code{some.criterion ~ classifying.variable(s)}
+#' (see examples).
 #' @param fun summary function to apply, defaulting to \code{mean}.
 #' @param include which rows of the \code{"cvDataFrame"} to include in the
 #' summary. One of \code{"cv"} (the default), rows representing the overall CV

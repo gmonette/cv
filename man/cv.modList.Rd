@@ -80,7 +80,7 @@ the same data; the several models may be named.
 For the \code{print()} method, arguments to be passed to the \code{print()} method for
 the individual model cross-validations.
 
-For the \code{plot()}, method, arguments to be passed to the base \code{\link[base]{plot}()}
+For the \code{plot()} method, arguments to be passed to the base \code{\link[base]{plot}()}
 function.}
 
 \item{x}{an object of class \code{"cvModList"} to be printed or plotted.}
@@ -131,7 +131,7 @@ or, when \code{recursive=TRUE}, an object of class \code{c("cvSelect", "cv")}.
 A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 created by the \code{models()} function. This \code{cv()} method simplifies
 the process of cross-validating several models on the same set of CV folds
-and may also be used recursive CV, where CV is used to select one from among
+and may also be used for recursive CV, where CV is used to select one from among
 several models. \code{models()} performs some
 "sanity" checks, warning if the models are of different classes, and
 reporting an error if they are fit to apparently different data sets or

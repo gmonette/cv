@@ -129,14 +129,16 @@ CV criterion for the cases in each fold and the regression coefficients
 with that fold deleted; default is \code{TRUE} if \code{k} is 10 or smaller,
 \code{FALSE} otherwise.}
 
-\item{save.model}{save the model that's selected using the \emph{full} data set.}
+\item{save.model}{save the model that's selected using the \emph{full} data set
+(default, \code{FALSE}).}
 
 \item{ncores}{number of cores to use for parallel computations
 (default is \code{1}, i.e., computations aren't done in parallel)}
 
 \item{...}{for \code{cvSelect()} and the \code{cv()} \code{"function"} method,
 arguments to be passed to \code{procedure()};
-for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.}
+for \code{selectStepAIC()} and \code{selectTransStepAIC()},
+arguments to be passed to \code{stepAIC()}.}
 
 \item{indices}{indices of cases in data defining the current fold.}
 
@@ -163,7 +165,7 @@ with \code{"bcPower"} as the default.}
 \item{rounded}{if \code{TRUE} (the default) use nicely rounded versions
 of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).}
 
-\item{k.recurse}{the number of folds for the recursive CVs; defaults
+\item{k.recurse}{the number of folds for recursive CV; defaults
 to the value of \code{k}; may be specified as \code{"loo"} or
 \code{"n"} as well as an integer.}
 
@@ -202,13 +204,14 @@ which is literally a list of \code{c("cvSelect", "cv")} objects.
 }
 \description{
 The \code{cv()} \code{"function"} method
-is a general function to cross-validate a model-selection procedure;
+is a general function to cross-validate a model-selection procedure,
+such as the following:
 \code{selectStepAIC()} is a procedure that applies the \code{\link[MASS]{stepAIC}()}
 model-selection function in the \pkg{MASS} package; \code{selectTrans()} is a procedure
 for selecting predictor and response transformations in regression, which
 uses the \code{\link[car]{powerTransform}()} function in the
 \pkg{car} package; \code{selectTransAndStepAIC()} combines predictor and response
-transformation with predictor selection; and \code{selectModelList()}
+transformations with predictor selection; and \code{selectModelList()}
 uses cross-validation to select a model from a list of models created by
 \code{\link{models}()} and employs (recursive) cross-validation to assess the predictive
 accuracy of this procedure.
