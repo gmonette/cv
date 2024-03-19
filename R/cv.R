@@ -172,9 +172,9 @@ cv.default <- function(model,
     # helper function to compute cv criterion for each fold
     indices.i <- fold(folds, i)
     model.i <- if (start) {
-      update(model, data = data[-indices.i, ], start = b)
+      update(model, data = data[-indices.i,], start = b)
     } else {
-      update(model, data = data[-indices.i, ])
+      update(model, data = data[-indices.i,])
     }
     fit.all.i <- predict(model.i, newdata = data, type = type, ...)
     fit.i <- fit.all.i[indices.i]
@@ -199,9 +199,9 @@ cv.default <- function(model,
       #   occur with args passed via ... (which is saved in dots)
       predict.args <- c(list(
         object = if (start) {
-          update(model, data = data[-indices.i, ], start = b)
+          update(model, data = data[-indices.i,], start = b)
         } else {
-          update(model, data = data[-indices.i, ])
+          update(model, data = data[-indices.i,])
         },
         newdata = data,
         type = type
@@ -338,7 +338,7 @@ cv.lm <- function(model,
         "s", ":"))
     print(b[is.na(b)])
     message("Aliased coefficients removed from the model")
-    X <- X[, !is.na(b)]
+    X <- X[,!is.na(b)]
     p <- ncol(X)
     model <- lm.wfit(X, y, w)
   }
@@ -523,7 +523,7 @@ cv.glm <- function(model,
       ))
       print(b[is.na(b)])
       message("Aliased coefficients removed from the model")
-      X <- X[, !is.na(b)]
+      X <- X[,!is.na(b)]
       p <- ncol(X)
     }
     eta <- predict(model)
@@ -679,13 +679,14 @@ print.cvList <- function(x, ...) {
 #' and the columns \code{"model"}, \code{"rep"}, and \code{"fold"}, if present,
 #' are always retained.
 #' @exportS3Method base::as.data.frame
-as.data.frame.cv <- function(x, row.names=NULL, optional,
-                             rows=c("cv", "folds"),
-                             columns=c("criteria", "coefficients"),
+as.data.frame.cv <- function(x,
+                             row.names = NULL,
+                             optional,
+                             rows = c("cv", "folds"),
+                             columns = c("criteria", "coefficients"),
                              ...) {
-
-  rows <- match.arg(rows, several.ok=TRUE)
-  columns <- match.arg(columns, several.ok=TRUE)
+  rows <- match.arg(rows, several.ok = TRUE)
+  columns <- match.arg(columns, several.ok = TRUE)
   D <- data.frame(fold = 0,
                   criterion = x$"CV crit")
   if (!is.null(x$"adj CV crit")) {
@@ -696,10 +697,12 @@ as.data.frame.cv <- function(x, row.names=NULL, optional,
   }
   if (!is.null(x$confint)) {
     D <-
-      cbind(D,
-            confint.lower = x$confint[1L],
-            confint.upper = x$confint[2L],
-            se.cv = x$"SE adj CV crit")
+      cbind(
+        D,
+        confint.lower = x$confint[1L],
+        confint.upper = x$confint[2L],
+        se.cv = x$"SE adj CV crit"
+      )
   }
   if (!is.null(x$coefficients)) {
     coefs <- x$coefficients
@@ -718,23 +721,12 @@ as.data.frame.cv <- function(x, row.names=NULL, optional,
       criterion = x$details$criterion
     )
     if (!is.null(x$details$coefficients)) {
-      D3 <- t(x$details$coefficients[[1L]])
+      Ds <- lapply(x$details$coefficients, t)
+      D3 <- do.call(Merge, Ds)
       colnames <- colnames(D3)
       colnames[colnames == "(Intercept)"] <- "Intercept"
       colnames <- paste0("coef.", colnames)
-      colnames <- make.names(colnames, unique = TRUE)
       colnames(D3) <- colnames
-      rownames(D3) <- 1
-      for (i in 2L:length(x$details$coefficients)) {
-        D4 <- t(x$details$coefficients[[i]])
-        colnames <- colnames(D4)
-        colnames[colnames == "(Intercept)"] <- "Intercept"
-        colnames <- paste0("coef.", colnames)
-        colnames <- make.names(colnames, unique = TRUE)
-        colnames(D4) <- colnames
-        rownames(D4) <- i
-        D3 <- Merge(D3, D4)
-      }
       D2 <- cbind(D2, D3)
     }
     D <- Merge(D, D2)
@@ -755,14 +747,18 @@ as.data.frame.cv <- function(x, row.names=NULL, optional,
   }
   rownames(D) <- row.names
 
-  if (!"cv" %in% rows) D <- D[D$fold != 0, ]
-  if (!"folds" %in% rows) D <- D[D$fold == 0, ]
+  if (!"cv" %in% rows)
+    D <- D[D$fold != 0,]
+  if (!"folds" %in% rows)
+    D <- D[D$fold == 0,]
 
   coefs.cols <- grepl("^coef\\.", colnames(D))
   always.cols <- colnames(D) %in% c("fold", "model", "rep")
   criteria.cols <- !(coefs.cols | always.cols)
-  if (!"coefficients" %in% columns) coefs.cols <- FALSE
-  if (!"criteria" %in% columns) criteria.cols <- FALSE
+  if (!"coefficients" %in% columns)
+    coefs.cols <- FALSE
+  if (!"criteria" %in% columns)
+    criteria.cols <- FALSE
   D <- D[, coefs.cols | always.cols | criteria.cols]
 
   class(D) <- c("cvDataFrame", class(D))
@@ -771,12 +767,12 @@ as.data.frame.cv <- function(x, row.names=NULL, optional,
 
 #' @describeIn cv \code{as.data.frame()} method for \code{"cvList"} objects.
 #' @exportS3Method base::as.data.frame
-as.data.frame.cvList <- function(x, row.names=NULL, optional, ...) {
+as.data.frame.cvList <- function(x, row.names = NULL, optional, ...) {
   Ds <- lapply(x, as.data.frame, ...)
-  D <- cbind(rep = 1, Ds[[1L]])
-  for (i in 2L:length((Ds))) {
-    D <- Merge(D, cbind(rep = i, Ds[[i]]))
+  for (i in seq_along(Ds)) {
+    Ds[[i]] <- cbind(rep = i, Ds[[i]])
   }
+  D <- do.call(Merge, Ds)
   rownames(D) <- row.names
   class(D) <- c("cvListDataFrame", "cvDataFrame", class(D))
   D
@@ -803,13 +799,13 @@ print.cvDataFrame <- function(x,
 summary.cvDataFrame <- function(object,
                                 formula,
                                 fun = mean,
-                                include=c("cv", "folds", "all"),
+                                include = c("cv", "folds", "all"),
                                 ...) {
   include <- match.arg(include)
   if (include == "cv") {
-    object <- object[object$fold == 0, ]
+    object <- object[object$fold == 0,]
   } else if (include == "folds") {
-    object <- object[object$fold != 0, ]
+    object <- object[object$fold != 0,]
   }
   helper <- function(formula, data) {
     cl <- match.call()
@@ -822,7 +818,6 @@ summary.cvDataFrame <- function(object,
     mf <- eval(mf, parent.frame())
     mf
   }
-  data <- helper(formula, data=object)
-  car::Tapply(formula, fun=fun, data = data)
+  data <- helper(formula, data = object)
+  car::Tapply(formula, fun = fun, data = data)
 }
-
