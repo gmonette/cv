@@ -1,13 +1,14 @@
 #' Cross-Validate a Model-Selection Procedure
 #'
 #' The \code{cv()} \code{"function"} method
-#' is a general function to cross-validate a model-selection procedure;
+#' is a general function to cross-validate a model-selection procedure,
+#' such as the following:
 #' \code{selectStepAIC()} is a procedure that applies the \code{\link[MASS]{stepAIC}()}
 #' model-selection function in the \pkg{MASS} package; \code{selectTrans()} is a procedure
 #' for selecting predictor and response transformations in regression, which
 #' uses the \code{\link[car]{powerTransform}()} function in the
 #' \pkg{car} package; \code{selectTransAndStepAIC()} combines predictor and response
-#' transformation with predictor selection; and \code{selectModelList()}
+#' transformations with predictor selection; and \code{selectModelList()}
 #' uses cross-validation to select a model from a list of models created by
 #' \code{\link{models}()} and employs (recursive) cross-validation to assess the predictive
 #' accuracy of this procedure.
@@ -30,7 +31,8 @@
 #' (and possibly other information)
 #' with that fold deleted; default is \code{TRUE} if \code{k} is 10 or smaller,
 #' \code{FALSE} otherwise.
-#' @param save.model save the model that's selected using the \emph{full} data set.
+#' @param save.model save the model that's selected using the \emph{full} data set
+#' (default, \code{FALSE}).
 #' @param reps number of times to replicate k-fold CV (default is \code{1})
 #' @param seed for R's random number generator; not used for n-fold cross-validation.
 #' If not explicitly set, a seed is randomly generated and saved to make the results
@@ -40,7 +42,8 @@
 #'        (default is \code{1}, i.e., computations aren't done in parallel)
 #' @param ... for \code{cvSelect()} and the \code{cv()} \code{"function"} method,
 #' arguments to be passed to \code{procedure()};
-#' for \code{selectStepAIC()}, arguments to be passed to \code{stepAIC()}.
+#' for \code{selectStepAIC()} and \code{selectTransStepAIC()},
+#' arguments to be passed to \code{stepAIC()}.
 #' @importFrom MASS stepAIC
 #' @returns An object of class \code{"cvSelect"},
 #' inheriting from class \code{"cv"}, with the CV criterion
@@ -633,7 +636,7 @@ selectTransStepAIC <- function(data,
 #' @param quietly if \code{TRUE} (the default), simple messages (for example about the
 #' value to which the random-number generator seed is set), but not warnings or
 #' errors, are suppressed.
-#' @param k.recurse the number of folds for the recursive CVs; defaults
+#' @param k.recurse the number of folds for recursive CV; defaults
 #' to the value of \code{k}; may be specified as \code{"loo"} or
 #' \code{"n"} as well as an integer.
 #' @export

@@ -4,6 +4,10 @@
 #' cross-validation function, with a default method,
 #' specific methods for linear and generalized-linear models that can be much
 #' more computationally efficient, and a method for robust linear models.
+#' There are also \code{cv()} methods for \link[=cv.merMod]{mixed-effects models},
+#' for \link[=cv.function]{model-selection procedures},
+#' and for \link[=cv.modList]{several models fit to the same data},
+#'  which are documented separately.
 #'
 #' @param model a regression model object (see Details).
 #' @param data data frame to which the model was fit (not usually necessary).
@@ -12,7 +16,7 @@
 #'        \code{yhat} the predicted values; the default is \code{\link{mse}}
 #'        (the mean-squared error).
 #' @param criterion.name a character string giving the name of the CV criterion function
-#' in the returned \code{"cv"} object).
+#' in the returned \code{"cv"} object (not usually needed).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
 #' cross-validation.
@@ -90,7 +94,9 @@
 #' and \code{method="Woodbury"} otherwise; \code{method="naive"} refits
 #' the model via \code{update()} and is generally much slower. The
 #' default for generalized linear models is \code{method="exact"},
-#' which employs \code{update()}.
+#' which employs \code{update()}. This default is conservative, and
+#' it is usually safe to use \code{method="hatvalues"} for n-fold CV
+#' or \code{method="Woodbury"} for k-fold CV.
 #'
 #' There is also a method for robust linear models fit by
 #' \code{\link[MASS]{rlm}()} in the \pkg{MASS} package (to avoid
@@ -166,9 +172,9 @@ cv.default <- function(model,
     # helper function to compute cv criterion for each fold
     indices.i <- fold(folds, i)
     model.i <- if (start) {
-      update(model, data = data[-indices.i, ], start = b)
+      update(model, data = data[-indices.i,], start = b)
     } else {
-      update(model, data = data[-indices.i, ])
+      update(model, data = data[-indices.i,])
     }
     fit.all.i <- predict(model.i, newdata = data, type = type, ...)
     fit.i <- fit.all.i[indices.i]
@@ -193,9 +199,9 @@ cv.default <- function(model,
       #   occur with args passed via ... (which is saved in dots)
       predict.args <- c(list(
         object = if (start) {
-          update(model, data = data[-indices.i, ], start = b)
+          update(model, data = data[-indices.i,], start = b)
         } else {
-          update(model, data = data[-indices.i, ])
+          update(model, data = data[-indices.i,])
         },
         newdata = data,
         type = type
@@ -332,7 +338,7 @@ cv.lm <- function(model,
         "s", ":"))
     print(b[is.na(b)])
     message("Aliased coefficients removed from the model")
-    X <- X[, !is.na(b)]
+    X <- X[,!is.na(b)]
     p <- ncol(X)
     model <- lm.wfit(X, y, w)
   }
@@ -517,7 +523,7 @@ cv.glm <- function(model,
       ))
       print(b[is.na(b)])
       message("Aliased coefficients removed from the model")
-      X <- X[, !is.na(b)]
+      X <- X[,!is.na(b)]
       p <- ncol(X)
     }
     eta <- predict(model)
@@ -573,7 +579,7 @@ cv.rlm <- function(model, data, criterion, k, reps = 1, seed, ...) {
 
 
 #' @describeIn cv \code{print()} method for \code{"cv"} objects.
-#' @param x a \code{"cv"}, \code{"cvList"}, or \code{cvDataFrame}
+#' @param x a \code{"cv"}, \code{"cvList"}, or \code{"cvDataFrame"}
 #' object to be printed or coerced to a data frame.
 #' @param digits significant digits for printing,
 #' default taken from the \code{"digits"} option.
@@ -660,8 +666,27 @@ print.cvList <- function(x, ...) {
 #' defaults to \code{NULL}.
 #' @param optional to match the \code{as.data.frame()} generic function;
 #' not used.
+#' @param rows the rows of the resulting data frame to retain: setting
+#' \code{rows="cv"} retains rows pertaining to the overall CV result
+#' (marked as "\code{fold 0}" ); setting \code{rows="folds"} retains
+#' rows pertaining to individual folds 1 through k; the default is
+#' \code{rows = c("cv", "folds")}, which retains all rows.
+#' @param columns the columns of the resulting data frame to retain:
+#' setting \code{columns="critera"} retains columns pertaining to CV
+#' criteria; setting \code{columns="coefficients"} retains columns pertaining
+#' to model coefficients (broadly construed); the default is
+#' \code{columns = c("criteria", "coefficients")}, which retains both;
+#' and the columns \code{"model"}, \code{"rep"}, and \code{"fold"}, if present,
+#' are always retained.
 #' @exportS3Method base::as.data.frame
-as.data.frame.cv <- function(x, row.names=NULL, optional, ...) {
+as.data.frame.cv <- function(x,
+                             row.names = NULL,
+                             optional,
+                             rows = c("cv", "folds"),
+                             columns = c("criteria", "coefficients"),
+                             ...) {
+  rows <- match.arg(rows, several.ok = TRUE)
+  columns <- match.arg(columns, several.ok = TRUE)
   D <- data.frame(fold = 0,
                   criterion = x$"CV crit")
   if (!is.null(x$"adj CV crit")) {
@@ -672,10 +697,12 @@ as.data.frame.cv <- function(x, row.names=NULL, optional, ...) {
   }
   if (!is.null(x$confint)) {
     D <-
-      cbind(D,
-            confint.lower = x$confint[1L],
-            confint.upper = x$confint[2L],
-            se.cv = x$"SE adj CV crit")
+      cbind(
+        D,
+        confint.lower = x$confint[1L],
+        confint.upper = x$confint[2L],
+        se.cv = x$"SE adj CV crit"
+      )
   }
   if (!is.null(x$coefficients)) {
     coefs <- x$coefficients
@@ -694,23 +721,12 @@ as.data.frame.cv <- function(x, row.names=NULL, optional, ...) {
       criterion = x$details$criterion
     )
     if (!is.null(x$details$coefficients)) {
-      D3 <- t(x$details$coefficients[[1L]])
+      Ds <- lapply(x$details$coefficients, t)
+      D3 <- do.call(Merge, Ds)
       colnames <- colnames(D3)
       colnames[colnames == "(Intercept)"] <- "Intercept"
       colnames <- paste0("coef.", colnames)
-      colnames <- make.names(colnames, unique = TRUE)
       colnames(D3) <- colnames
-      rownames(D3) <- 1
-      for (i in 2L:length(x$details$coefficients)) {
-        D4 <- t(x$details$coefficients[[i]])
-        colnames <- colnames(D4)
-        colnames[colnames == "(Intercept)"] <- "Intercept"
-        colnames <- paste0("coef.", colnames)
-        colnames <- make.names(colnames, unique = TRUE)
-        colnames(D4) <- colnames
-        rownames(D4) <- i
-        D3 <- Merge(D3, D4)
-      }
       D2 <- cbind(D2, D3)
     }
     D <- Merge(D, D2)
@@ -730,18 +746,33 @@ as.data.frame.cv <- function(x, row.names=NULL, optional, ...) {
       paste0("SE.adj.", criterion)
   }
   rownames(D) <- row.names
+
+  if (!"cv" %in% rows)
+    D <- D[D$fold != 0,]
+  if (!"folds" %in% rows)
+    D <- D[D$fold == 0,]
+
+  coefs.cols <- grepl("^coef\\.", colnames(D))
+  always.cols <- colnames(D) %in% c("fold", "model", "rep")
+  criteria.cols <- !(coefs.cols | always.cols)
+  if (!"coefficients" %in% columns)
+    coefs.cols <- FALSE
+  if (!"criteria" %in% columns)
+    criteria.cols <- FALSE
+  D <- D[, coefs.cols | always.cols | criteria.cols]
+
   class(D) <- c("cvDataFrame", class(D))
   D
 }
 
 #' @describeIn cv \code{as.data.frame()} method for \code{"cvList"} objects.
 #' @exportS3Method base::as.data.frame
-as.data.frame.cvList <- function(x, row.names=NULL, optional, ...) {
-  Ds <- lapply(x, as.data.frame)
-  D <- cbind(rep = 1, Ds[[1L]])
-  for (i in 2L:length((Ds))) {
-    D <- Merge(D, cbind(rep = i, Ds[[i]]))
+as.data.frame.cvList <- function(x, row.names = NULL, optional, ...) {
+  Ds <- lapply(x, as.data.frame, ...)
+  for (i in seq_along(Ds)) {
+    Ds[[i]] <- cbind(rep = i, Ds[[i]])
   }
+  D <- do.call(Merge, Ds)
   rownames(D) <- row.names
   class(D) <- c("cvListDataFrame", "cvDataFrame", class(D))
   D
@@ -757,7 +788,8 @@ print.cvDataFrame <- function(x,
 
 #' @describeIn cv \code{summary()} method for \code{"cvDataFrame"} objects.
 #' @param object an object inheriting from \code{"cvDataFrame"} to summarize.
-#' @param formula of the form \code{some.criterion ~ classifying.variable(s)}.
+#' @param formula of the form \code{some.criterion ~ classifying.variable(s)}
+#' (see examples).
 #' @param fun summary function to apply, defaulting to \code{mean}.
 #' @param include which rows of the \code{"cvDataFrame"} to include in the
 #' summary. One of \code{"cv"} (the default), rows representing the overall CV
@@ -767,13 +799,13 @@ print.cvDataFrame <- function(x,
 summary.cvDataFrame <- function(object,
                                 formula,
                                 fun = mean,
-                                include=c("cv", "folds", "all"),
+                                include = c("cv", "folds", "all"),
                                 ...) {
   include <- match.arg(include)
   if (include == "cv") {
-    object <- object[object$fold == 0, ]
+    object <- object[object$fold == 0,]
   } else if (include == "folds") {
-    object <- object[object$fold != 0, ]
+    object <- object[object$fold != 0,]
   }
   helper <- function(formula, data) {
     cl <- match.call()
@@ -786,7 +818,6 @@ summary.cvDataFrame <- function(object,
     mf <- eval(mf, parent.frame())
     mf
   }
-  data <- helper(formula, data=object)
-  car::Tapply(formula, fun=fun, data = data)
+  data <- helper(formula, data = object)
+  car::Tapply(formula, fun = fun, data = data)
 }
-

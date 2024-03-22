@@ -3,7 +3,7 @@
 #' A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 #' created by the \code{models()} function. This \code{cv()} method simplifies
 #' the process of cross-validating several models on the same set of CV folds
-#' and may also be used recursive CV, where CV is used to select one from among
+#' and may also be used for recursive CV, where CV is used to select one from among
 #' several models. \code{models()} performs some
 #' "sanity" checks, warning if the models are of different classes, and
 #' reporting an error if they are fit to apparently different data sets or
@@ -39,7 +39,7 @@
 #' For the \code{print()} method, arguments to be passed to the \code{print()} method for
 #' the individual model cross-validations.
 #'
-#' For the \code{plot()}, method, arguments to be passed to the base \code{\link[base]{plot}()}
+#' For the \code{plot()} method, arguments to be passed to the base \code{\link[base]{plot}()}
 #' function.
 #' @param x an object of class \code{"cvModList"} to be printed or plotted.
 #' @param y the name of the element in each \code{"cv"} object to be
@@ -431,7 +431,7 @@ plot.cvModList <- function(x,
 #' not used.
 #' @exportS3Method base::as.data.frame
 as.data.frame.cvModList <- function(x, row.names=NULL, optional, ...) {
-  Ds <- lapply(x, as.data.frame)
+  Ds <- lapply(x, as.data.frame, ...)
   model.names <- names(x)
   D <- cbind(model = model.names[1L], Ds[[1L]])
   for (i in 2L:length((Ds))) {
