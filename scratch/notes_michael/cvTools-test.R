@@ -23,8 +23,8 @@ library("robustbase")
 data("coleman")
 set.seed(1234)  # set seed for reproducibility
 
-# set up folds for cross-validation, K=5 folds, R=10 reps
-folds <- cvFolds(nrow(coleman), K = 5, R = 10)
+# set up folds for cross-validation, K=5 folds, R=25 reps
+folds <- cvFolds(nrow(coleman), K = 5, R = 25)
 
 
 #' ## compare LS, MM and LTS regression
@@ -86,9 +86,10 @@ se <- cvFits$se |> rename(method = Fit, se = CV)
 cv_all <- data.frame(cv, se = se$se,
                      y = 0.25 + .2* as.numeric(cv$method))  # scale relative to Density (y) axis
 
-ggplot(reps, aes(x = CV, color=method, fill=method)) +
+ggplot(reps, aes(x = CV, color=method, fill=method, shape=method)) +
   geom_density(alpha = 0.3) +
-  geom_rug() +
+#  geom_rug() +
+  geom_jitter(aes(y = -0.05), width=0, height = 0.05) +
   geom_point(data =cv_all, aes(x = CV, y = y, color = method), size = 5) +
   # plot error bars twice
   geom_errorbarh(data =cv_all,
@@ -98,7 +99,9 @@ ggplot(reps, aes(x = CV, color=method, fill=method)) +
                  aes(xmin = CV - 2*se, xmax = CV + 2*se, y = y, color = method),
                  height = .1, linewidth = 1) +
   # add labels, rather than a legend
-  geom_label(data =cv_all, aes(x = CV, y = y, label=method, fill = NULL), nudge_y = .2 ) +
+  geom_label(data =cv_all, aes(x = CV, y = y, label=method, fill = NULL),
+             nudge_y = .2
+             ) +
   labs(x = "Root mean squared prediction error (rtmsepe)",
        y = "Density") +
   theme_bw(base_size = 14) +
