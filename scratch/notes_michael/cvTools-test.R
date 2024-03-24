@@ -54,17 +54,21 @@ names(cvFits)
 cvFits$cv
 cvFits$se
 
-cvFits$reps
+cvFits$reps |> head()
 
 
 #' ## plot results for the MM regression model
 #' Of these the density plot is more useful
+#+ out.width="50%", fig.show="hold"
 plot(cvFitLmrob, method = "bw")
 plot(cvFitLmrob, method = "density")
 
 #' ## plot combined results
+#+ out.width="50%", fig.show="hold"
 plot(cvFits, method = "bw")
 plot(cvFits, method = "density")
+
+#+ out.width="50%", fig.show="hold"
 plot(cvFits, method = "xy")
 plot(cvFits, method = "dot")
 
@@ -74,14 +78,31 @@ library(dplyr)
 library(ggplot2)
 library(ggdist)
 
-reps <- cvFits$reps |>
-  rename(method = Fit)
+#' Wrangle the `cvFits` to give data frames for plotting in a density plot. Need to get the data for
+#' the overall CV measures in a separate data.frame
+reps <- cvFits$reps |> rename(method = Fit)
+cv <- cvFits$cv |> rename(method = Fit)
+se <- cvFits$se |> rename(method = Fit, se = CV)
+cv_all <- data.frame(cv, se = se$se,
+                     y = 0.25 + .2* as.numeric(cv$method))  # scale relative to Density (y) axis
 
 ggplot(reps, aes(x = CV, color=method, fill=method)) +
   geom_density(alpha = 0.3) +
   geom_rug() +
-  labs(x = "Root mean squared prediction error (rtmsepe)") +
-  theme_bw(base_size = 14)
+  geom_point(data =cv_all, aes(x = CV, y = y, color = method), size = 5) +
+  # plot error bars twice
+  geom_errorbarh(data =cv_all,
+                 aes(xmin = CV - se, xmax = CV + se, y = y, color = method),
+                 height = .2, linewidth = 1.6) +
+  geom_errorbarh(data =cv_all,
+                 aes(xmin = CV - 2*se, xmax = CV + 2*se, y = y, color = method),
+                 height = .1, linewidth = 1) +
+  # add labels, rather than a legend
+  geom_label(data =cv_all, aes(x = CV, y = y, label=method, fill = NULL), nudge_y = .2 ) +
+  labs(x = "Root mean squared prediction error (rtmsepe)",
+       y = "Density") +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "none")
 
 
 #' ## Raincloud-ish plot
@@ -102,6 +123,7 @@ ggplot(reps, aes(x = method, y = CV, fill = method)) +
     alpha = 0.3,
     outlier.size = 3) +
   geom_jitter(aes(color = method), width = 0.1) +
+  geom_point(data =cv_all, aes(x = method, y = CV, color = method), size = 5) +
   labs(y = "Root mean squared prediction error (rtmsepe)",
        x = "Estimation method") +
   theme_bw(base_size = 14)
