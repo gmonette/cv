@@ -84,7 +84,14 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 
 \method{print}{cvDataFrame}(x, digits = getOption("digits") - 2L, ...)
 
-\method{summary}{cvDataFrame}(object, formula, fun = mean, include = c("cv", "folds", "all"), ...)
+\method{summary}{cvDataFrame}(
+  object,
+  formula,
+  subset = NULL,
+  fun = mean,
+  include = c("cv", "folds", "all"),
+  ...
+)
 }
 \arguments{
 \item{model}{a regression model object (see Details).}
@@ -174,6 +181,9 @@ are always retained.}
 
 \item{formula}{of the form \code{some.criterion ~ classifying.variable(s)}
 (see examples).}
+
+\item{subset}{a subsetting expression; the default (\code{NULL}) is to
+is not to subset the \code{"cvDataFrame"} object.}
 
 \item{fun}{summary function to apply, defaulting to \code{mean}.}
 
@@ -290,6 +300,8 @@ head(D.auto.reps)
 summary(D.auto.reps, mse ~ rep + fold, include="folds")
 summary(D.auto.reps, mse ~ rep, include="folds")
 summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
+summary(D.auto.reps, mse ~ rep + fold, include = "folds",
+        subset = fold <= 5) # first 5 folds
 
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)

@@ -122,6 +122,8 @@
 #' summary(D.auto.reps, mse ~ rep + fold, include="folds")
 #' summary(D.auto.reps, mse ~ rep, include="folds")
 #' summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
+#' summary(D.auto.reps, mse ~ rep + fold, include = "folds",
+#'         subset = fold <= 5) # first 5 folds
 #'
 #' data("Mroz", package="carData")
 #' m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
@@ -145,6 +147,7 @@ cv <- function(model, data, criterion, k, reps = 1, seed, ...) {
 #' model.matrix model.response predict qnorm
 #' update weighted.mean weights
 #' residuals hatvalues printCoefmat sd
+#' na.pass
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
@@ -790,6 +793,8 @@ print.cvDataFrame <- function(x,
 #' @param object an object inheriting from \code{"cvDataFrame"} to summarize.
 #' @param formula of the form \code{some.criterion ~ classifying.variable(s)}
 #' (see examples).
+#' @param subset a subsetting expression; the default (\code{NULL}) is to
+#' is not to subset the \code{"cvDataFrame"} object.
 #' @param fun summary function to apply, defaulting to \code{mean}.
 #' @param include which rows of the \code{"cvDataFrame"} to include in the
 #' summary. One of \code{"cv"} (the default), rows representing the overall CV
@@ -798,6 +803,7 @@ print.cvDataFrame <- function(x,
 #' @exportS3Method base::summary
 summary.cvDataFrame <- function(object,
                                 formula,
+                                subset=NULL,
                                 fun = mean,
                                 include = c("cv", "folds", "all"),
                                 ...) {
@@ -807,17 +813,40 @@ summary.cvDataFrame <- function(object,
   } else if (include == "folds") {
     object <- object[object$fold != 0,]
   }
-  helper <- function(formula, data) {
-    cl <- match.call()
-    mf <- match.call(expand.dots = FALSE)
-    m <- match(c("formula", "data"),
-               names(mf), 0L)
-    mf <- mf[c(1L, m)]
-    mf$drop.unused.levels <- TRUE
-    mf[[1L]] <- quote(stats::model.frame)
-    mf <- eval(mf, parent.frame())
-    mf
-  }
-  data <- helper(formula, data = object)
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("formula", "subset"),
+             names(mf), 0L)
+  mf <- mf[c(1L, m)]
+  mf$data <- object
+  mf$drop.unused.levels <- TRUE
+  mf$na.action <- na.pass
+  mf[[1L]] <- quote(stats::model.frame)
+  data <- eval(mf, parent.frame())
   car::Tapply(formula, fun = fun, data = data)
 }
+
+# summary.cvDataFrame <- function(object,
+#                                 formula,
+#                                 fun = mean,
+#                                 include = c("cv", "folds", "all"),
+#                                 ...) {
+#   include <- match.arg(include)
+#   if (include == "cv") {
+#     object <- object[object$fold == 0,]
+#   } else if (include == "folds") {
+#     object <- object[object$fold != 0,]
+#   }
+#   helper <- function(formula, data) {
+#     cl <- match.call()
+#     mf <- match.call(expand.dots = FALSE)
+#     m <- match(c("formula", "data"),
+#                names(mf), 0L)
+#     mf <- mf[c(1L, m)]
+#     mf$drop.unused.levels <- TRUE
+#     mf[[1L]] <- quote(stats::model.frame)
+#     mf <- eval(mf, parent.frame())
+#     mf
+#   }
+#   data <- helper(formula, data = object)
+#   car::Tapply(formula, fun = fun, data = data)
+# }
