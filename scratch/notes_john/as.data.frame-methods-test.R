@@ -118,3 +118,6 @@ summary(D, criterion ~ model + rep)
 summary(D, criterion ~ model + rep, include="folds")
 summary(D, criterion ~ model, fun=sd, include="folds")
 summary(D, criterion ~ model, include="folds")
+summary(D, criterion ~ model + rep, include="folds",
+        subset = rep < 3)
+

@@ -120,10 +120,10 @@
 #' D.auto.reps <- as.data.frame(cv.auto.reps)
 #' head(D.auto.reps)
 #' summary(D.auto.reps, mse ~ rep + fold, include="folds")
-#' summary(D.auto.reps, mse ~ rep, include="folds")
-#' summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
 #' summary(D.auto.reps, mse ~ rep + fold, include = "folds",
 #'         subset = fold <= 5) # first 5 folds
+#' summary(D.auto.reps, mse ~ rep, include="folds")
+#' summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
 #'
 #' data("Mroz", package="carData")
 #' m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
@@ -821,32 +821,6 @@ summary.cvDataFrame <- function(object,
   mf$drop.unused.levels <- TRUE
   mf$na.action <- na.pass
   mf[[1L]] <- quote(stats::model.frame)
-  data <- eval(mf, parent.frame())
-  car::Tapply(formula, fun = fun, data = data)
+  object <- eval(mf, parent.frame())
+  car::Tapply(formula, fun = fun, data = object)
 }
-
-# summary.cvDataFrame <- function(object,
-#                                 formula,
-#                                 fun = mean,
-#                                 include = c("cv", "folds", "all"),
-#                                 ...) {
-#   include <- match.arg(include)
-#   if (include == "cv") {
-#     object <- object[object$fold == 0,]
-#   } else if (include == "folds") {
-#     object <- object[object$fold != 0,]
-#   }
-#   helper <- function(formula, data) {
-#     cl <- match.call()
-#     mf <- match.call(expand.dots = FALSE)
-#     m <- match(c("formula", "data"),
-#                names(mf), 0L)
-#     mf <- mf[c(1L, m)]
-#     mf$drop.unused.levels <- TRUE
-#     mf[[1L]] <- quote(stats::model.frame)
-#     mf <- eval(mf, parent.frame())
-#     mf
-#   }
-#   data <- helper(formula, data = object)
-#   car::Tapply(formula, fun = fun, data = data)
-# }

@@ -298,10 +298,10 @@ compareFolds(cv.auto)
 D.auto.reps <- as.data.frame(cv.auto.reps)
 head(D.auto.reps)
 summary(D.auto.reps, mse ~ rep + fold, include="folds")
-summary(D.auto.reps, mse ~ rep, include="folds")
-summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
 summary(D.auto.reps, mse ~ rep + fold, include = "folds",
         subset = fold <= 5) # first 5 folds
+summary(D.auto.reps, mse ~ rep, include="folds")
+summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
 
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
