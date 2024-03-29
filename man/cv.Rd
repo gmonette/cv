@@ -113,7 +113,9 @@ cross-validation.}
 supplied a random seed will be selected and saved; not needed
 for n-fold cross-validation.}
 
-\item{...}{to match generic; passed to \code{predict()} for the default method.}
+\item{...}{to match generic; passed to \code{predict()} for the default \code{cv()} method;
+passed to the \code{\link[car]{Tapply}()} function in the \pkg{car} package for
+\code{summary.cvDataFrame()}.}
 
 \item{criterion.name}{a character string giving the name of the CV criterion function
 in the returned \code{"cv"} object (not usually needed).}
@@ -184,7 +186,7 @@ are always retained.}
 \item{formula}{of the form \code{some.criterion ~ classifying.variable(s)}
 (see examples).}
 
-\item{subset}{a subsetting expression; the default (\code{NULL}) is to
+\item{subset}{a subsetting expression; the default (\code{NULL})
 is not to subset the \code{"cvDataFrame"} object.}
 
 \item{fun}{summary function to apply, defaulting to \code{mean}.}

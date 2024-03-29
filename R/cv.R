@@ -44,7 +44,9 @@
 #' @param start if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
 #' to \code{update()} is set to the vector of regression coefficients for the model fit
 #' to the full data, possibly making the CV updates faster, e.g., for a GLM.
-#' @param ... to match generic; passed to \code{predict()} for the default method.
+#' @param ... to match generic; passed to \code{predict()} for the default \code{cv()} method;
+#' passed to the \code{\link[car]{Tapply}()} function in the \pkg{car} package for
+#' \code{summary.cvDataFrame()}.
 #' @param model.function a regression function, typically for a new \code{cv()} method that
 #' that calls \code{cv.default()} via \code{NextMethod()},
 #' residing in a package that's not a declared dependency of the \pkg{cv} package,
@@ -798,7 +800,7 @@ print.cvDataFrame <- function(x,
 #' @param object an object inheriting from \code{"cvDataFrame"} to summarize.
 #' @param formula of the form \code{some.criterion ~ classifying.variable(s)}
 #' (see examples).
-#' @param subset a subsetting expression; the default (\code{NULL}) is to
+#' @param subset a subsetting expression; the default (\code{NULL})
 #' is not to subset the \code{"cvDataFrame"} object.
 #' @param fun summary function to apply, defaulting to \code{mean}.
 #' @param include which rows of the \code{"cvDataFrame"} to include in the
@@ -827,5 +829,5 @@ summary.cvDataFrame <- function(object,
   mf$na.action <- na.pass
   mf[[1L]] <- quote(stats::model.frame)
   object <- eval(mf, parent.frame())
-  car::Tapply(formula, fun = fun, data = object)
+  car::Tapply(formula, fun = fun, data = object, ...)
 }

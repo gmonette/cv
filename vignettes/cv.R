@@ -520,6 +520,30 @@ cv.auto.reps <- cv(
 )
 plot(cv.auto.reps)
 
+## ----recall-cv.auto.reps------------------------------------------------------
+cv.auto.reps
+class(cv.auto.reps)
+
+## ----as.data.frame------------------------------------------------------------
+D <- as.data.frame(cv.auto.reps)
+dim(D)
+class(D)
+
+## -----------------------------------------------------------------------------
+head(D)
+
+## -----------------------------------------------------------------------------
+D <- as.data.frame(cv.auto.reps, columns="criteria")
+head(D)
+head(subset(D, fold == 0))
+
+## ----summary.cvDataFrame------------------------------------------------------
+summary(D, adjusted.criterion ~ model + rep) # fold "0" only
+summary(D, criterion ~ model + rep, 
+        include="folds") # mean over folds
+summary(D, criterion ~ model + rep, fun=sd, 
+        include="folds")
+
 ## ----generate-selection-data--------------------------------------------------
 set.seed(24361) # for reproducibility
 D <- data.frame(y = rnorm(1000, mean = 10),

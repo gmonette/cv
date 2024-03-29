@@ -918,6 +918,48 @@ plot(cv.auto.reps)
 ```
 The graph shows both the average CV criterion and its range for each of the competing models.
 
+## Manipulating "cv" and related objects
+
+The `cv()` functions returns an object of class `"cv"`---or a closely related object, for example, of class `"cvList"`---which contains a variety of information about the results of a CV procedure. The **cv** package provides `as.data.frame()` methods to put this information in the form of data frames for further examination and analysis. There is also a `summary()` method for extracting and summarizing the information in the resulting data frames.
+
+We'll illustrate with the replicated CV that we performed for the 10 polynomial-regression models fit to the `Auto` data:
+```{r recall-cv.auto.reps}
+cv.auto.reps
+class(cv.auto.reps)
+```
+In this case, there are 5 replications of 10-fold CV.
+
+Converting `cv.auto.reps` into a data frame produces, by default:
+```{r as.data.frame}
+D <- as.data.frame(cv.auto.reps)
+dim(D)
+class(D)
+```
+The resulting data frame has $\mathsf{replications} \times (\mathsf{folds} + 1) \times \mathsf{models} = 5 \times (10 + 1) \times 10 = 550$ rows, the first few of which are
+```{r}
+head(D)
+```
+All of these rows pertain to the first model and the first replication, and fold = 0 indicates the overall results for the first replication of the first model.
+
+The regression coefficients appear as columns in the data frame. Because the first model includes only an intercept and a linear polynomial term, the other coefficients are all `NA`.
+
+It's possible to suppress the regression coefficients by specifying the argument `columns="criteria"` to `as.data.frame()`:
+```{r }
+D <- as.data.frame(cv.auto.reps, columns="criteria")
+head(D)
+head(subset(D, fold == 0))
+```
+
+The `summary()` method for `"cvDataFrame"` and related objects has a formula interface, and may be used, for example, as follows:
+```{r summary.cvDataFrame}
+summary(D, adjusted.criterion ~ model + rep) # fold "0" only
+summary(D, criterion ~ model + rep, 
+        include="folds") # mean over folds
+summary(D, criterion ~ model + rep, fun=sd, 
+        include="folds")
+```
+See `?summary.cvDataFrame` for details.
+
 ## Cross-validating model selection
 
 ### A preliminary example
