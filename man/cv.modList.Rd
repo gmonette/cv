@@ -39,7 +39,7 @@ models(...)
   ...
 )
 
-\method{as.data.frame}{cvModList}(x, row.names = NULL, optional, ...)
+\method{as.data.frame}{cvModList}(x, row.names = NULL, optional = TRUE, ...)
 }
 \arguments{
 \item{model}{a list of regression model objects,
@@ -119,8 +119,10 @@ element of the color palette; see \code{\link{palette}()}.}
 \item{row.names}{optional row names for the result,
 defaults to \code{NULL}.}
 
-\item{optional}{to match the \code{as.data.frame()} generic function;
-not used.}
+\item{optional}{to match the \code{\link{as.data.frame}()} generic function;
+if \code{FALSE} (the default is \code{TRUE}), then the names of the columns
+of the returned data frame, including the names of coefficients,
+are coerced to syntactically correct names.}
 }
 \value{
 \code{models()} returns a \code{"modList"} object, the

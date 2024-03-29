@@ -74,13 +74,13 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
 \method{as.data.frame}{cv}(
   x,
   row.names = NULL,
-  optional,
+  optional = TRUE,
   rows = c("cv", "folds"),
   columns = c("criteria", "coefficients"),
   ...
 )
 
-\method{as.data.frame}{cvList}(x, row.names = NULL, optional, ...)
+\method{as.data.frame}{cvList}(x, row.names = NULL, optional = TRUE, ...)
 
 \method{print}{cvDataFrame}(x, digits = getOption("digits") - 2L, ...)
 
@@ -160,8 +160,10 @@ default taken from the \code{"digits"} option.}
 \item{row.names}{optional row names for the result,
 defaults to \code{NULL}.}
 
-\item{optional}{to match the \code{as.data.frame()} generic function;
-not used.}
+\item{optional}{to match the \code{\link{as.data.frame}()} generic function;
+if \code{FALSE} (the default is \code{TRUE}), then the names of the columns
+of the returned data frame, including the names of coefficients,
+are coerced to syntactically correct names.}
 
 \item{rows}{the rows of the resulting data frame to retain: setting
 \code{rows="cv"} retains rows pertaining to the overall CV result

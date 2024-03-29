@@ -1023,7 +1023,7 @@ getLossFn <- function(cv) {
 }
 
 Merge <- function(...) {
-  Ds <- lapply(list(...), as.data.frame)
+  Ds <- lapply(list(...), as.data.frame, optional=TRUE)
   names <- unique(unlist(lapply(Ds, colnames)))
   for (i in 1L:length(Ds)) {
     missing <- setdiff(names, colnames(Ds[[i]]))

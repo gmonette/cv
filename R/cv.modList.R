@@ -427,17 +427,20 @@ plot.cvModList <- function(x,
 #' \code{"cvModList"} objects.
 #' @param row.names optional row names for the result,
 #' defaults to \code{NULL}.
-#' @param optional to match the \code{as.data.frame()} generic function;
-#' not used.
+#' @param optional to match the \code{\link{as.data.frame}()} generic function;
+#' if \code{FALSE} (the default is \code{TRUE}), then the names of the columns
+#' of the returned data frame, including the names of coefficients,
+#' are coerced to syntactically correct names.
 #' @exportS3Method base::as.data.frame
-as.data.frame.cvModList <- function(x, row.names=NULL, optional, ...) {
-  Ds <- lapply(x, as.data.frame, ...)
+as.data.frame.cvModList <- function(x, row.names=NULL, optional=TRUE, ...) {
+  Ds <- lapply(x, as.data.frame, optional=TRUE, ...)
   model.names <- names(x)
   D <- cbind(model = model.names[1L], Ds[[1L]])
   for (i in 2L:length((Ds))) {
     D <- Merge(D, cbind(model = model.names[i], Ds[[i]]))
   }
   rownames(D) <- row.names
+  if (!optional) names(D) <- make.names(names(D), unique = TRUE)
   class(D) <-
     c("cvModListDataFrame",
       "cvListDataFrame",

@@ -667,8 +667,10 @@ print.cvList <- function(x, ...) {
 #' @describeIn cv \code{as.data.frame()} method for \code{"cv"} objects.
 #' @param row.names optional row names for the result,
 #' defaults to \code{NULL}.
-#' @param optional to match the \code{as.data.frame()} generic function;
-#' not used.
+#' @param optional to match the \code{\link{as.data.frame}()} generic function;
+#' if \code{FALSE} (the default is \code{TRUE}), then the names of the columns
+#' of the returned data frame, including the names of coefficients,
+#' are coerced to syntactically correct names.
 #' @param rows the rows of the resulting data frame to retain: setting
 #' \code{rows="cv"} retains rows pertaining to the overall CV result
 #' (marked as "\code{fold 0}" ); setting \code{rows="folds"} retains
@@ -684,7 +686,7 @@ print.cvList <- function(x, ...) {
 #' @exportS3Method base::as.data.frame
 as.data.frame.cv <- function(x,
                              row.names = NULL,
-                             optional,
+                             optional = TRUE,
                              rows = c("cv", "folds"),
                              columns = c("criteria", "coefficients"),
                              ...) {
@@ -713,7 +715,6 @@ as.data.frame.cv <- function(x,
       coef.names <- names(coefs)
       coef.names[coef.names == "(Intercept)"] <- "Intercept"
       coef.names <- paste0("coef.", coef.names)
-      coef.names <- make.names(coef.names, unique = TRUE)
       names(coefs) <- coef.names
       D <- cbind(D, t(coefs))
     }
@@ -764,20 +765,24 @@ as.data.frame.cv <- function(x,
     criteria.cols <- FALSE
   D <- D[, coefs.cols | always.cols | criteria.cols]
 
+  if (!optional) names(D) <- make.names(names(D), unique = TRUE)
+
   class(D) <- c("cvDataFrame", class(D))
   D
 }
 
 #' @describeIn cv \code{as.data.frame()} method for \code{"cvList"} objects.
 #' @exportS3Method base::as.data.frame
-as.data.frame.cvList <- function(x, row.names = NULL, optional, ...) {
-  Ds <- lapply(x, as.data.frame, ...)
+as.data.frame.cvList <- function(x, row.names = NULL, optional = TRUE,
+                                 ...) {
+  Ds <- lapply(x, as.data.frame, optional=TRUE, ...)
   for (i in seq_along(Ds)) {
     Ds[[i]] <- cbind(rep = i, Ds[[i]])
   }
   D <- do.call(Merge, Ds)
   rownames(D) <- row.names
   class(D) <- c("cvListDataFrame", "cvDataFrame", class(D))
+  if (!optional) names(D) <- make.names(names(D), unique = TRUE)
   D
 }
 

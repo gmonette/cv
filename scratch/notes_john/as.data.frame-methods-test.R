@@ -121,3 +121,34 @@ summary(D, criterion ~ model, include="folds")
 summary(D, criterion ~ model + rep, include="folds",
         subset = rep < 3)
 
+
+library(cv)
+data("Auto", package="ISLR2")
+
+for (p in 1:10) {
+  command <- paste0("m.", p, "<- lm(mpg ~ poly(horsepower, ", p,
+                    "), data=Auto)")
+  eval(parse(text = command))
+}
+
+cv.auto.reps <- cv(
+  models(m.1, m.2, m.3, m.4, m.5,
+         m.6, m.7, m.8, m.9, m.10),
+  data = Auto,
+  seed = 8004,
+  reps = 5
+)
+
+cv.auto.df <- as.data.frame(cv.auto.reps)
+head(cv.auto.df)
+
+cv.auto.df <- as.data.frame(cv.auto.reps, optional=FALSE)
+names(cv.auto.df)
+
+cv.auto.df <- as.data.frame(cv.auto.reps, columns="criteria")
+head(cv.auto.df)
+head(subset(cv.auto.df, fold == 0))
+summary(cv.auto.df, adjusted.criterion ~ model + rep)
+
+summary(cv.auto.df, criterion ~ model + rep, include="folds")
+summary(cv.auto.df, criterion ~ model + rep, fun=sd, include="folds")
