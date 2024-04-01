@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-02-29</h4>
+            <h4 data-toc-skip class="date">2024-04-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-extend.Rmd" class="external-link"><code>vignettes/cv-extend.Rmd</code></a></small>
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -98,7 +98,7 @@ suitable for use with <code>selectModel()</code>.</p>
 <h2 id="adding-a-cost-criterion">Adding a cost criterion<a class="anchor" aria-label="anchor" href="#adding-a-cost-criterion"></a>
 </h2>
 <p>A cost criterion suitable for use with <code><a href="../reference/cv.html">cv()</a></code> or
-<code><a href="../reference/cvSelect.html">cvSelect()</a></code> should take two arguments, <code>y</code> (the
+<code><a href="../reference/cvCompute.html">cvSelect()</a></code> should take two arguments, <code>y</code> (the
 observed response vector) and <code>yhat</code> (a vector of fitted or
 predicted response values), and return a numeric index of lack of fit.
 The <strong>cv</strong> package supplies several such criteria:
@@ -171,6 +171,7 @@ Weisberg, 2019)</span>:</p>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, criterion<span class="op">=</span><span class="va">AUCcomp</span>, seed<span class="op">=</span><span class="fl">3639</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 3639</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: exact</span></span>
 <span><span class="co">#&gt; criterion: AUCcomp</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.27471</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.26362</span></span></code></pre></div>
@@ -199,7 +200,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt;     attr(result, "casewise loss") &lt;- "(y - yhat)^2"</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55bf57dff890&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x7fe85631cf98&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span>
 <span></span>
 <span><span class="fu">cv</span><span class="fu">:::</span><span class="fu">getLossFn</span><span class="op">(</span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -207,7 +208,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55bf5775e988&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x7fe8563815f0&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>"(y - yhat)^2"</code>, that evaluates to an expression that is a
@@ -275,9 +276,12 @@ positions on European integration, with scores from 0 to 3.</li>
 predictors enter the model additively:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">"nnet"</a></span><span class="op">)</span></span>
-<span><span class="va">m.beps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom</a></span><span class="op">(</span><span class="va">vote</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">economic.cond.national</span> <span class="op">+</span></span>
-<span>                       <span class="va">economic.cond.household</span> <span class="op">+</span> <span class="va">Blair</span> <span class="op">+</span> <span class="va">Hague</span> <span class="op">+</span> <span class="va">Kennedy</span> <span class="op">+</span></span>
-<span>                       <span class="va">Europe</span><span class="op">*</span><span class="va">political.knowledge</span>, data<span class="op">=</span><span class="va">BEPS</span><span class="op">)</span></span>
+<span><span class="va">m.beps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom</a></span><span class="op">(</span></span>
+<span>  <span class="va">vote</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">gender</span> <span class="op">+</span> <span class="va">economic.cond.national</span> <span class="op">+</span></span>
+<span>    <span class="va">economic.cond.household</span> <span class="op">+</span> <span class="va">Blair</span> <span class="op">+</span> <span class="va">Hague</span> <span class="op">+</span> <span class="va">Kennedy</span> <span class="op">+</span></span>
+<span>    <span class="va">Europe</span> <span class="op">*</span> <span class="va">political.knowledge</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">BEPS</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; # weights:  36 (22 variable)</span></span>
 <span><span class="co">#&gt; initial  value 1675.383740 </span></span>
 <span><span class="co">#&gt; iter  10 value 1240.047788</span></span>
@@ -311,11 +315,16 @@ package <span class="citation">(Fox &amp; Weisberg, 2019)</span> to
 visualize the <code>Europe</code> <span class="math inline">\(\times\)</span> <code>political.knowledge</code>
 interaction in a “stacked-area” graph:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">effects</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/effects/man/effect.html" class="external-link">Effect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Europe"</span>, <span class="st">"political.knowledge"</span><span class="op">)</span>, <span class="va">m.beps</span>,</span>
-<span>            xlevels<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Europe<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">11</span>, political.knowledge<span class="op">=</span><span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,</span>
-<span>            fixed.predictors<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>given.values<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>gendermale<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     lines<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blue"</span>, <span class="st">"red"</span>, <span class="st">"orange"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     axes<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rug<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>style<span class="op">=</span><span class="st">"stacked"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="fu">effects</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/effects/man/effect.html" class="external-link">Effect</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Europe"</span>, <span class="st">"political.knowledge"</span><span class="op">)</span>,</span>
+<span>    <span class="va">m.beps</span>,</span>
+<span>    xlevels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Europe <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">11</span>, political.knowledge <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>,</span>
+<span>    fixed.predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>given.values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>gendermale <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  lines <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blue"</span>, <span class="st">"red"</span>, <span class="st">"orange"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  axes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>rug <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>style <span class="op">=</span> <span class="st">"stacked"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="fig/BEPS-plot-1.png" width="864" style="display: block; margin: auto;"></p>
 <p>To cross-validate this multinomial-logit model we need an appropriate
 cost criterion. None of the criteria supplied by the <strong>cv</strong>
@@ -328,13 +337,13 @@ Bayes rule to a polytomous response:</p>
 <span><span class="co">#&gt; [1] Liberal Democrat Labour           Labour           Labour          </span></span>
 <span><span class="co">#&gt; [5] Labour           Labour          </span></span>
 <span><span class="co">#&gt; Levels: Conservative Labour Liberal Democrat</span></span>
-<span><span class="va">yhat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.beps</span>, type<span class="op">=</span><span class="st">"class"</span><span class="op">)</span></span>
+<span><span class="va">yhat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.beps</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">yhat</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] Labour           Labour           Labour           Labour          </span></span>
 <span><span class="co">#&gt; [5] Liberal Democrat Labour          </span></span>
 <span><span class="co">#&gt; Levels: Conservative Labour Liberal Democrat</span></span>
 <span></span>
-<span><span class="va">BayesRuleMulti</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span><span class="op">{</span></span>
+<span><span class="va">BayesRuleMulti</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">y</span> <span class="op">!=</span> <span class="va">yhat</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">result</span>, <span class="st">"casewise loss"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"y != yhat"</span></span>
 <span>  <span class="va">result</span></span>
@@ -368,8 +377,8 @@ cross-validation?</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span>, criterion<span class="op">=</span><span class="va">BayesRuleMulti</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in GetResponse.default(model): non-vector response</span></span></code></pre></div>
-<p>The default method of <code><a href="../reference/GetResponse.html">GetResponse()</a></code> (a function supplied
-by the <strong>cv</strong> package—see <code><a href="../reference/GetResponse.html">?GetResponse</a></code>) fails
+<p>The default method of <code><a href="../reference/cvCompute.html">GetResponse()</a></code> (a function supplied
+by the <strong>cv</strong> package—see <code><a href="../reference/cvCompute.html">?GetResponse</a></code>) fails
 for a <code>"multinom"</code> object. A straightforward solution is to
 supply a <code>GetResponse.multinom()</code> method that returns the
 factor response <span class="citation">(using the
@@ -380,7 +389,7 @@ package, Lüdecke, Waggoner, &amp; Makowski, 2019)</span>,</p>
 <span>  <span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/get_response.html" class="external-link">get_response</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/GetResponse.html">GetResponse</a></span><span class="op">(</span><span class="va">m.beps</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/cvCompute.html">GetResponse</a></span><span class="op">(</span><span class="va">m.beps</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] Liberal Democrat Labour           Labour           Labour          </span></span>
 <span><span class="co">#&gt; [5] Labour           Labour          </span></span>
 <span><span class="co">#&gt; Levels: Conservative Labour Liberal Democrat</span></span></code></pre></div>
@@ -406,64 +415,210 @@ be <code>type="class"</code>. We therefore must write a
 “<code>multinom</code>” method for <code><a href="../reference/cv.html">cv()</a></code>, but that proves to
 be very simple:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cv.multinom</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, <span class="va">criterion</span><span class="op">=</span><span class="va">BayesRuleMulti</span>, <span class="va">k</span>, <span class="va">reps</span>,</span>
-<span>                         <span class="va">seed</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod</a></span><span class="op">(</span>type<span class="op">=</span><span class="st">"class"</span>, criterion<span class="op">=</span><span class="va">criterion</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cv.multinom</span> <span class="op">&lt;-</span></span>
+<span>  <span class="kw">function</span> <span class="op">(</span><span class="va">model</span>, <span class="va">data</span>, <span class="va">criterion</span> <span class="op">=</span> <span class="va">BayesRuleMulti</span>, <span class="va">k</span>, <span class="va">reps</span>,</span>
+<span>            <span class="va">seed</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">model</span>, trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod</a></span><span class="op">(</span></span>
+<span>      type <span class="op">=</span> <span class="st">"class"</span>,</span>
+<span>      criterion <span class="op">=</span> <span class="va">criterion</span>,</span>
+<span>      criterion.name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/deparse.html" class="external-link">deparse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">substitute</a></span><span class="op">(</span><span class="va">criterion</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span></span></code></pre></div>
 <p>That is, we simply call the default <code><a href="../reference/cv.html">cv()</a></code> method with the
 <code>type</code> argument properly set. In addition to supplying the
 correct <code>type</code> argument, our method sets the default
 <code>criterion</code> for the <code>cv.multinom()</code> method to
-<code>BayesRuleMulti</code>.</p>
+<code>BayesRuleMulti</code>. Adding the argument
+<code>criterion.name=deparse(substitute(criterion))</code> is
+inessential, but it insures that printed output will include the name of
+the criterion function that’s employed, whether it’s the default
+<code>BayesRuleMulti</code> or something else. Prior to invoking
+<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>, we called <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> with
+<code>trace=FALSE</code> to suppress the iteration history reported by
+default by <code><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom()</a></code>—it would be tedious to see the
+iteration history for each fold.</p>
 <p>Then:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m.beps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m.beps</span>, trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 3465</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; criterion: BayesRuleMulti</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
 <span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
-<p>Prior to invoking <code><a href="../reference/cv.html">cv()</a></code>, we called <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>
-with <code>trace=FALSE</code> to suppress the iteration history reported
-by default by <code><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom()</a></code>—it would be tedious to see the
-iteration history for each fold. The cross-validated polytomous
-Bayes-rule criterion confirms that the fitted model does substantially
-better than the marginal Bayes-rule prediction that everyone votes for
-Labour.</p>
+<p>The cross-validated polytomous Bayes-rule criterion confirms that the
+fitted model does substantially better than the marginal Bayes-rule
+prediction that everyone votes for Labour.</p>
+<div class="section level4">
+<h4 id="calling-cvcompute">Calling cvCompute()<a class="anchor" aria-label="anchor" href="#calling-cvcompute"></a>
+</h4>
+<p><code><a href="../reference/cv.html">cv()</a></code> methods for independently sampled cases, such as
+<code><a href="../reference/cv.html">cv.default()</a></code>, <code><a href="../reference/cv.html">cv.lm()</a></code>, and
+<code><a href="../reference/cv.html">cv.glm()</a></code>, work by setting up calls to the
+<code><a href="../reference/cvCompute.html">cvCompute()</a></code> function, which is exported from the
+<strong>cv</strong> package to support development of <code><a href="../reference/cv.html">cv()</a></code>
+methods for additional classes of regression models. In most cases,
+however, such as the preceding <code>cv.multinom()</code> example, it
+will suffice and be much simpler to set up a suitable call to
+<code><a href="../reference/cv.html">cv.default()</a></code> via <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>.</p>
+<p>To illustrate how to use <code><a href="../reference/cvCompute.html">cvCompute()</a></code> directly, we write
+an alternative, and necessarily more complicated, version of
+<code>cv.multinom()</code>.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cv.multinom</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>,</span>
+<span>                        <span class="va">data</span> <span class="op">=</span> <span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">get_data</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>,</span>
+<span>                        <span class="va">criterion</span> <span class="op">=</span> <span class="va">BayesRuleMulti</span>,</span>
+<span>                        <span class="va">k</span> <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>                        <span class="va">reps</span> <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                        <span class="va">seed</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                        <span class="va">details</span> <span class="op">=</span> <span class="va">k</span> <span class="op">&lt;=</span> <span class="fl">10</span>,</span>
+<span>                        <span class="va">confint</span> <span class="op">=</span> <span class="va">n</span> <span class="op">&gt;=</span> <span class="fl">400</span>,</span>
+<span>                        <span class="va">level</span> <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>                        <span class="va">ncores</span> <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                        <span class="va">start</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                        <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># helper function to compute to compute fitted values,</span></span>
+<span>    <span class="co">#  etc., for each fold i</span></span>
+<span>    </span>
+<span>    <span class="va">indices.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvCompute.html">fold</a></span><span class="op">(</span><span class="va">folds</span>, <span class="va">i</span><span class="op">)</span></span>
+<span>    <span class="va">model.i</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">start</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">model</span>,</span>
+<span>             data <span class="op">=</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">indices.i</span>,<span class="op">]</span>,</span>
+<span>             start <span class="op">=</span> <span class="va">b</span>,</span>
+<span>             trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">indices.i</span>,<span class="op">]</span>, trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="va">fit.all.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model.i</span>, newdata <span class="op">=</span> <span class="va">data</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span>
+<span>    <span class="va">fit.i</span> <span class="op">&lt;-</span> <span class="va">fit.all.i</span><span class="op">[</span><span class="va">indices.i</span><span class="op">]</span></span>
+<span>    <span class="co"># returns:</span></span>
+<span>    <span class="co">#  fit.i: fitted values for the i-th fold</span></span>
+<span>    <span class="co">#  crit.all.i: CV criterion for all cases based on model with</span></span>
+<span>    <span class="co">#              i-th fold omitted</span></span>
+<span>    <span class="co">#  coef.i: coefficients for the model with i-th fold omitted</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      fit.i <span class="op">=</span> <span class="va">fit.i</span>,</span>
+<span>      crit.all.i <span class="op">=</span> <span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all.i</span><span class="op">)</span>,</span>
+<span>      coef.i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model.i</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="va">fPara</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">i</span>, <span class="va">multinom</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># helper function for parallel computation</span></span>
+<span>    <span class="co">#   argument multinom makes multinom() locally available</span></span>
+<span>    <span class="co">#   ... is necessary but not used</span></span>
+<span>    <span class="va">indices.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvCompute.html">fold</a></span><span class="op">(</span><span class="va">folds</span>, <span class="va">i</span><span class="op">)</span></span>
+<span>    <span class="va">model.i</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">start</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">model</span>,</span>
+<span>             data <span class="op">=</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">indices.i</span>,<span class="op">]</span>,</span>
+<span>             start <span class="op">=</span> <span class="va">b</span>,</span>
+<span>             trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">indices.i</span>,<span class="op">]</span>, trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="va">fit.all.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model.i</span>, newdata <span class="op">=</span> <span class="va">data</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span>
+<span>    <span class="va">fit.i</span> <span class="op">&lt;-</span> <span class="va">fit.all.i</span><span class="op">[</span><span class="va">indices.i</span><span class="op">]</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      fit.i <span class="op">=</span> <span class="va">fit.i</span>,</span>
+<span>      crit.all.i <span class="op">=</span> <span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all.i</span><span class="op">)</span>,</span>
+<span>      coef.i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model.i</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># see ?cvCompute for definitions of arguments</span></span>
+<span>  <span class="fu"><a href="../reference/cvCompute.html">cvCompute</a></span><span class="op">(</span></span>
+<span>    model <span class="op">=</span> <span class="va">model</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">data</span>,</span>
+<span>    criterion <span class="op">=</span> <span class="va">criterion</span>,</span>
+<span>    criterion.name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/deparse.html" class="external-link">deparse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">substitute</a></span><span class="op">(</span><span class="va">criterion</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    k <span class="op">=</span> <span class="va">k</span>,</span>
+<span>    reps <span class="op">=</span> <span class="va">reps</span>,</span>
+<span>    seed <span class="op">=</span> <span class="va">seed</span>,</span>
+<span>    details <span class="op">=</span> <span class="va">details</span>,</span>
+<span>    confint <span class="op">=</span> <span class="va">confint</span>,</span>
+<span>    level <span class="op">=</span> <span class="va">level</span>,</span>
+<span>    ncores <span class="op">=</span> <span class="va">ncores</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"class"</span>,</span>
+<span>    start <span class="op">=</span> <span class="va">start</span>,</span>
+<span>    f <span class="op">=</span> <span class="va">f</span>,</span>
+<span>    fPara <span class="op">=</span> <span class="va">fPara</span>,</span>
+<span>    multinom <span class="op">=</span> <span class="fu">nnet</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link">multinom</a></span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Notice that separate “helper” functions are defined for non-parallel
+and parallel computations.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Try the following, for example, with both versions of
+&lt;code&gt;cv.multinom()&lt;/code&gt; (possibly replacing &lt;code&gt;ncores=2&lt;/code&gt;
+with a larger number):&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&lt;span&gt;&lt;span class="fu"&gt;&lt;a href="https://rdrr.io/r/base/system.time.html" class="external-link"&gt;system.time&lt;/a&gt;&lt;/span&gt;&lt;span class="op"&gt;(&lt;/span&gt;&lt;span class="fu"&gt;&lt;a href="https://rdrr.io/r/base/print.html" class="external-link"&gt;print&lt;/a&gt;&lt;/span&gt;&lt;span class="op"&gt;(&lt;/span&gt;&lt;span class="va"&gt;cv1&lt;/span&gt; &lt;span class="op"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="fu"&gt;&lt;a href="../reference/cv.html"&gt;cv&lt;/a&gt;&lt;/span&gt;&lt;span class="op"&gt;(&lt;/span&gt;&lt;span class="va"&gt;m.beps&lt;/span&gt;, k&lt;span class="op"&gt;=&lt;/span&gt;&lt;span class="st"&gt;"loo"&lt;/span&gt;&lt;span class="op"&gt;)&lt;/span&gt;&lt;span class="op"&gt;)&lt;/span&gt;&lt;span class="op"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span&gt;&lt;span class="fu"&gt;&lt;a href="https://rdrr.io/r/base/system.time.html" class="external-link"&gt;system.time&lt;/a&gt;&lt;/span&gt;&lt;span class="op"&gt;(&lt;/span&gt;&lt;span class="fu"&gt;&lt;a href="https://rdrr.io/r/base/print.html" class="external-link"&gt;print&lt;/a&gt;&lt;/span&gt;&lt;span class="op"&gt;(&lt;/span&gt;&lt;span class="va"&gt;cv2&lt;/span&gt; &lt;span class="op"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="fu"&gt;&lt;a href="../reference/cv.html"&gt;cv&lt;/a&gt;&lt;/span&gt;&lt;span class="op"&gt;(&lt;/span&gt;&lt;span class="va"&gt;m.beps&lt;/span&gt;, k&lt;span class="op"&gt;=&lt;/span&gt;&lt;span class="st"&gt;"loo"&lt;/span&gt;, ncores&lt;span class="op"&gt;=&lt;/span&gt;&lt;span class="fl"&gt;2&lt;/span&gt;&lt;span class="op"&gt;)&lt;/span&gt;&lt;span class="op"&gt;)&lt;/span&gt;&lt;span class="op"&gt;)&lt;/span&gt;&lt;/span&gt;
+&lt;span&gt;&lt;span class="fu"&gt;&lt;a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link"&gt;all.equal&lt;/a&gt;&lt;/span&gt;&lt;span class="op"&gt;(&lt;/span&gt;&lt;span class="va"&gt;cv1&lt;/span&gt;, &lt;span class="va"&gt;cv2&lt;/span&gt;&lt;span class="op"&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;'><sup>1</sup></a> The new version of
+<code>cv.multinom()</code> produces the same results as the version that
+calls <code><a href="../reference/cv.html">cv.default()</a></code>:<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;A subtle point is that we added a &lt;code&gt;multinom&lt;/code&gt;
+argument to the local function &lt;code&gt;fPara()&lt;/code&gt;, which is passed to
+the &lt;code&gt;fPara&lt;/code&gt; argument of &lt;code&gt;&lt;a href="../reference/cvCompute.html"&gt;cvCompute()&lt;/a&gt;&lt;/code&gt;. There is
+also a &lt;code&gt;multinom&lt;/code&gt; argument to &lt;code&gt;&lt;a href="../reference/cvCompute.html"&gt;cvCompute()&lt;/a&gt;&lt;/code&gt;, which
+is set to the &lt;code&gt;multinom&lt;/code&gt; function in the
+&lt;strong&gt;nnet&lt;/strong&gt; package. The &lt;code&gt;multinom&lt;/code&gt; argument isn’t
+directly defined in &lt;code&gt;&lt;a href="../reference/cvCompute.html"&gt;cvCompute()&lt;/a&gt;&lt;/code&gt; (examine the definition of
+this function), but is passed through the &lt;code&gt;...&lt;/code&gt; argument.
+&lt;code&gt;&lt;a href="../reference/cvCompute.html"&gt;cvCompute()&lt;/a&gt;&lt;/code&gt;, in turn, will pass &lt;code&gt;multinom&lt;/code&gt; to
+&lt;code&gt;fPara()&lt;/code&gt; via &lt;code&gt;...&lt;/code&gt;, allowing &lt;code&gt;fPara()&lt;/code&gt;
+to find this function when it calls &lt;code&gt;&lt;a href="https://rdrr.io/r/stats/update.html" class="external-link"&gt;update()&lt;/a&gt;&lt;/code&gt; to refit the
+model with each fold &lt;code&gt;i&lt;/code&gt; omitted. This scoping issue arises
+because &lt;code&gt;&lt;a href="../reference/cvCompute.html"&gt;cvCompute()&lt;/a&gt;&lt;/code&gt; uses &lt;code&gt;foreach()&lt;/code&gt; for
+parallel computations, even though the &lt;strong&gt;nnet&lt;/strong&gt; package is
+attached to the search path in the current R session via
+&lt;code&gt;&lt;a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link"&gt;library("nnet")&lt;/a&gt;&lt;/code&gt;. &lt;code&gt;&lt;a href="../reference/cv.html"&gt;cv.default()&lt;/a&gt;&lt;/code&gt; is able to
+handle the scoping issue transparently by automatically locating
+&lt;code&gt;&lt;a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link"&gt;multinom()&lt;/a&gt;&lt;/code&gt;.&lt;/p&gt;'><sup>2</sup></a></p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R RNG seed set to 3465</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; criterion: BayesRuleMulti</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="mixed-effects-models">Mixed-effects models<a class="anchor" aria-label="anchor" href="#mixed-effects-models"></a>
 </h3>
 <p>Adding a <code><a href="../reference/cv.html">cv()</a></code> method for a mixed-model class is somewhat
-more complicated. We provide the <code><a href="../reference/cvMixed.html">cvMixed()</a></code> function to
+more complicated. We provide the <code><a href="../reference/cvCompute.html">cvMixed()</a></code> function to
 facilitate this process, and to see how that works, consider the
 <code>"lme"</code> method from the <strong>cv</strong> package:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">cv</span><span class="fu">:::</span><span class="va"><a href="../reference/cvMixed.html">cv.lme</a></span></span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">cv</span><span class="fu">:::</span><span class="va"><a href="../reference/cv.merMod.html">cv.lme</a></span></span>
 <span><span class="co">#&gt; function (model, data = insight::get_data(model), criterion = mse, </span></span>
-<span><span class="co">#&gt;     k, reps = 1, seed, ncores = 1, clusterVariables, blups = coef, </span></span>
-<span><span class="co">#&gt;     fixed.effects = nlme::fixef, ...) </span></span>
+<span><span class="co">#&gt;     k = NULL, reps = 1, seed, details = NULL, ncores = 1, clusterVariables, </span></span>
+<span><span class="co">#&gt;     blups = coef, fixed.effects = nlme::fixef, ...) </span></span>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     cvMixed(model, package = "nlme", data = data, criterion = criterion, </span></span>
-<span><span class="co">#&gt;         k = k, reps = reps, seed = seed, ncores = ncores, clusterVariables = clusterVariables, </span></span>
-<span><span class="co">#&gt;         predict.clusters.args = list(object = model, newdata = data, </span></span>
-<span><span class="co">#&gt;             level = 0), predict.cases.args = list(object = model, </span></span>
+<span><span class="co">#&gt;         criterion.name = deparse(substitute(criterion)), k = k, </span></span>
+<span><span class="co">#&gt;         reps = reps, seed = seed, details = details, ncores = ncores, </span></span>
+<span><span class="co">#&gt;         clusterVariables = clusterVariables, predict.clusters.args = list(object = model, </span></span>
+<span><span class="co">#&gt;             newdata = data, level = 0), predict.cases.args = list(object = model, </span></span>
 <span><span class="co">#&gt;             newdata = data, level = 1), blups = blups, fixed.effects = fixed.effects, </span></span>
 <span><span class="co">#&gt;         ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55bf602ebb68&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x7fe856dbc230&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
-<p>Notice that <code><a href="../reference/cvMixed.html">cv.lme()</a></code> sets up a call to
-<code><a href="../reference/cvMixed.html">cvMixed()</a></code>, which does the computational work.</p>
-<p>Most of the arguments of <code><a href="../reference/cvMixed.html">cvMixed()</a></code> are familiar:</p>
+<p>Notice that <code><a href="../reference/cv.merMod.html">cv.lme()</a></code> sets up a call to
+<code><a href="../reference/cvCompute.html">cvMixed()</a></code>, which does the computational work.</p>
+<p>Most of the arguments of <code><a href="../reference/cvCompute.html">cvMixed()</a></code> are familiar:</p>
 <ul>
 <li><p><code>model</code> is the mixed-model object, here of class
 <code>"lme"</code>.</p></li>
 <li><p><code>package</code> is the name of the package in which the
 mixed-modeling function used to fit the model, here <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme()</a></code>,
-resides—i.e., <code>"nlme"</code>; <code><a href="../reference/cvMixed.html">cvMixed()</a></code> uses this
+resides—i.e., <code>"nlme"</code>; <code><a href="../reference/cvCompute.html">cvMixed()</a></code> uses this
 argument to retrieve the package namespace.</p></li>
 <li><p><code>data</code> is the data set to which the model is fit, by
 default extracted by the <code>get_data()</code> function in the
@@ -491,7 +646,7 @@ to be passed to the <code><a href="https://rdrr.io/r/stats/predict.html" class="
 predictions for the full data set from a model fit to a subset of the
 data for cluster-based CV. The first two arguments should be
 <code>object</code> and <code>newdata</code>. It is typically necessary
-to tell <code><a href="../reference/cvMixed.html">cvMixed()</a></code> how to base predictions only on fixed
+to tell <code><a href="../reference/cvCompute.html">cvMixed()</a></code> how to base predictions only on fixed
 effects; in the case of <code>"lme"</code> models, this is done by
 setting <code>level = 0</code>.</p></li>
 <li><p>Similarly, <code>predict.cases.args</code> is a named list of
@@ -504,7 +659,7 @@ CV, respectively.</p></li>
 </ul>
 <p>Finally, any additional arguments, absorbed by <code>...</code>, are
 passed to <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code> when the model is refit with each fold
-omitted. <code><a href="../reference/cvMixed.html">cvMixed()</a></code> returns an object of class
+omitted. <code><a href="../reference/cvCompute.html">cvMixed()</a></code> returns an object of class
 <code>"cv"</code>.</p>
 <p>Now imagine that we want to support a new class of mixed-effects
 models. To be concrete, we illustrate with the <code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code>
@@ -515,13 +670,13 @@ superior functions, such the &lt;code&gt;&lt;a href="https://rdrr.io/pkg/lme4/ma
 &lt;strong&gt;lme4&lt;/strong&gt; package. There is, however, one situation in which
 &lt;code&gt;&lt;a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link"&gt;glmmPQL()&lt;/a&gt;&lt;/code&gt; might prove useful: to specify serial dependency
 in case-level errors within clusters for longitudinal data, which is not
-currently supported by &lt;code&gt;&lt;a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link"&gt;glmer()&lt;/a&gt;&lt;/code&gt;.&lt;/p&gt;'><sup>1</sup></a> Not
+currently supported by &lt;code&gt;&lt;a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link"&gt;glmer()&lt;/a&gt;&lt;/code&gt;.&lt;/p&gt;'><sup>3</sup></a> Not
 coincidentally, the arguments of <code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code> are similar to
 those of <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme()</a></code> (with an additional <code>family</code>
 argument), because the former iteratively invokes the latter; so
-<code>cv.glmmPQL()</code> should resemble <code><a href="../reference/cvMixed.html">cv.lme()</a></code>.</p>
+<code>cv.glmmPQL()</code> should resemble <code><a href="../reference/cv.merMod.html">cv.lme()</a></code>.</p>
 <p>As it turns out, neither the default method for
-<code><a href="../reference/GetResponse.html">GetResponse()</a></code> nor <code><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">insight::get_data()</a></code> work for
+<code><a href="../reference/cvCompute.html">GetResponse()</a></code> nor <code><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">insight::get_data()</a></code> work for
 <code>"glmmPQL"</code> objects. These objects include a
 <code>"data"</code> element, however, and so we can simply extract this
 element as the default for the <code>data</code> argument of our
@@ -531,52 +686,74 @@ part of the model as a GLM with only the regression constant on the
 right-hand side, and extract the response from that; because all we need
 is the response variable, we limit the number of GLM iterations to 1 and
 suppress warning messages about non-convergence:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">GetResponse.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">GetResponse.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span>  <span class="va">f</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># regression constant only on RHS</span></span>
-<span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">f</span>, data<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">data</span>, family<span class="op">=</span><span class="va">model</span><span class="op">$</span><span class="va">family</span>,</span>
-<span>                                control<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu">cv</span><span class="fu">::</span><span class="fu"><a href="../reference/GetResponse.html">GetResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span>  <span class="va">model</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span></span>
+<span>      <span class="va">f</span>,</span>
+<span>      data <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">data</span>,</span>
+<span>      family <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">family</span>,</span>
+<span>      control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>maxit <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>    <span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu">cv</span><span class="fu">::</span><span class="fu"><a href="../reference/cvCompute.html">GetResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Writing the <code><a href="../reference/cv.html">cv()</a></code> method is then straightforward:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cv.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>, <span class="va">data</span> <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">data</span>, <span class="va">criterion</span> <span class="op">=</span> <span class="va">mse</span>,</span>
-<span>                     <span class="va">k</span>, <span class="va">reps</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">seed</span>, <span class="va">ncores</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">clusterVariables</span>, </span>
-<span>                     <span class="va">blups</span><span class="op">=</span><span class="va">coef</span>, <span class="va">fixed.effects</span><span class="op">=</span><span class="fu">nlme</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span>, <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="fu"><a href="../reference/cvMixed.html">cvMixed</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cv.glmmPQL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span>,</span>
+<span>                       <span class="va">data</span> <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">data</span>,</span>
+<span>                       <span class="va">criterion</span> <span class="op">=</span> <span class="va">mse</span>,</span>
+<span>                       <span class="va">k</span>,</span>
+<span>                       <span class="va">reps</span> <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                       <span class="va">seed</span>,</span>
+<span>                       <span class="va">ncores</span> <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                       <span class="va">clusterVariables</span>,</span>
+<span>                       <span class="va">blups</span> <span class="op">=</span> <span class="va">coef</span>,</span>
+<span>                       <span class="va">fixed.effects</span> <span class="op">=</span> <span class="fu">nlme</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span>,</span>
+<span>                       <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="../reference/cvCompute.html">cvMixed</a></span><span class="op">(</span></span>
 <span>    <span class="va">model</span>,</span>
-<span>    package<span class="op">=</span><span class="st">"MASS"</span>,</span>
-<span>    data<span class="op">=</span><span class="va">data</span>,</span>
-<span>    criterion<span class="op">=</span><span class="va">criterion</span>,</span>
-<span>    k<span class="op">=</span><span class="va">k</span>,</span>
-<span>    reps<span class="op">=</span><span class="va">reps</span>,</span>
-<span>    seed<span class="op">=</span><span class="va">seed</span>,</span>
-<span>    ncores<span class="op">=</span><span class="va">ncores</span>,</span>
-<span>    clusterVariables<span class="op">=</span><span class="va">clusterVariables</span>,</span>
-<span>    predict.clusters.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>object<span class="op">=</span><span class="va">model</span>,</span>
-<span>                               newdata<span class="op">=</span><span class="va">data</span>,</span>
-<span>                               level<span class="op">=</span><span class="fl">0</span>,</span>
-<span>                               type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span>,</span>
-<span>    predict.cases.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>object<span class="op">=</span><span class="va">model</span>,</span>
-<span>                            newdata<span class="op">=</span><span class="va">data</span>,</span>
-<span>                            level<span class="op">=</span><span class="fl">1</span>,</span>
-<span>                            type<span class="op">=</span><span class="st">"response"</span><span class="op">)</span>,</span>
-<span>    blups<span class="op">=</span><span class="va">blups</span>,</span>
-<span>    fixed.effects<span class="op">=</span><span class="va">fixed.effects</span>,</span>
-<span>    verbose<span class="op">=</span><span class="cn">FALSE</span>,</span>
-<span>    <span class="va">...</span><span class="op">)</span></span>
+<span>    package <span class="op">=</span> <span class="st">"MASS"</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">data</span>,</span>
+<span>    criterion <span class="op">=</span> <span class="va">criterion</span>,</span>
+<span>    k <span class="op">=</span> <span class="va">k</span>,</span>
+<span>    reps <span class="op">=</span> <span class="va">reps</span>,</span>
+<span>    seed <span class="op">=</span> <span class="va">seed</span>,</span>
+<span>    ncores <span class="op">=</span> <span class="va">ncores</span>,</span>
+<span>    clusterVariables <span class="op">=</span> <span class="va">clusterVariables</span>,</span>
+<span>    predict.clusters.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      object <span class="op">=</span> <span class="va">model</span>,</span>
+<span>      newdata <span class="op">=</span> <span class="va">data</span>,</span>
+<span>      level <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>      type <span class="op">=</span> <span class="st">"response"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    predict.cases.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      object <span class="op">=</span> <span class="va">model</span>,</span>
+<span>      newdata <span class="op">=</span> <span class="va">data</span>,</span>
+<span>      level <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>      type <span class="op">=</span> <span class="st">"response"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    blups <span class="op">=</span> <span class="va">blups</span>,</span>
+<span>    fixed.effects <span class="op">=</span> <span class="va">fixed.effects</span>,</span>
+<span>    verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    <span class="va">...</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>We set the argument <code>verbose=FALSE</code> to suppress
-<code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code>’s iteration counter when <code><a href="../reference/cvMixed.html">cvMixed()</a></code>
+<code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL()</a></code>’s iteration counter when <code><a href="../reference/cvCompute.html">cvMixed()</a></code>
 calls <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>.</p>
 <p>Let’s apply our newly minted method to a logistic regression with a
 random intercept in an example that appears in
 <code><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">?glmmPQL</a></code>:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">"MASS"</a></span><span class="op">)</span></span>
-<span><span class="va">m.pql</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">week</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">)</span>, random <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">|</span> <span class="va">ID</span>,</span>
-<span>             family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">bacteria</span><span class="op">)</span></span>
+<span><span class="va">m.pql</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/glmmPQL.html" class="external-link">glmmPQL</a></span><span class="op">(</span></span>
+<span>  <span class="va">y</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">week</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  random <span class="op">=</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">|</span> <span class="va">ID</span>,</span>
+<span>  family <span class="op">=</span> <span class="va">binomial</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">bacteria</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; iteration 1</span></span>
 <span><span class="co">#&gt; iteration 2</span></span>
 <span><span class="co">#&gt; iteration 3</span></span>
@@ -617,11 +794,11 @@ random intercept in an example that appears in
 <span><span class="co">#&gt; Number of Groups: 50</span></span></code></pre></div>
 <p>We compare this result to that obtained from <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer()</a></code> in
 the <strong>lme4</strong> package:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lme4/lme4/" class="external-link">"lme4"</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: Matrix</span></span>
 <span><span class="va">m.glmer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">week</span> <span class="op">&gt;</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">ID</span><span class="op">)</span>,</span>
-<span>               family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">bacteria</span><span class="op">)</span></span>
+<span>                 family <span class="op">=</span> <span class="va">binomial</span>, data <span class="op">=</span> <span class="va">bacteria</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.glmer</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Generalized linear mixed model fit by maximum likelihood (Laplace</span></span>
 <span><span class="co">#&gt;   Approximation) [glmerMod]</span></span>
@@ -656,7 +833,7 @@ the <strong>lme4</strong> package:</p>
 <span><span class="co">#&gt; trtdrug+    -0.537  0.487       </span></span>
 <span><span class="co">#&gt; I(wk&gt;2)TRUE -0.656  0.126  0.064</span></span>
 <span></span>
-<span>  <span class="co"># comparison of fixed effects:</span></span>
+<span><span class="co"># comparison of fixed effects:</span></span>
 <span><span class="fu">car</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/compareCoefs.html" class="external-link">compareCoefs</a></span><span class="op">(</span><span class="va">m.pql</span>, <span class="va">m.glmer</span><span class="op">)</span> </span>
 <span><span class="co">#&gt; Warning in car::compareCoefs(m.pql, m.glmer): models to be compared are of</span></span>
 <span><span class="co">#&gt; different classes</span></span>
@@ -682,7 +859,7 @@ the <strong>lme4</strong> package:</p>
 <p>The two sets of estimates are similar, but not identical</p>
 <p>Finally, we try out our <code>cv.glmmPQL()</code> method,
 cross-validating both by clusters and by cases,</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pql</span>, clusterVariables<span class="op">=</span><span class="st">"ID"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation based on 50 {ID} clusters</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
@@ -696,9 +873,10 @@ cross-validating both by clusters and by cases,</p>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.20727</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.14545</span></span></code></pre></div>
 <p>and again compare to <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer()</a></code>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.glmer</span>, clusterVariables<span class="op">=</span><span class="st">"ID"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation based on 50 {ID} clusters</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19545</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.19545</span></span>
@@ -706,6 +884,7 @@ cross-validating both by clusters and by cases,</p>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.glmer</span>, data<span class="op">=</span><span class="va">bacteria</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">1490</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1490</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19364</span></span>
 <span><span class="co">#&gt; full-sample criterion = 0.15</span></span></code></pre></div>
@@ -714,18 +893,18 @@ cross-validating both by clusters and by cases,</p>
 <div class="section level2">
 <h2 id="adding-a-model-selection-procedure">Adding a model-selection procedure<a class="anchor" aria-label="anchor" href="#adding-a-model-selection-procedure"></a>
 </h2>
-<p>The <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> function supplied by the
+<p>The <code><a href="../reference/cv.function.html">selectStepAIC()</a></code> function supplied by the
 <strong>cv</strong> package, which is based on the
 <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code> function from the <strong>nnet</strong> package
 <span class="citation">(Venables &amp; Ripley, 2002)</span> for stepwise
 model selection, is suitable for the <code>procedure</code> argument of
-<code><a href="../reference/cvSelect.html">cvSelect()</a></code>. The use of <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> is
+<code><a href="../reference/cvCompute.html">cvSelect()</a></code>. The use of <code><a href="../reference/cv.function.html">selectStepAIC()</a></code> is
 illustrated in the principal vignette for the package.</p>
-<p>We’ll employ <code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> as a “template” for writing
+<p>We’ll employ <code><a href="../reference/cv.function.html">selectStepAIC()</a></code> as a “template” for writing
 a CV model-selection procedure. To see the code for this function, type
-<code><a href="../reference/cvSelect.html">cv::selectStepAIC</a></code> at the R command prompt, or examine the
+<code><a href="../reference/cv.function.html">cv::selectStepAIC</a></code> at the R command prompt, or examine the
 sources for the <strong>cv</strong> package at <a href="https://github.com/gmonette/cv" class="external-link uri">https://github.com/gmonette/cv</a> (the code for
-<code><a href="../reference/cvSelect.html">selectStepAIC()</a></code> is in <a href="https://github.com/gmonette/cv/blob/main/R/cvSelect.R" class="external-link uri">https://github.com/gmonette/cv/blob/main/R/cvSelect.R</a>).</p>
+<code><a href="../reference/cv.function.html">selectStepAIC()</a></code> is in <a href="https://github.com/gmonette/cv/blob/main/R/cvSelect.R" class="external-link uri">https://github.com/gmonette/cv/blob/main/R/cvSelect.R</a>).</p>
 <p>Another approach to model selection is all-subsets regression. The
 <code><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets()</a></code> function in the <strong>leaps</strong> package
 <span class="citation">(Lumley &amp; Miller, 2020)</span> implements an
@@ -736,10 +915,10 @@ measures of model predictive performance, including the &lt;span class="math inl
 residual sums of squares, Mallows’s &lt;span class="math inline"&gt;\(C_p\)&lt;/span&gt;, and the BIC. Several of these are
 suitable for comparing models with differing numbers of coefficients—we
 use the BIC below—but all necessarily agree when comparing models with
-the &lt;em&gt;same&lt;/em&gt; number of coefficients.&lt;/p&gt;'><sup>2</sup></a> To illustrate the use
+the &lt;em&gt;same&lt;/em&gt; number of coefficients.&lt;/p&gt;'><sup>4</sup></a> To illustrate the use
 of <code><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets()</a></code>, we employ the <code>swiss</code> data
 frame supplied by the <strong>leaps</strong> package:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st">"leaps"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">swiss</span><span class="op">)</span></span>
 <span><span class="co">#&gt;              Fertility Agriculture Examination Education Catholic</span></span>
@@ -782,7 +961,7 @@ as the percentage of live births surviving less than a year.</li>
 <p>Following <span class="citation">Lumley &amp; Miller (2020)</span>,
 we treat <code>Fertility</code> as the response and the other variables
 as predictors in a linear least-squares regression:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Fertility</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">swiss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.swiss</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -822,7 +1001,7 @@ subset of the predictors, taking account of the additional uncertainty
 induced by model selection?</p>
 <p>First, let’s apply best-subset selection to the complete data
 set:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">swiss.sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">Fertility</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">swiss</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">swiss.sub</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Subset selection object</span></span>
@@ -859,7 +1038,7 @@ Selecting the best model of each size.
 is the “best” model with 4 predictors, including
 <code>Agriculture</code>, <code>Education</code>, <code>Catholic</code>,
 and <code>Infant.Mortality</code>, but not <code>Examination</code>:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m.swiss</span>, <span class="va">.</span> <span class="op">~</span> <span class="va">.</span> <span class="op">-</span> <span class="va">Examination</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.best</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -898,65 +1077,72 @@ for the full model fit previously, but the cross-validated MSE is a bit
 lower; as we explain in the main vignette, however, it isn’t kosher to
 select and cross-validate a model on the same data.</p>
 <p>Here’s a function named <code>selectSubsets()</code>, meant to be
-used with <code><a href="../reference/cvSelect.html">cvSelect()</a></code>, suitable for cross-validating the
+used with <code><a href="../reference/cvCompute.html">cvSelect()</a></code>, suitable for cross-validating the
 model-selection process:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">selectSubsets</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">=</span><span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">get_data</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>, </span>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">selectSubsets</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span> <span class="op">=</span> <span class="fu">insight</span><span class="fu">::</span><span class="fu"><a href="https://easystats.github.io/insight/reference/get_data.html" class="external-link">get_data</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>,</span>
 <span>                          <span class="va">model</span>,</span>
 <span>                          <span class="va">indices</span>,</span>
-<span>                          <span class="va">criterion</span><span class="op">=</span><span class="va">mse</span>,</span>
-<span>                          <span class="va">details</span><span class="op">=</span><span class="cn">TRUE</span>, </span>
+<span>                          <span class="va">criterion</span> <span class="op">=</span> <span class="va">mse</span>,</span>
+<span>                          <span class="va">details</span> <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                          <span class="va">seed</span>,</span>
-<span>                          <span class="va">save.model</span><span class="op">=</span><span class="cn">FALSE</span>, </span>
-<span>                          <span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
-<span>  </span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">model</span>, <span class="st">"lm"</span>, which<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>                          <span class="va">save.model</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                          <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">model</span>, <span class="st">"lm"</span>, which <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">!=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"selectSubsets is appropriate only for 'lm' models"</span><span class="op">)</span></span>
 <span>  </span>
-<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GetResponse.html">GetResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span>  <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvCompute.html">GetResponse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span>  <span class="va">formula</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span></span>
+<span>  </span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">indices</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span><span class="op">)</span> <span class="va">seed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1e6</span>, <span class="fl">1L</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/missing.html" class="external-link">missing</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span> <span class="op">||</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="va">seed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1e6</span>, <span class="fl">1L</span><span class="op">)</span></span>
 <span>    <span class="co"># select the best model from the full data by BIC</span></span>
-<span>    <span class="va">sel</span> <span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">formula</span>, data<span class="op">=</span><span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>    <span class="va">sel</span> <span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">data</span>, <span class="va">...</span><span class="op">)</span></span>
 <span>    <span class="va">bics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sel</span><span class="op">)</span><span class="op">$</span><span class="va">bic</span></span>
 <span>    <span class="va">best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">sel</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bics</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">bics</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span>
 <span>    <span class="va">x.names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">best</span><span class="op">)</span></span>
 <span>    <span class="co"># fit the best model; intercept is already in X, hence - 1:</span></span>
-<span>    <span class="va">m.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">X</span><span class="op">[</span>, <span class="va">x.names</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> </span>
-<span>    <span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.best</span>, newdata<span class="op">=</span><span class="va">data</span><span class="op">)</span></span>
+<span>    <span class="va">m.best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">X</span><span class="op">[</span>, <span class="va">x.names</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>    <span class="va">fit.all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.best</span>, newdata <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>      criterion <span class="op">=</span> <span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all</span><span class="op">)</span>,</span>
-<span>      model <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">save.model</span><span class="op">)</span> <span class="va">m.best</span> <span class="kw">else</span> <span class="cn">NULL</span> <span class="co"># return best model</span></span>
-<span>      <span class="op">)</span><span class="op">)</span></span>
+<span>      model <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">save.model</span><span class="op">)</span></span>
+<span>        <span class="va">m.best</span> <span class="co"># return best model</span></span>
+<span>      <span class="kw">else</span></span>
+<span>        <span class="cn">NULL</span></span>
+<span>    <span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
-<span></span>
+<span>  </span>
 <span>  <span class="co"># select the best model omitting the i-th fold (given by indices)</span></span>
-<span>  <span class="va">sel.i</span> <span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">formula</span>, <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">indices</span>, <span class="op">]</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>  <span class="va">sel.i</span> <span class="op">&lt;-</span> <span class="fu">leaps</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaps/man/regsubsets.html" class="external-link">regsubsets</a></span><span class="op">(</span><span class="va">formula</span>, <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">indices</span>,<span class="op">]</span>, <span class="va">...</span><span class="op">)</span></span>
 <span>  <span class="va">bics.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">sel.i</span><span class="op">)</span><span class="op">$</span><span class="va">bic</span></span>
 <span>  <span class="va">best.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">sel.i</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bics.i</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">bics.i</span><span class="op">)</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="va">x.names.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">best.i</span><span class="op">)</span></span>
 <span>  <span class="va">m.best.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span><span class="op">[</span><span class="op">-</span><span class="va">indices</span><span class="op">]</span> <span class="op">~</span> <span class="va">X</span><span class="op">[</span><span class="op">-</span><span class="va">indices</span>, <span class="va">x.names.i</span><span class="op">]</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
-<span>              <span class="co"># predict() doesn't work here:</span></span>
+<span>  <span class="co"># predict() doesn't work here:</span></span>
 <span>  <span class="va">fit.all.i</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">X</span><span class="op">[</span>, <span class="va">x.names.i</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m.best.i</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="va">fit.i</span> <span class="op">&lt;-</span> <span class="va">fit.all.i</span><span class="op">[</span><span class="va">indices</span><span class="op">]</span></span>
-<span>  <span class="co"># return the fitted values for i-th fold, CV criterion for all cases, </span></span>
+<span>  <span class="co"># return the fitted values for i-th fold, CV criterion for all cases,</span></span>
 <span>  <span class="co">#   and the regression coefficients</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>fit.i<span class="op">=</span><span class="va">fit.i</span>, <span class="co"># fitted values for i-th fold</span></span>
-<span>       crit.all.i<span class="op">=</span><span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all.i</span><span class="op">)</span>, <span class="co"># CV crit for all cases</span></span>
-<span>       coefficients <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">details</span><span class="op">)</span><span class="op">{</span> <span class="co"># regression coefficients</span></span>
-<span>         <span class="va">coefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m.best.i</span><span class="op">)</span></span>
-<span>         </span>
-<span>         <span class="co"># fix coefficient names</span></span>
-<span>         <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"X\\[-indices, x.names.i\\]"</span>, <span class="st">""</span>,</span>
-<span>                             <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span><span class="op">)</span></span>
-<span>         </span>
-<span>         <span class="va">coefs</span></span>
-<span>       <span class="op">}</span>  <span class="kw">else</span> <span class="op">{</span></span>
-<span>         <span class="cn">NULL</span></span>
-<span>       <span class="op">}</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    fit.i <span class="op">=</span> <span class="va">fit.i</span>,</span>
+<span>    <span class="co"># fitted values for i-th fold</span></span>
+<span>    crit.all.i <span class="op">=</span> <span class="fu">criterion</span><span class="op">(</span><span class="va">y</span>, <span class="va">fit.all.i</span><span class="op">)</span>,</span>
+<span>    <span class="co"># CV crit for all cases</span></span>
+<span>    coefficients <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">details</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="co"># regression coefficients</span></span>
+<span>      <span class="va">coefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">m.best.i</span><span class="op">)</span></span>
+<span>      </span>
+<span>      <span class="co"># fix coefficient names</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"X\\[-indices, x.names.i\\]"</span>, <span class="st">""</span>,</span>
+<span>                          <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">coefs</span><span class="op">)</span><span class="op">)</span></span>
+<span>      </span>
+<span>      <span class="va">coefs</span></span>
+<span>    <span class="op">}</span>  <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="cn">NULL</span></span>
+<span>    <span class="op">}</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>A slightly tricky point is that because of scoping issues,
@@ -978,7 +1164,7 @@ these awkward names, removing the extraneous text,
 <code>"X[-indices, x.names.i]"</code>.</p>
 <p>Applying <code>selectSubsets()</code> to the full data produces the
 full-data cross-validated MSE (which we obtained previously):</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">selectSubsets</span><span class="op">(</span>model<span class="op">=</span><span class="va">m.swiss</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $criterion</span></span>
 <span><span class="co">#&gt; [1] 45.916</span></span>
@@ -992,7 +1178,7 @@ returns the MSE for the cases in the fold, based on the model selected
 and fit to the cases omitting the fold; the MSE for all of the cases,
 based on the same model; and the coefficients of the selected model,
 which includes 4 or the 5 predictors (and the intercept):</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">selectSubsets</span><span class="op">(</span>model<span class="op">=</span><span class="va">m.swiss</span>, indices<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">45</span>, by<span class="op">=</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $fit.i</span></span>
 <span><span class="co">#&gt; [1] 62.922 67.001 73.157 83.778 32.251</span></span>
@@ -1009,11 +1195,16 @@ which includes 4 or the 5 predictors (and the intercept):</p>
 <span><span class="co">#&gt;          1.01895</span></span></code></pre></div>
 <p>Then, using <code>selectSubsets()</code> in cross-validation, we
 get:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span><span class="va">cv.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvSelect.html">cvSelect</a></span><span class="op">(</span><span class="va">selectSubsets</span>, model<span class="op">=</span><span class="va">m.swiss</span>,</span>
-<span>                      data<span class="op">=</span><span class="va">swiss</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span><span class="op">)</span> <span class="co"># use same folds</span></span>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">cv.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cvCompute.html">cvSelect</a></span><span class="op">(</span></span>
+<span>  <span class="va">selectSubsets</span>,</span>
+<span>  model <span class="op">=</span> <span class="va">m.swiss</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">swiss</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">8433</span> <span class="co"># use same folds</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 8433</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 65.835</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.644</span></span>
 <span><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
@@ -1021,8 +1212,8 @@ get:</p>
 Examining the models selected for the 10 folds reveals that there is
 some uncertainty in identifying the predictors in the “best” model, with
 <code>Agriculture</code> sometimes appearing and sometimes not:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cvSelect.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.swiss</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.swiss</span><span class="op">)</span></span>
 <span><span class="co">#&gt; CV criterion by folds:</span></span>
 <span><span class="co">#&gt;   fold.1   fold.2   fold.3   fold.4   fold.5   fold.6   fold.7   fold.8 </span></span>
 <span><span class="co">#&gt;  76.6964  61.3105 131.1616   9.0662  52.9403  41.0853  51.8768 136.9498 </span></span>
@@ -1093,25 +1284,35 @@ are no consistent solutions in either case.</p>
 <p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> and <span class="math inline">\(\mathbf{y}_v\)</span>, accommodating the cases
 where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 1s:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">AUC</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">s</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">s</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">s</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">s</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span>  <span class="fu">Metrics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Metrics/man/auc.html" class="external-link">auc</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}_v\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Ymat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>, <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">n_v</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_v</span><span class="op">)</span> <span class="op">==</span> <span class="va">n_v</span><span class="op">)</span>    <span class="co"># n_v must be a positive integer</span></span>
-<span>  <span class="va">ret</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="fl">2</span><span class="op">^</span><span class="va">n_v</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>                <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rawConversion.html" class="external-link">intToBits</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n_v</span>, <span class="op">]</span></span>
-<span>  <span class="va">ret</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">is.matrix</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span> <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">n_v</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;&amp;</span></span>
+<span>              <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_v</span><span class="op">)</span> <span class="op">==</span> <span class="va">n_v</span><span class="op">)</span>    <span class="co"># n_v must be a positive integer</span></span>
+<span>  <span class="va">ret</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="fl">2</span> <span class="op">^</span> <span class="va">n_v</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>                <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>                  <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rawConversion.html" class="external-link">intToBits</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n_v</span>,<span class="op">]</span></span>
+<span>  <span class="va">ret</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">is.matrix</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span></span>
+<span>  <span class="kw">else</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"y"</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">exclude_identical</span><span class="op">)</span> <span class="va">ret</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span> <span class="kw">else</span> <span class="va">ret</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">exclude_identical</span><span class="op">)</span></span>
+<span>    <span class="va">ret</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span><span class="op">)</span>,<span class="op">]</span></span>
+<span>  <span class="kw">else</span></span>
+<span>    <span class="va">ret</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>For <span class="math inline">\(n_v=3\)</span>,</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3</span></span>
 <span><span class="co">#&gt; [1,]  0  0  0</span></span>
@@ -1124,7 +1325,7 @@ where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 <span><span class="co">#&gt; [8,]  1  1  1</span></span></code></pre></div>
 <p>If we exclude <span class="math inline">\(\mathbf{y}_v\)</span>s with
 identical values, then</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3</span></span>
 <span><span class="co">#&gt; [1,]  1  0  0</span></span>
@@ -1135,7 +1336,7 @@ identical values, then</p>
 <span><span class="co">#&gt; [6,]  0  1  1</span></span></code></pre></div>
 <p>Here is <span class="math inline">\(\mathbf{Y}\)</span> with
 corresponding values of AUC:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, AUC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">AUC</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3 AUC</span></span>
 <span><span class="co">#&gt; [1,]  0  0  0 0.0</span></span>
@@ -1177,20 +1378,21 @@ a least-squares problem, considering whether the residuals of the
 associated linear model are all 0, using the “design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> to
 predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v}
 \times 1)}\)</span>:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">resids</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>, <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">resids</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>,</span>
+<span>                   <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                   <span class="va">tol</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu">Ymat</span><span class="op">(</span><span class="va">n_v</span>, exclude_identical <span class="op">=</span> <span class="va">exclude_identical</span><span class="op">)</span></span>
 <span>  <span class="va">AUC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">Y</span>, <span class="fl">1</span>, <span class="va">AUC</span><span class="op">)</span></span>
-<span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">Y</span>, <span class="va">Y</span><span class="op">)</span></span>
+<span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">Y</span>, <span class="va">Y</span><span class="op">)</span></span>
 <span>  <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>warn <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">opts</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lsfit.html" class="external-link">lsfit</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">AUC</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  <span class="va">ret</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span><span class="op">(</span><span class="va">ret</span> <span class="op">&lt;</span> <span class="va">tol</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">ret</span> <span class="op">&lt;</span> <span class="va">tol</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">ret</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span>    <span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"c("</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_v</span>, <span class="fl">1</span><span class="op">:</span><span class="va">n_v</span><span class="op">)</span>, <span class="st">","</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"c("</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_v</span>, <span class="fl">1</span><span class="op">:</span><span class="va">n_v</span><span class="op">)</span>, <span class="st">","</span>,</span>
 <span>                              <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, each <span class="op">=</span> <span class="va">n_v</span><span class="op">)</span>, <span class="st">")"</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">ret</span>, <span class="st">"solution"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/zapsmall.html" class="external-link">zapsmall</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
@@ -1198,7 +1400,7 @@ predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\wide
 <span><span class="op">}</span></span></code></pre></div>
 <p>The case <span class="math inline">\(n_v=3\)</span>, excluding
 identical <span class="math inline">\(y\)</span>s, has a solution:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; attr(,"solution")</span></span>
@@ -1206,12 +1408,12 @@ identical <span class="math inline">\(y\)</span>s, has a solution:</p>
 <span><span class="co">#&gt;    1.0    0.0   -0.5    0.5    0.0    0.0</span></span></code></pre></div>
 <p>But, if identical <span class="math inline">\(y\)</span>s are
 included, the equation is not consistent:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.125</span></span></code></pre></div>
 <p>For <span class="math inline">\(n_v=4\)</span>, there are no
 solutions in either case:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">4</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.083333</span></span>
 <span><span class="fu">resids</span><span class="op">(</span><span class="fl">4</span>, exclude_identical <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>

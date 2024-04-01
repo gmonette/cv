@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,11 +54,16 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.2.0" id="cv-120">cv 1.2.0<a class="anchor" aria-label="anchor" href="#cv-120"></a></h2>
-<ul><li><p>New cv.function() method meant to replace cvSelect(), which is deprecated.</p></li>
+<h2 class="pkg-version" data-toc-text="2.0.0" id="cv-200">cv 2.0.0<a class="anchor" aria-label="anchor" href="#cv-200"></a></h2>
+<ul><li><p>New cv.function() method meant to replace cvSelect(), direct use of which is now discouraged.</p></li>
 <li><p>New selectModelList() to be used with cv.function() (or with cvSelect()). selectModelList() implements recursive cross-validation, where the fit of a model selected by CV is assessed by CV. The same procedure is also available by setting recursive=TRUE in a call to cv.modList().</p></li>
 <li><p>cv.default() and other cv() methods acquire a details argument, which if TRUE includes information about the folds in the returned object.</p></li>
+<li><p>New as.data.frame.cv() and related methods for turning the detailed results returned by cv() methods into a data frame, with new print() and summary() methods for the objects produced.</p></li>
 <li><p>Improvements to code, introducing folds(), fold(), and related functions.</p></li>
+<li><p>Refactoring of code; cv() methods now all call cvCompute() (which is new), cvMixed(), or cvSelect().</p></li>
+<li><p>Reorganization of package file structure and of documentation.</p></li>
+<li><p>Make the cv.default() method more robust, particularly for parallel computations.</p></li>
+<li><p>Other small improvements.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="cv-110">cv 1.1.0<a class="anchor" aria-label="anchor" href="#cv-110"></a></h2><p class="text-muted">CRAN release: 2024-01-27</p>
