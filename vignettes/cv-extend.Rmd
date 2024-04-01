@@ -443,7 +443,7 @@ cv(m.glmer, data=bacteria, criterion=BayesRule, seed=1490)
 
 The `selectStepAIC()` function supplied by the **cv** package, which is based on the `stepAIC()` function from the **nnet** package [@VenablesRipley:2002] for stepwise model selection, is suitable for the `procedure` argument of `cvSelect()`. The use of `selectStepAIC()` is illustrated in the principal vignette for the package. 
 
-We'll employ `selectStepAIC()` as a "template" for writing a CV model-selection procedure. To see the code for this function, type `cv::selectStepAIC` at the R command prompt, or examine the sources for the **cv** package at https://github.com/gmonette/cv (the code for `selectStepAIC()` is in https://github.com/gmonette/cv/blob/main/R/cvSelect.R).
+We'll employ `selectStepAIC()` as a "template" for writing a CV model-selection procedure. To see the code for this function, type `cv::selectStepAIC` at the R command prompt, or examine the sources for the **cv** package at https://github.com/gmonette/cv (the code for `selectStepAIC()` is in https://github.com/gmonette/cv/blob/main/R/cv-select.R).
 
 Another approach to model selection is all-subsets regression. The `regsubsets()` function in the **leaps** package [@LumleyMiller:2020] implements an efficient algorithm for selecting the best-fitting linear least-squares regressions for subsets of predictors of all sizes, from 1 through the maximum number of candidate predictors.[^1] To illustrate the use of `regsubsets()`, we employ the `swiss` data frame supplied by the **leaps** package:
 
