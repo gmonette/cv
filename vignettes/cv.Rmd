@@ -89,17 +89,28 @@ The relationship between the two variables is monotone, decreasing, and nonlinea
 #| out.width = "100%",
 #| fig.height = 5,
 #| fig.cap = "`mpg` vs `horsepower` for the `Auto` data"
-plot(mpg ~ horsepower, data=Auto)
-horsepower <- with(Auto, 
-                   seq(min(horsepower), max(horsepower), 
-                       length=1000))
-for (p in 1:5){
-  m <- lm(mpg ~ poly(horsepower,p), data=Auto)
-  mpg <- predict(m, newdata=data.frame(horsepower=horsepower))
-  lines(horsepower, mpg, col=p + 1, lty=p, lwd=2)
+plot(mpg ~ horsepower, data = Auto)
+horsepower <- with(Auto,
+                   seq(min(horsepower), max(horsepower),
+                       length = 1000))
+for (p in 1:5) {
+  m <- lm(mpg ~ poly(horsepower, p), data = Auto)
+  mpg <- predict(m, newdata = data.frame(horsepower = horsepower))
+  lines(horsepower,
+        mpg,
+        col = p + 1,
+        lty = p,
+        lwd = 2)
 }
-legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=2,
-       title="Degree", inset=0.02)
+legend(
+  "topright",
+  legend = 1:5,
+  col = 2:6,
+  lty = 1:5,
+  lwd = 2,
+  title = "Degree",
+  inset = 0.02
+)
 ```
 The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ may over-fit the data by chasing one or two relatively high `mpg` values at the right (but see the CV results reported below).
 
@@ -112,20 +123,46 @@ The following graph shows two measures of estimated (squared) error as a functio
 library("cv") # for mse() and other functions
 
 var <- mse <- numeric(10)
-for (p in 1:10){
-  m <- lm(mpg ~ poly(horsepower, p), data=Auto)
+for (p in 1:10) {
+  m <- lm(mpg ~ poly(horsepower, p), data = Auto)
   mse[p] <- mse(Auto$mpg, fitted(m))
-  var[p] <- summary(m)$sigma^2
+  var[p] <- summary(m)$sigma ^ 2
 }
 
-plot(c(1, 10), range(mse, var), type="n",
-     xlab="Degree of polynomial, p",
-     ylab="Estimated Squared Error")
-lines(1:10, mse, lwd=2, lty=1, col=2, pch=16, type="b")
-lines(1:10, var, lwd=2, lty=2, col=3, pch=17, type="b")
-legend("topright", inset=0.02,
-       legend=c(expression(hat(sigma)^2), "MSE"),
-       lwd=2, lty=2:1, col=3:2, pch=17:16)
+plot(
+  c(1, 10),
+  range(mse, var),
+  type = "n",
+  xlab = "Degree of polynomial, p",
+  ylab = "Estimated Squared Error"
+)
+lines(
+  1:10,
+  mse,
+  lwd = 2,
+  lty = 1,
+  col = 2,
+  pch = 16,
+  type = "b"
+)
+lines(
+  1:10,
+  var,
+  lwd = 2,
+  lty = 2,
+  col = 3,
+  pch = 17,
+  type = "b"
+)
+legend(
+  "topright",
+  inset = 0.02,
+  legend = c(expression(hat(sigma) ^ 2), "MSE"),
+  lwd = 2,
+  lty = 2:1,
+  col = 3:2,
+  pch = 17:16
+)
 ```
 The code for this graph uses the `mse()` function from the **cv** package to compute the MSE for each fit.
 
@@ -133,7 +170,7 @@ The code for this graph uses the `mse()` function from the **cv** package to com
 
 The generic `cv()` function has an `"lm"` method, which by default performs $k = 10$-fold CV:
 ```{r cv-lm-1}
-m.auto <- lm(mpg ~ poly(horsepower, 2), data=Auto)
+m.auto <- lm(mpg ~ poly(horsepower, 2), data = Auto)
 summary(m.auto)
 
 cv(m.auto)
@@ -143,27 +180,27 @@ The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury m
 To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases in the data, here `k=392`, or, more conveniently, to `k="loo"` or `k="n"`:
 
 ```{r cv.lm-2`}
-cv(m.auto, k="loo")
+cv(m.auto, k = "loo")
 ```
 For LOO CV of a linear model, `cv()` by default uses the hatvalues from the model fit to the full data for the LOO updates, and reports only the CV estimate of MSE. Alternative methods are to use the Woodbury matrix identity or the "naive" approach of literally refitting the model with each case omitted. All three methods produce exact results for a linear model (within the precision of floating-point computations):
 ```{r cv.lm-3}
-cv(m.auto, k="loo", method="naive")
+cv(m.auto, k = "loo", method = "naive")
 
-cv(m.auto, k="loo", method="Woodbury")
+cv(m.auto, k = "loo", method = "Woodbury")
 ```
 The `"naive"` and `"Woodbury"` methods also return the bias-adjusted estimate of MSE and the full-sample MSE, but bias isn't an issue for LOO CV.
 
 This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In this comparison, we include the `cv.glm()` function from the **boot** package, which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the `microbenchmark()` function from the package of the same name for the timings [@Mersmann:2023]:
 ```{r cv.lm.timings, cache=TRUE}
-m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data=Auto)
+m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data = Auto)
 boot::cv.glm(Auto, m.auto.glm)$delta
 
 microbenchmark::microbenchmark(
-  hatvalues = cv(m.auto, k="loo"),
-  Woodbury = cv(m.auto, k="loo", method="Woodbury"),
-  naive = cv(m.auto, k="loo", method="naive"),
+  hatvalues = cv(m.auto, k = "loo"),
+  Woodbury = cv(m.auto, k = "loo", method = "Woodbury"),
+  naive = cv(m.auto, k = "loo", method = "naive"),
   cv.glm = boot::cv.glm(Auto, m.auto.glm),
-  times=10
+  times = 10
 )
 ```
 On our computer, using the hatvalues is about an order of magnitude faster than employing Woodbury matrix updates, and more than two orders of magnitude faster than refitting the model.[^microbenchmark]
@@ -176,12 +213,12 @@ The `cv()` function also has a method that can be applied to a list of regressio
 
 We illustrate with the polynomial regression models of varying degree for the `Auto` data (discussed previously), beginning by fitting and saving the 10 models:
 ```{r polyomial-models}
-for (p in 1:10){
+for (p in 1:10) {
   command <- paste0("m.", p, "<- lm(mpg ~ poly(horsepower, ", p,
                     "), data=Auto)")
-  eval(parse(text=command))
+  eval(parse(text = command))
 }
-objects(pattern="m\\.[0-9]")
+objects(pattern = "m\\.[0-9]")
 summary(m.2) # for example, the quadratic fit
 ```
 The convoluted code within the loop to produce the 10 models insures that the model formula are of the form, e.g., `mpg ~ poly(horsepower, 2)` rather than `mpg ~ poly(horsepower, p)`, which will be useful to us later, when we consider cross-validating the model-selection process.
@@ -189,15 +226,19 @@ The convoluted code within the loop to produce the 10 models insures that the mo
 We then apply `cv()` to the list of 10 models (the `data` argument is required):
 ```{r polynomial-regression-CV}
 # 10-fold CV
-cv.auto.10 <- cv(models(m.1, m.2, m.3, m.4, m.5,
-                     m.6, m.7, m.8, m.9, m.10),
-              data=Auto, seed=2120)
+cv.auto.10 <- cv(
+  models(m.1, m.2, m.3, m.4, m.5,
+         m.6, m.7, m.8, m.9, m.10),
+  data = Auto,
+  seed = 2120
+)
 cv.auto.10[1:2] # for the linear and quadratic models
 
 # LOO CV
 cv.auto.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
-                        m.6, m.7, m.8, m.9, m.10),
-                 data=Auto, k="loo")
+                         m.6, m.7, m.8, m.9, m.10),
+                  data = Auto,
+                  k = "loo")
 cv.auto.loo[1:2] # linear and quadratic models
 ```
 Because we didn't supply names for the models in the calls to the `models()` function, the names `model.1`, `model.2`, etc., are generated by the function.
@@ -207,16 +248,44 @@ Finally, we extract and graph the adjusted MSEs for $10$-fold CV and the MSEs fo
 #| out.width = "100%",
 #| fig.height = 5,
 #| fig.cap = "Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$"
-cv.mse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
-cv.mse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
-plot(c(1, 10), range(cv.mse.10, cv.mse.loo), type="n",
-     xlab="Degree of polynomial, p",
-     ylab="Cross-Validated MSE")
-lines(1:10, cv.mse.10, lwd=2, lty=1, col=2, pch=16, type="b")
-lines(1:10, cv.mse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
-legend("topright", inset=0.02,
-       legend=c("10-Fold CV", "LOO CV"),
-       lwd=2, lty=2:1, col=3:2, pch=17:16)
+cv.mse.10 <- sapply(cv.auto.10, function(x)
+  x[["adj CV crit"]])
+cv.mse.loo <- sapply(cv.auto.loo, function(x)
+  x[["CV crit"]])
+plot(
+  c(1, 10),
+  range(cv.mse.10, cv.mse.loo),
+  type = "n",
+  xlab = "Degree of polynomial, p",
+  ylab = "Cross-Validated MSE"
+)
+lines(
+  1:10,
+  cv.mse.10,
+  lwd = 2,
+  lty = 1,
+  col = 2,
+  pch = 16,
+  type = "b"
+)
+lines(
+  1:10,
+  cv.mse.loo,
+  lwd = 2,
+  lty = 2,
+  col = 3,
+  pch = 17,
+  type = "b"
+)
+legend(
+  "topright",
+  inset = 0.02,
+  legend = c("10-Fold CV", "LOO CV"),
+  lwd = 2,
+  lty = 2:1,
+  col = 3:2,
+  pch = 17:16
+)
 ```
 
 Alternatively, we can use the `plot()` method for `"cvModList"` objects to compare the models, though with separate graphs for 10-fold and LOO CV:
@@ -237,7 +306,7 @@ In this example, 10-fold and LOO CV produce generally similar results, and also 
 
 The `Mroz` data set from the **carData** package [associated with @FoxWeisberg:2019] has been used by several authors to illustrate binary logistic regression; see, in particular @FoxWeisberg:2019. The data were originally drawn from the U.S. Panel Study of Income Dynamics and pertain to married women. Here are a few cases in the data set:
 ```{r Mroz-data}
-data("Mroz", package="carData")
+data("Mroz", package = "carData")
 head(Mroz, 3)
 tail(Mroz, 3)
 ```
@@ -253,11 +322,11 @@ The response variable in the logistic regression is `lfp`, labor-force participa
 
 We use the `glm()` function to fit a binary logistic regression to the `Mroz` data:
 ```{r Mroz-logistic-regresion}
-m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
+m.mroz <- glm(lfp ~ ., data = Mroz, family = binomial)
 summary(m.mroz)
 
-BayesRule(ifelse(Mroz$lfp == "yes", 1, 0), 
-          fitted(m.mroz, type="response"))
+BayesRule(ifelse(Mroz$lfp == "yes", 1, 0),
+          fitted(m.mroz, type = "response"))
 ```
 In addition to the usually summary output for a GLM, we show the result of applying the `BayesRule()` function from the **cv** package to predictions derived from the fitted model. Bayes rule, which predicts a "success" in a binary regression model when the fitted probability of success [i.e., $\phi = \Pr(y = 1)$] is $\widehat{\phi} \ge .5$ and a "failure" if $\widehat{\phi} \lt .5$.[^BayesRule] The first argument to `BayesRule()` is the binary {0, 1} response, and the second argument is the predicted probability of success. `BayesRule()` returns the proportion of predictions that are *in error*, as appropriate for a "cost" function. 
 
@@ -270,9 +339,12 @@ In this example, the fitted logistic regression incorrectly predicts 31% of the 
 The `"glm"` method for `cv()` is largely similar to the `"lm"` method, although the default algorithm, selected explicitly by `method="exact"`, refits the model with each fold removed (and is thus equivalent to `method="naive"` for `"lm"` models). For generalized linear models, `method="Woodbury"` or (for LOO CV) `method="hatvalues"` provide approximate results (see the last section of the vignette for details):
 
 ```{r cv-Mroz-10-fold}
-cv(m.mroz, criterion=BayesRule, seed=248)
+cv(m.mroz, criterion = BayesRule, seed = 248)
 
-cv(m.mroz, criterion=BayesRule, seed=248, method="Woodbury")
+cv(m.mroz,
+   criterion = BayesRule,
+   seed = 248,
+   method = "Woodbury")
 ```
 To ensure that the two methods use the same 10 folds, we specify the seed for R's random-number generator explicitly; here, and as is common in our experience, the `"exact"` and `"Woodbury"` algorithms produce nearly identical results. The CV estimates of prediction error are slightly higher than the estimate based on all of the cases.
 
@@ -280,23 +352,40 @@ The printed output includes a 95% confidence interval for the bias-adjusted Baye
 
 Here are results of applying LOO CV to the Mroz model, using both the exact and the approximate methods:
 ```{r cv-Mroz-LOO}
-cv(m.mroz, k="loo", criterion=BayesRule)
+cv(m.mroz, k = "loo", criterion = BayesRule)
 
-cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury")
+cv(m.mroz,
+   k = "loo",
+   criterion = BayesRule,
+   method = "Woodbury")
 
-cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues")
+cv(m.mroz,
+   k = "loo",
+   criterion = BayesRule,
+   method = "hatvalues")
 ```
 To the number of decimal digits shown, the three methods produce identical results for this example.
 
 As for linear models, we report some timings for the various `cv()` methods of computation in LOO CV as well as for the `cv.glm()` function from the **boot** package (which, recall, refits the model with each case removed, and thus is comparable to `cv()` with `method="exact"`):
 ```{r glm.timings, cache=TRUE}
 microbenchmark::microbenchmark(
-  hatvalues=cv(m.mroz, k="loo", criterion=BayesRule, method="hatvalues"),
-  Woodbury=cv(m.mroz, k="loo", criterion=BayesRule, method="Woodbury"),
-  exact=cv(m.mroz, k="loo", criterion=BayesRule),
-  cv.glm=boot::cv.glm(Mroz, m.mroz,
-               cost=BayesRule),
-  times=10)
+  hatvalues = cv(
+    m.mroz,
+    k = "loo",
+    criterion = BayesRule,
+    method = "hatvalues"
+  ),
+  Woodbury = cv(
+    m.mroz,
+    k = "loo",
+    criterion = BayesRule,
+    method = "Woodbury"
+  ),
+  exact = cv(m.mroz, k = "loo", criterion = BayesRule),
+  cv.glm = boot::cv.glm(Mroz, m.mroz,
+                        cost = BayesRule),
+  times = 10
+)
 ```
 There is a substantial time penalty associated with exact computations.
 
@@ -322,12 +411,12 @@ Following their use by @RaudenbushBryk:2002, data from the 1982 *High School and
 
 The HSB data are included in the `MathAchieve` and `MathAchSchool` data sets in the **nlme** package  [@PinheiroBates:2000]. `MathAchieve` includes individual-level data on 7185  students in 160 high schools, and `MathAchSchool` includes school-level data:
 ```{r HSB-data}
-data("MathAchieve", package="nlme")
+data("MathAchieve", package = "nlme")
 dim(MathAchieve)
 head(MathAchieve, 3)
 tail(MathAchieve, 3)
 
-data("MathAchSchool", package="nlme")
+data("MathAchSchool", package = "nlme")
 dim(MathAchSchool)
 head(MathAchSchool, 2)
 tail(MathAchSchool, 2)
@@ -341,9 +430,9 @@ Some data-management is required before fitting a mixed-effects model to the HSB
 library("dplyr")
 MathAchieve %>% group_by(School) %>%
   summarize(mean.ses = mean(SES)) -> Temp
-Temp <- merge(MathAchSchool, Temp, by="School")
+Temp <- merge(MathAchSchool, Temp, by = "School")
 HSB <- merge(Temp[, c("School", "Sector", "mean.ses")],
-             MathAchieve[, c("School", "SES", "MathAch")], by="School")
+             MathAchieve[, c("School", "SES", "MathAch")], by = "School")
 names(HSB) <- tolower(names(HSB))
 
 HSB$cses <- with(HSB, ses - mean.ses)
@@ -353,18 +442,21 @@ In the process, we created two new school-level variables: `meanses`, which is t
 Still following Fox and Weisberg, we proceed to use the `lmer()` function in the **lme4** package [@BatesEtAl:2015] to fit a mixed model for math achievement to the HSB data:
 ```{r HSB-lmer, cache=TRUE}
 library("lme4")
-hsb.lmer <- lmer(mathach ~ mean.ses*cses + sector*cses
-                   + (cses | school), data=HSB)
-summary(hsb.lmer, correlation=FALSE)
+hsb.lmer <- lmer(mathach ~ mean.ses * cses + sector * cses
+                 + (cses | school), data = HSB)
+summary(hsb.lmer, correlation = FALSE)
 ```
 
 We can then cross-validate at the cluster (i.e., school) level,
 ```{r HSB-lmer-CV-cluster, cache=TRUE}
-cv(hsb.lmer, k=10, clusterVariables="school", seed=5240)
+cv(hsb.lmer,
+   k = 10,
+   clusterVariables = "school",
+   seed = 5240)
 ```
 or at the case (i.e., student) level,
 ```{r HSB-lmer-CV-case, cache=TRUE}
-cv(hsb.lmer, seed=1575)
+cv(hsb.lmer, seed = 1575)
 ```
 For cluster-level CV, the `clusterVariables` argument tells `cv()` how the clusters are defined. Were there more than one clustering variable, say classes within schools, these would be provided as a character vector of variable names: `clusterVariables = c("school", "class")`. For cluster-level CV, the default is `k = "loo"`, that is, leave one cluster out at a time; we instead specify `k = 10` folds of clusters, each fold therefore comprising $160/10 = 16$ schools. 
 
@@ -373,14 +465,20 @@ If the `clusterVariables` argument is omitted, then case-level CV is employed, w
 There is also a `cv()` method for linear mixed models fit by the `lme()` function in the **nlme** package, and the arguments for `cv()` in this case are the same as for a model fit by `lmer()` or `glmer()`. We illustrate with the mixed model fit to the HSB data:
 ```{r hsb-lme, cache=TRUE}
 library("nlme")
-hsb.lme <- lme(mathach ~ mean.ses*cses + sector*cses,
-                 random = ~ cses | school, data=HSB,
-               control=list(opt="optim"))
+hsb.lme <- lme(
+  mathach ~ mean.ses * cses + sector * cses,
+  random = ~ cses | school,
+  data = HSB,
+  control = list(opt = "optim")
+)
 summary(hsb.lme)
 
-cv(hsb.lme, k=10, clusterVariables="school", seed=5240)
+cv(hsb.lme,
+   k = 10,
+   clusterVariables = "school",
+   seed = 5240)
 
-cv(hsb.lme, seed=1575)
+cv(hsb.lme, seed = 1575)
 ```
 We used the same random-number generator seeds as in the previous example cross-validating the model fit by `lmer()`, and so the same folds are employed in both cases.[^optimizer] The estimated covariance components and fixed effects in the summary output differ slightly between the `lmer()` and `lme()` solutions, although both functions seek to maximize the REML criterion. This is, of course, to be expected when different algorithms are used for numerical optimization.  To the precision reported, the cluster-level CV results for the `lmer()` and `lme()` models are identical, while the case-level CV results are very similar but not identical.
 
@@ -400,31 +498,28 @@ We start by generating the data, using parameters consistent with the descriptio
 
 ```{r data}
 # Parameters:
-set.seed(9693) 
+set.seed(9693)
 Nb <- 100     # number of groups
 Nw <- 5       # number of individuals within groups
 Bb <- 0       # between-group regression coefficient on group mean
-SDre <- 2.0   # between-group SD of random level relative to group mean of x
+SDre <-
+  2.0   # between-group SD of random level relative to group mean of x
 SDwithin <- 0.5  # within group SD
 Bw <- 1          # within group effect of x
 Ay <- 10         # intercept for response
 Ax <- 20         # starting level of x
-Nx <- Nw*10      # number of distinct x values
+Nx <- Nw * 10    # number of distinct x values
 
-Data <- data.frame(
-  group = factor(rep(1:Nb, each=Nw)),
-  x = Ax + rep(1:Nx, length.out = Nw*Nb)
-) |>
-  within(
-    {
-      xm  <- ave(x, group, FUN = mean) # within-group mean
-      y <- Ay +
-        Bb * xm +                    # contextual effect
-        Bw * (x - xm) +              # within-group effect
-        rnorm(Nb, sd=SDre)[group] +  # random level by group
-        rnorm(Nb*Nw, sd=SDwithin)    # random error within groups
-    }
-  )
+Data <- data.frame(group = factor(rep(1:Nb, each = Nw)),
+                   x = Ax + rep(1:Nx, length.out = Nw * Nb)) |>
+  within({
+    xm  <- ave(x, group, FUN = mean) # within-group mean
+    y <- Ay +
+      Bb * xm +                      # contextual effect
+      Bw * (x - xm) +                # within-group effect
+      rnorm(Nb, sd = SDre)[group] +  # random level by group
+      rnorm(Nb * Nw, sd = SDwithin)  # random error within groups
+  })
 ```
 
 Here is a scatterplot of the data for a representative group of 10 (without loss of generality, the first 10) of 100 students, showing the 95% concentration ellipse for each cluster:[^2]
@@ -437,10 +532,15 @@ Here is a scatterplot of the data for a representative group of 10 (without loss
 #| fig.cap = "Hierarchical data set, showing the first 10 of 100 students."
 library("lattice")
 library("latticeExtra")
-plot <- xyplot(y ~ x, data=Data[1:Nx, ], group=group,
-               ylim=c(4, 16),
-               par.settings=list(superpose.symbol=list(pch=1, cex=0.7))) +
-    layer(panel.ellipse(..., center.cex=0))
+plot <- xyplot(
+  y ~ x,
+  data = Data[1:Nx,],
+  group = group,
+  ylim = c(4, 16),
+  par.settings = list(superpose.symbol = list(pch = 1, cex =
+                                                0.7))
+) +
+  layer(panel.ellipse(..., center.cex = 0))
 plot # display graph
 ```
 
@@ -509,11 +609,23 @@ Predictions based on the random-intercept model `mod.0` for the first 10 student
 #| out.width = "100%",
 #| fig.height = 6,
 #| fig.cap = "Predictions from the random intercept model."
-(plot +
-  xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" & effect == "fe"),
-         groups=group, type="l", lwd=2) +
-  xyplot(fit ~ x, subset(Data_long, modelcode == "mod0" &  effect == "re"),
-         groups=group, type="l", lwd=2, lty=3)
+(
+  plot +
+    xyplot(
+      fit ~ x,
+      subset(Data_long, modelcode == "mod0" & effect == "fe"),
+      groups = group,
+      type = "l",
+      lwd = 2
+    ) +
+    xyplot(
+      fit ~ x,
+      subset(Data_long, modelcode == "mod0" &  effect == "re"),
+      groups = group,
+      type = "l",
+      lwd = 2,
+      lty = 3
+    )
 ) |> update(
   main="Model: y ~ 1 + (1 | group)",
   key=list(
@@ -536,11 +648,23 @@ Predictions from this model appear in the following graph:
 #| out.width = "100%",
 #| fig.height = 6,
 #| fig.cap = "Predictions from the model with random intercepts and $x$ as a fixed-effect predictor."
-(plot +
-  xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "fe"),
-         groups=group, type="l", lwd=2) +
-  xyplot(fit ~ x, subset(Data_long, modelcode == "mod1" & effect == "re"),
-         groups=group, type="l", lwd=2, lty=3)
+(
+  plot +
+    xyplot(
+      fit ~ x,
+      subset(Data_long, modelcode == "mod1" & effect == "fe"),
+      groups = group,
+      type = "l",
+      lwd = 2
+    ) +
+    xyplot(
+      fit ~ x,
+      subset(Data_long, modelcode == "mod1" & effect == "re"),
+      groups = group,
+      type = "l",
+      lwd = 2,
+      lty = 3
+    )
 ) |> update(
   main="Model: y ~ 1 + x + (1 | group)",
   ylim=c(-15, 35),
@@ -565,11 +689,23 @@ Predictions from model `mod.2` appear in the following graph:
 #| out.width = "100%",
 #| fig.height = 6,
 #| fig.cap = "Predictors from the model with random intercepts, $x$, and the group (student) mean of $x$ as predictors."
-(plot +
-  xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "fe"),
-         groups=group, type="l", lwd=2) +
-  xyplot(fit ~ x, subset(Data_long, modelcode == "mod2" & effect == "re"),
-         groups=group, type="l", lwd=2, lty=3)
+(
+  plot +
+    xyplot(
+      fit ~ x,
+      subset(Data_long, modelcode == "mod2" & effect == "fe"),
+      groups = group,
+      type = "l",
+      lwd = 2
+    ) +
+    xyplot(
+      fit ~ x,
+      subset(Data_long, modelcode == "mod2" & effect == "re"),
+      groups = group,
+      type = "l",
+      lwd = 2,
+      lty = 3
+    )
 ) |> update(
   main="Model: y ~ 1 + x + xm + (1 | group)",
   ylim=c(4, 16),
@@ -597,11 +733,23 @@ The predictions from `mod.3` are therefore similar to those from `mod.2`:
 #| out.width = "100%",
 #| fig.height = 6,
 #| fig.cap = "Predictions from the estimated model generating the data."
-(plot +
-  xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "fe"),
-         groups=group, type="l", lwd=2) +
-  xyplot(fit ~ x, subset(Data_long, modelcode == "mod3" & effect == "re"),
-         groups=group, type="l", lwd=2, lty=3)
+(
+  plot +
+    xyplot(
+      fit ~ x,
+      subset(Data_long, modelcode == "mod3" & effect == "fe"),
+      groups = group,
+      type = "l",
+      lwd = 2
+    ) +
+    xyplot(
+      fit ~ x,
+      subset(Data_long, modelcode == "mod3" & effect == "re"),
+      groups = group,
+      type = "l",
+      lwd = 2,
+      lty = 3
+    )
 ) |> update(
   main="Model: y ~ 1 + I(x - xm) + (1 | group)",
   ylim=c(4, 16),
@@ -617,18 +765,29 @@ We next carry out case-based cross-validation, which, as we have explained, is b
 #| out.width = "100%",
 #| fig.height = 6,
 #| fig.cap = "10-fold cluster-based cross-validation comparing random intercept models with varying fixed effects. The error bars show the 95% confidence interval around the CV estimate of the MSE for each model."
-modlist <- models("~ 1"=mod.0, "~ 1 + x"=mod.1, 
-                  "~ 1 + x + xm"=mod.2, "~ 1 + I(x - xm)"=mod.3)
-cvs_clusters <- cv(modlist, data=Data, cluster="group", k=10, seed=6449)
-plot(cvs_clusters, main="Model Comparison, Cluster-Based CV")
+modlist <- models(
+  "~ 1" = mod.0,
+  "~ 1 + x" = mod.1,
+  "~ 1 + x + xm" = mod.2,
+  "~ 1 + I(x - xm)" = mod.3
+)
+cvs_clusters <-
+  cv(
+    modlist,
+    data = Data,
+    cluster = "group",
+    k = 10,
+    seed = 6449
+  )
+plot(cvs_clusters, main = "Model Comparison, Cluster-Based CV")
 ```
 
 ```{r cross-validation-cases}
 #| out.width = "100%",
 #| fig.height = 6,
 #| fig.cap = "10-fold case-based cross-validation comparing random intercept models with varying fixed effects."
-cvs_cases <- cv(modlist, data=Data, seed=9693)
-plot(cvs_cases, main="Model Comparison, Case-Based CV")
+cvs_cases <- cv(modlist, data = Data, seed = 9693)
+plot(cvs_cases, main = "Model Comparison, Case-Based CV")
 ```
 
 In summary, model `mod.1`, with $x$ alone and without the contextual mean of $x$, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. Model `mod.2`, which includes both $x$ and its contextual mean, produces better results using both cluster-based and case-based CV. The data-generating model, `mod.3`, which includes the fixed effect of `x - xm` in place of separate terms in `x` and `xm`, isn't distinguishable from model `mod.2`, which includes `x` and `xm` separately, even though `mod.2` has an unnecessary parameter (recall that the population coefficient of `xm` is 0 when `x` is expressed as deviations from the contextual mean). These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
@@ -640,8 +799,8 @@ Crossed random effects arise when the structure of the data aren't strictly hier
 We'll illustrate with data on pig growth, introduced by @DiggleLiangZeger:1994 [Table 3.1]. The data are in the `Pigs` data frame in the **cv** package:
 ```{r pigs}
 head(Pigs, 9)
-head(xtabs(~ id + week, data=Pigs), 3)
-tail(xtabs(~ id + week, data=Pigs), 3)
+head(xtabs( ~ id + week, data = Pigs), 3)
+tail(xtabs( ~ id + week, data = Pigs), 3)
 ```
 Each of 48 pigs is observed weekly over a period of 9 weeks, with the weight of the pig recorded in kg. The data are in "long" format, as is appropriate for use with the `lmer()` function in the **lme4** package. The data are very regular, with no missing cases.
 
@@ -650,14 +809,23 @@ The following graph, showing the growth trajectories of the pigs, is similar to 
 #| out.width = "60%",
 #| fig.height = 6,
 #| fig.cap = "Growth trajectories for 48 pigs, with overall least-squares line (sold blue) and loess line (broken magenta)."
-plot(weight ~ week, data=Pigs, type="n")
-for (i in unique(Pigs$id)){
-  with(Pigs, lines(x=1:9, y=Pigs[id == i, "weight"],
-                   col="gray"))
+plot(weight ~ week, data = Pigs, type = "n")
+for (i in unique(Pigs$id)) {
+  with(Pigs, lines(
+    x = 1:9,
+    y = Pigs[id == i, "weight"],
+    col = "gray"
+  ))
 }
-abline(lm(weight ~ week, data=Pigs), col="blue", lwd=2)
-lines(with(Pigs, loess.smooth(week, weight, span=0.5)),
-      col="magenta", lty=2, lwd=2)
+abline(lm(weight ~ week, data = Pigs),
+       col = "blue",
+       lwd = 2)
+lines(
+  with(Pigs, loess.smooth(week, weight, span = 0.5)),
+  col = "magenta",
+  lty = 2,
+  lwd = 2
+)
 ```
 The individual "growth curves" and the overall trend are generally linear, with some tendency for variability of pig weight to increase over weeks (a feature of the data that we ignore in the mixed model that we fit to the data below). 
 
@@ -679,24 +847,32 @@ Although we might prefer an alternative model,[^pig-alternative] we think that t
 
 The **Stata** manual fits the mixed model by maximum likelihood (rather than REML), and we duplicate the results reported there using `lmer()`:
 ```{r pigs-lmer}
-m.p <- lmer(weight ~ week + (1 | id) + (1 | week),
-            data=Pigs, REML=FALSE, # i.e., ML
-            control=lmerControl(optimizer="bobyqa"))
+m.p <- lmer(
+  weight ~ week + (1 | id) + (1 | week),
+  data = Pigs,
+  REML = FALSE, # i.e., ML
+  control = lmerControl(optimizer = "bobyqa")
+)
 summary(m.p)
 ```
 We opt for the non-default `"bobyqa"` optimizer because it provides more numerically stable results for subsequent cross-validation in this example.
 
 We can then cross-validate the model by omitting folds composed of pigs, folds composed of weeks, or folds composed of pig-weeks (which in the `Pigs` data set correspond to individual cases, using only the fixed effects):
 ```{r pigs-cv}
-cv(m.p, clusterVariables="id")
+cv(m.p, clusterVariables = "id")
 
-cv(m.p, clusterVariables="week")
+cv(m.p, clusterVariables = "week")
 
-cv(m.p, clusterVariables=c("id", "week"), k=10, seed=8469)
+cv(
+  m.p,
+  clusterVariables = c("id", "week"),
+  k = 10,
+  seed = 8469
+)
 ```
 We can also cross-validate the individual cases taking account of the random effects (employing the same 10 folds):
 ```{r pigs-cv-cases}
-cv(m.p, k=10, seed=8469)
+cv(m.p, k = 10, seed = 8469)
 ```
 Because these predictions are based on BLUPs, they are more accurate than the predictions based only on fixed effects.[^crossed-vs-nested] As well, the difference between the MSE computed for the model fit to the full data and the CV estimates of the MSE is greater here than for cluster-based predictions.
 
@@ -712,8 +888,13 @@ Because the partition into folds that's employed is selected randomly, the resul
 Here, for example, is 10-fold CV for the Mroz logistic regression, repeated 5 times:
 
 ```{r mroz-reps}
-cv(m.mroz, criterion=BayesRule, seed=248, reps=5, 
-   method="Woodbury")
+cv(
+  m.mroz,
+  criterion = BayesRule,
+  seed = 248,
+  reps = 5,
+  method = "Woodbury"
+)
 ```
 When `reps` > `1`, the result returned by `cv()` is an object of class `"cvList"`---literally a list of `"cv"` objects. The results are reported for each repetition and then averaged across repetitions, with the standard deviations of the CV criterion and the biased-adjusted CV criterion given in parentheses. In this example, there is therefore little variation across repetitions, increasing our confidence in the reliability of the results. 
 
@@ -726,12 +907,58 @@ It's also possible to replicate CV when comparing competing models via the `cv()
 #| out.width = "100%",
 #| fig.height = 5,
 #| fig.cap = " Replicated cross-validated 10-fold CV as a function of polynomial degree, $p$"
-cv.auto.reps <- cv(models(m.1, m.2, m.3, m.4, m.5,
-                        m.6, m.7, m.8, m.9, m.10),
-                 data=Auto, seed=8004, reps=5)
+cv.auto.reps <- cv(
+  models(m.1, m.2, m.3, m.4, m.5,
+         m.6, m.7, m.8, m.9, m.10),
+  data = Auto,
+  seed = 8004,
+  reps = 5
+)
 plot(cv.auto.reps)
 ```
 The graph shows both the average CV criterion and its range for each of the competing models.
+
+## Manipulating "cv" and related objects
+
+The `cv()` functions returns an object of class `"cv"`---or a closely related object, for example, of class `"cvList"`---which contains a variety of information about the results of a CV procedure. The **cv** package provides `as.data.frame()` methods to put this information in the form of data frames for further examination and analysis. There is also a `summary()` method for extracting and summarizing the information in the resulting data frames.
+
+We'll illustrate with the replicated CV that we performed for the 10 polynomial-regression models fit to the `Auto` data:
+```{r recall-cv.auto.reps}
+cv.auto.reps
+class(cv.auto.reps)
+```
+In this case, there are 5 replications of 10-fold CV.
+
+Converting `cv.auto.reps` into a data frame produces, by default:
+```{r as.data.frame}
+D <- as.data.frame(cv.auto.reps)
+dim(D)
+class(D)
+```
+The resulting data frame has $\mathsf{replications} \times (\mathsf{folds} + 1) \times \mathsf{models} = 5 \times (10 + 1) \times 10 = 550$ rows, the first few of which are
+```{r}
+head(D)
+```
+All of these rows pertain to the first model and the first replication, and fold = 0 indicates the overall results for the first replication of the first model.
+
+The regression coefficients appear as columns in the data frame. Because the first model includes only an intercept and a linear polynomial term, the other coefficients are all `NA`.
+
+It's possible to suppress the regression coefficients by specifying the argument `columns="criteria"` to `as.data.frame()`:
+```{r }
+D <- as.data.frame(cv.auto.reps, columns="criteria")
+head(D)
+head(subset(D, fold == 0))
+```
+
+The `summary()` method for `"cvDataFrame"` and related objects has a formula interface, and may be used, for example, as follows:
+```{r summary.cvDataFrame}
+summary(D, adjusted.criterion ~ model + rep) # fold "0" only
+summary(D, criterion ~ model + rep, 
+        include="folds") # mean over folds
+summary(D, criterion ~ model + rep, fun=sd, 
+        include="folds")
+```
+See `?summary.cvDataFrame` for details.
 
 ## Cross-validating model selection
 
@@ -743,16 +970,14 @@ The following example is similar in spirit to one employed by @HastieTibshiraniF
 
 ```{r generate-selection-data}
 set.seed(24361) # for reproducibility
-D <- data.frame(
-  y = rnorm(1000, mean=10),
-  X = matrix(rnorm(1000*100), 1000, 100)
-)
+D <- data.frame(y = rnorm(1000, mean = 10),
+                X = matrix(rnorm(1000 * 100), 1000, 100))
 head(D[, 1:6])
 ```
 Least-squares provides accurate estimates of the regression constant $\alpha = 10$ and the error variance $\sigma^2 = 1$ for the "null model" including only the regression constant; moreover, the omnibus $F$-test of the correct null hypothesis that all of the $\beta$s are 0 for the "full model" with all 100 $x$s is associated with a large $p$-value:
 ```{r omnibus-F}
-m.full <- lm(y ~ ., data=D)
-m.null <- lm(y ~ 1, data=D)
+m.full <- lm(y ~ ., data = D)
+m.null <- lm(y ~ 1, data = D)
 anova(m.null, m.full)
 
 summary(m.null)
@@ -763,9 +988,12 @@ Next, using the `stepAIC()` function in the **MASS** package [@VenablesRipley:20
 
 ```{r forward-selection}
 library("MASS")  # for stepAIC()
-m.select <- stepAIC(m.null,
-                    direction="forward", trace=FALSE,
-                    scope=list(lower=~1, upper=formula(m.full)))
+m.select <- stepAIC(
+  m.null,
+  direction = "forward",
+  trace = FALSE,
+  scope = list(lower =  ~ 1, upper = formula(m.full))
+)
 summary(m.select)
 mse(D$y, fitted(m.select))
 ```
@@ -773,14 +1001,19 @@ The resulting model has 15 predictors, a very modest $R^2 = .044$, but a small $
 
 If we cross-validate the selected model, we also obtain an optimistic estimate of its predictive power (although the confidence interval for the bias-adjusted MSE includes 1):
 ```{r cv-selectedModel}
-cv(m.select, seed=2529)
+cv(m.select, seed = 2529)
 ```
 
 The `"function"` method of `cv()` allows us to cross-validate the whole model-selection procedure, where first argument to `cv()` is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The `selectStepAIC()` function, in the **cv** package and based on `stepAIC()`, is suitable for use with `cv()`:
 ```{r cvSelect-artificial-data, cache=TRUE}
-cv.select <- cv(selectStepAIC, data=D, seed=3791,
-                working.model=m.null, direction="forward",
-                scope=list(lower=~1, upper=formula(m.full)))
+cv.select <- cv(
+  selectStepAIC,
+  data = D,
+  seed = 3791,
+  working.model = m.null,
+  direction = "forward",
+  scope = list(lower =  ~ 1, upper = formula(m.full))
+)
 cv.select
 ```
 
@@ -805,41 +1038,74 @@ Previously, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regress
 #| out.width = "100%",
 #| fig.height = 5,
 #| fig.cap = "Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$ (repeated)"
-cv.mse.10 <- sapply(cv.auto.10, function(x) x[["adj CV crit"]])
-cv.mse.loo <- sapply(cv.auto.loo, function(x) x[["CV crit"]])
-plot(c(1, 10), range(cv.mse.10, cv.mse.loo), type="n",
-     xlab="Degree of polynomial, p",
-     ylab="Cross-Validated MSE")
-lines(1:10, cv.mse.10, lwd=2, lty=1, col=2, pch=16, type="b")
-lines(1:10, cv.mse.loo, lwd=2, lty=2, col=3, pch=17, type="b")
-legend("topright", inset=0.02,
-       legend=c("10-Fold CV", "LOO CV"),
-       lwd=2, lty=2:1, col=3:2, pch=17:16)
+cv.mse.10 <- sapply(cv.auto.10, function(x)
+  x[["adj CV crit"]])
+cv.mse.loo <- sapply(cv.auto.loo, function(x)
+  x[["CV crit"]])
+plot(
+  c(1, 10),
+  range(cv.mse.10, cv.mse.loo),
+  type = "n",
+  xlab = "Degree of polynomial, p",
+  ylab = "Cross-Validated MSE"
+)
+lines(
+  1:10,
+  cv.mse.10,
+  lwd = 2,
+  lty = 1,
+  col = 2,
+  pch = 16,
+  type = "b"
+)
+lines(
+  1:10,
+  cv.mse.loo,
+  lwd = 2,
+  lty = 2,
+  col = 3,
+  pch = 17,
+  type = "b"
+)
+legend(
+  "topright",
+  inset = 0.02,
+  legend = c("10-Fold CV", "LOO CV"),
+  lwd = 2,
+  lty = 2:1,
+  col = 3:2,
+  pch = 17:16
+)
 ```
 
 If we then select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
 
 Applying `selectModelList()` to the `Auto` polynomial-regression models, and using 10-fold CV, we obtain:
 ```{r recursive-CV-polynomials}
-recursiveCV.auto <- cv(selectModelList, Auto,
-                       working.model=models(m.1, m.2, m.3, m.4, m.5,
-                                            m.6, m.7, m.8, m.9, m.10),
-                       save.model=TRUE,
-                       seed=2120)
+recursiveCV.auto <- cv(
+  selectModelList,
+  Auto,
+  working.model = models(m.1, m.2, m.3, m.4, m.5,
+                         m.6, m.7, m.8, m.9, m.10),
+  save.model = TRUE,
+  seed = 2120
+)
 recursiveCV.auto
 recursiveCV.auto$selected.model
-cv(m.7, seed=2120) # same seed for same folds
+cv(m.7, seed = 2120) # same seed for same folds
 ```
 As expected, recursive CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model.
 
 We can equivalently call `cv()` with the list of models as the first argument and set `recursive=TRUE`:
 ```{r recursive-cv-alt}
-recursiveCV.auto.alt <- cv(models(m.1, m.2, m.3, m.4, m.5,
-                                  m.6, m.7, m.8, m.9, m.10),
-                           data=Auto,
-                           seed=2120,
-                           recursive=TRUE,
-                           save.model=TRUE)
+recursiveCV.auto.alt <- cv(
+  models(m.1, m.2, m.3, m.4, m.5,
+         m.6, m.7, m.8, m.9, m.10),
+  data = Auto,
+  seed = 2120,
+  recursive = TRUE,
+  save.model = TRUE
+)
 all.equal(recursiveCV.auto, recursiveCV.auto.alt)
 ```
 
@@ -853,27 +1119,30 @@ summary(m.mroz)
 
 Applying stepwise model selection Mroz's logistic regression, using BIC as the model-selection criterion (via the argument `k=log(nrow(Mroz))` to `stepAIC()`) selects 5 of the 7 original predictors:
 ```{r mroz-selection}
-m.mroz.sel <- stepAIC(m.mroz, k=log(nrow(Mroz)),
-                      trace=FALSE)
+m.mroz.sel <- stepAIC(m.mroz, k = log(nrow(Mroz)),
+                      trace = FALSE)
 summary(m.mroz.sel)
 BayesRule(Mroz$lfp == "yes",
-          predict(m.mroz.sel, type="response"))
+          predict(m.mroz.sel, type = "response"))
 ```
 Bayes rule applied to the selected model misclassifies 32% of the cases in the `Mroz` data. 
 
 Cross-validating the selected model produces a similar, slightly larger, estimate of misclassification, about 33%:
 ```{r cv-mroz-regression}
-cv(m.mroz.sel, criterion=BayesRule, seed=345266)
+cv(m.mroz.sel, criterion = BayesRule, seed = 345266)
 ```
 Is this estimate of predictive performance optimistic?
 
 We proceed to apply the model-selection procedure by cross-validation, producing more or less the same result:
 ```{r cv-mroz-selection}
-m.mroz.sel.cv <- cv(selectStepAIC, Mroz, 
-                    seed=6681,
-                    criterion=BayesRule,
-                    working.model=m.mroz,
-                    AIC=FALSE)
+m.mroz.sel.cv <- cv(
+  selectStepAIC,
+  Mroz,
+  seed = 6681,
+  criterion = BayesRule,
+  working.model = m.mroz,
+  AIC = FALSE
+)
 m.mroz.sel.cv
 ```
 Setting `AIC=FALSE` in the call to `cv()` uses the BIC rather than the AIC as the model-selection criterion. As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using `compareFolds()`:
@@ -892,7 +1161,7 @@ Selecting transformations analytically raises the possibility of automating the 
 
 To illustrate, we adapt an example appearing in several places in @FoxWeisberg:2019 (for example in Chapter 3 on transforming data), using data on the prestige and other characteristics of 102 Canadian occupations circa 1970. The data are in the `Prestige` data frame in the **carData** package:
 ```{r Prestige-data}
-data("Prestige", package="carData")
+data("Prestige", package = "carData")
 head(Prestige)
 summary(Prestige)
 ```
@@ -912,13 +1181,17 @@ A scatterplot matrix (using the `scatterplotMatrix()` function in the **car** pa
 #| fig.height = 6,
 #| fig.cap = "Scatterplot matrix for the `Prestige` data."
 library("car")
-scatterplotMatrix(~ prestige + income + education + women,
-                  data=Prestige, smooth=list(spread=FALSE))
+scatterplotMatrix(
+  ~ prestige + income + education + women,
+  data = Prestige,
+  smooth = list(spread = FALSE)
+)
 ```
 The `powerTransform()` function in the **car** package transforms variables towards multivariate normality by a generalization of Box and Cox's maximum-likelihood-like approach [@BoxCox:1964]. Several "families" of power transformations can be used, including the original Box-Cox family, simple powers (and roots), and two adaptations of the Box-Cox family to data that may include negative values and zeros: the Box-Cox-with-negatives family and the Yeo-Johnson family; see @Weisberg:2014 [Chap. 8], and @FoxWeisberg:2019 [Chap. 3] for details. Because `women` has some zero values, we use the Yeo-Johnson family:
 ```{r power-transform-Prestige}
-trans <- powerTransform( cbind(income, education, women) ~ 1,
-                         data=Prestige, family="yjPower")
+trans <- powerTransform(cbind(income, education, women) ~ 1,
+                        data = Prestige,
+                        family = "yjPower")
 summary(trans)
 ```
 We thus have evidence of the desirability of transforming `income` (by the $1/3$ power) and `women` (by the $0.16$ power---which is close to the "0" power, i.e., the log transformation), but not `education`. Applying the "rounded" power transformations makes the predictors better-behaved:
@@ -929,18 +1202,21 @@ We thus have evidence of the desirability of transforming `income` (by the $1/3$
 P <- Prestige[, c("prestige", "income", "education", "women")]
 (lambdas <- trans$roundlam)
 names(lambdas) <- c("income", "education", "women")
-for (var in c("income", "education", "women")){
-  P[, var] <- yjPower(P[, var], lambda=lambdas[var])
+for (var in c("income", "education", "women")) {
+  P[, var] <- yjPower(P[, var], lambda = lambdas[var])
 }
 summary(P)
 
-scatterplotMatrix(~ prestige + income + education + women,
-                  data=P, smooth=list(spread=FALSE))
+scatterplotMatrix(
+  ~ prestige + income + education + women,
+  data = P,
+  smooth = list(spread = FALSE)
+)
 ```
 Comparing the MSE for the regressions with the original and transformed predictors shows a advantage to the latter:
 ```{r prestige-regressions}
-m.pres <- lm(prestige ~ income + education + women, data=Prestige)
-m.pres.trans <- lm(prestige ~ income + education + women, data=P)
+m.pres <- lm(prestige ~ income + education + women, data = Prestige)
+m.pres.trans <- lm(prestige ~ income + education + women, data = P)
 mse(Prestige$prestige, fitted(m.pres))
 mse(P$prestige, fitted(m.pres.trans))
 ```
@@ -961,20 +1237,29 @@ summary(powerTransform(m.pres.trans))
 
 The `selectTrans()` function in the **cv** package automates the process of selecting predictor and response transformations. The function takes a `data` set and "working" `model` as arguments, along with the candidate `predictors` and `response` for transformation, and the transformation `family` to employ. If the `predictors` argument is missing then only the response is transformed, and if the `response` argument is missing, only the supplied predictors are transformed. The default `family` for transforming the predictors is `"bcPower"`---the original Box-Cox family---as is the default `family.y` for transforming the response; here we specify `family="yjPower` because of the zeros in `women`. `selectTrans()` returns the result of applying a lack-of-fit criterion to the model after the selected transformation is applied, with the default `criterion=mse`:
 ```{r selectTrans}
-selectTrans(data=Prestige, model=m.pres,
-            predictors=c("income", "education", "women"),
-            response="prestige", family="yjPower")
+selectTrans(
+  data = Prestige,
+  model = m.pres,
+  predictors = c("income", "education", "women"),
+  response = "prestige",
+  family = "yjPower"
+)
 ```
 `selectTrans()` also takes an optional `indices` argument, making it suitable for doing computations on a subset of the data (i.e., a CV fold), and hence for use with `cv()` (see `?selectTrans` for details):
 
 ```{r cv-select-transformations}
-cvs <- cv(selectTrans, data=Prestige, 
-          working.model=m.pres, seed=1463,
-          predictors=c("income", "education", "women"),
-          response="prestige", family="yjPower")
+cvs <- cv(
+  selectTrans,
+  data = Prestige,
+  working.model = m.pres,
+  seed = 1463,
+  predictors = c("income", "education", "women"),
+  response = "prestige",
+  family = "yjPower"
+)
 cvs
 
-cv(m.pres, seed=1463) # untransformed model with same folds
+cv(m.pres, seed = 1463) # untransformed model with same folds
 
 compareFolds(cvs)
 ```
@@ -992,9 +1277,9 @@ Alternatively, if we're able to automate the process of model selection, then we
 To illustrate this process, we return to the `Auto` data set:
 ```{r Auto-redux}
 summary(Auto)
-xtabs(~ year, data=Auto)
-xtabs(~ origin, data=Auto)
-xtabs(~ cylinders, data=Auto)
+xtabs( ~ year, data = Auto)
+xtabs( ~ origin, data = Auto)
+xtabs( ~ cylinders, data = Auto)
 ```
 We previously used the `Auto` here in a preliminary example where we employed CV to inform the selection of the order of a polynomial regression of `mpg` on `horsepower`. Here, we consider more generally the problem of predicting `mpg` from the other variables in the `Auto` data. We begin with a bit of data management, and then examine the pairwise relationships among the numeric variables in the data set:
 ```{r Auto-explore}
@@ -1002,15 +1287,18 @@ We previously used the `Auto` here in a preliminary example where we employed CV
 #| fig.height = 7,
 #| fig.cap = "Scatterplot matrix for the numeric variables in the `Auto` data"
 Auto$cylinders <- factor(Auto$cylinders,
-                         labels=c("3.4", "3.4", "5.6", "5.6", "8"))
+                         labels = c("3.4", "3.4", "5.6", "5.6", "8"))
 Auto$year <- as.factor(Auto$year)
 Auto$origin <- factor(Auto$origin,
-                      labels=c("America", "Europe", "Japan"))
-rownames(Auto) <- make.names(Auto$name, unique=TRUE)
+                      labels = c("America", "Europe", "Japan"))
+rownames(Auto) <- make.names(Auto$name, unique = TRUE)
 Auto$name <- NULL
 
-scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
-                  smooth=list(spread=FALSE), data=Auto)
+scatterplotMatrix(
+  ~ mpg + displacement + horsepower + weight + acceleration,
+  smooth = list(spread = FALSE),
+  data = Auto
+)
 ```
 A comment before we proceed: `origin` is clearly categorical and so converting it to a factor is natural, but we could imagine treating `cylinders` and `year` as numeric predictors. There are, however, only 5 distinct values of `cylinders` (ranging from 3 to 8), but cars with 3 or 5 cylinders are rare. and none of the cars has 7 cylinders. There are similarly only 13 distinct years between 1970 and 1982 in the data, and the relationship between `mpg` and `year` is difficult to characterize.[^year] It's apparent that most these variables are positively skewed and that many of the pairwise relationships among them are nonlinear.
 
@@ -1032,7 +1320,8 @@ The component+residual plots, created with the `crPlots()` function in the previ
 
 We proceed to transform the numeric predictors towards multi-normality: 
 ```{r Auto-transform}
-num.predictors <- c("displacement", "horsepower", "weight", "acceleration")
+num.predictors <-
+  c("displacement", "horsepower", "weight", "acceleration")
 tr.x <- powerTransform(Auto[, num.predictors])
 summary(tr.x)
 ```
@@ -1040,12 +1329,12 @@ We then apply the (rounded) transformations---all, as it turns out, logs---to th
 ```{r Auto-with-transformed-predictors}
 A <- Auto
 powers <- tr.x$roundlam
-for (pred in num.predictors){
-  A[, pred] <- bcPower(A[, pred], lambda=powers[pred])
+for (pred in num.predictors) {
+  A[, pred] <- bcPower(A[, pred], lambda = powers[pred])
 }
 head(A)
 
-m <- update(m.auto, data=A)
+m <- update(m.auto, data = A)
 ```
 Finally, we perform Box-Cox regression to transform the response (also obtaining a log transformation):
 ```{r Auto-Box-Cox}
@@ -1062,9 +1351,12 @@ The transformed numeric variables are much better-behaved:
 #| out.width = "100%",
 #| fig.height = 7,
 #| fig.cap = "Scatterplot matrix for the transformed numeric variables in the `Auto` data"
-scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight 
-                  + acceleration, 
-                  smooth=list(spread=FALSE), data=A)
+scatterplotMatrix(
+  ~ log(mpg) + displacement + horsepower + weight
+  + acceleration,
+  smooth = list(spread = FALSE),
+  data = A
+)
 ```
 And the partial relationships in the model fit to the transformed data are much more nearly linear:
 ```{r Auto-CR-plots-transformed}
@@ -1098,9 +1390,16 @@ medAbsErr(Auto$mpg, fitted(m.auto))
 Now let's use `cv()` with `selectTransAndStepAIC()` to automate and cross-validate the whole model-specification process:
 ```{r Auto-transform-and-select}
 num.predictors
-cvs <- cv(selectTransStepAIC, data=Auto, seed=76692, 
-          working.model=m.auto, predictors=num.predictors,
-          response="mpg", AIC=FALSE, criterion=medAbsErr)
+cvs <- cv(
+  selectTransStepAIC,
+  data = Auto,
+  seed = 76692,
+  working.model = m.auto,
+  predictors = num.predictors,
+  response = "mpg",
+  AIC = FALSE,
+  criterion = medAbsErr
+)
 cvs
 
 compareFolds(cvs)
@@ -1121,18 +1420,28 @@ The CV functions in the **cv** package are all capable of performing parallel co
 
 To illustrate, let's time model selection in Mroz's logistic regression, repeating the computation as performed previously and then doing it in parallel using 2 cores:
 ```{r parallel-computation}
-system.time(m.mroz.sel.cv <- cv(selectStepAIC, Mroz,
-                          seed=6681,
-                          criterion=BayesRule,
-                          working.model=m.mroz,
-                          AIC=FALSE))
+system.time(
+  m.mroz.sel.cv <- cv(
+    selectStepAIC,
+    Mroz,
+    seed = 6681,
+    criterion = BayesRule,
+    working.model = m.mroz,
+    AIC = FALSE
+  )
+)
 
-system.time(m.mroz.sel.cv.p <- cv(selectStepAIC, Mroz,
-                          seed=6681,
-                          criterion=BayesRule,
-                          working.model=m.mroz,
-                          AIC=FALSE,
-                          ncores=2))
+system.time(
+  m.mroz.sel.cv.p <- cv(
+    selectStepAIC,
+    Mroz,
+    seed = 6681,
+    criterion = BayesRule,
+    working.model = m.mroz,
+    AIC = FALSE,
+    ncores = 2
+  )
+)
 all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
 ```
 

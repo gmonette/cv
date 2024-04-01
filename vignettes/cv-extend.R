@@ -55,25 +55,33 @@ head(BEPS)
 
 ## ----BEPS-model---------------------------------------------------------------
 library("nnet")
-m.beps <- multinom(vote ~ age + gender + economic.cond.national +
-                       economic.cond.household + Blair + Hague + Kennedy +
-                       Europe*political.knowledge, data=BEPS)
+m.beps <- multinom(
+  vote ~ age + gender + economic.cond.national +
+    economic.cond.household + Blair + Hague + Kennedy +
+    Europe * political.knowledge,
+  data = BEPS
+)
 
 car::Anova(m.beps)
 
 ## ----BEPS-plot, fig.width=9, fig.height=5-------------------------------------
-plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
-            xlevels=list(Europe=1:11, political.knowledge=0:3),
-            fixed.predictors=list(given.values=c(gendermale=0.5))),
-     lines=list(col=c("blue", "red", "orange")),
-     axes=list(x=list(rug=FALSE), y=list(style="stacked")))
+plot(
+  effects::Effect(
+    c("Europe", "political.knowledge"),
+    m.beps,
+    xlevels = list(Europe = 1:11, political.knowledge = 0:3),
+    fixed.predictors = list(given.values = c(gendermale = 0.5))
+  ),
+  lines = list(col = c("blue", "red", "orange")),
+  axes = list(x = list(rug = FALSE), y = list(style = "stacked"))
+)
 
 ## ----BayesRuleMulti-----------------------------------------------------------
 head(BEPS$vote)
-yhat <- predict(m.beps, type="class")
+yhat <- predict(m.beps, type = "class")
 head(yhat)
 
-BayesRuleMulti <- function(y, yhat){
+BayesRuleMulti <- function(y, yhat) {
   result <- mean(y != yhat)
   attr(result, "casewise loss") <- "y != yhat"
   result
@@ -98,68 +106,183 @@ head(GetResponse(m.beps))
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
 
 ## ----cv.nultinom--------------------------------------------------------------
-cv.multinom <- function (model, data, criterion=BayesRuleMulti, k, reps,
-                         seed, ...){
-  NextMethod(type="class", criterion=criterion)
-}
+cv.multinom <-
+  function (model, data, criterion = BayesRuleMulti, k, reps,
+            seed, ...) {
+    model <- update(model, trace = FALSE)
+    NextMethod(
+      type = "class",
+      criterion = criterion,
+      criterion.name = deparse(substitute(criterion))
+    )
+  }
 
 ## ----BEPS-cv------------------------------------------------------------------
-m.beps <- update(m.beps, trace=FALSE)
+cv(m.beps, seed=3465)
+
+## ----cv.multinom-alternative--------------------------------------------------
+cv.multinom <- function(model,
+                        data = insight::get_data(model),
+                        criterion = BayesRuleMulti,
+                        k = 10,
+                        reps = 1,
+                        seed = NULL,
+                        details = k <= 10,
+                        confint = n >= 400,
+                        level = 0.95,
+                        ncores = 1,
+                        start = FALSE,
+                        ...) {
+  f <- function(i) {
+    # helper function to compute to compute fitted values,
+    #  etc., for each fold i
+    
+    indices.i <- fold(folds, i)
+    model.i <- if (start) {
+      update(model,
+             data = data[-indices.i,],
+             start = b,
+             trace = FALSE)
+    } else {
+      update(model, data = data[-indices.i,], trace = FALSE)
+    }
+    fit.all.i <- predict(model.i, newdata = data, type = "class")
+    fit.i <- fit.all.i[indices.i]
+    # returns:
+    #  fit.i: fitted values for the i-th fold
+    #  crit.all.i: CV criterion for all cases based on model with
+    #              i-th fold omitted
+    #  coef.i: coefficients for the model with i-th fold omitted
+    list(
+      fit.i = fit.i,
+      crit.all.i = criterion(y, fit.all.i),
+      coef.i = coef(model.i)
+    )
+  }
+  
+  fPara <- function(i, multinom, ...) {
+    # helper function for parallel computation
+    #   argument multinom makes multinom() locally available
+    #   ... is necessary but not used
+    indices.i <- fold(folds, i)
+    model.i <- if (start) {
+      update(model,
+             data = data[-indices.i,],
+             start = b,
+             trace = FALSE)
+    } else {
+      update(model, data = data[-indices.i,], trace = FALSE)
+    }
+    fit.all.i <- predict(model.i, newdata = data, type = "class")
+    fit.i <- fit.all.i[indices.i]
+    list(
+      fit.i = fit.i,
+      crit.all.i = criterion(y, fit.all.i),
+      coef.i = coef(model.i)
+    )
+  }
+  
+  n <- nrow(data)
+  
+  # see ?cvCompute for definitions of arguments
+  cvCompute(
+    model = model,
+    data = data,
+    criterion = criterion,
+    criterion.name = deparse(substitute(criterion)),
+    k = k,
+    reps = reps,
+    seed = seed,
+    details = details,
+    confint = confint,
+    level = level,
+    ncores = ncores,
+    type = "class",
+    start = start,
+    f = f,
+    fPara = fPara,
+    multinom = nnet::multinom
+  )
+}
+
+## ----BEPS-cv-alt-version------------------------------------------------------
 cv(m.beps, seed=3465)
 
 ## ----cv.lme-------------------------------------------------------------------
 cv:::cv.lme
 
 ## ----GetResponse.glmmPQL------------------------------------------------------
-GetResponse.glmmPQL <- function(model, ...){
+GetResponse.glmmPQL <- function(model, ...) {
   f <- formula(model)
   f[[3]] <- 1 # regression constant only on RHS
-  model <- suppressWarnings(glm(f, data=model$data, family=model$family,
-                                control=list(maxit=1)))
+  model <-
+    suppressWarnings(glm(
+      f,
+      data = model$data,
+      family = model$family,
+      control = list(maxit = 1)
+    ))
   cv::GetResponse(model)
 }
 
 ## ----cv.glmmPQL---------------------------------------------------------------
-cv.glmmPQL <- function(model, data = model$data, criterion = mse,
-                     k, reps = 1, seed, ncores = 1, clusterVariables, 
-                     blups=coef, fixed.effects=nlme::fixef, ...){
+cv.glmmPQL <- function(model,
+                       data = model$data,
+                       criterion = mse,
+                       k,
+                       reps = 1,
+                       seed,
+                       ncores = 1,
+                       clusterVariables,
+                       blups = coef,
+                       fixed.effects = nlme::fixef,
+                       ...) {
   cvMixed(
     model,
-    package="MASS",
-    data=data,
-    criterion=criterion,
-    k=k,
-    reps=reps,
-    seed=seed,
-    ncores=ncores,
-    clusterVariables=clusterVariables,
-    predict.clusters.args=list(object=model,
-                               newdata=data,
-                               level=0,
-                               type="response"),
-    predict.cases.args=list(object=model,
-                            newdata=data,
-                            level=1,
-                            type="response"),
-    blups=blups,
-    fixed.effects=fixed.effects,
-    verbose=FALSE,
-    ...)
+    package = "MASS",
+    data = data,
+    criterion = criterion,
+    k = k,
+    reps = reps,
+    seed = seed,
+    ncores = ncores,
+    clusterVariables = clusterVariables,
+    predict.clusters.args = list(
+      object = model,
+      newdata = data,
+      level = 0,
+      type = "response"
+    ),
+    predict.cases.args = list(
+      object = model,
+      newdata = data,
+      level = 1,
+      type = "response"
+    ),
+    blups = blups,
+    fixed.effects = fixed.effects,
+    verbose = FALSE,
+    ...
+  )
 }
 
 ## ----glmmPQL-example----------------------------------------------------------
 library("MASS")
-m.pql <- glmmPQL(y ~ trt + I(week > 2), random = ~ 1 | ID,
-             family = binomial, data = bacteria)
+m.pql <- glmmPQL(
+  y ~ trt + I(week > 2),
+  random = ~ 1 | ID,
+  family = binomial,
+  data = bacteria
+)
 summary(m.pql)
 
 ## ----compare-to-lme4----------------------------------------------------------
 library("lme4")
 m.glmer <- glmer(y ~ trt + I(week > 2) + (1 | ID),
-               family = binomial, data = bacteria)
+                 family = binomial, data = bacteria)
 summary(m.glmer)
 
-  # comparison of fixed effects:
+# comparison of fixed effects:
 car::compareCoefs(m.pql, m.glmer) 
 
 ## ----swiss--------------------------------------------------------------------
@@ -189,62 +312,69 @@ summary(m.best)
 cv(m.best, seed=8433) # use same folds as before
 
 ## ----selectSubsets------------------------------------------------------------
-selectSubsets <- function(data=insight::get_data(model), 
+selectSubsets <- function(data = insight::get_data(model),
                           model,
                           indices,
-                          criterion=mse,
-                          details=TRUE, 
+                          criterion = mse,
+                          details = TRUE,
                           seed,
-                          save.model=FALSE, 
-                          ...){
-  
-  if (inherits(model, "lm", which=TRUE) != 1)
+                          save.model = FALSE,
+                          ...) {
+  if (inherits(model, "lm", which = TRUE) != 1)
     stop("selectSubsets is appropriate only for 'lm' models")
   
   y <- GetResponse(model)
   formula <- formula(model)
   X <- model.matrix(model)
-
+  
   if (missing(indices)) {
-    if (missing(seed) || is.null(seed)) seed <- sample(1e6, 1L)
+    if (missing(seed) || is.null(seed))
+      seed <- sample(1e6, 1L)
     # select the best model from the full data by BIC
-    sel <- leaps::regsubsets(formula, data=data, ...)
+    sel <- leaps::regsubsets(formula, data = data, ...)
     bics <- summary(sel)$bic
     best <- coef(sel, 1:length(bics))[[which.min(bics)]]
     x.names <- names(best)
     # fit the best model; intercept is already in X, hence - 1:
-    m.best <- lm(y ~ X[, x.names] - 1) 
-    fit.all <- predict(m.best, newdata=data)
+    m.best <- lm(y ~ X[, x.names] - 1)
+    fit.all <- predict(m.best, newdata = data)
     return(list(
       criterion = criterion(y, fit.all),
-      model = if (save.model) m.best else NULL # return best model
-      ))
+      model = if (save.model)
+        m.best # return best model
+      else
+        NULL
+    ))
   }
-
+  
   # select the best model omitting the i-th fold (given by indices)
-  sel.i <- leaps::regsubsets(formula, data[-indices, ], ...)
+  sel.i <- leaps::regsubsets(formula, data[-indices,], ...)
   bics.i <- summary(sel.i)$bic
   best.i <- coef(sel.i, 1:length(bics.i))[[which.min(bics.i)]]
   x.names.i <- names(best.i)
   m.best.i <- lm(y[-indices] ~ X[-indices, x.names.i] - 1)
-              # predict() doesn't work here:
+  # predict() doesn't work here:
   fit.all.i <- as.vector(X[, x.names.i] %*% coef(m.best.i))
   fit.i <- fit.all.i[indices]
-  # return the fitted values for i-th fold, CV criterion for all cases, 
+  # return the fitted values for i-th fold, CV criterion for all cases,
   #   and the regression coefficients
-  list(fit.i=fit.i, # fitted values for i-th fold
-       crit.all.i=criterion(y, fit.all.i), # CV crit for all cases
-       coefficients = if (details){ # regression coefficients
-         coefs <- coef(m.best.i)
-         
-         # fix coefficient names
-         names(coefs) <- sub("X\\[-indices, x.names.i\\]", "",
-                             names(coefs))
-         
-         coefs
-       }  else {
-         NULL
-       }
+  list(
+    fit.i = fit.i,
+    # fitted values for i-th fold
+    crit.all.i = criterion(y, fit.all.i),
+    # CV crit for all cases
+    coefficients = if (details) {
+      # regression coefficients
+      coefs <- coef(m.best.i)
+      
+      # fix coefficient names
+      names(coefs) <- sub("X\\[-indices, x.names.i\\]", "",
+                          names(coefs))
+      
+      coefs
+    }  else {
+      NULL
+    }
   )
 }
 
@@ -255,8 +385,12 @@ selectSubsets(model=m.swiss)
 selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 
 ## ----cvSelect-selectSubsets---------------------------------------------------
-(cv.swiss <- cvSelect(selectSubsets, model=m.swiss,
-                      data=swiss, seed=8433)) # use same folds
+(cv.swiss <- cvSelect(
+  selectSubsets,
+  model = m.swiss,
+  data = swiss,
+  seed = 8433 # use same folds
+))
 
 ## ----best-models-by-folds-----------------------------------------------------
 compareFolds(cv.swiss)
@@ -264,19 +398,29 @@ compareFolds(cv.swiss)
 ## -----------------------------------------------------------------------------
 AUC <- function(y, yhat = seq_along(y)) {
   s <- sum(y)
-  if (s == 0) return(0)
-  if (s == length(y)) return(1)
+  if (s == 0)
+    return(0)
+  if (s == length(y))
+    return(1)
   Metrics::auc(y, yhat)
 }
 
 ## -----------------------------------------------------------------------------
 Ymat <- function(n_v, exclude_identical = FALSE) {
-  stopifnot(n_v > 0 && round(n_v) == n_v)    # n_v must be a positive integer
-  ret <- sapply(0:(2^n_v - 1),
-                function(x) as.integer(intToBits(x)) )[1:n_v, ]
-  ret <- if (is.matrix(ret)) t(ret) else matrix(ret)
+  stopifnot(n_v > 0 &&
+              round(n_v) == n_v)    # n_v must be a positive integer
+  ret <- sapply(0:(2 ^ n_v - 1),
+                function(x)
+                  as.integer(intToBits(x)))[1:n_v,]
+  ret <- if (is.matrix(ret))
+    t(ret)
+  else
+    matrix(ret)
   colnames(ret) <- paste0("y", 1:ncol(ret))
-  if (exclude_identical) ret[-c(1, nrow(ret)), ] else ret
+  if (exclude_identical)
+    ret[-c(1, nrow(ret)),]
+  else
+    ret
 }
 
 ## -----------------------------------------------------------------------------
@@ -289,19 +433,20 @@ Ymat(3, exclude_identical = TRUE)
 cbind(Ymat(3), AUC = apply(Ymat(3), 1, AUC))
 
 ## -----------------------------------------------------------------------------
-resids <- function(n_v, exclude_identical = FALSE, 
+resids <- function(n_v,
+                   exclude_identical = FALSE,
                    tol = sqrt(.Machine$double.eps)) {
   Y <- Ymat(n_v, exclude_identical = exclude_identical)
   AUC <- apply(Y, 1, AUC)
-  X <- cbind(1-Y, Y)
+  X <- cbind(1 - Y, Y)
   opts <- options(warn = -1)
   on.exit(options(opts))
   fit <- lsfit(X, AUC, intercept = FALSE)
   ret <- max(abs(residuals(fit)))
-  if(ret < tol){
+  if (ret < tol) {
     ret <- 0
     solution <- coef(fit)
-    names(solution) <- paste0("c(", c(1:n_v, 1:n_v), ",", 
+    names(solution) <- paste0("c(", c(1:n_v, 1:n_v), ",",
                               rep(0:1, each = n_v), ")")
     attr(ret, "solution") <- zapsmall(solution)
   }
