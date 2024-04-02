@@ -65,7 +65,10 @@ cv.auto.coef <- as.data.frame(cv.auto, columns="coefficients") |>
          horsepower = coef.horsepower)
 
 dataEllipse(horsepower ~ Intercept, data=cv.auto.coef,
-            levels = 0.68, pch = 15)
+            levels = 0.68, pch = 15,
+            xlim = c(39, 40.5),
+            ylim = c(-0.164, -0.150),
+            main = "CV coefficients for folds and confidence ellipse")
 # show the overall estimate
 points(cv.auto.coef[1, "Intercept"], cv.auto.coef[1, "horsepower"],
        pch = "+", cex = 2)
