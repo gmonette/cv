@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-03-11" />
+<meta name="date" content="2024-04-01" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-03-11</h4>
+<h4 class="date">2024-04-01</h4>
 
 
 
@@ -477,7 +477,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x12c2d7ba0&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x11606f468&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -1141,7 +1141,7 @@ illustrated in the principal vignette for the package.</p>
 a CV model-selection procedure. To see the code for this function, type
 <code>cv::selectStepAIC</code> at the R command prompt, or examine the
 sources for the <strong>cv</strong> package at <a href="https://github.com/gmonette/cv" class="uri">https://github.com/gmonette/cv</a> (the code for
-<code>selectStepAIC()</code> is in <a href="https://github.com/gmonette/cv/blob/main/R/cvSelect.R" class="uri">https://github.com/gmonette/cv/blob/main/R/cvSelect.R</a>).</p>
+<code>selectStepAIC()</code> is in <a href="https://github.com/gmonette/cv/blob/main/R/cv-select.R" class="uri">https://github.com/gmonette/cv/blob/main/R/cv-select.R</a>).</p>
 <p>Another approach to model selection is all-subsets regression. The
 <code>regsubsets()</code> function in the <strong>leaps</strong> package
 <span class="citation">(Lumley &amp; Miller, 2020)</span> implements an
