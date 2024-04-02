@@ -317,12 +317,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 478757</span></span>
+<span><span class="co">#&gt; R RNG seed set to 752460</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.277</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.261</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.296</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.279</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity to update the
@@ -393,11 +393,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq      mean   median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   2.6395   2.8643    2.9887   2.9918    3.0365    3.4109    10</span></span>
-<span><span class="co">#&gt;   Woodbury  26.3273  27.0871   27.6818  27.7756   28.1424   28.9695    10</span></span>
-<span><span class="co">#&gt;      naive 554.5564 560.5730  601.9259 571.8729  582.4379  861.7151    10</span></span>
-<span><span class="co">#&gt;     cv.glm 925.6928 949.5058 1019.0975 966.4277 1100.2874 1197.9009    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.664    2.8496    3.0126    2.9994    3.2675    3.3878    10</span></span>
+<span><span class="co">#&gt;   Woodbury   26.884   28.2363   32.0099   30.9198   33.7384   40.3487    10</span></span>
+<span><span class="co">#&gt;      naive  623.132  647.7243  773.7880  753.9340  896.3475  970.9450    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1103.482 1186.5516 1302.2041 1263.8842 1408.0595 1601.4563    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -791,11 +791,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    2.7804    2.9904    3.1023    3.0642    3.2314    3.5112    10</span></span>
-<span><span class="co">#&gt;   Woodbury   85.0366   85.3005   88.5875   88.4977   88.6519   98.9368    10</span></span>
-<span><span class="co">#&gt;      exact 3901.6769 4003.1104 4127.9247 4056.0741 4148.3910 4804.0990    10</span></span>
-<span><span class="co">#&gt;     cv.glm 4523.9650 4605.3766 4792.7914 4752.6341 4947.8830 5350.9265    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min       lq      mean    median        uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.9999    3.346    4.0949    3.5462    4.5329    7.285    10</span></span>
+<span><span class="co">#&gt;   Woodbury   88.4250   91.909   99.1727   96.0817  101.8368  132.322    10</span></span>
+<span><span class="co">#&gt;      exact 4256.3282 4494.682 5460.8470 5653.2575 5800.1399 7517.386    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4798.0733 5478.484 6772.5158 6657.8960 7842.2009 9061.517    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -3582,7 +3582,7 @@ doing it in parallel using 2 cores:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.731   0.042   0.794</span></span>
+<span><span class="co">#&gt;   0.455   0.028   0.483</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
@@ -3597,7 +3597,7 @@ doing it in parallel using 2 cores:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.086   0.022   7.137</span></span>
+<span><span class="co">#&gt;   0.060   0.014   2.802</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>In this small problem, the parallel computation is actually
