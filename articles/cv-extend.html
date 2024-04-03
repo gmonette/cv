@@ -45,6 +45,9 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/cv-extend.html">Extending the cv package</a>
+    <a class="dropdown-item" href="../articles/cv-mixed.html">Cross-validation of mixed-effects models</a>
+    <a class="dropdown-item" href="../articles/cv-notes.html">Computational and technical notes on cross-validation of regression models</a>
+    <a class="dropdown-item" href="../articles/cv-selection.html">Cross-validating model selection</a>
   </div>
 </li>
 <li class="nav-item">
@@ -78,7 +81,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-04-02</h4>
+            <h4 data-toc-skip class="date">2024-04-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-extend.Rmd" class="external-link"><code>vignettes/cv-extend.Rmd</code></a></small>
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -126,10 +129,9 @@ into a cost measure by taking its complement:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">AUCcomp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu">Metrics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Metrics/man/auc.html" class="external-link">auc</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span></code></pre></div>
 <p>We then apply <code>AUCcomp()</code> to the the Mroz logistic
-regression discussed in the main <strong>cv</strong> package vignette,
-which we reproduce here, using the <code>Mroz</code> data frame from the
-<strong>carData</strong> package <span class="citation">(Fox &amp;
-Weisberg, 2019)</span>:</p>
+regression, discussed in the introductory vignette on cross-validating
+regression models, which we reproduce here. Using the <code>Mroz</code>
+data frame from the <strong>carData</strong> package <span class="citation">(Fox &amp; Weisberg, 2019)</span>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Mroz"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span>
 <span><span class="va">m.mroz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">lfp</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">Mroz</span>, family<span class="op">=</span><span class="va">binomial</span><span class="op">)</span></span>
@@ -182,9 +184,9 @@ whole data set.</p>
 models,” the <code><a href="../reference/cv.html">cv()</a></code> function differentiates between CV
 criteria that are averages of casewise components and criteria that are
 not. Computation of bias corrections and confidence intervals is limited
-to the former. We show in the appendix to this vignette that the AUC,
-and hence its complement, cannot be expressed as averages of casewise
-components.</p>
+to the former. We show in the technical and computational vignette that
+the AUC, and hence its complement, cannot be expressed as averages of
+casewise components.</p>
 <p><code><a href="../reference/cv.html">cv()</a></code> looks for a <code>"casewise loss"</code> attribute
 of the value returned by a CV criterion function. If this attribute
 exists, then the criterion is treated as the mean of casewise
@@ -200,7 +202,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt;     attr(result, "casewise loss") &lt;- "(y - yhat)^2"</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x7f9699e38fa0&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x7fefe30a2bd0&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span>
 <span></span>
 <span><span class="fu">cv</span><span class="fu">:::</span><span class="fu">getLossFn</span><span class="op">(</span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -208,7 +210,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x7f9699e9a600&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x7fefe1ef3a00&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>"(y - yhat)^2"</code>, that evaluates to an expression that is a
@@ -608,7 +610,7 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt;             newdata = data, level = 1), blups = blups, fixed.effects = fixed.effects, </span></span>
 <span><span class="co">#&gt;         ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x7f969d0b3d48&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x7fefe8fab5b8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cv.merMod.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvCompute.html">cvMixed()</a></code>, which does the computational work.</p>
@@ -899,7 +901,7 @@ cross-validating both by clusters and by cases,</p>
 <span class="citation">(Venables &amp; Ripley, 2002)</span> for stepwise
 model selection, is suitable for the <code>procedure</code> argument of
 <code><a href="../reference/cvCompute.html">cvSelect()</a></code>. The use of <code><a href="../reference/cv.function.html">selectStepAIC()</a></code> is
-illustrated in the principal vignette for the package.</p>
+illustrated in the vignette on cross-validating model selection.</p>
 <p>We’ll employ <code><a href="../reference/cv.function.html">selectStepAIC()</a></code> as a “template” for writing
 a CV model-selection procedure. To see the code for this function, type
 <code><a href="../reference/cv.function.html">cv::selectStepAIC</a></code> at the R command prompt, or examine the
@@ -1074,8 +1076,9 @@ and <code>Infant.Mortality</code>, but not <code>Examination</code>:</p>
 <span><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
 <p>The MSE for the selected model is (of course) slightly higher than
 for the full model fit previously, but the cross-validated MSE is a bit
-lower; as we explain in the main vignette, however, it isn’t kosher to
-select and cross-validate a model on the same data.</p>
+lower; as we explain in the vignette on cross-validating model
+selection, however, it isn’t kosher to select and cross-validate a model
+on the same data.</p>
 <p>Here’s a function named <code>selectSubsets()</code>, meant to be
 used with <code><a href="../reference/cvCompute.html">cvSelect()</a></code>, suitable for cross-validating the
 model-selection process:</p>
@@ -1234,193 +1237,6 @@ some uncertainty in identifying the predictors in the “best” model, with
 <span><span class="co">#&gt; Fold 10     52.5112   0.1005   -0.7232           1.0809</span></span></code></pre></div>
 <p>As well, the fold-wise MSE varies considerably, reflecting the small
 size of the <code>swiss</code> data set (47 cases),</p>
-</div>
-<div class="section level2">
-<h2 id="appendix-why-the-complement-of-auc-isnt-a-casewise-cv-criterion">Appendix: Why the complement of AUC isn’t a casewise CV
-criterion<a class="anchor" aria-label="anchor" href="#appendix-why-the-complement-of-auc-isnt-a-casewise-cv-criterion"></a>
-</h2>
-<p>Consider calculating AUC for folds in which a validation set contains
-<span class="math inline">\(n_v\)</span> observations. To calculate AUC
-in the validation set, we need the vector of prediction criteria, <span class="math inline">\(\widehat{\mathbf{y}}_{v_{(n_v \times 1)}} =
-(\widehat{y}_1, ..., \widehat{y}_{n_v})^T\)</span>, and the vector of
-observed responses in the validation set, <span class="math inline">\(\mathbf{y}_{v_{(n_v \times 1)}} = (y_1, \ldots,
-y_{n_v})^T\)</span> with <span class="math inline">\(y_i \in \{0,1\}, \;
-i = 1, \ldots, n_v\)</span>.</p>
-<p>To construct the ROC curve, only the ordering of the values in <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> is relevant. Thus,
-assuming that there are no ties, and reordering observations if
-necessary, we can set <span class="math inline">\(\mathbf{\widehat{y}}_v
-= (1, 2, \ldots, n_v)^T\)</span>.</p>
-<p>If the AUC can be expressed as the casewise mean or sum of a function
-<span class="math inline">\(\mathrm{cv}(\widehat{y}_i,y_i)\)</span>,
-where <span class="math inline">\(\mathrm{cv}:
-\{1,2,...,n_v\}\times\{0,1\} \rightarrow [0,1]\)</span>, then <span class="math display">\[\begin{equation}
-\label{eq:cw}
-\tag{1}
-\sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) =
-\mathrm{AUC}(\mathbf{\widehat{y}}_v,\mathbf{y}_v)
-\end{equation}\]</span> must hold for all <span class="math inline">\(2^{n_v}\)</span> possible values of <span class="math inline">\(\mathbf{y}_v = (y_1,...,y_{n_v})^T\)</span>. If
-all <span class="math inline">\(y\mathrm{s}\)</span> have the same
-value, either 1 or 0, then the definition of AUC is ambiguous. AUC could
-be considered undefined, or it could be set to 0 if all <span class="math inline">\(y\)</span>s are 0 and to 1 if all <span class="math inline">\(y\)</span>s are 1. If AUC is considered to be
-undefined in these cases, we have <span class="math inline">\(2^{n_v} -
-2\)</span> admissible values for <span class="math inline">\(\mathbf{y}_v\)</span>.</p>
-<p>Thus, equation (<span class="math inline">\(\ref{eq:cw}\)</span>)
-produces either <span class="math inline">\(2^{n_v}\)</span> or <span class="math inline">\(2^{n_v}-2\)</span> constraints. Although there are
-only <span class="math inline">\(2n_v\)</span> possible values for the
-<span class="math inline">\(\mathrm{cv(\cdot)}\)</span> function,
-equation (<span class="math inline">\(\ref{eq:cw}\)</span>) could,
-nevertheless, have consistent solutions. We therefore need to determine
-whether there is a value of <span class="math inline">\(n_v\)</span> for
-which (<span class="math inline">\(\ref{eq:cw}\)</span>) has no
-consistent solution for all admissible values of <span class="math inline">\(\mathbf{y}_v\)</span>. In that eventuality, we
-will have shown that AUC cannot, in general, be expressed through a
-casewise sum.</p>
-<p>If <span class="math inline">\(n_v=3\)</span>, we show below that
-(<span class="math inline">\(\ref{eq:cw}\)</span>) has no consistent
-solution if we include all possibilities for <span class="math inline">\(\mathbf{y}_v\)</span>, but does if we exclude
-cases where all <span class="math inline">\(y\)</span>s have the same
-value. If <span class="math inline">\(n_v=4\)</span>, we show that there
-are no consistent solutions in either case.</p>
-<p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> and <span class="math inline">\(\mathbf{y}_v\)</span>, accommodating the cases
-where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
-1s:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">AUC</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">s</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">s</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span>  <span class="fu">Metrics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Metrics/man/auc.html" class="external-link">auc</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}_v\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Ymat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>, <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">n_v</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;&amp;</span></span>
-<span>              <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_v</span><span class="op">)</span> <span class="op">==</span> <span class="va">n_v</span><span class="op">)</span>    <span class="co"># n_v must be a positive integer</span></span>
-<span>  <span class="va">ret</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="op">(</span><span class="fl">2</span> <span class="op">^</span> <span class="va">n_v</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>                <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span>                  <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rawConversion.html" class="external-link">intToBits</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">n_v</span>,<span class="op">]</span></span>
-<span>  <span class="va">ret</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">is.matrix</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span></span>
-<span>  <span class="kw">else</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"y"</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">exclude_identical</span><span class="op">)</span></span>
-<span>    <span class="va">ret</span><span class="op">[</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">ret</span><span class="op">)</span><span class="op">)</span>,<span class="op">]</span></span>
-<span>  <span class="kw">else</span></span>
-<span>    <span class="va">ret</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>For <span class="math inline">\(n_v=3\)</span>,</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      y1 y2 y3</span></span>
-<span><span class="co">#&gt; [1,]  0  0  0</span></span>
-<span><span class="co">#&gt; [2,]  1  0  0</span></span>
-<span><span class="co">#&gt; [3,]  0  1  0</span></span>
-<span><span class="co">#&gt; [4,]  1  1  0</span></span>
-<span><span class="co">#&gt; [5,]  0  0  1</span></span>
-<span><span class="co">#&gt; [6,]  1  0  1</span></span>
-<span><span class="co">#&gt; [7,]  0  1  1</span></span>
-<span><span class="co">#&gt; [8,]  1  1  1</span></span></code></pre></div>
-<p>If we exclude <span class="math inline">\(\mathbf{y}_v\)</span>s with
-identical values, then</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      y1 y2 y3</span></span>
-<span><span class="co">#&gt; [1,]  1  0  0</span></span>
-<span><span class="co">#&gt; [2,]  0  1  0</span></span>
-<span><span class="co">#&gt; [3,]  1  1  0</span></span>
-<span><span class="co">#&gt; [4,]  0  0  1</span></span>
-<span><span class="co">#&gt; [5,]  1  0  1</span></span>
-<span><span class="co">#&gt; [6,]  0  1  1</span></span></code></pre></div>
-<p>Here is <span class="math inline">\(\mathbf{Y}\)</span> with
-corresponding values of AUC:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, AUC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">AUC</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      y1 y2 y3 AUC</span></span>
-<span><span class="co">#&gt; [1,]  0  0  0 0.0</span></span>
-<span><span class="co">#&gt; [2,]  1  0  0 0.0</span></span>
-<span><span class="co">#&gt; [3,]  0  1  0 0.5</span></span>
-<span><span class="co">#&gt; [4,]  1  1  0 0.0</span></span>
-<span><span class="co">#&gt; [5,]  0  0  1 1.0</span></span>
-<span><span class="co">#&gt; [6,]  1  0  1 0.5</span></span>
-<span><span class="co">#&gt; [7,]  0  1  1 1.0</span></span>
-<span><span class="co">#&gt; [8,]  1  1  1 1.0</span></span></code></pre></div>
-<p>The values of <span class="math inline">\(\mathrm{cv}(\widehat{y}_i,
-y_i)\)</span> that express AUC as a sum of casewise values are solutions
-of equation (<span class="math inline">\(\ref{eq:cw}\)</span>), which
-can be written as solutions of the following system of <span class="math inline">\(2^{n_v}\)</span> linear simultaneous equations in
-<span class="math inline">\(2n_v\)</span> unknowns: <span class="math display">\[\begin{equation}
-\label{eq:lin}
-\tag{2}
-(\mathbf{U} -\mathbf{Y}) \mathbf{c}_0 + \mathbf{Y} \mathbf{c}_1
-=
-[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]
-\begin{bmatrix}
-\mathbf{c}_0 \\ \mathbf{c}_1
-\end{bmatrix}
-= \mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})
-\end{equation}\]</span> where <span class="math inline">\(\mathbf{U}_{(2^{n_v} \times n_v)}\)</span> is a
-matrix of 1s conformable with <span class="math inline">\(\mathbf{Y}\)</span>; <span class="math inline">\(\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ...,
-\mathrm{cv}(n_v,0)]^T\)</span>; <span class="math inline">\(\mathbf{c}_1
-= [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T\)</span>; <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v}
-\times 2n_v)}\)</span> and <span class="math inline">\(\begin{bmatrix}\begin{aligned}
-\mathbf{c}_0 \\ \mathbf{c}_1
-\end{aligned}
-\end{bmatrix}_{(2n_v \times 1)}\)</span> are partitioned matrices; and
-<span class="math inline">\(\mathbf{\widehat{Y}}_{(2^{n_v} \times
-n_v)}\)</span> is a matrix each of whose rows consists of the integers 1
-to <span class="math inline">\(n_v\)</span>.</p>
-<p>We can test whether equation (<span class="math inline">\(\ref{eq:lin}\)</span>) has a solution for any
-given <span class="math inline">\(n_v\)</span> by trying to solve it as
-a least-squares problem, considering whether the residuals of the
-associated linear model are all 0, using the “design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> to
-predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v}
-\times 1)}\)</span>:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">resids</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>,</span>
-<span>                   <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                   <span class="va">tol</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu">Ymat</span><span class="op">(</span><span class="va">n_v</span>, exclude_identical <span class="op">=</span> <span class="va">exclude_identical</span><span class="op">)</span></span>
-<span>  <span class="va">AUC</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">Y</span>, <span class="fl">1</span>, <span class="va">AUC</span><span class="op">)</span></span>
-<span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">Y</span>, <span class="va">Y</span><span class="op">)</span></span>
-<span>  <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>warn <span class="op">=</span> <span class="op">-</span><span class="fl">1</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">opts</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lsfit.html" class="external-link">lsfit</a></span><span class="op">(</span><span class="va">X</span>, <span class="va">AUC</span>, intercept <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>  <span class="va">ret</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">ret</span> <span class="op">&lt;</span> <span class="va">tol</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">ret</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span>    <span class="va">solution</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"c("</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_v</span>, <span class="fl">1</span><span class="op">:</span><span class="va">n_v</span><span class="op">)</span>, <span class="st">","</span>,</span>
-<span>                              <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, each <span class="op">=</span> <span class="va">n_v</span><span class="op">)</span>, <span class="st">")"</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">ret</span>, <span class="st">"solution"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/zapsmall.html" class="external-link">zapsmall</a></span><span class="op">(</span><span class="va">solution</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  <span class="va">ret</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>The case <span class="math inline">\(n_v=3\)</span>, excluding
-identical <span class="math inline">\(y\)</span>s, has a solution:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="co">#&gt; attr(,"solution")</span></span>
-<span><span class="co">#&gt; c(1,0) c(2,0) c(3,0) c(1,1) c(2,1) c(3,1) </span></span>
-<span><span class="co">#&gt;    1.0    0.0   -0.5    0.5    0.0    0.0</span></span></code></pre></div>
-<p>But, if identical <span class="math inline">\(y\)</span>s are
-included, the equation is not consistent:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.125</span></span></code></pre></div>
-<p>For <span class="math inline">\(n_v=4\)</span>, there are no
-solutions in either case:</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">4</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.083333</span></span>
-<span><span class="fu">resids</span><span class="op">(</span><span class="fl">4</span>, exclude_identical <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.25</span></span></code></pre></div>
-<p>Consequently, the widely employed AUC measure of fit for binary
-regression cannot in general be used for a casewise cross-validation
-criterion.</p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
