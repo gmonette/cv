@@ -1,0 +1,269 @@
+---
+title: "Computational and technical notes on cross-validation of regression models"
+author: "John Fox and Georges Monette"
+date: "`r Sys.Date()`"
+package: cv
+output: 
+  rmarkdown::html_vignette:
+  fig_caption: yes
+bibliography: ["cv.bib"]
+csl: apa.csl
+vignette: >
+  %\VignetteIndexEntry{Computational and technical notes on cross-validation of regression models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  message = TRUE,
+  warning = TRUE,
+  fig.align = "center",
+  fig.height = 6,
+  fig.width = 7,
+  fig.path = "fig/",
+  dev = "png",
+  comment = "#>" #,
+)
+
+# save some typing
+knitr::set_alias(w = "fig.width",
+                 h = "fig.height",
+                 cap = "fig.cap")
+
+# colorize text: use inline as `r colorize(text, color)`
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color,
+      x)
+  } else x
+}
+
+
+.opts <- options(digits = 5)
+```
+
+
+## Efficient computations for linear and generalized linear models
+
+The most straightforward way to implement cross-validation in R for statistical modeling functions that are written in the canonical manner is to use `update()` to refit the model with each fold removed. This is the approach taken in the default method for `cv()`, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds in modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.
+
+The `"lm"` and `"glm"` methods for `cv()` take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the weight matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
+
+The weighted-least-squares (WLS) estimator of $\boldsymbol{\beta}$ is [see, e.g., @Fox:2016, Sec. 12.2.2] [^WLS]
+$$
+\mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} 
+  \mathbf{X}^T \mathbf{W} \mathbf{y}
+$$ 
+
+[^WLS]: This is a definitional formula, which assumes that the model matrix $\mathbf{X}$ is of full column rank, and which can be subject to numerical instability when $\mathbf{X}$ is ill-conditioned. `lm()` uses the singular-value decomposition of the model matrix to obtain computationally more stable results.
+
+Fitted values are then $\widehat{\mathbf{y}} = \mathbf{X}\mathbf{b}_{\mathrm{WLS}}$.
+
+The LOO fitted value for the $i$th case can be efficiently computed by $\widehat{y}_{-i} = y_i - e_i/(1 - h_i)$ where $h_i = \mathbf{x}^T_i \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i$ (the so-called "hatvalue"). Here, $\mathbf{x}^T_i$ is the $i$th row of $\mathbf{X}$, and $\mathbf{x}_i$ is the $i$th row written as a column vector. This approach can break down when one or more hatvalues are equal to 1, in which case the formula for $\widehat{y}_{-i}$ requires division by 0.
+
+To compute cross-validated fitted values when the folds contain more than one case, we make use of the Woodbury matrix identify [@Wikipedia-Woodbury:2023],
+$$
+\left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k} 
+\mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} = \mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} + 
+\mathbf{VA}^{-1}\mathbf{U} \right)^{-1} \mathbf{VA}^{-1}
+$$
+where $\mathbf{A}$ is a nonsingular order-$n$ matrix. We apply this result by letting
+\begin{align*}
+	\mathbf{A} &= \mathbf{X}^T \mathbf{W} \mathbf{X} \\
+	\mathbf{U} &= \mathbf{X}_\mathbf{j}^T \\
+	\mathbf{V} &= - \mathbf{X}_\mathbf{j} \\
+	\mathbf{C} &= \mathbf{W}_\mathbf{j} \\
+\end{align*}
+where the subscript $\mathbf{j} = (i_{j1}, \ldots, i_{jm})^T$ represents the vector of indices for the cases in the $j$th fold, $j = 1, \ldots, k$. The negative sign in $\mathbf{V} = - \mathbf{X}_\mathbf{j}$ reflects the *removal*, rather than addition, of the cases in $\mathbf{j}$. 
+
+Applying the Woodbury identity isn't quite as fast as using the hatvalues, but it is generally much faster than refitting the model. A disadvantage of the Woodbury identity, however, is that it entails explicit matrix inversion and thus may be numerically unstable. The inverse of $\mathbf{A} = \mathbf{X}^T \mathbf{W} \mathbf{X}$ is available directly in the `"lm"` object, but the second term on the right-hand side of the Woodbury identity requires a matrix inversion with each fold deleted. (In contrast, the inverse of each $\mathbf{C} = \mathbf{W}_\mathbf{j}$ is straightforward because $\mathbf{W}$ is diagonal.)
+
+The Woodbury identity also requires that the model matrix be of full rank. We impose that restriction in our code by removing redundant regressors from the model matrix for all of the cases, but that doesn't preclude rank deficiency from surfacing when a fold is removed. Rank deficiency of $\mathbf{X}$ doesn't disqualify cross-validation because all we need are fitted values under the estimated model.
+
+`glm()` computes the maximum-likelihood estimates for a generalized linear model by iterated weighted least squares [see, e.g., @FoxWeisberg:2019, Sec. 6.12]. The last iteration is therefore just a WLS fit of the "working response" on the model matrix using "working weights." Both the working weights and the working response at convergence are available from the information in the object returned by `glm()`. 
+
+We then treat re-estimation of the model with a case or cases deleted as a WLS problem, using the hatvalues or the Woodbury matrix identity. The resulting fitted values for the deleted fold aren't exact---that is, except for the Gaussian family, the result isn't identical to what we would obtain by literally refitting the model---but in our (limited) experience, the approximation is very good, especially for LOO CV, which is when we would be most tempted to use it. Nevertheless, because these results are approximate, the default for the `"glm"` `cv()` method is to perform the exact computation, which entails refitting the model with each fold omitted.
+
+## Computation of the bias-corrected CV criterion and confidence intervals
+
+Let $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ represent a cross-validation cost criterion, such as mean-squared error, computed for all of the $n$ values of the response $\mathbf{y}$ based on fitted values $\widehat{\mathbf{y}}$ from the model fit to all of the data. We require that $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ is the mean of casewise components, that is, $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i, \widehat{y}_i)$.[^contrast-function] For example, $\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$.
+
+[^contrast-function]: @ArlotCelisse:2010 term the casewise loss, $\mathrm{cv}(y_i, \widehat{y}_i)$, the "contrast function."
+
+We divide the $n$ cases into $k$ folds of approximately $n_j \approx n/k$ cases each, where $n = \sum n_j$. As above, let $\mathbf{j}$ denote the indices of the cases in the $j$th fold.
+
+Now define $\mathrm{CV}_j = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})$. The superscript $(j)$ on $\widehat{\mathbf{y}}^{(j)}$ represents fitted values computed  for all of the cases from the model with fold $j$ omitted. Let $\widehat{\mathbf{y}}^{(-i)}$ represent the vector of fitted values for all $n$ cases where the fitted value for the $i$th case is computed from the model fit with the fold including the $i$th case omitted (i.e., fold $j$ for which $i \in \mathbf{j}$).
+
+Then the cross-validation criterion is just $\mathrm{CV} = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(-i)})$.
+Following @DavisonHinkley:1997[pp. 293--295], the bias-adjusted cross-validation criterion is
+$$
+\mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
+$$
+
+We compute the standard error of CV as 
+$$
+\mathrm{SE}(\mathrm{CV}) = \frac{1}{\sqrt n} \sqrt{ \frac{\sum_{i=1}^n \left[ \mathrm{cv}(y_i, \widehat{y}_i^{(-i)} ) - \mathrm{CV} \right]^2 }{n - 1} }
+$$
+that is, as the standard deviation of the casewise components of CV divided by the square-root of the number of cases.
+
+We then use $\mathrm{SE}(\mathrm{CV})$ to construct a $100 \times (1 - \alpha)$% confidence interval around the *adjusted* CV estimate of error:
+$$
+\left[ \mathrm{CV}_{\mathrm{adj}} - z_{1 - \alpha/2}\mathrm{SE}(\mathrm{CV}), \mathrm{CV}_{\mathrm{adj}} + z_{1 - \alpha/2}\mathrm{SE}(\mathrm{CV})  \right]
+$$
+where $z_{1 - \alpha/2}$ is the $1 - \alpha/2$ quantile of the standard-normal distribution (e.g, $z \approx 1.96$ for a 95% confidence interval, for which $1 - \alpha/2 = .975$).
+
+@BatesHastieTibshirani:2023 show that the coverage of this confidence interval is poor for small samples, and they suggest a much more computationally intensive procedure, called *nested cross-validation*, to compute better estimates of error and confidence intervals with better coverage for small samples. We may implement Bates et al.'s approach in a later release of the **cv** package. At present we use the confidence interval above for sufficiently large $n$, which, based on Bates et al.'s results, we take by default to be $n \ge 400$.
+
+## Why the complement of AUC isn't a casewise CV criterion
+
+Consider calculating AUC for folds in which a validation set contains $n_v$ observations. To calculate AUC in the validation set, we need the vector of prediction criteria, $\widehat{\mathbf{y}}_{v_{(n_v \times 1)}} = (\widehat{y}_1, ..., \widehat{y}_{n_v})^T$, and the vector of observed responses in the validation set, $\mathbf{y}_{v_{(n_v \times 1)}} = (y_1, \ldots, y_{n_v})^T$ with $y_i \in \{0,1\}, \; i = 1, \ldots, n_v$.
+
+To construct the ROC curve, only the ordering of the values in 
+$\mathbf{\widehat{y}}_v$ is relevant. Thus, assuming that there are no ties, and reordering observations if necessary, we can set 
+$\mathbf{\widehat{y}}_v = (1, 2, \ldots, n_v)^T$.
+
+If the AUC can be expressed as the casewise mean or sum of a function $\mathrm{cv}(\widehat{y}_i,y_i)$, where $\mathrm{cv}: \{1,2,...,n_v\}\times\{0,1\} \rightarrow [0,1]$, then
+\begin{equation}
+\label{eq:cw}
+\tag{1}
+\sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) = \mathrm{AUC}(\mathbf{\widehat{y}}_v,\mathbf{y}_v)
+\end{equation}
+must hold for all $2^{n_v}$ possible values of $\mathbf{y}_v = (y_1,...,y_{n_v})^T$. If all $y\mathrm{s}$ have the same value, either 1 or 0, then the definition of AUC is ambiguous. AUC could be considered undefined, or it could be set to 0 if all $y$s are 0 and to 1 if all $y$s are 1. If AUC is considered to be undefined in these cases, we have $2^{n_v} - 2$ admissible values for $\mathbf{y}_v$.
+
+Thus, equation (\ref{eq:cw}) produces either $2^{n_v}$ or $2^{n_v}-2$ constraints. Although there are only $2n_v$ possible values for the $\mathrm{cv(\cdot)}$ function, equation (\ref{eq:cw}) could, nevertheless, have consistent solutions.  We therefore need to determine whether there is a value of $n_v$ for which (\ref{eq:cw}) has no consistent solution for all admissible values of $\mathbf{y}_v$. In that eventuality, we will have shown that AUC cannot, in general, be expressed through a casewise sum.
+
+If $n_v=3$, we show below that (\ref{eq:cw}) has no consistent solution if we include all possibilities for $\mathbf{y}_v$, but does if we exclude cases where all $y$s have the same value. If $n_v=4$, we show that there are no consistent solutions in either case.
+
+The following R function computes AUC from $\mathbf{\widehat{y}}_v$ and $\mathbf{y}_v$, accommodating the cases where $\mathbf{y}_v$ is all 0s or all 1s:
+
+```{r}
+AUC <- function(y, yhat = seq_along(y)) {
+  s <- sum(y)
+  if (s == 0)
+    return(0)
+  if (s == length(y))
+    return(1)
+  Metrics::auc(y, yhat)
+}
+```
+
+We then define a function to generate all possible $\mathbf{y}_v$s of length $n_v$ as rows of the matrix $\mathbf{Y}_{(2^{n_v} \times n_v)}$:
+
+```{r}
+Ymat <- function(n_v, exclude_identical = FALSE) {
+  stopifnot(n_v > 0 &&
+              round(n_v) == n_v)    # n_v must be a positive integer
+  ret <- sapply(0:(2 ^ n_v - 1),
+                function(x)
+                  as.integer(intToBits(x)))[1:n_v,]
+  ret <- if (is.matrix(ret))
+    t(ret)
+  else
+    matrix(ret)
+  colnames(ret) <- paste0("y", 1:ncol(ret))
+  if (exclude_identical)
+    ret[-c(1, nrow(ret)),]
+  else
+    ret
+}
+```
+
+For $n_v=3$,
+
+```{r}
+Ymat(3)
+```
+
+If we exclude $\mathbf{y}_v$s with identical values, then
+
+```{r}
+Ymat(3, exclude_identical = TRUE)
+```
+
+Here is $\mathbf{Y}$ with corresponding values of AUC:
+
+```{r}
+cbind(Ymat(3), AUC = apply(Ymat(3), 1, AUC))
+```
+
+The values of $\mathrm{cv}(\widehat{y}_i, y_i)$ that express AUC as a sum of casewise values are solutions of equation (\ref{eq:cw}), which can be written as solutions of the following system of $2^{n_v}$ linear simultaneous equations in $2n_v$ unknowns:
+\begin{equation}
+\label{eq:lin}
+\tag{2}
+(\mathbf{U} -\mathbf{Y}) \mathbf{c}_0 + \mathbf{Y} \mathbf{c}_1
+=
+[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]
+\begin{bmatrix}
+\mathbf{c}_0 \\ \mathbf{c}_1
+\end{bmatrix}
+= \mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})
+\end{equation}
+where $\mathbf{U}_{(2^{n_v} \times n_v)}$ is a matrix of 1s conformable with $\mathbf{Y}$; $\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ..., \mathrm{cv}(n_v,0)]^T$; $\mathbf{c}_1 = [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T$; $[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v} \times 2n_v)}$ and
+$\begin{bmatrix}\begin{aligned}
+\mathbf{c}_0 \\ \mathbf{c}_1
+\end{aligned}
+\end{bmatrix}_{(2n_v \times 1)}$ 
+are partitioned matrices; and $\mathbf{\widehat{Y}}_{(2^{n_v} \times n_v)}$ is a matrix each of whose rows consists of the integers 1 to $n_v$.
+
+We can test whether equation (\ref{eq:lin}) has a solution for any given $n_v$ by trying to solve it as a least-squares problem, considering whether the residuals of the associated linear model are all 0, using the "design matrix" $[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]$ to predict the "outcome"
+$\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v} \times 1)}$:
+
+```{r}
+resids <- function(n_v,
+                   exclude_identical = FALSE,
+                   tol = sqrt(.Machine$double.eps)) {
+  Y <- Ymat(n_v, exclude_identical = exclude_identical)
+  AUC <- apply(Y, 1, AUC)
+  X <- cbind(1 - Y, Y)
+  opts <- options(warn = -1)
+  on.exit(options(opts))
+  fit <- lsfit(X, AUC, intercept = FALSE)
+  ret <- max(abs(residuals(fit)))
+  if (ret < tol) {
+    ret <- 0
+    solution <- coef(fit)
+    names(solution) <- paste0("c(", c(1:n_v, 1:n_v), ",",
+                              rep(0:1, each = n_v), ")")
+    attr(ret, "solution") <- zapsmall(solution)
+  }
+  ret
+}
+```
+
+The case $n_v=3$, excluding identical $y$s, has a solution:
+
+```{r}
+resids(3, exclude_identical = TRUE)
+```
+
+But, if identical $y$s are included, the equation is not consistent:
+
+```{r}
+resids(3, exclude_identical = FALSE)
+```
+
+For $n_v=4$, there are no solutions in either case:
+
+```{r}
+resids(4, exclude_identical = TRUE)
+resids(4, exclude_identical = FALSE)
+```
+
+Consequently, the widely employed AUC measure of fit for binary regression cannot in general be used for a casewise cross-validation criterion.
+
+
+```{r coda, include = FALSE}
+options(.opts)
+```
+
+
+## References
+
+
+
+
+

@@ -1,0 +1,8 @@
+dplyr
+Matrix
+lme4
+foreach
+iterators
+doParallel
+cv
+nlme

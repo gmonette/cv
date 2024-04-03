@@ -60,7 +60,7 @@ To illustrate using a different prediction cost criterion, we'll base a cost cri
 AUCcomp <- function(y, yhat) 1 - Metrics::auc(y, yhat)
 ```
 
-We then apply `AUCcomp()` to the the Mroz logistic regression discussed in the main **cv** package vignette, which we reproduce here, using the `Mroz` data frame from the **carData** package [@FoxWeisberg:2019]:
+We then apply `AUCcomp()` to the the Mroz logistic regression, discussed in the introductory vignette on cross-validating regression models, which we reproduce here. Using the `Mroz` data frame from the **carData** package [@FoxWeisberg:2019]:
 ```{r Mroz-regression}
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
@@ -75,7 +75,7 @@ cv(m.mroz, criterion=AUCcomp, seed=3639)
 ```
 As expected, the cross-validated complement to the AUC is somewhat less optimistic than the criterion computed from the model fit to the whole data set.
 
-As we explain in the vignette "Cross-validation of regression models," the `cv()` function differentiates between CV criteria that are averages of casewise components and criteria that are not. Computation of bias corrections and confidence intervals is limited to the former. We show in the appendix to this vignette that the AUC, and hence its complement, cannot be expressed as averages of casewise components.
+As we explain in the vignette "Cross-validation of regression models," the `cv()` function differentiates between CV criteria that are averages of casewise components and criteria that are not. Computation of bias corrections and confidence intervals is limited to the former. We show in the technical and computational vignette that the AUC, and hence its complement, cannot be expressed as averages of casewise components.
 
 `cv()` looks for a `"casewise loss"` attribute of the value returned by a CV criterion function. If this attribute exists, then the criterion is treated as the mean of casewise components, and `cv()` uses the unexported function `getLossFn()` to construct a function that returns the casewise components of the criterion.
 
@@ -441,7 +441,7 @@ cv(m.glmer, data=bacteria, criterion=BayesRule, seed=1490)
 
 ## Adding a model-selection procedure
 
-The `selectStepAIC()` function supplied by the **cv** package, which is based on the `stepAIC()` function from the **nnet** package [@VenablesRipley:2002] for stepwise model selection, is suitable for the `procedure` argument of `cvSelect()`. The use of `selectStepAIC()` is illustrated in the principal vignette for the package. 
+The `selectStepAIC()` function supplied by the **cv** package, which is based on the `stepAIC()` function from the **nnet** package [@VenablesRipley:2002] for stepwise model selection, is suitable for the `procedure` argument of `cvSelect()`. The use of `selectStepAIC()` is illustrated in the vignette on cross-validating model selection. 
 
 We'll employ `selectStepAIC()` as a "template" for writing a CV model-selection procedure. To see the code for this function, type `cv::selectStepAIC` at the R command prompt, or examine the sources for the **cv** package at https://github.com/gmonette/cv (the code for `selectStepAIC()` is in https://github.com/gmonette/cv/blob/main/R/cv-select.R).
 
@@ -490,7 +490,7 @@ summary(m.best)
 
 cv(m.best, seed=8433) # use same folds as before
 ```
-The MSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated MSE is a bit lower; as we explain in the main vignette, however, it isn't kosher to select and cross-validate a model on the same data.
+The MSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated MSE is a bit lower; as we explain in the vignette on cross-validating model selection, however, it isn't kosher to select and cross-validate a model on the same data.
 
 Here's a function named `selectSubsets()`, meant to be used with `cvSelect()`, suitable for cross-validating the model-selection process:
 ```{r selectSubsets}
@@ -588,151 +588,4 @@ compareFolds(cv.swiss)
 ```
 As well, the fold-wise MSE varies considerably, reflecting the small size of the `swiss` data set (47 cases),
 
-## Appendix: Why the complement of AUC isn't a casewise CV criterion
-
-Consider calculating AUC for folds in which a validation set contains $n_v$ observations. To calculate AUC in the validation set, we need the vector of prediction criteria, $\widehat{\mathbf{y}}_{v_{(n_v \times 1)}} = (\widehat{y}_1, ..., \widehat{y}_{n_v})^T$, and the vector of observed responses in the validation set, $\mathbf{y}_{v_{(n_v \times 1)}} = (y_1, \ldots, y_{n_v})^T$ with $y_i \in \{0,1\}, \; i = 1, \ldots, n_v$.
-
-To construct the ROC curve, only the ordering of the values in 
-$\mathbf{\widehat{y}}_v$ is relevant. Thus, assuming that there are no ties, and reordering observations if necessary, we can set 
-$\mathbf{\widehat{y}}_v = (1, 2, \ldots, n_v)^T$.
-
-If the AUC can be expressed as the casewise mean or sum of a function $\mathrm{cv}(\widehat{y}_i,y_i)$, where $\mathrm{cv}: \{1,2,...,n_v\}\times\{0,1\} \rightarrow [0,1]$, then
-\begin{equation}
-\label{eq:cw}
-\tag{1}
-\sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) = \mathrm{AUC}(\mathbf{\widehat{y}}_v,\mathbf{y}_v)
-\end{equation}
-must hold for all $2^{n_v}$ possible values of $\mathbf{y}_v = (y_1,...,y_{n_v})^T$. If all $y\mathrm{s}$ have the same value, either 1 or 0, then the definition of AUC is ambiguous. AUC could be considered undefined, or it could be set to 0 if all $y$s are 0 and to 1 if all $y$s are 1. If AUC is considered to be undefined in these cases, we have $2^{n_v} - 2$ admissible values for $\mathbf{y}_v$.
-
-Thus, equation (\ref{eq:cw}) produces either $2^{n_v}$ or $2^{n_v}-2$ constraints. Although there are only $2n_v$ possible values for the $\mathrm{cv(\cdot)}$ function, equation (\ref{eq:cw}) could, nevertheless, have consistent solutions.  We therefore need to determine whether there is a value of $n_v$ for which (\ref{eq:cw}) has no consistent solution for all admissible values of $\mathbf{y}_v$. In that eventuality, we will have shown that AUC cannot, in general, be expressed through a casewise sum.
-
-If $n_v=3$, we show below that (\ref{eq:cw}) has no consistent solution if we include all possibilities for $\mathbf{y}_v$, but does if we exclude cases where all $y$s have the same value. If $n_v=4$, we show that there are no consistent solutions in either case.
-
-The following R function computes AUC from $\mathbf{\widehat{y}}_v$ and $\mathbf{y}_v$, accommodating the cases where $\mathbf{y}_v$ is all 0s or all 1s:
-
-```{r}
-AUC <- function(y, yhat = seq_along(y)) {
-  s <- sum(y)
-  if (s == 0)
-    return(0)
-  if (s == length(y))
-    return(1)
-  Metrics::auc(y, yhat)
-}
-```
-
-We then define a function to generate all possible $\mathbf{y}_v$s of length $n_v$ as rows of the matrix $\mathbf{Y}_{(2^{n_v} \times n_v)}$:
-
-```{r}
-Ymat <- function(n_v, exclude_identical = FALSE) {
-  stopifnot(n_v > 0 &&
-              round(n_v) == n_v)    # n_v must be a positive integer
-  ret <- sapply(0:(2 ^ n_v - 1),
-                function(x)
-                  as.integer(intToBits(x)))[1:n_v,]
-  ret <- if (is.matrix(ret))
-    t(ret)
-  else
-    matrix(ret)
-  colnames(ret) <- paste0("y", 1:ncol(ret))
-  if (exclude_identical)
-    ret[-c(1, nrow(ret)),]
-  else
-    ret
-}
-```
-
-For $n_v=3$,
-
-```{r}
-Ymat(3)
-```
-
-If we exclude $\mathbf{y}_v$s with identical values, then
-
-```{r}
-Ymat(3, exclude_identical = TRUE)
-```
-
-Here is $\mathbf{Y}$ with corresponding values of AUC:
-
-```{r}
-cbind(Ymat(3), AUC = apply(Ymat(3), 1, AUC))
-```
-
-The values of $\mathrm{cv}(\widehat{y}_i, y_i)$ that express AUC as a sum of casewise values are solutions of equation (\ref{eq:cw}), which can be written as solutions of the following system of $2^{n_v}$ linear simultaneous equations in $2n_v$ unknowns:
-\begin{equation}
-\label{eq:lin}
-\tag{2}
-(\mathbf{U} -\mathbf{Y}) \mathbf{c}_0 + \mathbf{Y} \mathbf{c}_1
-=
-[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]
-\begin{bmatrix}
-\mathbf{c}_0 \\ \mathbf{c}_1
-\end{bmatrix}
-= \mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})
-\end{equation}
-where $\mathbf{U}_{(2^{n_v} \times n_v)}$ is a matrix of 1s conformable with $\mathbf{Y}$; $\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ..., \mathrm{cv}(n_v,0)]^T$; $\mathbf{c}_1 = [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T$; $[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v} \times 2n_v)}$ and
-$\begin{bmatrix}\begin{aligned}
-\mathbf{c}_0 \\ \mathbf{c}_1
-\end{aligned}
-\end{bmatrix}_{(2n_v \times 1)}$ 
-are partitioned matrices; and $\mathbf{\widehat{Y}}_{(2^{n_v} \times n_v)}$ is a matrix each of whose rows consists of the integers 1 to $n_v$.
-
-We can test whether equation (\ref{eq:lin}) has a solution for any given $n_v$ by trying to solve it as a least-squares problem, considering whether the residuals of the associated linear model are all 0, using the "design matrix" $[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]$ to predict the "outcome"
-$\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v} \times 1)}$:
-
-```{r}
-resids <- function(n_v,
-                   exclude_identical = FALSE,
-                   tol = sqrt(.Machine$double.eps)) {
-  Y <- Ymat(n_v, exclude_identical = exclude_identical)
-  AUC <- apply(Y, 1, AUC)
-  X <- cbind(1 - Y, Y)
-  opts <- options(warn = -1)
-  on.exit(options(opts))
-  fit <- lsfit(X, AUC, intercept = FALSE)
-  ret <- max(abs(residuals(fit)))
-  if (ret < tol) {
-    ret <- 0
-    solution <- coef(fit)
-    names(solution) <- paste0("c(", c(1:n_v, 1:n_v), ",",
-                              rep(0:1, each = n_v), ")")
-    attr(ret, "solution") <- zapsmall(solution)
-  }
-  ret
-}
-```
-
-The case $n_v=3$, excluding identical $y$s, has a solution:
-
-```{r}
-resids(3, exclude_identical = TRUE)
-```
-
-But, if identical $y$s are included, the equation is not consistent:
-
-```{r}
-resids(3, exclude_identical = FALSE)
-```
-
-For $n_v=4$, there are no solutions in either case:
-
-```{r}
-resids(4, exclude_identical = TRUE)
-resids(4, exclude_identical = FALSE)
-```
-
-Consequently, the widely employed AUC measure of fit for binary regression cannot in general be used for a casewise cross-validation criterion.
-
-
-```{r coda, include = FALSE}
-options(.opts)
-```
-
 ## References
-
-
-
-
-
