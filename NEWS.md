@@ -16,6 +16,8 @@
 
 - Make the cv.default() method more robust, particularly for parallel computations.
 
+- Reorganize package vignettes (of which there are now 5).
+
 - Other small improvements.
 
 # cv 1.1.0
