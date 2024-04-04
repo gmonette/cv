@@ -2,8 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-vignettes/cv_cache
-vignettes/cv-extend_cache
 docs
 /doc/
 /Meta/
