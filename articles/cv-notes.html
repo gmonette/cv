@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-04-03</h4>
+            <h4 data-toc-skip class="date">2024-04-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-notes.Rmd" class="external-link"><code>vignettes/cv-notes.Rmd</code></a></small>
       <div class="d-none name"><code>cv-notes.Rmd</code></div>
@@ -190,6 +190,192 @@ is when we would be most tempted to use it. Nevertheless, because these
 results are approximate, the default for the <code>"glm"</code>
 <code><a href="../reference/cv.html">cv()</a></code> method is to perform the exact computation, which
 entails refitting the model with each fold omitted.</p>
+<p>Let’s compare the efficiency of the various computational methods for
+linear and generalized linear models. Consider, for example,
+leave-one-out cross-validation for the quadratic regression of
+<code>mpg</code> on <code>horsepower</code> in the <code>Auto</code>
+data, from the introductory “Cross-validation of regression models”
+vignette, repeated here:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Auto"</span>, package<span class="op">=</span><span class="st">"ISLR2"</span><span class="op">)</span></span>
+<span><span class="va">m.auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">horsepower</span>, <span class="fl">2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = mpg ~ poly(horsepower, 2), data = Auto)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -14.714  -2.594  -0.086   2.287  15.896 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;                      Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)            23.446      0.221   106.1   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; poly(horsepower, 2)1 -120.138      4.374   -27.5   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; poly(horsepower, 2)2   44.090      4.374    10.1   &lt;2e-16 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 4.37 on 389 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.688,  Adjusted R-squared:  0.686 </span></span>
+<span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gmonette.github.io/cv/">"cv"</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: doParallel</span></span>
+<span><span class="co">#&gt; Loading required package: foreach</span></span>
+<span><span class="co">#&gt; Loading required package: iterators</span></span>
+<span><span class="co">#&gt; Loading required package: parallel</span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span><span class="op">)</span>  <span class="co"># default method = "hatvalues"</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: hatvalues</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"naive"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: naive</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; full-sample criterion = 18.985</span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
+<p>This is a small regression problem and all three computational
+approaches are essentially instantaneous, but it is still of interest to
+investigate their relative speed. In this comparison, we include the
+<code><a href="../reference/cv.html">cv.glm()</a></code> function from the <strong>boot</strong> package
+<span class="citation">(Canty &amp; Ripley, 2022; Davison &amp; Hinkley,
+1997)</span>, which takes the naive approach, and for which we have to
+fit the linear model as an equivalent Gaussian GLM. We use the
+<code>microbenchmark()</code> function from the package of the same name
+for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m.auto.glm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">horsepower</span>, <span class="fl">2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/cv.glm.html" class="external-link">cv.glm</a></span><span class="op">(</span><span class="va">Auto</span>, <span class="va">m.auto.glm</span><span class="op">)</span><span class="op">$</span><span class="va">delta</span></span>
+<span><span class="co">#&gt; [1] 19.248 19.248</span></span>
+<span></span>
+<span><span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html" class="external-link">microbenchmark</a></span><span class="op">(</span></span>
+<span>  hatvalues <span class="op">=</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span><span class="op">)</span>,</span>
+<span>  Woodbury <span class="op">=</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span>,</span>
+<span>  naive <span class="op">=</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"naive"</span><span class="op">)</span>,</span>
+<span>  cv.glm <span class="op">=</span> <span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/cv.glm.html" class="external-link">cv.glm</a></span><span class="op">(</span><span class="va">Auto</span>, <span class="va">m.auto.glm</span><span class="op">)</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Unit: milliseconds</span></span>
+<span><span class="co">#&gt;       expr      min       lq    mean   median      uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues   2.4148   2.4954   2.731   2.6141   2.814    3.4342    10</span></span>
+<span><span class="co">#&gt;   Woodbury  25.4494  27.2970  29.163  28.3862  28.712   37.7792    10</span></span>
+<span><span class="co">#&gt;      naive 540.3078 559.6859 606.722 567.5709 669.916  705.9246    10</span></span>
+<span><span class="co">#&gt;     cv.glm 911.3053 936.8669 960.060 956.0830 980.085 1041.8608    10</span></span></code></pre></div>
+<p>On our computer, using the hatvalues is about an order of magnitude
+faster than employing Woodbury matrix updates, and more than two orders
+of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
+&lt;code&gt;microbenchmark()&lt;/code&gt; to execute each command only 10 times
+rather than the default 100. With the exception of the last columns, the
+output is self-explanatory. The last column shows which methods have
+average timings that are statistically distinguishable. Because of the
+small number of repetitions (i.e., 10), the &lt;code&gt;"hatvalues"&lt;/code&gt; and
+&lt;code&gt;"Woodbury"&lt;/code&gt; methods aren’t distinguishable, but the
+difference between these methods persists when we perform more
+repetitions—we invite the reader to redo this computation with the
+default &lt;code&gt;times=100&lt;/code&gt; repetitions.&lt;/p&gt;'><sup>2</sup></a></p>
+<p>Similarly, let’s return to the logistic-regression model fit to
+Mroz’s data on women’s labor-force participation, also employed as an
+example in the introductory vignette:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Mroz"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span>
+<span><span class="va">m.mroz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">lfp</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">Mroz</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; glm(formula = lfp ~ ., family = binomial, data = Mroz)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span><span class="co">#&gt; (Intercept)  3.18214    0.64438    4.94  7.9e-07 ***</span></span>
+<span><span class="co">#&gt; k5          -1.46291    0.19700   -7.43  1.1e-13 ***</span></span>
+<span><span class="co">#&gt; k618        -0.06457    0.06800   -0.95  0.34234    </span></span>
+<span><span class="co">#&gt; age         -0.06287    0.01278   -4.92  8.7e-07 ***</span></span>
+<span><span class="co">#&gt; wcyes        0.80727    0.22998    3.51  0.00045 ***</span></span>
+<span><span class="co">#&gt; hcyes        0.11173    0.20604    0.54  0.58762    </span></span>
+<span><span class="co">#&gt; lwg          0.60469    0.15082    4.01  6.1e-05 ***</span></span>
+<span><span class="co">#&gt; inc         -0.03445    0.00821   -4.20  2.7e-05 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
+<span><span class="co">#&gt; Residual deviance:  905.27  on 745  degrees of freedom</span></span>
+<span><span class="co">#&gt; AIC: 921.3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, <span class="co"># default method = "exact"</span></span>
+<span>   k <span class="op">=</span> <span class="st">"loo"</span>, </span>
+<span>   criterion <span class="op">=</span> <span class="va">BayesRule</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: exact</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
+<span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
+<span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
+<span>   method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
+<span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
+<span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
+<span>   method <span class="op">=</span> <span class="st">"hatvalues"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: hatvalues</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span></code></pre></div>
+<p>As for linear models, we report some timings for the various
+<code><a href="../reference/cv.html">cv()</a></code> methods of computation in LOO CV as well as for the
+<code><a href="../reference/cv.html">cv.glm()</a></code> function from the <strong>boot</strong> package
+(which, recall, refits the model with each case removed, and thus is
+comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>method="exact"</code>):</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">microbenchmark</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbenchmark/man/microbenchmark.html" class="external-link">microbenchmark</a></span><span class="op">(</span></span>
+<span>  hatvalues <span class="op">=</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
+<span>    <span class="va">m.mroz</span>,</span>
+<span>    k <span class="op">=</span> <span class="st">"loo"</span>,</span>
+<span>    criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
+<span>    method <span class="op">=</span> <span class="st">"hatvalues"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  Woodbury <span class="op">=</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
+<span>    <span class="va">m.mroz</span>,</span>
+<span>    k <span class="op">=</span> <span class="st">"loo"</span>,</span>
+<span>    criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
+<span>    method <span class="op">=</span> <span class="st">"Woodbury"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  exact <span class="op">=</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, k <span class="op">=</span> <span class="st">"loo"</span>, criterion <span class="op">=</span> <span class="va">BayesRule</span><span class="op">)</span>,</span>
+<span>  cv.glm <span class="op">=</span> <span class="fu">boot</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/boot/man/cv.glm.html" class="external-link">cv.glm</a></span><span class="op">(</span><span class="va">Mroz</span>, <span class="va">m.mroz</span>,</span>
+<span>                        cost <span class="op">=</span> <span class="va">BayesRule</span><span class="op">)</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">10</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Unit: milliseconds</span></span>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    2.5747    2.7353    3.1569    2.8575    3.1104    4.7376    10</span></span>
+<span><span class="co">#&gt;   Woodbury   84.4876   88.3227   91.1591   89.8674   92.9453  100.8939    10</span></span>
+<span><span class="co">#&gt;      exact 3825.4235 3834.3144 3932.2071 3940.7751 3982.1123 4107.3255    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4516.1235 4538.2187 4655.5673 4660.1739 4717.7107 4920.7681    10</span></span></code></pre></div>
+<p>There is a substantial time penalty associated with exact
+computations.</p>
 </div>
 <div class="section level2">
 <h2 id="computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals">Computation of the bias-corrected CV criterion and confidence
@@ -204,7 +390,7 @@ is, <span class="math inline">\(\mathrm{CV}(\mathbf{y},
 \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i,
 \widehat{y}_i)\)</span>.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;&lt;span class="citation"&gt;Arlot &amp;amp; Celisse (2010)&lt;/span&gt;
 term the casewise loss, &lt;span class="math inline"&gt;\(\mathrm{cv}(y_i,
-\widehat{y}_i)\)&lt;/span&gt;, the “contrast function.”&lt;/p&gt;'><sup>2</sup></a> For example, <span class="math inline">\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) =
+\widehat{y}_i)\)&lt;/span&gt;, the “contrast function.”&lt;/p&gt;'><sup>3</sup></a> For example, <span class="math inline">\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) =
 \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\)</span>.</p>
 <p>We divide the <span class="math inline">\(n\)</span> cases into <span class="math inline">\(k\)</span> folds of approximately <span class="math inline">\(n_j \approx n/k\)</span> cases each, where <span class="math inline">\(n = \sum n_j\)</span>. As above, let <span class="math inline">\(\mathbf{j}\)</span> denote the indices of the
 cases in the <span class="math inline">\(j\)</span>th fold.</p>
@@ -299,7 +485,7 @@ are no consistent solutions in either case.</p>
 <p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> and <span class="math inline">\(\mathbf{y}_v\)</span>, accommodating the cases
 where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 1s:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">AUC</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">s</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span></span>
@@ -309,7 +495,7 @@ where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 <span>  <span class="fu">Metrics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Metrics/man/auc.html" class="external-link">auc</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}_v\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Ymat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>, <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">n_v</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;&amp;</span></span>
 <span>              <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_v</span><span class="op">)</span> <span class="op">==</span> <span class="va">n_v</span><span class="op">)</span>    <span class="co"># n_v must be a positive integer</span></span>
@@ -327,7 +513,7 @@ where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 <span>    <span class="va">ret</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>For <span class="math inline">\(n_v=3\)</span>,</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3</span></span>
 <span><span class="co">#&gt; [1,]  0  0  0</span></span>
@@ -340,7 +526,7 @@ where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 <span><span class="co">#&gt; [8,]  1  1  1</span></span></code></pre></div>
 <p>If we exclude <span class="math inline">\(\mathbf{y}_v\)</span>s with
 identical values, then</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3</span></span>
 <span><span class="co">#&gt; [1,]  1  0  0</span></span>
@@ -351,7 +537,7 @@ identical values, then</p>
 <span><span class="co">#&gt; [6,]  0  1  1</span></span></code></pre></div>
 <p>Here is <span class="math inline">\(\mathbf{Y}\)</span> with
 corresponding values of AUC:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, AUC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">AUC</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3 AUC</span></span>
 <span><span class="co">#&gt; [1,]  0  0  0 0.0</span></span>
@@ -393,7 +579,7 @@ a least-squares problem, considering whether the residuals of the
 associated linear model are all 0, using the “design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> to
 predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v}
 \times 1)}\)</span>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">resids</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>,</span>
 <span>                   <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                   <span class="va">tol</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -415,7 +601,7 @@ predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\wide
 <span><span class="op">}</span></span></code></pre></div>
 <p>The case <span class="math inline">\(n_v=3\)</span>, excluding
 identical <span class="math inline">\(y\)</span>s, has a solution:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; attr(,"solution")</span></span>
@@ -423,12 +609,12 @@ identical <span class="math inline">\(y\)</span>s, has a solution:</p>
 <span><span class="co">#&gt;    1.0    0.0   -0.5    0.5    0.0    0.0</span></span></code></pre></div>
 <p>But, if identical <span class="math inline">\(y\)</span>s are
 included, the equation is not consistent:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.125</span></span></code></pre></div>
 <p>For <span class="math inline">\(n_v=4\)</span>, there are no
 solutions in either case:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">4</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.083333</span></span>
 <span><span class="fu">resids</span><span class="op">(</span><span class="fl">4</span>, exclude_identical <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -452,6 +638,10 @@ What does it estimate and how well does it do it? <em>Journal of the
 American Statistical Association</em>, <em>in press</em>. Retrieved from
 <a href="https://doi.org/10.1080/01621459.2023.2197686" class="external-link">https://doi.org/10.1080/01621459.2023.2197686</a>
 </div>
+<div id="ref-CantyRipley2022" class="csl-entry">
+Canty, A., &amp; Ripley, B. D. (2022). <em>Boot: Bootstrap
+<span>R</span> (<span>S</span>-plus) functions</em>.
+</div>
 <div id="ref-DavisonHinkley:1997" class="csl-entry">
 Davison, A. C., &amp; Hinkley, D. V. (1997). <em>Bootstrap methods and
 their applications</em>. Cambridge: Cambridge University Press.
@@ -464,6 +654,10 @@ models</em> (Second edition). Thousand Oaks <span>CA</span>: Sage.
 Fox, J., &amp; Weisberg, S. (2019). <em>An <span>R</span> companion to
 applied regression</em> (Third edition). Thousand Oaks <span>CA</span>:
 Sage.
+</div>
+<div id="ref-Mersmann:2023" class="csl-entry">
+Mersmann, O. (2023). <em>Microbenchmark: Accurate timing functions</em>.
+Retrieved from <a href="https://CRAN.R-project.org/package=microbenchmark" class="external-link">https://CRAN.R-project.org/package=microbenchmark</a>
 </div>
 <div id="ref-Wikipedia-Woodbury:2023" class="csl-entry">
 "Woodbury matrix identity". (2023). Woodbury matrix
