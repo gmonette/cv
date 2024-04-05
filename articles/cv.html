@@ -83,7 +83,7 @@ package</h3>
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-04-04</h4>
+            <h4 data-toc-skip class="date">2024-04-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -333,12 +333,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 812047</span></span>
+<span><span class="co">#&gt; R RNG seed set to 133710</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.162</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.153</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.265</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.25</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity <span class="citation">("Woodbury matrix identity", 2023)</span> to update the
@@ -1217,42 +1217,40 @@ number &gt; <code>1</code> (which is the default). Parallel computation
 can be advantageous for large problems, reducing the execution time of
 the program.</p>
 <p>To illustrate, let’s time model selection in Mroz’s logistic
-regression, repeating the computation as performed previously and then
-doing it in parallel using 2 cores:</p>
+regression, repeating the computation as performed previously (but with
+LOO CV to lengthen the calculation) and then doing it in parallel using
+2 cores:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>    <span class="va">selectStepAIC</span>,</span>
 <span>    <span class="va">Mroz</span>,</span>
-<span>    seed <span class="op">=</span> <span class="fl">6681</span>,</span>
+<span>    k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>    criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
 <span>    working.model <span class="op">=</span> <span class="va">m.mroz</span>,</span>
 <span>    AIC <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.454   0.038   0.531</span></span>
+<span><span class="co">#&gt;  37.057   2.123  39.223</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>    <span class="va">selectStepAIC</span>,</span>
 <span>    <span class="va">Mroz</span>,</span>
-<span>    seed <span class="op">=</span> <span class="fl">6681</span>,</span>
+<span>    k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>    criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
 <span>    working.model <span class="op">=</span> <span class="va">m.mroz</span>,</span>
 <span>    AIC <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    ncores <span class="op">=</span> <span class="fl">2</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.058   0.011   2.106</span></span>
+<span><span class="co">#&gt;   0.498   0.082  28.954</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p>In this small problem, the parallel computation is actually
-<em>slower</em>, because there is an overhead cost to parallelization,
-but we can see that it produces the same result as before.</p>
+<p>The parallel computation with 2 cores is nearly twice as fast, and
+produces the same result as the non-parallel computation.</p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
