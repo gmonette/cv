@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-04-03" />
+<meta name="date" content="2024-04-05" />
 
 <title>Extending the cv package</title>
 
@@ -362,7 +362,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-04-03</h4>
+<h4 class="date">2024-04-05</h4>
 
 
 
@@ -476,7 +476,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x10449ace8&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x145954d90&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -1413,11 +1413,12 @@ which includes 4 or the 5 predictors (and the intercept):</p>
 <span id="cb31-12"><a href="#cb31-12" tabindex="-1"></a><span class="co">#&gt;         63.80452         -0.15895         -1.04218          0.13066 </span></span>
 <span id="cb31-13"><a href="#cb31-13" tabindex="-1"></a><span class="co">#&gt; Infant.Mortality </span></span>
 <span id="cb31-14"><a href="#cb31-14" tabindex="-1"></a><span class="co">#&gt;          1.01895</span></span></code></pre></div>
-<p>Then, using <code>selectSubsets()</code> in cross-validation, we
+<p>Then, using <code>selectSubsets()</code> in cross-validation,
+invoking the <code>cv.function()</code> method for <code>cv()</code>, we
 get:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>(cv.swiss <span class="ot">&lt;-</span> <span class="fu">cvSelect</span>(</span>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>(cv.swiss <span class="ot">&lt;-</span> <span class="fu">cv</span>(</span>
 <span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a>  selectSubsets,</span>
-<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>  <span class="at">model =</span> m.swiss,</span>
+<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>  <span class="at">working.model =</span> m.swiss,</span>
 <span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a>  <span class="at">data =</span> swiss,</span>
 <span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">8433</span> <span class="co"># use same folds</span></span>
 <span id="cb32-6"><a href="#cb32-6" tabindex="-1"></a>))</span>
@@ -1451,7 +1452,7 @@ some uncertainty in identifying the predictors in the “best” model, with
 <span id="cb33-18"><a href="#cb33-18" tabindex="-1"></a><span class="co">#&gt; Fold 9      62.2632   0.1230   -1.0067           1.1000       -0.17</span></span>
 <span id="cb33-19"><a href="#cb33-19" tabindex="-1"></a><span class="co">#&gt; Fold 10     52.5112   0.1005   -0.7232           1.0809</span></span></code></pre></div>
 <p>As well, the fold-wise MSE varies considerably, reflecting the small
-size of the <code>swiss</code> data set (47 cases),</p>
+size of the <code>swiss</code> data set (47 cases).</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>

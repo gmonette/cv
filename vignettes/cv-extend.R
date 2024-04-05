@@ -385,9 +385,9 @@ selectSubsets(model=m.swiss)
 selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 
 ## ----cvSelect-selectSubsets---------------------------------------------------
-(cv.swiss <- cvSelect(
+(cv.swiss <- cv(
   selectSubsets,
-  model = m.swiss,
+  working.model = m.swiss,
   data = swiss,
   seed = 8433 # use same folds
 ))

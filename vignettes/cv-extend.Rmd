@@ -573,11 +573,11 @@ Similarly, applying the function to an imaginary "fold" of 5 cases returns the M
 selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 ```
 
-Then, using `selectSubsets()` in cross-validation, we get:
+Then, using `selectSubsets()` in cross-validation, invoking the `cv.function()` method for `cv()`, we get:
 ```{r cvSelect-selectSubsets}
-(cv.swiss <- cvSelect(
+(cv.swiss <- cv(
   selectSubsets,
-  model = m.swiss,
+  working.model = m.swiss,
   data = swiss,
   seed = 8433 # use same folds
 ))
@@ -586,6 +586,6 @@ Cross-validation shows that model selection exacts a penalty in MSE. Examining t
 ```{r best-models-by-folds}
 compareFolds(cv.swiss)
 ```
-As well, the fold-wise MSE varies considerably, reflecting the small size of the `swiss` data set (47 cases),
+As well, the fold-wise MSE varies considerably, reflecting the small size of the `swiss` data set (47 cases).
 
 ## References
