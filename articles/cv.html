@@ -333,12 +333,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 133710</span></span>
+<span><span class="co">#&gt; R RNG seed set to 997589</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.265</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.25</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.281</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.265</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity <span class="citation">("Woodbury matrix identity", 2023)</span> to update the
@@ -1232,7 +1232,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  37.057   2.123  39.223</span></span>
+<span><span class="co">#&gt;  36.218   2.237  38.540</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
@@ -1246,11 +1246,12 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.498   0.082  28.954</span></span>
+<span><span class="co">#&gt;   0.478   0.090  31.239</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p>The parallel computation with 2 cores is nearly twice as fast, and
-produces the same result as the non-parallel computation.</p>
+<p>On our computer, the parallel computation with 2 cores is nearly
+twice as fast, and produces the same result as the non-parallel
+computation.</p>
 </div>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
