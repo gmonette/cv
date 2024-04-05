@@ -470,7 +470,7 @@ system.time(
 )
 all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
 ```
-The parallel computation with 2 cores is nearly twice as fast, and produces the same result as the non-parallel computation.
+On our computer, the parallel computation with 2 cores is nearly twice as fast, and produces the same result as the non-parallel computation.
 
 ```{r coda, include = FALSE}
 options(.opts)
