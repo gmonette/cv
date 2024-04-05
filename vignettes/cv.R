@@ -272,31 +272,6 @@ summary(D, criterion ~ model + rep,
 summary(D, criterion ~ model + rep, fun=sd, 
         include="folds")
 
-## ----parallel-computation-----------------------------------------------------
-system.time(
-  m.mroz.sel.cv <- cv(
-    selectStepAIC,
-    Mroz,
-    seed = 6681,
-    criterion = BayesRule,
-    working.model = m.mroz,
-    AIC = FALSE
-  )
-)
-
-system.time(
-  m.mroz.sel.cv.p <- cv(
-    selectStepAIC,
-    Mroz,
-    seed = 6681,
-    criterion = BayesRule,
-    working.model = m.mroz,
-    AIC = FALSE,
-    ncores = 2
-  )
-)
-all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
-
 ## ----coda, include = FALSE----------------------------------------------------
 options(.opts)
 
