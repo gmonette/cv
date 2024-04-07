@@ -83,7 +83,7 @@ package</h3>
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-04-05</h4>
+            <h4 data-toc-skip class="date">2024-04-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -333,12 +333,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 859137</span></span>
+<span><span class="co">#&gt; R RNG seed set to 658941</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.247</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.233</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.243</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.229</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity <span class="citation">("Woodbury matrix identity", 2023)</span> to update the
@@ -892,7 +892,10 @@ of the competing models.</p>
 <code>"cvList"</code>—which contains a variety of information about the
 results of a CV procedure. The <strong>cv</strong> package provides
 <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> methods to put this information in the form
-of data frames for further examination and analysis. There is also a
+of data frames for further examination and analysis.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;These &lt;code&gt;&lt;a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link"&gt;as.data.frame()&lt;/a&gt;&lt;/code&gt; methods were created
+at the suggestion of Michael Friendly of York University as a mechanism
+for making the output of the various &lt;code&gt;&lt;a href="../reference/cv.html"&gt;cv()&lt;/a&gt;&lt;/code&gt; methods more
+accessible to the user.&lt;/p&gt;'><sup>5</sup></a> There is also a
 <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for extracting and summarizing the
 information in the resulting data frames.</p>
 <p>We’ll illustrate with the replicated CV that we performed for the 10
@@ -1232,7 +1235,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  54.445   3.561  66.882</span></span>
+<span><span class="co">#&gt;  40.515   3.336  43.890</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
@@ -1246,7 +1249,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.399   0.070  35.052</span></span>
+<span><span class="co">#&gt;   0.400   0.076  25.627</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>On our computer, the parallel computation with 2 cores is nearly
