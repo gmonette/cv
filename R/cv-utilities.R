@@ -148,14 +148,14 @@ cvCompute <- function(model,
                       data = insight::get_data(model),
                       criterion = mse,
                       criterion.name,
-                      k = 10,
-                      reps = 1,
+                      k = 10L,
+                      reps = 1L,
                       seed,
-                      details = k <= 10,
+                      details = k <= 10L,
                       confint,
                       level = 0.95,
                       method = NULL,
-                      ncores = 1,
+                      ncores = 1L,
                       type = "response",
                       start = FALSE,
                       f,
@@ -188,7 +188,7 @@ cvCompute <- function(model,
     }
   }
   if (!is.numeric(k) ||
-      length(k) > 1L || k > n || k < 2 || k != round(k)) {
+      length(k) > 1L || k > n || k < 2L || k != round(k)) {
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
   if (k != n) {
@@ -197,7 +197,7 @@ cvCompute <- function(model,
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
-    if (reps > 1)
+    if (reps > 1L)
       stop("reps should not be > 1 for n-fold CV")
     if (!missing(seed) &&
         !is.null(seed))
@@ -216,13 +216,13 @@ cvCompute <- function(model,
   if (details) {
     crit.i <- numeric(k)
     coef.i <- vector(k, mode = "list")
-    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep = ".")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1L:k, sep = ".")
   } else {
     crit.i <- NULL
     coef.i <- NULL
   }
 
-  if (ncores > 1) {
+  if (ncores > 1L) {
     dots <- list(...)
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
@@ -295,7 +295,7 @@ cvCompute <- function(model,
   if (missing(method) || is.null(method))
     result$method <- NULL
   class(result) <- "cv"
-  if (reps == 1) {
+  if (reps == 1L) {
     return(result)
   } else {
     res <- cvCompute(
@@ -304,7 +304,7 @@ cvCompute <- function(model,
       criterion = criterion,
       criterion.name = criterion.name,
       k = k,
-      reps = reps - 1,
+      reps = reps - 1L,
       details = details,
       confint = confint,
       level = level,
@@ -320,12 +320,12 @@ cvCompute <- function(model,
       ...
     )
 
-    if (reps  > 2) {
-      res[[length(res) + 1]] <- result
+    if (reps  > 2L) {
+      res[[length(res) + 1L]] <- result
     } else {
       res <- list(res, result)
     }
-    for (i in 1:(length(res) - 1)) {
+    for (i in 1L:(length(res) - 1L)) {
       res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
     }
     class(res) <- "cvList"
@@ -343,12 +343,12 @@ cvMixed <- function(model,
                     criterion = mse,
                     criterion.name,
                     k,
-                    reps = 1,
+                    reps = 1L,
                     confint,
                     level = 0.95,
                     seed,
                     details,
-                    ncores = 1,
+                    ncores = 1L,
                     clusterVariables,
                     predict.clusters.args = list(object = model, newdata =
                                                    data),
@@ -415,7 +415,7 @@ cvMixed <- function(model,
   if (is.null(clusterVariables)) {
     n <- nrow(data)
     if (missing(k) || is.null(k))
-      k <- 10
+      k <- 10L
     if (is.character(k)) {
       if (k == "n" || k == "loo") {
         k <- n
@@ -431,7 +431,7 @@ cvMixed <- function(model,
   }
 
   if (!is.numeric(k) ||
-      length(k) > 1L || k > n || k < 2 || k != round(k)) {
+      length(k) > 1L || k > n || k < 2L || k != round(k)) {
     stop("k must be an integer between 2 and number of",
          if (is.null(clusterVariables))
            "cases"
@@ -445,7 +445,7 @@ cvMixed <- function(model,
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
-    if (reps > 1)
+    if (reps > 1L)
       stop("reps should not be > 1 for n-fold CV")
     if (!missing(seed) &&
         !is.null(seed))
@@ -454,12 +454,12 @@ cvMixed <- function(model,
   }
 
   if (missing(details) || is.null(details))
-    details <- k <= 10
+    details <- k <= 10L
 
   if (details) {
     crit.i <- numeric(k)
     coef.i <- vector(k, mode = "list")
-    names(crit.i) <- names(coef.i) <- paste("fold", 1:k, sep = ".")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1L:k, sep = ".")
   } else {
     crit.i <- NULL
     coef.i <- NULL
@@ -555,7 +555,7 @@ cvMixed <- function(model,
                      coefficients = coef.i)
   )
   class(result) <- "cv"
-  if (reps == 1) {
+  if (reps == 1L) {
     return(result)
   } else {
     res <- cv(
@@ -564,16 +564,16 @@ cvMixed <- function(model,
       criterion = criterion,
       k = k,
       ncores = ncores,
-      reps = reps - 1,
+      reps = reps - 1L,
       clusterVariables = clusterVariables,
       ...
     )
-    if (reps  > 2) {
-      res[[length(res) + 1]] <- result
+    if (reps  > 2L) {
+      res[[length(res) + 1L]] <- result
     } else {
       res <- list(res, result)
     }
-    for (i in 1:(length(res) - 1)) {
+    for (i in 1L:(length(res) - 1L)) {
       res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
     }
     class(res) <- "cvList"
@@ -592,15 +592,15 @@ cvSelect <- function(procedure,
                      criterion.name,
                      model,
                      y.expression,
-                     k = 10,
+                     k = 10L,
                      confint = n >= 400,
                      level = 0.95,
-                     reps = 1,
+                     reps = 1L,
                      save.coef,
-                     details = k <= 10,
+                     details = k <= 10L,
                      save.model = FALSE,
                      seed,
-                     ncores = 1,
+                     ncores = 1L,
                      ...) {
   if (missing(criterion.name) ||
       is.null(criterion.name))
@@ -626,7 +626,7 @@ cvSelect <- function(procedure,
     }
   }
   if (!is.numeric(k) ||
-      length(k) > 1L || k > n || k < 2 || k != round(k)) {
+      length(k) > 1L || k > n || k < 2L || k != round(k)) {
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
   if (k != n) {
@@ -635,10 +635,10 @@ cvSelect <- function(procedure,
     set.seed(seed)
     message("R RNG seed set to ", seed)
   } else {
-    if (reps > 1)
+    if (reps > 1L)
       stop("reps should not be > 1 for n-fold CV")
     if (k == n) {
-      if (reps > 1)
+      if (reps > 1L)
         stop("reps should not be > 1 for n-fold CV")
       if (!missing(seed) &&
           !is.null(seed) &&
@@ -663,21 +663,21 @@ cvSelect <- function(procedure,
     coef.i <- vector(k, mode = "list")
     model.name.i <- character(k)
     names(crit.i) <- names(coef.i) <- names(model.name.i) <-
-      paste("fold", 1:k, sep = ".")
+      paste("fold", 1L:k, sep = ".")
   } else {
     crit.i <- NULL
     coef.i <- NULL
     model.name.i <- NULL
   }
 
-  if (ncores > 1) {
+  if (ncores > 1L) {
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     arglist <- c(
       list(
         data = data,
-        indices = 1,
-        details = k <= 10,
+        indices = 1L,
+        details = k <= 10L,
         criterion = criterion,
         model = model
       ),
@@ -717,7 +717,7 @@ cvSelect <- function(procedure,
         procedure(
           data,
           indices.i,
-          details = k <= 10,
+          details = k <= 10L,
           criterion = criterion,
           model = model,
           k = k.save,
@@ -727,7 +727,7 @@ cvSelect <- function(procedure,
         procedure(
           data,
           indices.i,
-          details = k <= 10,
+          details = k <= 10L,
           criterion = criterion,
           model = model,
           ...
@@ -826,7 +826,7 @@ cvSelect <- function(procedure,
       "selected.model" = selected.model
     )
   class(result) <- c("cvSelect", "cv")
-  if (reps == 1) {
+  if (reps == 1L) {
     return(result)
   } else {
     if (missing(y.expression))
@@ -841,7 +841,7 @@ cvSelect <- function(procedure,
       k = k,
       confint = confint,
       level = level,
-      reps = reps - 1,
+      reps = reps - 1L,
       save.coef = save.coef,
       details = details,
       save.model = save.model,
@@ -849,8 +849,8 @@ cvSelect <- function(procedure,
       ...
     )
 
-    if (reps  > 2) {
-      res[[length(res) + 1]] <- result
+    if (reps  > 2L) {
+      res[[length(res) + 1L]] <- result
     } else {
       res <- list(res, result)
     }
@@ -865,13 +865,13 @@ folds <- function(n, k) {
   nk <-  n %/% k # number of cases in each fold
   rem <- n %% k  # remainder
   folds <-
-    rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
+    rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
   ends <- cumsum(folds) # end of each fold
-  starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
+  starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
   indices <- if (n > k)
     sample(n, n)
   else
-    1:n # permute cases
+    1L:n # permute cases
   result <- list(
     n = n,
     k = k,
@@ -904,15 +904,15 @@ print.folds <- function(x, ...) {
   }
   cat(x$k, "folds of approximately", floor(x$n / x$k),
       "cases each")
-  for (i in 1:min(x$k, 10)) {
+  for (i in 1L:min(x$k, 10L)) {
     cat("\n fold", paste0(i, ": "))
     fld <- fold(x, i)
-    if (length(fld) <= 10)
+    if (length(fld) <= 10L)
       cat(fld)
     else
-      cat(fld[1:10], "...")
+      cat(fld[1L:10L], "...")
   }
-  if (x$k > 10)
+  if (x$k > 10L)
     cat("\n ...")
   cat("\n")
   invisible(x)
@@ -947,8 +947,8 @@ GetResponse.merMod <- function(model, ...) {
   y <- insight::get_response(model)
   if (is.factor(y)) {
     levels <- levels(y)
-    failure <- levels[1]
-    if (length(levels) > 2) {
+    failure <- levels[1L]
+    if (length(levels) > 2L) {
       message(
         "Note: the response has more than 2 levels.\n",
         " The first level ('",
@@ -978,7 +978,7 @@ GetResponse.glmmTMB <- GetResponse.merMod
 #' @describeIn cvCompute \code{"modList"} method.
 #' @export
 GetResponse.modList <- function(model, ...)
-  GetResponse(model[[1]])
+  GetResponse(model[[1L]])
 
 
 # not exported
@@ -990,7 +990,7 @@ summarizeReps <- function(x) {
     x[["CV crit"]]))
   CVcritRange <- range(sapply(x, function(x)
     x[["CV crit"]]))
-  if (!is.null(x[[1]][["adj CV crit"]])) {
+  if (!is.null(x[[1L]][["adj CV crit"]])) {
     adjCVcrit <- mean(sapply(x, function(x)
       x[["adj CV crit"]]))
     adjCVcritSD <- sd(sapply(x, function(x)

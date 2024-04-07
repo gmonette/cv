@@ -14,20 +14,20 @@
 \alias{summary.cvDataFrame}
 \title{Cross-Validate Regression Models}
 \usage{
-cv(model, data, criterion, k, reps = 1, seed, ...)
+cv(model, data, criterion, k, reps = 1L, seed, ...)
 
 \method{cv}{default}(
   model,
   data = insight::get_data(model),
   criterion = mse,
-  k = 10,
-  reps = 1,
+  k = 10L,
+  reps = 1L,
   seed = NULL,
   criterion.name = deparse(substitute(criterion)),
-  details = k <= 10,
-  confint = n >= 400,
+  details = k <= 10L,
+  confint = n >= 400L,
   level = 0.95,
-  ncores = 1,
+  ncores = 1L,
   type = "response",
   start = FALSE,
   model.function,
@@ -38,14 +38,14 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   model,
   data = insight::get_data(model),
   criterion = mse,
-  k = 10,
-  reps = 1,
+  k = 10L,
+  reps = 1L,
   seed = NULL,
-  details = k <= 10,
-  confint = n >= 400,
+  details = k <= 10L,
+  confint = n >= 400L,
   level = 0.95,
   method = c("auto", "hatvalues", "Woodbury", "naive"),
-  ncores = 1,
+  ncores = 1L,
   ...
 )
 
@@ -53,19 +53,19 @@ cv(model, data, criterion, k, reps = 1, seed, ...)
   model,
   data = insight::get_data(model),
   criterion = mse,
-  k = 10,
-  reps = 1,
+  k = 10L,
+  reps = 1L,
   seed = NULL,
-  details = k <= 10,
-  confint = n >= 400,
+  details = k <= 10L,
+  confint = n >= 400L,
   level = 0.95,
   method = c("exact", "hatvalues", "Woodbury"),
-  ncores = 1,
+  ncores = 1L,
   start = FALSE,
   ...
 )
 
-\method{cv}{rlm}(model, data, criterion, k, reps = 1, seed, ...)
+\method{cv}{rlm}(model, data, criterion, k, reps = 1L, seed, ...)
 
 \method{print}{cv}(x, digits = getOption("digits"), ...)
 

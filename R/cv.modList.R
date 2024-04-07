@@ -94,7 +94,7 @@ cv.modList <-
            data,
            criterion = mse,
            k,
-           reps = 1,
+           reps = 1L,
            seed,
            quietly = TRUE,
            recursive = FALSE,
@@ -105,11 +105,11 @@ cv.modList <-
     }
     if (recursive) {
       if (missing(k))
-        k <- 10
+        k <- 10L
       if (k == "loo" || k == "n")
         seed <- NULL
       if (missing(data))
-        data <- insight::get_data(model[[1]])
+        data <- insight::get_data(model[[1L]])
       return(
         cv(
           selectModelList,
@@ -246,7 +246,7 @@ plot.cvModList <- function(x,
                            main,
                            axis.args = list(labels = names(x), las = 3L),
                            col = palette()[2L],
-                           lwd = 2,
+                           lwd = 2L,
                            grid = TRUE,
                            ...) {
   spread <- match.arg(spread)
@@ -283,7 +283,7 @@ plot.cvModList <- function(x,
   }
   if (isTRUE(axis.args$las == 3L)) {
     mai <- par("mai")
-    mai[1] <- max(strwidth(axis.args$labels, units = "inches")) + 0.5
+    mai[1L] <- max(strwidth(axis.args$labels, units = "inches")) + 0.5
     save.mai <- par(mai = mai)
     on.exit(par(save.mai))
   }
@@ -303,9 +303,9 @@ plot.cvModList <- function(x,
       max.y <- crit + sds
     } else {
       min.y <- sapply(sumry, function(x)
-        x[[ynm]][1])
+        x[[ynm]][1L])
       max.y <- sapply(sumry, function(x)
-        x[[ynm]][2])
+        x[[ynm]][2L])
     }
     plot(
       c(1L, length(x)),
@@ -332,9 +332,9 @@ plot.cvModList <- function(x,
       length = 0.125,
       angle = 90,
       col = col,
-      code = 3,
-      lty = 1,
-      lwd = 1
+      code = 3L,
+      lty = 1L,
+      lwd = 1L
     )
   } else {
     crit <- sapply(x, function (x)
@@ -400,9 +400,9 @@ plot.cvModList <- function(x,
         length = 0.125,
         angle = 90,
         col = col,
-        code = 3,
-        lty = 1,
-        lwd = 1
+        code = 3L,
+        lty = 1L,
+        lwd = 1L
       )
     }
   }

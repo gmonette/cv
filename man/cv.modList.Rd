@@ -13,7 +13,7 @@
   data,
   criterion = mse,
   k,
-  reps = 1,
+  reps = 1L,
   seed,
   quietly = TRUE,
   recursive = FALSE,
@@ -34,7 +34,7 @@ models(...)
   main,
   axis.args = list(labels = names(x), las = 3L),
   col = palette()[2L],
-  lwd = 2,
+  lwd = 2L,
   grid = TRUE,
   ...
 )

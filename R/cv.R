@@ -139,7 +139,7 @@
 #' cv(m.rlm, k="loo")
 #'
 #' @export
-cv <- function(model, data, criterion, k, reps = 1, seed, ...) {
+cv <- function(model, data, criterion, k, reps = 1L, seed, ...) {
   UseMethod("cv")
 }
 
@@ -161,14 +161,14 @@ cv <- function(model, data, criterion, k, reps = 1, seed, ...) {
 cv.default <- function(model,
                        data = insight::get_data(model),
                        criterion = mse,
-                       k = 10,
-                       reps = 1,
+                       k = 10L,
+                       reps = 1L,
                        seed = NULL,
                        criterion.name = deparse(substitute(criterion)),
-                       details = k <= 10,
-                       confint = n >= 400,
+                       details = k <= 10L,
+                       confint = n >= 400L,
                        level = 0.95,
-                       ncores = 1,
+                       ncores = 1L,
                        type = "response",
                        start = FALSE,
                        model.function,
@@ -221,7 +221,7 @@ cv.default <- function(model,
     }
 
   if (missing(model.function)) {
-    model.function <- try(getCall(model)[[1]])
+    model.function <- try(getCall(model)[[1L]])
     if (inherits(model.function, "try-error")) {
       stop(
         "cv.default() cannot extract the call from the model\n",
@@ -272,14 +272,14 @@ cv.default <- function(model,
 cv.lm <- function(model,
                   data = insight::get_data(model),
                   criterion = mse,
-                  k = 10,
-                  reps = 1,
+                  k = 10L,
+                  reps = 1L,
                   seed = NULL,
-                  details = k <= 10,
-                  confint = n >= 400,
+                  details = k <= 10L,
+                  confint = n >= 400L,
                   level = 0.95,
                   method = c("auto", "hatvalues", "Woodbury", "naive"),
-                  ncores = 1,
+                  ncores = 1L,
                   ...) {
   UpdateLM <- function(omit) {
     # compute coefficients with omit cases deleted
@@ -321,11 +321,11 @@ cv.lm <- function(model,
     }
   }
   if (!is.numeric(k) ||
-      length(k) > 1L || k > n || k < 2 || k != round(k)) {
+      length(k) > 1L || k > n || k < 2L || k != round(k)) {
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
   if (k == n) {
-    if (reps > 1)
+    if (reps > 1L)
       stop("reps should not be > 1 for n-fold CV")
     if (!missing(seed) &&
         !is.null(seed))
@@ -414,14 +414,14 @@ cv.lm <- function(model,
 cv.glm <- function(model,
                    data = insight::get_data(model),
                    criterion = mse,
-                   k = 10,
-                   reps = 1,
+                   k = 10L,
+                   reps = 1L,
                    seed = NULL,
-                   details = k <= 10,
-                   confint = n >= 400,
+                   details = k <= 10L,
+                   confint = n >= 400L,
                    level = 0.95,
                    method = c("exact", "hatvalues", "Woodbury"),
-                   ncores = 1,
+                   ncores = 1L,
                    start = FALSE,
                    ...) {
   UpdateIWLS <- function(omit) {
@@ -460,11 +460,11 @@ cv.glm <- function(model,
     }
   }
   if (!is.numeric(k) ||
-      length(k) > 1L || k > n || k < 2 || k != round(k)) {
+      length(k) > 1L || k > n || k < 2L || k != round(k)) {
     stop('k must be an integer between 2 and n or "n" or "loo"')
   }
   if (k == n) {
-    if (reps > 1)
+    if (reps > 1L)
       stop("reps should not be > 1 for n-fold CV")
     if (!missing(seed) &&
         !is.null(seed))
@@ -539,7 +539,7 @@ cv.glm <- function(model,
     XXi <- chol2inv(mod.lm$qr$qr[1L:p, 1L:p, drop = FALSE])
     Xz <- t(X) %*% (w * z)
     if (!is.numeric(k) ||
-        length(k) > 1L || k > n || k < 2 || k != round(k)) {
+        length(k) > 1L || k > n || k < 2L || k != round(k)) {
       stop("k must be an integer between 2 and n")
     }
 
@@ -576,7 +576,7 @@ cv.glm <- function(model,
 
 #' @describeIn cv \code{"rlm"} method (to avoid inheriting the \code{"lm"} method).
 #' @export
-cv.rlm <- function(model, data, criterion, k, reps = 1, seed, ...) {
+cv.rlm <- function(model, data, criterion, k, reps = 1L, seed, ...) {
   result <- NextMethod(method = "naive", model.function = NULL)
   result$method <- NULL
   result
@@ -810,7 +810,7 @@ print.cvDataFrame <- function(x,
 #' @exportS3Method base::summary
 summary.cvDataFrame <- function(object,
                                 formula,
-                                subset=NULL,
+                                subset = NULL,
                                 fun = mean,
                                 include = c("cv", "folds", "all"),
                                 ...) {

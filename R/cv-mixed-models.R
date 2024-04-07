@@ -85,10 +85,10 @@ cv.merMod <-
            data = insight::get_data(model),
            criterion = mse,
            k = NULL,
-           reps = 1,
+           reps = 1L,
            seed,
            details = NULL,
-           ncores = 1,
+           ncores = 1L,
            clusterVariables,
            blups = coef,
            fixed.effects = lme4::fixef,
@@ -132,10 +132,10 @@ cv.lme <-
            data = insight::get_data(model),
            criterion = mse,
            k = NULL,
-           reps = 1,
+           reps = 1L,
            seed,
            details = NULL,
-           ncores = 1,
+           ncores = 1L,
            clusterVariables,
            blups = coef,
            fixed.effects = nlme::fixef,
@@ -176,10 +176,10 @@ cv.glmmTMB <-
            data = insight::get_data(model),
            criterion = mse,
            k = NULL,
-           reps = 1,
+           reps = 1L,
            seed,
            details = NULL,
-           ncores = 1,
+           ncores = 1L,
            clusterVariables,
            blups = coef,
            fixed.effects = glmmTMB::fixef,
@@ -221,7 +221,7 @@ defineClusters <- function(variables, data) {
   if (any(bad <- !variables %in% all.variables)) {
     stop(
       "The following cluster variable",
-      if (sum(bad) > 1)
+      if (sum(bad) > 1L)
         "s are"
       else
         " is",
@@ -233,7 +233,7 @@ defineClusters <- function(variables, data) {
 }
 
 selectCluster <- function(cluster, data) {
-  result <- apply(data[, names(cluster), drop = FALSE], 1,
+  result <- apply(data[, names(cluster), drop = FALSE], 1L,
                   function(x)
                     all(x == cluster))
   if (!any(result))
@@ -244,6 +244,6 @@ selectCluster <- function(cluster, data) {
 }
 
 selectClusters <- function(clusters, data) {
-  result <- apply(clusters, 1, selectCluster, data = data)
-  apply(result, 1, any)
+  result <- apply(clusters, 1L, selectCluster, data = data)
+  apply(result, 1L, any)
 }

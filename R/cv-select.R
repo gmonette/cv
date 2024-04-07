@@ -117,16 +117,16 @@
 cv.function <- function(model,
                         data,
                         criterion = mse,
-                        k = 10,
-                        reps = 1,
+                        k = 10L,
+                        reps = 1L,
                         seed = NULL,
                         working.model = NULL,
                         y.expression = NULL,
-                        confint = n >= 400,
+                        confint = n >= 400L,
                         level = 0.95,
-                        details = k <= 10,
+                        details = k <= 10L,
                         save.model = FALSE,
-                        ncores = 1,
+                        ncores = 1L,
                         ...) {
   n <- nrow(data)
   cvSelect(
@@ -335,7 +335,7 @@ selectTrans <- function(data,
   )
 
   if (missing(indices)) {
-    indices <- nrow(data) + 1 # will use full sample
+    indices <- nrow(data) + 1L # will use full sample
     full.sample <- TRUE
   } else {
     # refit model omitting current fold
@@ -483,7 +483,7 @@ selectTransStepAIC <- function(data,
   # if indices is missing, use full data set;
   # otherwise remove cases in current fold (indices)
   inds <- if (missing(indices))
-    length(y) + 1
+    length(y) + 1L
   else
     indices
 
@@ -645,9 +645,9 @@ selectModelList <-
            indices,
            model,
            criterion = mse,
-           k = 10,
+           k = 10L,
            k.recurse = k,
-           details =  k <= 10,
+           details =  k <= 10L,
            save.model = FALSE,
            seed = FALSE,
            quietly = TRUE,
@@ -677,7 +677,7 @@ selectModelList <-
                   else
                     NULL))
     }
-    y <- GetResponse(model[[1]])
+    y <- GetResponse(model[[1L]])
     for (i in seq_along(model)) {
       mod <- model[[i]]
       model[[i]] <- update(mod, data = data[-indices,])
