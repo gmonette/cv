@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-04-05" />
+<meta name="date" content="2024-04-07" />
 
 <title>Cross-validation of regression models</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Cross-validation of regression models</h1>
 <h3 class="subtitle">Introduction to the cv package</h3>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-04-05</h4>
+<h4 class="date">2024-04-07</h4>
 
 
 
@@ -590,12 +590,12 @@ method, which by default performs <span class="math inline">\(k =
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">cv</span>(m.auto)</span>
-<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 810548</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 549853</span></span>
 <span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
 <span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.129</span></span>
-<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.121</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.137</span></span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.129</span></span>
 <span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>&quot;lm&quot;</code> method by default uses <code>mse()</code> as
 the CV criterion and the Woodbury matrix identity <span class="citation">(&quot;Woodbury matrix identity&quot;, 2023)</span> to update the
@@ -1120,7 +1120,7 @@ of the competing models.</p>
 <code>&quot;cvList&quot;</code>—which contains a variety of information about the
 results of a CV procedure. The <strong>cv</strong> package provides
 <code>as.data.frame()</code> methods to put this information in the form
-of data frames for further examination and analysis. There is also a
+of data frames for further examination and analysis.<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> There is also a
 <code>summary()</code> method for extracting and summarizing the
 information in the resulting data frames.</p>
 <p>We’ll illustrate with the replicated CV that we performed for the 10
@@ -1542,6 +1542,10 @@ is a <code>&quot;cv&quot;</code> object with the correct random-number seed save
 and so this technical detail can be safely ignored. The individual
 <code>&quot;cv&quot;</code> objects are printed in the order in which they are
 stored rather than the order in which they are computed.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>These <code>as.data.frame()</code> methods were created
+at the suggestion of Michael Friendly of York University as a mechanism
+for making the output of the various <code>cv()</code> methods more
+accessible to the user.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 

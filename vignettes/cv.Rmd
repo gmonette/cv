@@ -400,7 +400,9 @@ The graph shows both the average CV criterion and its range for each of the comp
 
 ## Manipulating "cv" and related objects
 
-The `cv()` functions returns an object of class `"cv"`---or a closely related object, for example, of class `"cvList"`---which contains a variety of information about the results of a CV procedure. The **cv** package provides `as.data.frame()` methods to put this information in the form of data frames for further examination and analysis. There is also a `summary()` method for extracting and summarizing the information in the resulting data frames.
+The `cv()` functions returns an object of class `"cv"`---or a closely related object, for example, of class `"cvList"`---which contains a variety of information about the results of a CV procedure. The **cv** package provides `as.data.frame()` methods to put this information in the form of data frames for further examination and analysis.[^Friendly] There is also a `summary()` method for extracting and summarizing the information in the resulting data frames.
+
+[^Friendly]: These `as.data.frame()` methods were created at the suggestion of Michael Friendly of York University as a mechanism for making the output of the various `cv()` methods more accessible to the user.
 
 We'll illustrate with the replicated CV that we performed for the 10 polynomial-regression models fit to the `Auto` data:
 ```{r recall-cv.auto.reps}
