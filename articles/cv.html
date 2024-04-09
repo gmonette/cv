@@ -83,7 +83,7 @@ package</h3>
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-04-07</h4>
+            <h4 data-toc-skip class="date">2024-04-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -333,12 +333,12 @@ method, which by default performs <span class="math inline">\(k =
 <span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 752835</span></span>
+<span><span class="co">#&gt; R RNG seed set to 154380</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.296</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.28</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.188</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.178</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity <span class="citation">("Woodbury matrix identity", 2023)</span> to update the
@@ -1171,7 +1171,6 @@ as follows:</p>
 <span><span class="co">#&gt;           rep</span></span>
 <span><span class="co">#&gt; model           1      2      3      4      5</span></span>
 <span><span class="co">#&gt;   model.1  24.193 24.113 24.226 24.144 24.184</span></span>
-<span><span class="co">#&gt;   model.10 19.524 19.586 19.345 19.027 19.214</span></span>
 <span><span class="co">#&gt;   model.2  19.209 19.285 19.240 19.205 19.256</span></span>
 <span><span class="co">#&gt;   model.3  19.309 19.445 19.348 19.255 19.282</span></span>
 <span><span class="co">#&gt;   model.4  19.521 19.524 19.402 19.343 19.301</span></span>
@@ -1180,12 +1179,12 @@ as follows:</p>
 <span><span class="co">#&gt;   model.7  18.935 19.056 18.960 18.596 18.715</span></span>
 <span><span class="co">#&gt;   model.8  19.043 19.174 19.111 18.675 18.861</span></span>
 <span><span class="co">#&gt;   model.9  19.133 19.286 19.161 18.811 18.880</span></span>
+<span><span class="co">#&gt;   model.10 19.524 19.586 19.345 19.027 19.214</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span>, </span>
 <span>        include<span class="op">=</span><span class="st">"folds"</span><span class="op">)</span> <span class="co"># mean over folds</span></span>
 <span><span class="co">#&gt;           rep</span></span>
 <span><span class="co">#&gt; model           1      2      3      4      5</span></span>
 <span><span class="co">#&gt;   model.1  24.181 24.128 24.226 24.134 24.229</span></span>
-<span><span class="co">#&gt;   model.10 19.603 19.710 19.416 19.068 19.329</span></span>
 <span><span class="co">#&gt;   model.2  19.202 19.310 19.236 19.193 19.306</span></span>
 <span><span class="co">#&gt;   model.3  19.309 19.483 19.352 19.247 19.336</span></span>
 <span><span class="co">#&gt;   model.4  19.536 19.571 19.415 19.342 19.360</span></span>
@@ -1194,12 +1193,12 @@ as follows:</p>
 <span><span class="co">#&gt;   model.7  18.954 19.135 18.997 18.601 18.787</span></span>
 <span><span class="co">#&gt;   model.8  19.071 19.259 19.162 18.686 18.944</span></span>
 <span><span class="co">#&gt;   model.9  19.171 19.379 19.214 18.834 18.965</span></span>
+<span><span class="co">#&gt;   model.10 19.603 19.710 19.416 19.068 19.329</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span>, fun<span class="op">=</span><span class="va">sd</span>, </span>
 <span>        include<span class="op">=</span><span class="st">"folds"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           rep</span></span>
 <span><span class="co">#&gt; model           1      2      3      4      5</span></span>
 <span><span class="co">#&gt;   model.1  7.5627 5.2658 5.7947 4.7165 7.3591</span></span>
-<span><span class="co">#&gt;   model.10 6.1825 4.8554 6.2557 5.7029 6.1985</span></span>
 <span><span class="co">#&gt;   model.2  5.9324 5.2518 5.8166 5.1730 6.2126</span></span>
 <span><span class="co">#&gt;   model.3  6.0754 5.4492 5.8168 5.2288 6.2387</span></span>
 <span><span class="co">#&gt;   model.4  6.1737 5.2488 5.9952 5.4866 6.3122</span></span>
@@ -1207,7 +1206,8 @@ as follows:</p>
 <span><span class="co">#&gt;   model.6  5.7094 5.0444 6.4010 5.2868 5.9796</span></span>
 <span><span class="co">#&gt;   model.7  5.6307 5.1164 6.6751 5.1084 5.8796</span></span>
 <span><span class="co">#&gt;   model.8  5.7009 5.1229 6.4827 5.1068 5.9460</span></span>
-<span><span class="co">#&gt;   model.9  5.7979 5.2289 6.3960 5.3181 6.0902</span></span></code></pre></div>
+<span><span class="co">#&gt;   model.9  5.7979 5.2289 6.3960 5.3181 6.0902</span></span>
+<span><span class="co">#&gt;   model.10 6.1825 4.8554 6.2557 5.7029 6.1985</span></span></code></pre></div>
 <p>See <code><a href="../reference/cv.html">?summary.cvDataFrame</a></code> for details.</p>
 </div>
 <div class="section level2">
@@ -1235,7 +1235,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  52.598   3.468  56.312</span></span>
+<span><span class="co">#&gt;  35.982   2.293  38.370</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
@@ -1249,7 +1249,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.407   0.074  30.900</span></span>
+<span><span class="co">#&gt;   0.315   0.060  21.184</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>On our computer, the parallel computation with 2 cores is nearly
