@@ -807,13 +807,31 @@ print.cvDataFrame <- function(x,
 #' summary. One of \code{"cv"} (the default), rows representing the overall CV
 #' results; \code{"folds"}, rows for individual folds; \code{"all"}, all rows
 #' (generally not sensible).
+#' @param numeric.sort if \code{TRUE} (the default), numbers in the values of
+#' factor or character columns in the \code{"cvDataFrame"} object are ordered
+#' numerically rather than alphabetically, so that, e.g., \code{"model.10"} sorts
+#' after \code{"model.9"} rather than before \code{"model.2"}.
 #' @exportS3Method base::summary
 summary.cvDataFrame <- function(object,
                                 formula,
                                 subset = NULL,
                                 fun = mean,
                                 include = c("cv", "folds", "all"),
+                                numeric.sort=TRUE,
                                 ...) {
+
+  factor.cols <- sapply(object, function(x) any(class(x)
+                        %in% c("factor", "character")))
+  if (numeric.sort && any(factor.cols)){
+    which.factor <- which(factor.cols)
+    for (col in which.factor){
+      levels <- unique(as.character(object[, col]))
+      levels2 <- gsub("[.-]", "_", levels)
+      object[, col] <- factor(object[, col],
+                              levels=levels[gtools::mixedorder(levels2)])
+    }
+  }
+
   include <- match.arg(include)
   if (include == "cv") {
     object <- object[object$fold == 0,]
