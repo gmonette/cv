@@ -441,6 +441,9 @@ as.data.frame.cvModList <- function(x, row.names=NULL, optional=TRUE, ...) {
   }
   rownames(D) <- row.names
   if (!optional) names(D) <- make.names(names(D), unique = TRUE)
+  levels <- unique(D$model)
+  levels2 <- gsub("[.-]", "_", levels)
+  D$model <- factor(D$model, levels = levels[gtools::mixedorder(levels2)])
   class(D) <-
     c("cvModListDataFrame",
       "cvListDataFrame",

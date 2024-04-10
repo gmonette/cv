@@ -90,7 +90,6 @@ cv(model, data, criterion, k, reps = 1L, seed, ...)
   subset = NULL,
   fun = mean,
   include = c("cv", "folds", "all"),
-  numeric.sort = TRUE,
   ...
 )
 }
@@ -196,11 +195,6 @@ is not to subset the \code{"cvDataFrame"} object.}
 summary. One of \code{"cv"} (the default), rows representing the overall CV
 results; \code{"folds"}, rows for individual folds; \code{"all"}, all rows
 (generally not sensible).}
-
-\item{numeric.sort}{if \code{TRUE} (the default), numbers in the values of
-factor or character columns in the \code{"cvDataFrame"} object are ordered
-numerically rather than alphabetically, so that, e.g., \code{"model.10"} sorts
-after \code{"model.9"} rather than before \code{"model.2"}.}
 }
 \value{
 The \code{cv()} methods return an object of class \code{"cv"}, with the CV criterion
