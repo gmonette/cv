@@ -180,7 +180,7 @@ summary(m.auto)
 
 cv(m.auto)
 ```
-The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity [@Wikipedia-Woodbury:2023] to update the regression with each fold deleted without having literally to refit the model. (Computational details are discussed in a separate vignette.) The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the original, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
+The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity [@Hager:1989] to update the regression with each fold deleted without having literally to refit the model. (Computational details are discussed in a separate vignette.) The function reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the original, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
 
 To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases in the data, here `k=392`, or, more conveniently, to `k="loo"` or `k="n"`:
 

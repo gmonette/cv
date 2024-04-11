@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-04-04" />
+<meta name="date" content="2024-04-11" />
 
 <title>Computational and technical notes on cross-validation of regression models</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Computational and technical notes on
 cross-validation of regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-04-04</h4>
+<h4 class="date">2024-04-11</h4>
 
 
 
@@ -411,7 +411,7 @@ approach can break down when one or more hatvalues are equal to 1, in
 which case the formula for <span class="math inline">\(\widehat{y}_{-i}\)</span> requires division by
 0.</p>
 <p>To compute cross-validated fitted values when the folds contain more
-than one case, we make use of the Woodbury matrix identify <span class="citation">(&quot;Woodbury matrix identity&quot;, 2023)</span>, <span class="math display">\[
+than one case, we make use of the Woodbury matrix identify <span class="citation">(Hager, 1989)</span>, <span class="math display">\[
 \left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k}
 \mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} =
 \mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} +
@@ -901,14 +901,13 @@ Fox, J., &amp; Weisberg, S. (2019). <em>An <span>R</span> companion to
 applied regression</em> (Third edition). Thousand Oaks <span>CA</span>:
 Sage.
 </div>
+<div id="ref-Hager:1989" class="csl-entry">
+Hager, W. W. (1989). Updating the inverse of a matrix.
+<em><span>SIAM</span> Review</em>, <em>31</em>(2), 221–239.
+</div>
 <div id="ref-Mersmann:2023" class="csl-entry">
 Mersmann, O. (2023). <em>Microbenchmark: Accurate timing functions</em>.
 Retrieved from <a href="https://CRAN.R-project.org/package=microbenchmark">https://CRAN.R-project.org/package=microbenchmark</a>
-</div>
-<div id="ref-Wikipedia-Woodbury:2023" class="csl-entry">
-&quot;Woodbury matrix identity&quot;. (2023). Woodbury matrix
-identity—<span>W</span>ikipedia<span>,</span> the free encyclopedia.
-Retrieved from <a href="https://en.wikipedia.org/wiki/Woodbury_matrix_identity">https://en.wikipedia.org/wiki/Woodbury_matrix_identity</a>
 </div>
 </div>
 </div>
