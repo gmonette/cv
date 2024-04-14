@@ -42,8 +42,8 @@ which are documented separately."><!-- mathjax --><script src="https://cdnjs.clo
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/cv-extend.html">Extending the cv package</a>
-    <a class="dropdown-item" href="../articles/cv-mixed.html">Cross-validation of mixed-effects models</a>
-    <a class="dropdown-item" href="../articles/cv-notes.html">Computational and technical notes on cross-validation of regression models</a>
+    <a class="dropdown-item" href="../articles/cv-mixed.html">Cross-validating mixed-effects models</a>
+    <a class="dropdown-item" href="../articles/cv-notes.html">Computational and technical notes on cross-validating regression models</a>
     <a class="dropdown-item" href="../articles/cv-selection.html">Cross-validating model selection</a>
   </div>
 </li>
@@ -380,7 +380,7 @@ or <code>method="Woodbury"</code> for k-fold CV.</p>
 <code><a href="https://rdrr.io/pkg/MASS/man/rlm.html" class="external-link">rlm</a>()</code> in the <span class="pkg">MASS</span> package (to avoid
 inheriting the <code>"lm"</code> method for which the default <code>"auto"</code>
 computational method would be inappropriate).</p>
-<p>For additional details, see the "Cross-validation of regression models"
+<p>For additional details, see the "Cross-validating regression models"
 vignette (<code><a href="../articles/cv.html">vignette("cv", package="cv")</a></code>).</p>
 <p><code>cv()</code> is designed to be extensible to other classes of regression
 models; see the "Extending the cv package" vignette
