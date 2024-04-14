@@ -1,5 +1,5 @@
 ---
-title: "Computational and technical notes on cross-validation of regression models"
+title: "Computational and technical notes on cross-validating regression models"
 author: "John Fox and Georges Monette"
 date: "`r Sys.Date()`"
 package: cv
@@ -9,7 +9,7 @@ output:
 bibliography: ["cv.bib"]
 csl: apa.csl
 vignette: >
-  %\VignetteIndexEntry{Computational and technical notes on cross-validation of regression models}
+  %\VignetteIndexEntry{Computational and technical notes on cross-validating regression models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -88,7 +88,7 @@ The Woodbury identity also requires that the model matrix be of full rank. We im
 
 We then treat re-estimation of the model with a case or cases deleted as a WLS problem, using the hatvalues or the Woodbury matrix identity. The resulting fitted values for the deleted fold aren't exact---that is, except for the Gaussian family, the result isn't identical to what we would obtain by literally refitting the model---but in our (limited) experience, the approximation is very good, especially for LOO CV, which is when we would be most tempted to use it. Nevertheless, because these results are approximate, the default for the `"glm"` `cv()` method is to perform the exact computation, which entails refitting the model with each fold omitted.
 
-Let's compare the efficiency of the various computational methods for linear and generalized linear models. Consider, for example, leave-one-out cross-validation for the quadratic regression of `mpg` on `horsepower` in the `Auto` data, from the introductory "Cross-validation of regression models" vignette, repeated here:
+Let's compare the efficiency of the various computational methods for linear and generalized linear models. Consider, for example, leave-one-out cross-validation for the quadratic regression of `mpg` on `horsepower` in the `Auto` data, from the introductory "Cross-validating regression models" vignette, repeated here:
 ```{r Auto-data-quaadratic-regression}
 data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ poly(horsepower, 2), data = Auto)

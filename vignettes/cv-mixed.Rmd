@@ -1,5 +1,5 @@
 ---
-title: "Cross-validation of mixed-effects models"
+title: "Cross-validating mixed-effects models"
 author: "John Fox and Georges Monette"
 date: "`r Sys.Date()`"
 package: cv
@@ -9,7 +9,7 @@ output:
 bibliography: ["cv.bib"]
 csl: apa.csl
 vignette: >
-  %\VignetteIndexEntry{Cross-validation of mixed-effects models}
+  %\VignetteIndexEntry{Cross-validating mixed-effects models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

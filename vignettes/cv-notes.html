@@ -12,9 +12,9 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-04-11" />
+<meta name="date" content="2024-04-14" />
 
-<title>Computational and technical notes on cross-validation of regression models</title>
+<title>Computational and technical notes on cross-validating regression models</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -361,9 +361,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Computational and technical notes on
-cross-validation of regression models</h1>
+cross-validating regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-04-11</h4>
+<h4 class="date">2024-04-14</h4>
 
 
 
@@ -466,7 +466,7 @@ entails refitting the model with each fold omitted.</p>
 linear and generalized linear models. Consider, for example,
 leave-one-out cross-validation for the quadratic regression of
 <code>mpg</code> on <code>horsepower</code> in the <code>Auto</code>
-data, from the introductory “Cross-validation of regression models”
+data, from the introductory “Cross-validating regression models”
 vignette, repeated here:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Auto&quot;</span>, <span class="at">package=</span><span class="st">&quot;ISLR2&quot;</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>m.auto <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> <span class="fu">poly</span>(horsepower, <span class="dv">2</span>), <span class="at">data =</span> Auto)</span>

@@ -256,7 +256,7 @@ There is also a method for robust linear models fit by
 inheriting the \code{"lm"} method for which the default \code{"auto"}
 computational method would be inappropriate).
 
-For additional details, see the "Cross-validation of regression models"
+For additional details, see the "Cross-validating regression models"
 vignette (\code{vignette("cv", package="cv")}).
 
 \code{cv()} is designed to be extensible to other classes of regression

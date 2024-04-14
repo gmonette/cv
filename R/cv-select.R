@@ -83,7 +83,7 @@
 #' argument, see the code for \code{selectStepAIC()},
 #' \code{selectTrans()}, and \code{selectTransAndStepAIC()}.
 #'
-#' For additional information, see the "Cross-validation of model selection"
+#' For additional information, see the "Cross-validating model selection"
 #' vignette (\code{vignette("cv-select", package="cv")})
 #' and the "Extending the cv package" vignette
 #' (\code{vignette("cv-extend", package="cv")}).

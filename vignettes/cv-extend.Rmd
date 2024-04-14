@@ -75,7 +75,7 @@ cv(m.mroz, criterion=AUCcomp, seed=3639)
 ```
 As expected, the cross-validated complement to the AUC is somewhat less optimistic than the criterion computed from the model fit to the whole data set.
 
-As we explain in the vignette "Cross-validation of regression models," the `cv()` function differentiates between CV criteria that are averages of casewise components and criteria that are not. Computation of bias corrections and confidence intervals is limited to the former. We show in the technical and computational vignette that the AUC, and hence its complement, cannot be expressed as averages of casewise components.
+As we explain in the vignette "Cross-validating regression models," the `cv()` function differentiates between CV criteria that are averages of casewise components and criteria that are not. Computation of bias corrections and confidence intervals is limited to the former. We show in the technical and computational vignette that the AUC, and hence its complement, cannot be expressed as averages of casewise components.
 
 `cv()` looks for a `"casewise loss"` attribute of the value returned by a CV criterion function. If this attribute exists, then the criterion is treated as the mean of casewise components, and `cv()` uses the unexported function `getLossFn()` to construct a function that returns the casewise components of the criterion.
 
