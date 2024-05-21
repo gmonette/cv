@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-05-14</h4>
+            <h4 data-toc-skip class="date">2024-05-21</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-mixed.Rmd" class="external-link"><code>vignettes/cv-mixed.Rmd</code></a></small>
       <div class="d-none name"><code>cv-mixed.Rmd</code></div>
@@ -150,26 +150,31 @@ school-level data:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"MathAchieve"</span>, package <span class="op">=</span> <span class="st">"nlme"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">MathAchieve</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 7185    6</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">MathAchieve</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 7185    6</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">MathAchieve</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   School Minority    Sex    SES MathAch MEANSES</span></span>
 <span><span class="co">#&gt; 1   1224       No Female -1.528   5.876  -0.428</span></span>
 <span><span class="co">#&gt; 2   1224       No Female -0.588  19.708  -0.428</span></span>
-<span><span class="co">#&gt; 3   1224       No   Male -0.528  20.349  -0.428</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">MathAchieve</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 3   1224       No   Male -0.528  20.349  -0.428</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">MathAchieve</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      School Minority    Sex    SES MathAch MEANSES</span></span>
 <span><span class="co">#&gt; 7183   9586       No Female  1.332  19.641   0.627</span></span>
 <span><span class="co">#&gt; 7184   9586       No Female -0.008  16.241   0.627</span></span>
-<span><span class="co">#&gt; 7185   9586       No Female  0.792  22.733   0.627</span></span>
-<span></span>
+<span><span class="co">#&gt; 7185   9586       No Female  0.792  22.733   0.627</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"MathAchSchool"</span>, package <span class="op">=</span> <span class="st">"nlme"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">MathAchSchool</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 160   7</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">MathAchSchool</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 160   7</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">MathAchSchool</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      School Size Sector PRACAD DISCLIM HIMINTY MEANSES</span></span>
 <span><span class="co">#&gt; 1224   1224  842 Public   0.35   1.597       0  -0.428</span></span>
-<span><span class="co">#&gt; 1288   1288 1855 Public   0.27   0.174       0   0.128</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">MathAchSchool</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 1288   1288 1855 Public   0.27   0.174       0   0.128</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">MathAchSchool</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      School Size   Sector PRACAD DISCLIM HIMINTY MEANSES</span></span>
 <span><span class="co">#&gt; 9550   9550 1532   Public   0.45   0.791       0   0.059</span></span>
 <span><span class="co">#&gt; 9586   9586  262 Catholic   1.00  -2.416       0   0.627</span></span></code></pre></div>
@@ -185,7 +190,7 @@ standardized math-achievement test) variables in the
 to the HSB data, for which we use the <strong>dplyr</strong> package
 <span class="citation">(Wickham, François, Henry, Müller, &amp; Vaughan,
 2023)</span>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
 <span><span class="va">MathAchieve</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">School</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>mean.ses <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">SES</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">Temp</span></span>
@@ -203,7 +208,7 @@ its mean. For details, see <span class="citation">Fox &amp; Weisberg
 <p>Still following Fox and Weisberg, we proceed to use the
 <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer()</a></code> function in the <strong>lme4</strong> package <span class="citation">(Bates, Mächler, Bolker, &amp; Walker, 2015)</span> to
 fit a mixed model for math achievement to the HSB data:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lme4/lme4/" class="external-link">"lme4"</a></span><span class="op">)</span></span>
 <span><span class="va">hsb.lmer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">mathach</span> <span class="op">~</span> <span class="va">mean.ses</span> <span class="op">*</span> <span class="va">cses</span> <span class="op">+</span> <span class="va">sector</span> <span class="op">*</span> <span class="va">cses</span></span>
 <span>                 <span class="op">+</span> <span class="op">(</span><span class="va">cses</span> <span class="op">|</span> <span class="va">school</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">HSB</span><span class="op">)</span></span>
@@ -234,7 +239,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <span><span class="co">#&gt; mean.ses:cses          1.039      0.299    3.48</span></span>
 <span><span class="co">#&gt; cses:sectorCatholic   -1.643      0.240   -6.85</span></span></code></pre></div>
 <p>We can then cross-validate at the cluster (i.e., school) level,</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gmonette.github.io/cv/">"cv"</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>,</span>
@@ -249,7 +254,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (38.066, 40.231)</span></span>
 <span><span class="co">#&gt; full-sample criterion = 39.006</span></span></code></pre></div>
 <p>or at the case (i.e., student) level,</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, seed <span class="op">=</span> <span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
 <span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
@@ -284,7 +289,7 @@ by the <code><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-lin
 and the arguments for <code><a href="../reference/cv.html">cv()</a></code> in this case are the same as for
 a model fit by <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer()</a></code> or <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer()</a></code>. We
 illustrate with the mixed model fit to the HSB data:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://svn.r-project.org/R-packages/trunk/nlme/" class="external-link">"nlme"</a></span><span class="op">)</span></span>
 <span><span class="va">hsb.lme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme</a></span><span class="op">(</span></span>
 <span>  <span class="va">mathach</span> <span class="op">~</span> <span class="va">mean.ses</span> <span class="op">*</span> <span class="va">cses</span> <span class="op">+</span> <span class="va">sector</span> <span class="op">*</span> <span class="va">cses</span>,</span>
@@ -327,8 +332,9 @@ illustrate with the mixed model fit to the HSB data:</p>
 <span><span class="co">#&gt; -3.170106 -0.724877  0.014892  0.754263  2.965498 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of Observations: 7185</span></span>
-<span><span class="co">#&gt; Number of Groups: 160</span></span>
-<span></span>
+<span><span class="co">#&gt; Number of Groups: 160</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lme</span>,</span>
 <span>   k <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>   clusterVariables <span class="op">=</span> <span class="st">"school"</span>,</span>
@@ -339,8 +345,9 @@ illustrate with the mixed model fit to the HSB data:</p>
 <span><span class="co">#&gt; cross-validation criterion = 39.157</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.149</span></span>
 <span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (38.066, 40.232)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 39.006</span></span>
-<span></span>
+<span><span class="co">#&gt; full-sample criterion = 39.006</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lme</span>, seed <span class="op">=</span> <span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -399,7 +406,7 @@ of measurements taken from each student.</p>
 description above and meant to highlight the issues that arise in
 cross-validating mixed-effects models:<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;We invite the interested reader to experiment with
 varying the parameters of our example.&lt;/p&gt;"><sup>4</sup></a></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Parameters:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">9693</span><span class="op">)</span></span>
 <span><span class="va">Nb</span> <span class="op">&lt;-</span> <span class="fl">100</span>     <span class="co"># number of groups</span></span>
@@ -430,7 +437,7 @@ varying the parameters of our example.&lt;/p&gt;"><sup>4</sup></a></p>
 and &lt;strong&gt;latticeExtra&lt;/strong&gt; &lt;span class="citation"&gt;(Sarkar &amp;amp;
 Andrews, 2022)&lt;/span&gt; packages for this and other graphs in this
 section.&lt;/p&gt;'><sup>5</sup></a></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://lattice.r-forge.r-project.org/" class="external-link">"lattice"</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://latticeextra.r-forge.r-project.org/" class="external-link">"latticeExtra"</a></span><span class="op">)</span></span>
 <span><span class="va">plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span></span>
@@ -455,7 +462,7 @@ observations among all 100 students) produces an estimated slope close
 to 0 (though with a small <span class="math inline">\(p\)</span>-value),
 because the slope is heavily weighted toward the between-student
 effect:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, data<span class="op">=</span><span class="va">Data</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -477,7 +484,7 @@ effect:</p>
 <span><span class="co">#&gt; F-statistic: 8.26 on 1 and 498 DF,  p-value: 0.00422</span></span></code></pre></div>
 <p>The initial mixed-effects model that we fit to the data is a simple
 random-intercepts model:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># random intercept only:</span></span>
 <span><span class="va">mod.0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">group</span><span class="op">)</span>, <span class="va">Data</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.0</span><span class="op">)</span></span>
@@ -503,7 +510,7 @@ random-intercepts model:</p>
 <p>We will shortly consider three other, more complex, mixed models;
 because of data-management considerations, it is convenient to fit them
 now, but we defer discussion of these models:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># effect of x and random intercept:</span></span>
 <span><span class="va">mod.1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">group</span><span class="op">)</span>, <span class="va">Data</span><span class="op">)</span></span>
 <span></span>
@@ -520,7 +527,7 @@ alone, as would be used for cross-validation based on clusters (i.e.,
 students), and for fixed and random effects—so-called best linear
 unbiased predictions or BLUPs—as would be used for cross-validation
 based on cases (i.e., occasions within students):</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">within</a></span><span class="op">(</span><span class="va">Data</span>, <span class="op">{</span></span>
 <span>  <span class="va">fit_mod0.fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.0</span>, re.form <span class="op">=</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span> <span class="co"># fixed effects only</span></span>
 <span>  <span class="va">fit_mod0.re</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.0</span><span class="op">)</span> <span class="co"># fixed and random effects (BLUPs)</span></span>
@@ -532,7 +539,7 @@ based on cases (i.e., occasions within students):</p>
 <span>  <span class="va">fit_mod3.re</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">mod.3</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p>We then prepare the data for plotting:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Data_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">reshape</a></span><span class="op">(</span><span class="va">Data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">Nx</span>, <span class="op">]</span>, direction <span class="op">=</span> <span class="st">"long"</span>, sep <span class="op">=</span> <span class="st">"."</span>, </span>
 <span>              timevar <span class="op">=</span> <span class="st">"effect"</span>, varying <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"\\."</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">Data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">Nx</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Data_long</span><span class="op">$</span><span class="va">id</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Data_long</span><span class="op">)</span></span>
@@ -544,7 +551,7 @@ based on cases (i.e., occasions within students):</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Predictions based on the random-intercept model <code>mod.0</code>
 for the first 10 students are shown in the following graph:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span></span>
 <span>  <span class="va">plot</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span></span>
@@ -583,7 +590,7 @@ skill, the fixed-effect-only predictions and the BLUPs are not very
 different.</p>
 <p>Our next model, <code>mod.1</code>, includes a fixed intercept and
 fixed effect of <code>x</code> along with a random intercept:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
 <span><span class="co">#&gt; Formula: y ~ x + (1 | group)</span></span>
@@ -610,7 +617,7 @@ fixed effect of <code>x</code> along with a random intercept:</p>
 <span><span class="co">#&gt;   (Intr)</span></span>
 <span><span class="co">#&gt; x -0.460</span></span></code></pre></div>
 <p>Predictions from this model appear in the following graph:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span></span>
 <span>  <span class="va">plot</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span></span>
@@ -653,7 +660,7 @@ of <span class="math inline">\(x\)</span>—that is, the cluster mean
 <code>xm</code>—along with <span class="math inline">\(x\)</span> and
 the intercept in the fixed-effect part of the model, and a random
 intercept:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
 <span><span class="co">#&gt; Formula: y ~ x + xm + (1 | group)</span></span>
@@ -688,7 +695,7 @@ generated the data once the coefficient of the contextual predictor
 below).</p>
 <p>Predictions from model <code>mod.2</code> appear in the following
 graph:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span></span>
 <span>  <span class="va">plot</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span></span>
@@ -748,7 +755,7 @@ generate the data. As mentioned, it is a constrained version of
 <code>mod.2</code>, with the coefficient of <code>xm</code> set to 0,
 and with <code>x</code> expressed as a deviation from the cluster mean
 <code>xm</code>:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">mod.3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
 <span><span class="co">#&gt; Formula: y ~ I(x - xm) + (1 | group)</span></span>
@@ -776,7 +783,7 @@ and with <code>x</code> expressed as a deviation from the cluster mean
 <span><span class="co">#&gt; I(x - xm) 0.000</span></span></code></pre></div>
 <p>The predictions from <code>mod.3</code> are therefore similar to
 those from <code>mod.2</code>:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span></span>
 <span>  <span class="va">plot</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html" class="external-link">xyplot</a></span><span class="op">(</span></span>
@@ -813,7 +820,7 @@ effects only. In order to reduce between-model random variability in
 comparisons of models, we apply <code><a href="../reference/cv.html">cv()</a></code> to the list of models
 created by the <code><a href="../reference/cv.modList.html">models()</a></code> function (introduced previously),
 performing cross-validation with the same folds for each model:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modlist</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.modList.html">models</a></span><span class="op">(</span></span>
 <span>  <span class="st">"~ 1"</span> <span class="op">=</span> <span class="va">mod.0</span>,</span>
 <span>  <span class="st">"~ 1 + x"</span> <span class="op">=</span> <span class="va">mod.1</span>,</span>
@@ -836,7 +843,7 @@ with varying fixed effects. The error bars show the 95% confidence
 interval around the CV estimate of the MSE for each model.
 </p>
 </div>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvs_cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">modlist</span>, data <span class="op">=</span> <span class="va">Data</span>, seed <span class="op">=</span> <span class="fl">9693</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cvs_cases</span>, main <span class="op">=</span> <span class="st">"Model Comparison, Case-Based CV"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
@@ -873,7 +880,7 @@ refitted model to predict the response in the removed fold.</p>
 <p>We’ll illustrate with data on pig growth, introduced by <span class="citation">Diggle, Liang, &amp; Zeger (1994, Table 3.1)</span>.
 The data are in the <code>Pigs</code> data frame in the
 <strong>cv</strong> package:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Pigs</span>, <span class="fl">9</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   id week weight</span></span>
 <span><span class="co">#&gt; 1  1    1   24.0</span></span>
@@ -884,14 +891,16 @@ The data are in the <code>Pigs</code> data frame in the
 <span><span class="co">#&gt; 6  1    6   54.5</span></span>
 <span><span class="co">#&gt; 7  1    7   61.0</span></span>
 <span><span class="co">#&gt; 8  1    8   65.0</span></span>
-<span><span class="co">#&gt; 9  1    9   72.0</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">id</span> <span class="op">+</span> <span class="va">week</span>, data <span class="op">=</span> <span class="va">Pigs</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 9  1    9   72.0</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">id</span> <span class="op">+</span> <span class="va">week</span>, data <span class="op">=</span> <span class="va">Pigs</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    week</span></span>
 <span><span class="co">#&gt; id  1 2 3 4 5 6 7 8 9</span></span>
 <span><span class="co">#&gt;   1 1 1 1 1 1 1 1 1 1</span></span>
 <span><span class="co">#&gt;   2 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="co">#&gt;   3 1 1 1 1 1 1 1 1 1</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">id</span> <span class="op">+</span> <span class="va">week</span>, data <span class="op">=</span> <span class="va">Pigs</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   3 1 1 1 1 1 1 1 1 1</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">id</span> <span class="op">+</span> <span class="va">week</span>, data <span class="op">=</span> <span class="va">Pigs</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     week</span></span>
 <span><span class="co">#&gt; id   1 2 3 4 5 6 7 8 9</span></span>
 <span><span class="co">#&gt;   46 1 1 1 1 1 1 1 1 1</span></span>
@@ -906,7 +915,7 @@ missing cases.</p>
 similar to Figure 3.1 in <span class="citation">Diggle et al.
 (1994)</span>; we add an overall least-squares line and a loess smooth,
 which are nearly indistinguishable:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">weight</span> <span class="op">~</span> <span class="va">week</span>, data <span class="op">=</span> <span class="va">Pigs</span>, type <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">Pigs</span><span class="op">$</span><span class="va">id</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">Pigs</span>, <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
@@ -963,7 +972,7 @@ a reasonable specification.</p>
 <p>The <strong>Stata</strong> manual fits the mixed model by maximum
 likelihood (rather than REML), and we duplicate the results reported
 there using <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer()</a></code>:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span></span>
 <span>  <span class="va">weight</span> <span class="op">~</span> <span class="va">week</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">id</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fl">1</span> <span class="op">|</span> <span class="va">week</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">Pigs</span>,</span>
@@ -1005,15 +1014,16 @@ in this example.</p>
 pigs, folds composed of weeks, or folds composed of pig-weeks (which in
 the <code>Pigs</code> data set correspond to individual cases, using
 only the fixed effects):</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.p</span>, clusterVariables <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation based on 48 {id} clusters</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.973</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.965</span></span>
 <span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (17.125, 22.805)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 19.201</span></span>
-<span></span>
+<span><span class="co">#&gt; full-sample criterion = 19.201</span></span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.p</span>, clusterVariables <span class="op">=</span> <span class="st">"week"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation based on 9 {week} clusters</span></span>
@@ -1021,8 +1031,9 @@ only the fixed effects):</p>
 <span><span class="co">#&gt; cross-validation criterion = 19.312</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.305</span></span>
 <span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (16.566, 22.044)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 19.201</span></span>
-<span></span>
+<span><span class="co">#&gt; full-sample criterion = 19.201</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.p</span>,</span>
 <span>  clusterVariables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"week"</span><span class="op">)</span>,</span>
@@ -1038,7 +1049,7 @@ only the fixed effects):</p>
 <span><span class="co">#&gt; full-sample criterion = 19.201</span></span></code></pre></div>
 <p>We can also cross-validate the individual cases taking account of the
 random effects (employing the same 10 folds):</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.p</span>, k <span class="op">=</span> <span class="fl">10</span>, seed <span class="op">=</span> <span class="fl">8469</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 8469</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
