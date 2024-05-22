@@ -50,6 +50,7 @@ has vignette
 
 https://cran.r-project.org/web/packages/rsample/
 ** evaluate further
+use as comparison?
 
 https://cran.r-project.org/web/packages/surveyCV/
 for complex surveys, using survey package
@@ -59,3 +60,13 @@ with lower-level programming can be adapted to other
 
 https://cran.r-project.org/web/packages/tidyfit/
 ** evaluate further
+CV only incidental (using rsample?)
+
+
+features of cv package:
+
+model-based
+simple interface through cv()
+extensible if necessary
+takes advantage of computational efficiencies (e.g., Woodbury, parallel computations)
+novel or unusual features: supports mixed models, cross-validates model-specification including via recursive CV

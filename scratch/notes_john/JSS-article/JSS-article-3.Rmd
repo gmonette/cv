@@ -54,23 +54,27 @@ The \pkg{cv} package for \proglang{R} automates the process of cross-validation 
 library("cv", quietly=TRUE)
 methods("cv")
 ```
-The \code{"modList"} method for \code{cv()} cross-validates several competing models, not necessarily of the same class, using the same division of the data into folds. The \code{cv()} function is introduced in the context of a preliminary example in Section \ref{preliminary-example-polynomial-regression} of the paper.
+* The \code{"lm"} and \code{"glm"} methods are for linear and generalized-linear models fit respectively by the standard \proglang{R} \code{lm()} and \code{glm()} functions.
 
-Cross-validating mixed-effects models, using the \code{"glmmTMB"}, \code{"lme"}, and  \code{"merMod"} methods for \code{cv()}, involves special considerations that we take up in Section \ref{cross-validating-mixed-effects-models}.
+* The \code{"modList"} method for \code{cv()} cross-validates several competing models, not necessarily of the same class, using the same division of the data into folds. The \code{cv()} function is introduced in the context of a preliminary example in Section \ref{preliminary-example-polynomial-regression} of the paper.
 
-The \code{"function"} method for \code{cv()}, discussed in Section \ref{cross-validating-model-specification}, cross-validates a complex model-specification process that may, for example, involve choice of data transformations and predictors, or model selection via CV itself.
+* Cross-validating mixed-effects models, using the \code{"glmmTMB"}, \code{"lme"}, and  \code{"merMod"} methods for \code{cv()}, involves special considerations that we take up in Section \ref{cross-validating-mixed-effects-models}.
 
-The \code{"default"} \code{cv()} method works (perhaps with a bit of coaxing) with many other existing regression-model classes for which there is an \code{update()} method that accepts a \code{data} argument. More generally, the \pkg{cv} package is designed to be extensible, as discussed in Section \ref{extending-the-cv-package}.
+* The \code{"function"} method for \code{cv()}, discussed in Section \ref{cross-validating-model-specification}, cross-validates a complex model-specification process that may, for example, involve choice of data transformations and predictors, or model selection via CV itself.
+
+* The \code{"default"} \code{cv()} method works (perhaps with a bit of coaxing) with many other existing regression-model classes for which there is an \code{update()} method that accepts a \code{data} argument. More generally, the \pkg{cv} package is designed to be extensible, as discussed in Section \ref{extending-the-cv-package}.
 
 A number of existing \proglang{R} packages include functions for cross-validating regression models. We briefly situate the \pkg{cv} package relative to other \proglang{R} software for cross-validation in Section \ref{comparing-cv-to-other-r-software-for-cross-validation}.
 
-In the interest of brevity, we won't describe all of the features of the \pkg{cv} package here, concentrating on the aspects of the package that are relatively novel. For example, the \code{cv()} function can perform computations in parallel and can independently replicate a cross-validation procedure several times. These and other features not discussed in this paper are taken up in the vignettes distributed with the package, which also provides greater detail on some of topics that we do describe, such as extensions to the package.
+The final section of the paper (Section \ref{computational-notes}) describes some computational details, including efficient CV computations for linear and generalized-linear models and computation of bias-corrected CV criteria.
+
+In the interest of brevity, we won't describe all of the features of the \pkg{cv} package here, concentrating on the aspects of the package that are relatively novel. For example, the \code{cv()} function can perform computations in parallel and can independently replicate a cross-validation procedure several times. There are also data management facilities in the package, such as coercing the objects produced by the \code{cv()} function into data frames for further analysis. These and other features not discussed in this paper are taken up in the vignettes distributed with the package, which also provides greater detail on some of topics that we do describe, such as extensions to the package.
 
 # Preliminary Example: Polynomial regression
 
 The data for the example in this section are drawn from the \pkg{ISLR2} package for \proglang{R}, associated with @JamesEtAl:2021. The presentation here is close (though not identical) to that in the original source [@JamesEtAl:2021 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function.[^boot] 
 
-[^boot]: @JamesEtAl:2021 use the `cv.glm()` function in the \pkg{boot} package [@CantyRipley2022; @DavisonHinkley:1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function.
+[^boot]: @JamesEtAl:2021 use the `cv.glm()` function in the \pkg{boot} package [@CantyRipley2022; @DavisonHinkley:1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function. The \pkg{boot} package is part of the standard \proglang{R} distribution.
 
 The \code{Auto} dataset contains information about 392 cars:
 
@@ -176,7 +180,7 @@ The \code{"naive"} and \code{"Woodbury"} methods also return the bias-adjusted e
 This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In the following comparison, we include the \code{cv.glm()} function from the \pkg{boot} package, which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the \code{microbenchmark()} function from the package of the same name  [@Mersmann:2023] for the timings:
 ```{r cv.lm.timings, cache=TRUE}
 m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data=Auto)
-boot::cv.glm(Auto, m.auto.glm)$delta
+boot::cv.glm(Auto, m.auto.glm)$delta # MSE, biased-corrected MSE
 
 microbenchmark::microbenchmark(
   hatvalues = cv(m.auto, k="loo"),
@@ -240,7 +244,7 @@ We can think of two approaches to applying cross-validation to clustered data:[^
 
 [^cv-faq]: We subsequently discovered that @Vehtari:2023 [Section 8] makes similar points.
 
-1. Treat CV as analogous to predicting the response for one or more cases in a *newly observed cluster*. In this instance, the folds comprise one or more whole clusters; we refit the model with all of the cases in clusters in the current fold removed; and then we predict the response for the cases in clusters in the current fold. These predictions are based only on fixed effects because the random effects for the omitted clusters are presumably unknown, as they would be for data on cases in newly observed clusters.
+1. Treat CV as analogous to predicting the response for one or more cases in a *newly observed cluster*. In this instance, the folds comprise one or more whole clusters; we refit the model with all of the cases in clusters in the current fold removed; and then we predict the response for the cases in clusters in the current fold. These predictions are based only on fixed effects because the random effects for the omitted clusters are construed to be unknown, as they would be for data on cases in newly observed clusters.
 
 2. Treat CV as analogous to predicting the response for a newly observed case in an *existing cluster*. In this instance, the folds comprise one or more individual cases, and the predictions can use both the fixed and random effects---so-called "best-linear-unbiased predictors" or "BLUPs."
 
@@ -275,7 +279,7 @@ HSB <- within(HSB, {
   cses <- ses - mean.ses
 })
 ```
-In the process, we merged variables from the school-level and student-level data sets and created two new school-level variables: \code{mean.ses}, which is the average SES for students in each school; and \code{cses}, which is the individual students' SES centered at their school means. For details, see @FoxWeisberg:2019 [Sec. 7.2.2].
+In the process, we merge variables from the school-level and student-level data sets, and create two new school-level variables: \code{mean.ses}, which is the average SES for students in each school; and \code{cses}, which is the individual students' SES centered at their school means. For details, see @FoxWeisberg:2019 [Sec. 7.2.2].
 
 Still following Fox and Weisberg, we proceed to use the \code{lmer()} function in the \pkg{lme4} package [@BatesEtAl:2015] to fit a mixed model for math achievement to the HSB data:
 ```{r HSB-lmer, cache=TRUE}
@@ -488,7 +492,7 @@ In summary, \code{mod.1}, with $x$ alone and without the contextual mean of $x$,
 
 As @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"] explain, if the whole data are used to specify or fine-tune a statistical model, then subsequent cross-validation of the model is intrinsically misleading, because the model is selected to fit the whole data, including the part of the data that remains when each fold is removed.  Statistical modeling is partly a craft, and one could imagine applying that craft to successive partial data sets, each with a fold removed. The resulting procedure would be tedious, though possibly worth the effort, but it would also be difficult to realize in practice: After all, we can hardly erase our memory of statistical modeling choices between analyzing partial data sets. Alternatively, if we're able to automate the process of model specification, then we can more realistically apply CV mechanically. 
 
-The \code{"function"} method for \code{cv()} cross-validates a model-specification process in a general manner. Functions for four such model-specification processes are included in the package: \code{selectStepAIC()}, based on the \code{stepAIC()} function in the \pkg{MASS} package [@VenablesRipley:2002], performs stepwise predictor selection for regression models; \code{selectTrans()}, based on the \code{powerTransform()} function in the \pkg{car} package [@FoxWeisberg:2019], transforms predictors and the response in a regression model towards normality; \code{selectTransAndStepAIC()}---the use of which we illustrate in the current section---performs both of these procedures sequentially; and \code{selectModelList()}---also illustrated in the current section---uses CV both to select one of several competing models, and then, recursively, to estimate prediction error for the selected model. In a vignette on extending the \pkg{cv} package, we explain how to add model-selection procedures.
+The \code{"function"} method for \code{cv()} cross-validates a model-specification process in a general manner. Functions for four such model-specification processes are included in the package: \code{selectStepAIC()}, based on the \code{stepAIC()} function in the \pkg{MASS} package [@VenablesRipley:2002], performs stepwise predictor selection for regression models; \code{selectTrans()}, based on the \code{powerTransform()} function in the \pkg{car} package [@FoxWeisberg:2019], transforms predictors and the response in a regression model towards normality; \code{selectTransAndStepAIC()}---the use of which we illustrate in the current section---performs both of these procedures sequentially; and \code{selectModelList()}---also illustrated in the current section---uses CV both to select one of several competing models, and then, recursively, to estimate prediction error for the selected model. In a vignette on extending the \pkg{cv} package, we explain how to specify additional model-selection procedures.
 
 ## Example: Data transformation and predictor selection for the Auto data
 
@@ -506,7 +510,7 @@ The \code{Auto} data appeared in a preliminary example in Section \ref{prelimina
 ```{r Auto-explore}
 #| out.width = "60%",
 #| fig.height = 5,
-#| fig.cap = "Scatterplot matrix for the numeric variables in the \\code{Auto} data"
+#| fig.cap = "Scatterplot matrix for the numeric variables in the \\code{Auto} data. In each panel, the solid line shows the linear least-squares fit and the broken line is for a nonparametric regression."
 Auto$cylinders <- factor(Auto$cylinders,
                          labels=c("3-4", "3-4", "5-6", "5-6", "8"))
 Auto$year <- as.factor(Auto$year)
@@ -526,7 +530,7 @@ We start with a "working model" that specifies linear partial relationships of t
 ```{r Auto-working-model}
 #| out.width = "60%",
 #| fig.height = 5,
-#| fig.cap = "Component+residual plots for the working model fit to the \\code{Auto} data"
+#| fig.cap = "Component+residual plots for the working model fit to the \\code{Auto} data. The broken blue lines show linear least-squares fits, while the solid magenta lines are nonparametric-regression smooths."
 m.auto <- lm(mpg ~ ., data = Auto)
 crPlots(m.auto, pch=".")
 ```
@@ -541,7 +545,7 @@ num.predictors <- c("displacement", "horsepower", "weight",
 tr.x <- powerTransform(Auto[, num.predictors])
 summary(tr.x)
 ```
-We then apply the (rounded) transformations---all, as it turns out, logs---to the data and re-estimate the model:
+We then apply the (rounded) transformations---all, as it turns out, logs (i.e., "Oth" powers)---to the data and re-estimate the model:
 ```{r Auto-with-transformed-predictors}
 A <- Auto
 powers <- tr.x$roundlam
@@ -557,7 +561,7 @@ summary(powerTransform(m))
 m <- update(m, log(mpg) ~ .)
 ```
 
-The transformed numeric variables are much better-behaved (cf., Figures \ref{fig:Auto-explore}, on page \pageref{fig:Auto-explore}, and \ref{fig:Auto-transformed-scatterplot-matrix}):
+The transformed numeric variables are much better-behaved (cf., Figure \ref{fig:Auto-explore}, on page \pageref{fig:Auto-explore}, and Figure \ref{fig:Auto-transformed-scatterplot-matrix}):
 ```{r Auto-transformed-scatterplot-matrix}
 #| out.width = "60%",
 #| fig.height = 5,
@@ -607,7 +611,7 @@ The other arguments to \code{cv()} are (see \code{?cv:::cv.function} for additio
 
 * \code{data}, the data set to which the model is fit.
 * \code{seed}, an optional seed for \proglang{R}'s pseudo-random-number generator; as for \code{cv()}, if the seed isn't supplied by the user, then a seed is randomly selected and saved.
-* Arguments required by the model-selection function: the starting \code{working.model} (\code{m.auto}) for transformation and predictor selection, the names of the variables---\code{predictors} and \code{response}---that are candidates for transformation, and \code{AIC=FALSE}, which specifies use of the BIC for model selection. 
+* Arguments required by the model-selection function: the starting \code{working.model} (here, \code{m.auto}) for transformation and predictor selection; the names of the variables---\code{predictors} and \code{response}---that are candidates for transformation; and \code{AIC=FALSE}, which specifies use of the BIC for model selection. 
 
 Some noteworthy points:
 
@@ -617,9 +621,30 @@ Some noteworthy points:
 
 ## Example: Applying recursive CV to polynomial regression for the Auto data
 
+In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of `mpg` to `horsepower` for the `Auto` data, saving the 10 models, named `m.1` through `m.10`, in `mlist`. We then used `cv()` to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
+
+If we then select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
+
+Applying `selectModelList()` to the `Auto` polynomial-regression models, and using 10-fold CV, we obtain:
+```{r recursive-CV-polynomials}
+recursiveCV.auto <- cv(selectModelList, data=Auto, 
+                       working.model=mlist,
+                       save.model=TRUE, seed=2120)
+recursiveCV.auto
+recursiveCV.auto$selected.model
+cv(mlist[[7]], seed=2120) # same seed for same folds
+```
+As expected, recursive CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model.
+
+We can equivalently call `cv()` with the list of models as its first argument and set the argument `recursive=TRUE`:
+```{r recursive-cv-alt}
+cv(mlist, data=Auto, seed=2120, recursive=TRUE, save.model=TRUE)
+```
+
+
 # Extending the cv package
 
-The \pkg{cv} package is designed to be extensible in several directions; in order of increasing general complexity, we can add: (1) a cross-validation cost criterion; (2) a model class that's not directly accommodated by the \code{cv()} default method or by another directly inherited method; and (3) a new model-selection procedure suitable for use with the \code{"function"} method for \code{cv()}. In this section, we illustrate (1) and (2); more extensive examples may be found in the vignette on extending the \pkg{cv} package.
+The \pkg{cv} package is designed to be extensible in several directions. In order of increasing general complexity, we can add: (1) a cross-validation cost criterion; (2) a model class that's not directly accommodated by the \code{cv()} default method or by another directly inherited method; and (3) a new model-selection procedure suitable for use with the \code{"function"} method for \code{cv()}. In this section, we illustrate (1) and (2); more diverse and extensive examples may be found in the vignette on extending the \pkg{cv} package.
 
 Suppose that we want to cross-validate a multinomial logistic regression model fit by the \code{multinom()} function in the \pkg{nnet} package [@VenablesRipley:2002]. We borrow an example from @Fox:2016 [Sec. 14.2.1], with data from the British Election Panel Study on vote choice in the 2001 British election. Data for the example are in the \code{BEPS} data set in the \pkg{carData} package:
 ```{r BEPS-data}
@@ -651,16 +676,16 @@ The \code{Europe} $\times$ \code{political.knowledge} interaction is associated 
 plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
             xlevels=list(Europe=1:11, political.knowledge=0:3),
             fixed.predictors=list(given.values=c(gendermale=0.5))),
-     lines=list(col=c("blue", "red", "orange")),
+     lines=list(col=c("blue", "red", "orange")), # party colors
      axes=list(x=list(rug=FALSE), y=list(style="stacked")))
 ```
-As political knowledge increases, voters tend to align their votes more closely with the party positions on European integration: The Conservative Party was "Eurosceptic," while Labour and the Liberal Democrats were supportive of the UK's participation in the EU.
+As political knowledge increases, voters tend to align their votes more closely with the party positions on European integration: The Conservative Party was relatively Euro-skeptic, while Labour and the Liberal Democrats were more supportive of the UK's participation in the EU.
 
 To cross-validate this multinomial-logit model we need an appropriate cost criterion. None of the criteria in the \pkg{cv} package will do---for example, \code{mse()} is appropriate only for a numeric response. The \code{BayesRule()} criterion, also supplied by \pkg{cv}, which is for a binary response, comes close:
 ```{r BayesRule}
 BayesRule
 ```
-After doing some error checking, \code{BayesRule()} rounds the predicted proabability of a 1 ("success") response in a binary regression model to 0 or 1 to obtain a categorical prediction and then reports the proportion of incorrect predictions. Because the Bayes's rule criterion is an average of casewise components (as, e.g., is the MSE), a \code{"casewise loss"} attribute is attached to the result, enabling the computation of bias correction and confidence intervals (as discussion in Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
+After doing some error checking, \code{BayesRule()} rounds the predicted proabability of a 1 ("success") response in a binary regression model to 0 or 1 to obtain a categorical prediction, and then reports the proportion of incorrect predictions. Because the Bayes's rule criterion is an average of casewise components (as, e.g., is the MSE), a \code{"casewise loss"} attribute is attached to the result, enabling the computation of bias correction and confidence intervals (as discussed in Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
 
 It is straightforward to adapt Bayes's rule to a polytomous response:
 ```{r BayesRuleMulti}
@@ -712,7 +737,7 @@ cv.multinom <- function (model, data, criterion = BayesRuleMulti,
     )
   }
 ```
-That is, we simply call the default `cv()` method with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`. Adding the argument `criterion.name=` `deparse(substitute(criterion))` is inessential, but it insures that printed output will include the name of the criterion function that's employed, whether it's the default `BayesRuleMulti` or something else. Prior to invoking `NextMethod()`, we called `update()` with `trace=FALSE` to suppress the iteration history reported by default by `multinom()`---it would be tedious to see the iteration history for each fold. 
+That is, we simply call the default `cv()` method (via \code{NextMethod()}) with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`. Adding the argument `criterion.name=` `deparse(substitute(criterion))` is inessential, but it insures that printed output will include the name of the criterion function that's employed, whether it's the default `BayesRuleMulti` or something else. Prior to invoking `NextMethod()`, we called `update()` with `trace=FALSE` to suppress the iteration history reported by default by `multinom()`---it would be tedious to see the iteration history for each fold. 
 
 Then:
 ```{r BEPS-cv}
