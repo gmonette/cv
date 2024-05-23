@@ -65,7 +65,7 @@ Fitted values are then $\widehat{\mathbf{y}} = \mathbf{X}\mathbf{b}_{\mathrm{WLS
 
 The LOO fitted value for the $i$th case can be efficiently computed by $\widehat{y}_{-i} = y_i - e_i/(1 - h_i)$ where $h_i = \mathbf{x}^T_i \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i$ (the so-called "hatvalue"). Here, $\mathbf{x}^T_i$ is the $i$th row of $\mathbf{X}$, and $\mathbf{x}_i$ is the $i$th row written as a column vector. This approach can break down when one or more hatvalues are equal to 1, in which case the formula for $\widehat{y}_{-i}$ requires division by 0.
 
-To compute cross-validated fitted values when the folds contain more than one case, we make use of the Woodbury matrix identify [@Hager:1989],
+To compute cross-validated fitted values when the folds contain more than one case, we make use of the Woodbury matrix identity [@Hager:1989],
 $$
 \left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k} 
 \mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} = \mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} + 

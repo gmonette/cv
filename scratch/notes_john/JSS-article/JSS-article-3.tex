@@ -371,15 +371,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 423102
+R RNG seed set to 486347
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.27853
-bias-adjusted cross-validation criterion = 19.26291
-95% CI for bias-adjusted CV criterion = (15.80408, 22.72175)
+cross-validation criterion = 19.52274
+bias-adjusted cross-validation criterion = 19.49438
+95% CI for bias-adjusted CV criterion = (15.96188, 23.02687)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1876,18 +1876,18 @@ which is for a binary response, comes close:
 R> BayesRule
 \end{CodeInput}
 \begin{CodeOutput}
-function (y, yhat) 
-{
-    if (!all(y %in% c(0, 1))) 
-        stop("response values not all 0 or 1")
-    if (any(yhat < 0) || any(yhat > 1)) 
-        stop("fitted values outside of interval [0, 1]")
-    yhat <- round(yhat)
-    result <- mean(y != yhat)
-    attr(result, "casewise loss") <- "y != round(yhat)"
-    result
+function(y, yhat) {
+  if (!all(y %in% c(0, 1)))
+    stop("response values not all 0 or 1")
+  if (any(yhat < 0) ||
+      any(yhat > 1))
+    stop("fitted values outside of interval [0, 1]")
+  yhat <- round(yhat)
+  result <- mean(y != yhat) # proportion in error
+  attr(result, "casewise loss") <- "y != round(yhat)"
+  result
 }
-<bytecode: 0x12e288c00>
+<bytecode: 0x111a6b780>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
