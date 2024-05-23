@@ -1,21 +1,22 @@
 Web Pages for Cross Validation Packages on CRAN
 
-https://cran.r-project.org/web/packages/caret/
-** evaluate further
+https://cran.r-project.org/web/packages/caret/ $$$
+incorporates CV as part of model-selection process; provides interface to regression functions in many existing R packages.
 
 https://cran.r-project.org/web/packages/crossval/
 not actively developed since 2014
 no vignettes/weak documentation
 no parallel computation, naive algorithm
 
-https://cran.r-project.org/web/packages/cvms/
+https://cran.r-project.org/web/packages/cvms/ $$$
 extensive vignettes/docs
 cross_validate() for (G)L(M)Ms
 naive algorithm
 parallel computation supported
 pre-process for folds
 actively developed
-** evaluate further
+nested CV apparently similar to our recursive CV
+similar in general approach to rsample
 
 https://cran.r-project.org/web/packages/cvTools/
 not actively developed
@@ -35,20 +36,20 @@ naive algorithm
 https://cran.r-project.org/web/packages/groupdata2
 creates folds, must write or find function for CV
 
-https://cran.r-project.org/web/packages/mlexperiments/
+https://cran.r-project.org/web/packages/mlexperiments/ $$$
 novel R6 approach
 a few "learner" function supplied, otherwise must be programmed
 not model-based
 has vignettes
 ** evaluate further
 
-https://cran.r-project.org/web/packages/origami/
+https://cran.r-project.org/web/packages/origami/ $$$
 focuses on creating folds; user supplies a function to compute
   CV criterion for each fold
 not model-based
 has vignette
 
-https://cran.r-project.org/web/packages/rsample/
+https://cran.r-project.org/web/packages/rsample/ $$$
 ** evaluate further
 use as comparison?
 
@@ -58,9 +59,10 @@ essentially limited to linear and logistic regression
 with lower-level programming can be adapted to other
   models
 
-https://cran.r-project.org/web/packages/tidyfit/
+https://cran.r-project.org/web/packages/tidyfit/ $$$
 ** evaluate further
-CV only incidental (using rsample?)
+similar to caret
+CV only incidental (using rsample)
 
 
 features of cv package:

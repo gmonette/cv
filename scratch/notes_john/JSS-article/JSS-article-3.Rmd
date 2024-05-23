@@ -747,6 +747,85 @@ The cross-validated polytomous Bayes's rule criterion confirms that the fitted m
 
 # Comparing cv to other R software for cross-validation
 
+The \pkg{cv} package is far from unique in implementing cross-validation of regression models in \proglang{R}. We've already mentioned the \code{cv.glm()} function in the \pkg{boot} package. A general review of CV facilities in \proglang{R} is beyond the scope of the current paper, but in this section we remark selectively on other \proglang{R} packages that support CV.
+
+Our goal in implementing CV is to make it conveniently available to \proglang{R} users with limited programming skills,[^cv-by-programming] and hence to encourage its use. Towards this end, the \pkg{cv} package provides a simple, consistent interface through the \code{cv()} generic function, with specific methods for different classes of standard \proglang{R} statistical models. Moreover, we have tried to make writing methods for additional classes of statistical models as simple and straightforward as possible. Because CV is computationally intensive, we also aim for efficiency, by enabling parallel computations generally, and by exploiting properties of specific classes of statistical models (in particular, computations based on hatvalues and the Woodbury matrix identity for linear and generalized linear model). Finally, the package includes some unusual features, such as general support for mixed-effects models and for cross-validating complex model-specification procedures.
+
+[^cv-by-programming]: \proglang{R} users with sophisticated programming skills would generally find it unchallenging to implement CV directly for specific applications. Even in this case, however, there's an argument for using a simple pre-programmed interface to CV, to minimize programming effort and to avoid mistakes.
+
+Some \proglang{R} packages for statistical learning include facilities for cross-validation. Notable examples are the \pkg{caret} package [@Kuhn:2008] and the \pkg{tidyfit} package [@Pfitzinger:2024]; the latter employs \pkg{rsample} [@FrickEtAl:2024] for CV, which we will discuss presently This contrasts with the approach taken in the \pkg{cv} package, which, as we have explained, directly supports classes of standard \proglang{R} statistical models.
+
+Other packages, including \pkg{cvms} [@OlsenZachariae:2024], \pkg{mlexperiments} [@Kapsner:2024], \pkg{origami} [@CoyleEtAl:2022], and \pkg{rsample} (which also supports bootstrapping), modularize the CV process to a greater or lesser extent. Advantages of this approach include flexibility and generality, but a disadvantage is that use of these packages entails nontrivial programming effort and skill. 
+
+We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package. Here, with minimal explanation, is how one would perform LOO CV for this example using \pkg{rsample}:[^k-fold-used-in-rsample]
+```{r rsample-example, cache=TRUE}
+library(rsample)
+
+data("attrition", package = "modeldata")
+nrow(attrition)
+
+# formula for model to be fit; Attrition is binary:
+mod_form <- Attrition ~ JobSatisfaction + Gender + MonthlyIncome
+
+rs_obj <- loo_cv(attrition) # original uses vfold_cv()
+
+# user-supplied function:
+holdout_results <- function(splits, ...) {
+  mod <- glm(..., data=analysis(splits), family=binomial)
+  holdout <- assessment(splits)
+  res <- broom::augment(mod, newdata=holdout)
+  lvls <- levels(holdout$Attrition)
+  predictions <- factor(ifelse(res$.fitted > 0, lvls[2], lvls[1]),
+                        levels=lvls)
+  res$correct <- predictions == holdout$Attrition
+  res
+}
+
+library(purrr, quietly=TRUE)
+# apply CV:
+rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
+# summarize results:
+rs_obj$accuracy <- map_dbl(rs_obj$results,
+                           function(x) mean(x$correct))
+# accuracy is the complement of the Bayes-rule CV criterion:
+1 - summary(rs_obj$accuracy) 
+```
+[^k-fold-used-in-rsample]: The example in the \pkg{rsample} vignette uses 10-fold rather than LOO CV, but otherwise the code from the vignette is only trivially modified here.
+
+And here's how we can perform the same computation using the \code{cv()} function in the \pkg{cv} package:
+```{r rsample-example-using-cv, cache=TRUE}
+mod.attrition <- glm(mod_form, data=attrition, family=binomial)
+(cv.attrition <- cv(mod.attrition, k="loo", criterion=BayesRule))
+```
+
+Let's compare the computational efficiency of the two implementations, also showing the use of \code{method="Woodbury"} and \code{method="hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method="exact"}:
+```{r compare-rsample-cv, cache=TRUE}
+all.equal(cv.attrition$`CV crit`,
+          cv(mod.attrition, k="loo", criterion=BayesRule,
+             method="Woodbury")$`CV crit`,
+          )
+all.equal(cv.attrition$`CV crit`,
+          cv(mod.attrition, k="loo", criterion=BayesRule,
+             method="hatvalues")$`CV crit`
+          )
+
+microbenchmark::microbenchmark(
+  rsample={
+    rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
+    rs_obj$accuracy <- map_dbl(rs_obj$results,
+                               function(x) mean(x$correct))
+  },
+  cv.exact=cv(mod.attrition, k="loo", criterion=BayesRule),
+  cv.wood=cv(mod.attrition, k="loo", criterion=BayesRule,
+             method="Woodbury"),
+  cv.hatvalues=cv(mod.attrition, k="loo", criterion=BayesRule,
+                  method="hatvalues"),
+  times=10
+)
+```
+Computing time for \pkg{rsample} for this problem is similar to \code{cv()} with \code{method="exact"}, but more than an order of magnitude slower than \code{cv()} with \code{method="Woodbury"}, and more than three orders of magnitude slower then \code{cv()} with \code{method="hatvalues"}.
+
+
 # Computational notes
 
 ## Efficient computations for linear and generalized linear models
@@ -792,7 +871,9 @@ We then treat re-estimation of the model with a case or cases deleted as a WLS p
 
 ## Computation of the bias-corrected CV criterion and confidence intervals
 
-Let $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ represent a cross-validation cost criterion, such as mean-squared error, computed for all of the $n$ values of the response $\mathbf{y}$ based on fitted values $\widehat{\mathbf{y}}$ from the model fit to all of the data. We require that $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ is the mean of casewise components, that is, $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i, \widehat{y}_i)$.[^contrast-function] For example, $\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$.
+Let $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ represent a cross-validation cost criterion, such as mean-squared error, computed for all of the $n$ values of the response $\mathbf{y}$ based on fitted values $\widehat{\mathbf{y}}$ from the model fit to all of the data. We require that $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ is the mean of casewise components, that is, $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i, \widehat{y}_i)$.[^contrast-function] For example, $\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$.[^casewise-loss]
+
+[^casewise-loss]: Some commonly employed CV criteria---such as the root-mean-squared error (RMSE), median absolute error, and, for binary-regression models, the complement of the area under the receiver operating characteristic (ROC) curve---are not means of casewise components. That the RMSE and median absolute error aren't means of casewise components is obvious; for the complement of the area under the ROC curve, see the vignette on extending the \pkg{cv} package.
 
 [^contrast-function]: @ArlotCelisse:2010 term the casewise loss, $\mathrm{cv}(y_i, \widehat{y}_i)$, the "contrast function."
 

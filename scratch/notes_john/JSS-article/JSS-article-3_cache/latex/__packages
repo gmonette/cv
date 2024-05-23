@@ -4,3 +4,11 @@ doParallel
 cv
 Matrix
 lme4
+lattice
+latticeExtra
+carData
+car
+MASS
+nnet
+rsample
+purrr
