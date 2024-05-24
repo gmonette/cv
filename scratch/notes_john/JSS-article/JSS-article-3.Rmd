@@ -21,7 +21,7 @@ title:
   # For running headers, if needed
   short:     "\\pkg{cv}: Cross-Validating Regression Models"
 abstract: >
-  The abstract of the article.
+  We describe the \pkg{cv} package, which implements cross-validation for standard \proglang{R} regression models through a uniform and simple to use generic function. Methods for the \code{cv()} function are provided for many commonly employed classes of statistical models, including mixed-effects models, and it is straightforward to extend the \pkg{cv} package by writing methods for additional classes of models. The \code{cv()} function also can cross-validate complex model-selection procedures, such as those that include variable transformations, predictor selection, and selection among competing models. The \code{cv()} function generally supports parallel computations, and the supplied methods for linear and generalized linear models take advantage of computational efficiencies.
 keywords:
   # at least one keyword must be supplied
   formatted: [cross-validation, regression analysis, model selection, "\\proglang{R}"]
@@ -619,7 +619,9 @@ Some noteworthy points:
 * As we anticipated, the estimate of the MSE that we obtain by cross-validating the whole model-specification process is larger than the MSE computed for the model we fit to the \code{Auto} data separately selecting transformations of the predictors and the response and then selecting predictors for the whole data set.
 * When we look at the transformations and predictors selected with each of the 10 folds omitted (i.e., the output of \code{compareFolds()}), we see that there is little uncertainty in choosing variable transformations (the \code{lam.*}s for the $x$s and \code{lambda} for $y$ in the output), but considerably more uncertainty in subsequently selecting predictors: \code{horsepower}, \code{weight}, and \code{year} are always included among the selected predictors; \code{acceleration} and \code{displacement} are included respectively in 4 and 3 of 10 selected models; and \code{cylinders} and \code{origin} are each included in only 1 of 10 models. Recall that when we selected predictors for the full data, we obtained a model with \code{horsepower}, \code{weight}, \code{acceleration}, \code{year}, and \code{origin}.
 
-## Example: Applying recursive CV to polynomial regression for the Auto data
+## Example: Applying recursive CV to polynomial regression for the Auto data[^recursive-cv]
+
+[^recursive-cv]: What we call here "recursive CV" has also been termed "nested CV" [e.g., in the \pkg{cvms} package by @OlsenZachariae:2024]. We prefer, however, to reserve the term "nested CV" for the procedure described by [@BatesHastieTibshirani:2023].
 
 In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of `mpg` to `horsepower` for the `Auto` data, saving the 10 models, named `m.1` through `m.10`, in `mlist`. We then used `cv()` to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
 
@@ -757,7 +759,7 @@ Some \proglang{R} packages for statistical learning include facilities for cross
 
 Other packages, including \pkg{cvms} [@OlsenZachariae:2024], \pkg{mlexperiments} [@Kapsner:2024], \pkg{origami} [@CoyleEtAl:2022], and \pkg{rsample} (which also supports bootstrapping), modularize the CV process to a greater or lesser extent. Advantages of this approach include flexibility and generality, but a disadvantage is that use of these packages entails nontrivial programming effort and skill. 
 
-We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package. Here, with minimal explanation, is how one would perform LOO CV for this example using \pkg{rsample}:[^k-fold-used-in-rsample]
+We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package [@Kuhn:2024]. Here, with minimal explanation, is how one would perform LOO CV for this example using \pkg{rsample}:[^k-fold-used-in-rsample]
 ```{r rsample-example, cache=TRUE}
 library(rsample)
 

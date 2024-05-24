@@ -20,7 +20,18 @@ Models}
 
 
 \Abstract{
-The abstract of the article.
+We describe the \pkg{cv} package, which implements cross-validation for
+standard \proglang{R} regression models through a uniform and simple to
+use generic function. Methods for the \code{cv()} function are provided
+for many commonly employed classes of statistical models, including
+mixed-effects models, and it is straightforward to extend the \pkg{cv}
+package by writing methods for additional classes of models. The
+\code{cv()} function also can cross-validate complex model-selection
+procedures, such as those that include variable transformations,
+predictor selection, and selection among competing models. The
+\code{cv()} function generally supports parallel computations, and the
+supplied methods for linear and generalized linear models take advantage
+of computational efficiencies.
 }
 
 \Keywords{cross-validation, regression analysis, model
@@ -371,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 226376
+R RNG seed set to 891621
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.33326
-bias-adjusted cross-validation criterion = 19.31477
-95% CI for bias-adjusted CV criterion = (15.83621, 22.79333)
+cross-validation criterion = 19.30934
+bias-adjusted cross-validation criterion = 19.29207
+95% CI for bias-adjusted CV criterion = (15.80161, 22.78253)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -474,12 +485,12 @@ Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :
 less accurate nanosecond times to avoid potential integer overflows
 \end{CodeOutput}
 \begin{CodeOutput}
-Unit: milliseconds
+Unit: microseconds
       expr        min         lq       mean     median         uq        max
- hatvalues   1.139062   1.184244   1.202678   1.194248   1.205769   1.297117
-  Woodbury  12.106521  12.310701  13.115158  12.337515  12.808810  16.149900
-     naive 217.941773 219.491204 225.861284 220.053909 222.015410 278.078974
-    cv.glm 373.900074 379.259963 397.907632 382.333036 437.228141 441.112358
+ hatvalues    992.282   1149.681   1181.427   1199.188   1223.235   1356.485
+  Woodbury  12297.663  12375.317  14678.447  12908.952  16017.675  22227.535
+     naive 217204.347 222086.545 249652.690 250411.416 277112.440 279141.530
+    cv.glm 379237.823 382052.063 401064.952 388823.726 435052.394 440563.573
  neval
     10
     10
@@ -1643,9 +1654,14 @@ Some noteworthy points:
   \code{year}, and \code{origin}.
 \end{itemize}
 
-\subsection{Example: Applying recursive CV to polynomial regression for
-the Auto
-data}\label{example-applying-recursive-cv-to-polynomial-regression-for-the-auto-data}
+\subsection[Example: Applying recursive CV to polynomial regression for
+the Auto data]{\texorpdfstring{Example: Applying recursive CV to
+polynomial regression for the Auto
+data\footnote{What we call here ``recursive CV'' has also been termed
+  ``nested CV'' \citep[e.g., in the \pkg{cvms} package
+  by][]{OlsenZachariae:2024}. We prefer, however, to reserve the term
+  ``nested CV'' for the procedure described by
+  \citep{BatesHastieTibshirani:2023}.}}{Example: Applying recursive CV to polynomial regression for the Auto data}}\label{example-applying-recursive-cv-to-polynomial-regression-for-the-auto-datarecursive-cv}
 
 In Section \ref{comparing-competing-models}, following \citet[Secs. 5.1,
 5.3]{JamesEtAl:2021}, we fit polynomial regressions up to degree 10 to
@@ -1887,7 +1903,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x14013a7f0>
+<bytecode: 0x1293c2ea8>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2129,11 +2145,11 @@ programming effort and skill.
 
 We illustrate with an example adapted from a vignette in the
 \pkg{rsample} package, which uses the \code{attrition} data set from the
-\pkg{modeldata} package. Here, with minimal explanation, is how one
-would perform LOO CV for the example using \pkg{rsample}:\footnote{The
-  example in the \pkg{rsample} vignette uses 10-fold rather than LOO CV,
-  but otherwise the code from the vignette is only trivially modified
-  here.}
+\pkg{modeldata} package \citep{Kuhn:2024}. Here, with minimal
+explanation, is how one would perform LOO CV for this example using
+\pkg{rsample}:\footnote{The example in the \pkg{rsample} vignette uses
+  10-fold rather than LOO CV, but otherwise the code from the vignette
+  is only trivially modified here.}
 
 \begin{CodeChunk}
 \begin{CodeInput}
@@ -2164,6 +2180,22 @@ R> holdout_results <- function(splits, ...) {
 + }
 R> 
 R> library(purrr, quietly=TRUE)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Attaching package: 'purrr'
+\end{CodeOutput}
+\begin{CodeOutput}
+The following object is masked from 'package:car':
+
+    some
+\end{CodeOutput}
+\begin{CodeOutput}
+The following objects are masked from 'package:foreach':
+
+    accumulate, when
+\end{CodeOutput}
+\begin{CodeInput}
 R> # apply CV:
 R> rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
 R> # summarize results:
@@ -2238,28 +2270,24 @@ R> microbenchmark::microbenchmark(
 + )
 \end{CodeInput}
 \begin{CodeOutput}
-Warning in microbenchmark::microbenchmark(rsample = {: less accurate nanosecond
-times to avoid potential integer overflows
-\end{CodeOutput}
-\begin{CodeOutput}
 Unit: milliseconds
          expr         min          lq        mean      median          uq
-      rsample 5814.989369 5864.285227 5952.773502 5897.248509 6023.438043
-     cv.exact 4739.827837 4827.064193 4902.546681 4910.249278 4952.683150
-      cv.wood  103.663047  104.760125  110.628578  111.201532  116.027007
- cv.hatvalues    1.217905    1.222251    1.409719    1.479649    1.543937
+      rsample 5858.845429 5918.511745 6182.166132 6032.719008 6513.721496
+     cv.exact 4823.821011 4879.622175 4986.028516 4973.975331 5051.786505
+      cv.wood  103.815690  107.823973  112.389204  112.138341  117.148398
+ cv.hatvalues    1.248655    1.299823    1.540665    1.587007    1.654432
          max neval
- 6207.205988    10
- 5090.904318    10
-  118.610540    10
-    1.591538    10
+ 6707.589832    10
+ 5305.047728    10
+  121.483287    10
+    1.916832    10
 \end{CodeOutput}
 \end{CodeChunk}
 
 Computing time for \pkg{rsample} for this problem is similar to
 \code{cv()} with \code{method="exact"}, but more than an order of
-magitude slower than \code{cv()} with \code{method="Woodbury"}, and more
-than three orders of magnitude slower then \code{cv()} with
+magnitude slower than \code{cv()} with \code{method="Woodbury"}, and
+more than three orders of magnitude slower then \code{cv()} with
 \code{method="hatvalues"}.
 
 \section{Computational notes}\label{computational-notes}
