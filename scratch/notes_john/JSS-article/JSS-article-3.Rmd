@@ -798,6 +798,8 @@ And here's how we can perform the same computation using the \code{cv()} functio
 ```{r rsample-example-using-cv, cache=TRUE}
 mod.attrition <- glm(mod_form, data=attrition, family=binomial)
 (cv.attrition <- cv(mod.attrition, k="loo", criterion=BayesRule))
+all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy), 
+          check.attributes=FALSE)
 ```
 
 Let's compare the computational efficiency of the two implementations, also showing the use of \code{method="Woodbury"} and \code{method="hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method="exact"}:

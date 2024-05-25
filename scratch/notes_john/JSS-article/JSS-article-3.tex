@@ -382,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 508110
+R RNG seed set to 866542
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.23279
-bias-adjusted cross-validation criterion = 19.21953
-95% CI for bias-adjusted CV criterion = (15.76747, 22.67159)
+cross-validation criterion = 19.09701
+bias-adjusted cross-validation criterion = 19.09108
+95% CI for bias-adjusted CV criterion = (15.65339, 22.52877)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1903,7 +1903,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x14aa65750>
+<bytecode: 0x13b740948>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2227,6 +2227,13 @@ cross-validation criterion = 0.1612245
 bias-adjusted cross-validation criterion = 0.1612245
 95% CI for bias-adjusted CV criterion = (0.1424194, 0.1800296)
 full-sample criterion = 0.1612245 
+\end{CodeOutput}
+\begin{CodeInput}
+R> all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy), 
++           check.attributes=FALSE)
+\end{CodeInput}
+\begin{CodeOutput}
+[1] TRUE
 \end{CodeOutput}
 \end{CodeChunk}
 
