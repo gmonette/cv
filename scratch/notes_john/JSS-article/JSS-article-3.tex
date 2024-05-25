@@ -382,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 891621
+R RNG seed set to 508110
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.30934
-bias-adjusted cross-validation criterion = 19.29207
-95% CI for bias-adjusted CV criterion = (15.80161, 22.78253)
+cross-validation criterion = 19.23279
+bias-adjusted cross-validation criterion = 19.21953
+95% CI for bias-adjusted CV criterion = (15.76747, 22.67159)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1903,7 +1903,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x1293c2ea8>
+<bytecode: 0x14aa65750>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2145,11 +2145,12 @@ programming effort and skill.
 
 We illustrate with an example adapted from a vignette in the
 \pkg{rsample} package, which uses the \code{attrition} data set from the
-\pkg{modeldata} package \citep{Kuhn:2024}. Here, with minimal
-explanation, is how one would perform LOO CV for this example using
-\pkg{rsample}:\footnote{The example in the \pkg{rsample} vignette uses
-  10-fold rather than LOO CV, but otherwise the code from the vignette
-  is only trivially modified here.}
+\pkg{modeldata} package \citep{Kuhn:2024} (and which is by a wide margin
+the most downloaded of the CV packages mentioned in the preceding
+paragraph). Here, with minimal explanation, is how one would perform LOO
+CV for this example using \pkg{rsample}:\footnote{The example in the
+  \pkg{rsample} vignette uses 10-fold rather than LOO CV, but otherwise
+  the code from the vignette is only trivially modified here.}
 
 \begin{CodeChunk}
 \begin{CodeInput}
