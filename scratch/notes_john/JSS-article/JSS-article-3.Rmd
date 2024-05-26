@@ -621,11 +621,11 @@ Some noteworthy points:
 
 ## Example: Applying recursive CV to polynomial regression for the Auto data[^recursive-cv]
 
-[^recursive-cv]: What we call here "recursive CV" has also been termed "nested CV" [e.g., in the \pkg{cvms} package by @OlsenZachariae:2024]. We prefer, however, to reserve the term "nested CV" for the procedure described by [@BatesHastieTibshirani:2023].
+[^recursive-cv]: What we call here "recursive CV" has also been termed "nested CV" [e.g., in the \pkg{cvms} package by @OlsenZachariae:2024]. We prefer, however, to reserve the term "nested CV" for the procedure described by @BatesHastieTibshirani:2023.
 
-In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of `mpg` to `horsepower` for the `Auto` data, saving the 10 models, named `m.1` through `m.10`, in `mlist`. We then used `cv()` to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
+In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of `mpg` to `horsepower` for the `Auto` data, saving the 10 models, named `m.1` through `m.10`, in the list `mlist`. We then used `cv()` to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
 
-If we then select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
+If we select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
 
 Applying `selectModelList()` to the `Auto` polynomial-regression models, and using 10-fold CV, we obtain:
 ```{r recursive-CV-polynomials}
@@ -755,7 +755,7 @@ Our goal in implementing CV is to make it conveniently available to \proglang{R}
 
 [^cv-by-programming]: \proglang{R} users with sophisticated programming skills would generally find it unchallenging to implement CV directly for specific applications. Even in this case, however, there's an argument for using a simple pre-programmed interface to CV, to minimize programming effort and to avoid mistakes.
 
-Some \proglang{R} packages for statistical learning include facilities for cross-validation. Notable examples are the \pkg{caret} package [@Kuhn:2008] and the \pkg{tidyfit} package [@Pfitzinger:2024]; the latter employs \pkg{rsample} [@FrickEtAl:2024] for CV, which we will discuss presently This contrasts with the approach taken in the \pkg{cv} package, which, as we have explained, directly supports classes of standard \proglang{R} statistical models.
+Some \proglang{R} packages for statistical learning include facilities for cross-validation. Notable examples are the \pkg{caret} package [@Kuhn:2008] and the \pkg{tidyfit} package [@Pfitzinger:2024]; the latter employs \pkg{rsample} [@FrickEtAl:2024] for CV, which we will discuss presently. This contrasts with the approach taken in the \pkg{cv} package, which, as we have explained, directly supports classes of standard \proglang{R} statistical models.
 
 Other packages, including \pkg{cvms} [@OlsenZachariae:2024], \pkg{mlexperiments} [@Kapsner:2024], \pkg{origami} [@CoyleEtAl:2022], and \pkg{rsample} (which also supports bootstrapping), modularize the CV process to a greater or lesser extent. Advantages of this approach include flexibility and generality, but a disadvantage is that use of these packages entails nontrivial programming effort and skill. 
 
@@ -783,7 +783,7 @@ holdout_results <- function(splits, ...) {
   res
 }
 
-library(purrr, quietly=TRUE)
+library(purrr, warn.conflicts=FALSE)
 # apply CV:
 rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
 # summarize results:

@@ -382,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 866542
+R RNG seed set to 968919
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.09701
-bias-adjusted cross-validation criterion = 19.09108
-95% CI for bias-adjusted CV criterion = (15.65339, 22.52877)
+cross-validation criterion = 19.22048
+bias-adjusted cross-validation criterion = 19.20805
+95% CI for bias-adjusted CV criterion = (15.74739, 22.66871)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1661,18 +1661,18 @@ data\footnote{What we call here ``recursive CV'' has also been termed
   ``nested CV'' \citep[e.g., in the \pkg{cvms} package
   by][]{OlsenZachariae:2024}. We prefer, however, to reserve the term
   ``nested CV'' for the procedure described by
-  \citep{BatesHastieTibshirani:2023}.}}{Example: Applying recursive CV to polynomial regression for the Auto data}}\label{example-applying-recursive-cv-to-polynomial-regression-for-the-auto-datarecursive-cv}
+  \citet{BatesHastieTibshirani:2023}.}}{Example: Applying recursive CV to polynomial regression for the Auto data}}\label{example-applying-recursive-cv-to-polynomial-regression-for-the-auto-datarecursive-cv}
 
 In Section \ref{comparing-competing-models}, following \citet[Secs. 5.1,
 5.3]{JamesEtAl:2021}, we fit polynomial regressions up to degree 10 to
 the relationship of \texttt{mpg} to \texttt{horsepower} for the
 \texttt{Auto} data, saving the 10 models, named \texttt{m.1} through
-\texttt{m.10}, in \texttt{mlist}. We then used \texttt{cv()} to compare
-the cross-validated MSE for the 10 models, discovering that the 7th
-degree polynomial had the smallest MSE (by a small margin).
+\texttt{m.10}, in the list \texttt{mlist}. We then used \texttt{cv()} to
+compare the cross-validated MSE for the 10 models, discovering that the
+7th degree polynomial had the smallest MSE (by a small margin).
 
-If we then select the 7th degree polynomial model, intending to use it
-for prediction, the CV estimate of the MSE for this model will be
+If we select the 7th degree polynomial model, intending to use it for
+prediction, the CV estimate of the MSE for this model will be
 optimistic. One solution is to cross-validate the process of using CV to
 select the ``best'' model---that is, to apply CV to CV recursively. The
 function \texttt{selectModelList()}, which is suitable for use with
@@ -1903,7 +1903,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x13b740948>
+<bytecode: 0x142fa0f70>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2131,7 +2131,7 @@ Some \proglang{R} packages for statistical learning include facilities
 for cross-validation. Notable examples are the \pkg{caret} package
 \citep{Kuhn:2008} and the \pkg{tidyfit} package \citep{Pfitzinger:2024};
 the latter employs \pkg{rsample} \citep{FrickEtAl:2024} for CV, which we
-will discuss presently This contrasts with the approach taken in the
+will discuss presently. This contrasts with the approach taken in the
 \pkg{cv} package, which, as we have explained, directly supports classes
 of standard \proglang{R} statistical models.
 
@@ -2180,23 +2180,7 @@ R> holdout_results <- function(splits, ...) {
 +   res
 + }
 R> 
-R> library(purrr, quietly=TRUE)
-\end{CodeInput}
-\begin{CodeOutput}
-
-Attaching package: 'purrr'
-\end{CodeOutput}
-\begin{CodeOutput}
-The following object is masked from 'package:car':
-
-    some
-\end{CodeOutput}
-\begin{CodeOutput}
-The following objects are masked from 'package:foreach':
-
-    accumulate, when
-\end{CodeOutput}
-\begin{CodeInput}
+R> library(purrr, warn.conflicts=FALSE)
 R> # apply CV:
 R> rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
 R> # summarize results:
