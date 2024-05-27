@@ -382,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 799417
+R RNG seed set to 507470
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.20609
-bias-adjusted cross-validation criterion = 19.19442
-95% CI for bias-adjusted CV criterion = (15.73743, 22.6514)
+cross-validation criterion = 19.41715
+bias-adjusted cross-validation criterion = 19.39447
+95% CI for bias-adjusted CV criterion = (15.86881, 22.92014)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1903,7 +1903,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x1118adc78>
+<bytecode: 0x14ad5f380>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2261,6 +2261,9 @@ Resampling results:
   0.8387755  0    
 \end{CodeOutput}
 \end{CodeChunk}
+
+In fairness, \pkg{caret} really isn't intended for this kind of simple
+CV computation.
 
 And here's how we can perform the same computation using the \code{cv()}
 function in the \pkg{cv} package:

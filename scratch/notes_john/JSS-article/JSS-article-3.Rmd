@@ -828,7 +828,7 @@ mod <- train(x = attrition[, c("JobSatisfaction", "Gender",
              trControl = trainControl(method="LOOCV"))
 mod # reports complement of Bayes-rule criterion
 ```
-
+In fairness, \pkg{caret} really isn't intended for this kind of simple CV computation.
 
 And here's how we can perform the same computation using the \code{cv()} function in the \pkg{cv} package:
 ```{r rsample-example-using-cv, cache=TRUE}
