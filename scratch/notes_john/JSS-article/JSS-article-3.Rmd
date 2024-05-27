@@ -759,9 +759,13 @@ Some \proglang{R} packages for statistical learning include facilities for cross
 
 Other packages, including \pkg{cvms} [@OlsenZachariae:2024], \pkg{mlexperiments} [@Kapsner:2024], \pkg{origami} [@CoyleEtAl:2022], and \pkg{rsample} (which also supports bootstrapping), modularize the CV process to a greater or lesser extent. Advantages of this approach include flexibility and generality, but a disadvantage is that use of these packages entails nontrivial programming effort and skill. 
 
-We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package [@Kuhn:2024] (and which is by a wide margin the most downloaded from the RStudio CRAN mirror of the CV packages mentioned in the preceding paragraph). Here, with minimal explanation, is how one would perform LOO CV for this example using \pkg{rsample}:[^k-fold-used-in-rsample]
+<!-- We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package [@Kuhn:2024] (and which is by a wide margin the most downloaded from the RStudio CRAN mirror of the CV packages mentioned in the preceding paragraph).  -->
+
+We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package [@Kuhn:2024], comparing LOO CV computed using the \code{cv()} function in the \pkg{cv} package to LOO CV computed using the \pkg{caret} and \pkg{rsample} packages. At more than 15 million cumulative downloads, \pkg{caret} is by a very wide margin the most downloaded from the RStudio CRAN mirror of the \proglang{R} packages mentioned above. Among the packages that focus more on cross-validation, \pkg{rsample} is the most downloaded, at nearly 4 million downloads.
+
+Here, with minimal explanation, is how one would perform LOO CV for this example using \pkg{rsample}:[^k-fold-used-in-rsample]
 ```{r rsample-example, cache=TRUE}
-library(rsample)
+library("rsample")
 
 data("attrition", package = "modeldata")
 nrow(attrition)
@@ -783,7 +787,7 @@ holdout_results <- function(splits, ...) {
   res
 }
 
-library(purrr, warn.conflicts=FALSE)
+library("purrr", warn.conflicts=FALSE)
 # apply CV:
 rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
 # summarize results:
@@ -806,6 +810,25 @@ for (i in 1:n){
 mean(((attrition$Attrition == "Yes") - round(yhat))^2)
 ```
 
+The \pkg{caret} package doesn't directly support generalized linear models fit by \code{glm()}, but it can be made to do so by defining a custom "method" for the binary logistic regression fit to the \code{attrition} data:
+```{r rsample-example-using-caret, cache=TRUE}
+library("caret", quietly=TRUE, warn.conflicts=FALSE)
+
+glm_mod <- getModelInfo("glm", regex = FALSE)[[1]]
+glm_mod$fit <- function(x, y, wts, param, lev, last, classProbs, ...) {
+  x$Attrition <- y
+  glm(Attrition ~ JobSatisfaction + Gender + MonthlyIncome,
+      family = binomial, data = x)
+}
+
+mod <- train(x = attrition[, c("JobSatisfaction", "Gender",
+                               "MonthlyIncome")],
+             y = attrition$Attrition,
+             method = glm_mod,
+             trControl = trainControl(method="LOOCV"))
+mod # reports complement of Bayes-rule criterion
+```
+
 
 And here's how we can perform the same computation using the \code{cv()} function in the \pkg{cv} package:
 ```{r rsample-example-using-cv, cache=TRUE}
@@ -814,7 +837,7 @@ all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy),
           check.attributes=FALSE)
 ```
 
-Let's compare the computational efficiency of the three implementations, also showing the use of \code{method="Woodbury"} and \code{method="hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method="exact"}:
+Let's compare the computational efficiency of the various implementations, also showing the use of \code{method="Woodbury"} and \code{method="hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method="exact"}:
 ```{r compare-rsample-cv, cache=TRUE}
 all.equal(cv.attrition$`CV crit`,
           cv(mod.attrition, k="loo", criterion=BayesRule,
@@ -831,6 +854,11 @@ microbenchmark::microbenchmark(
     rs_obj$accuracy <- map_dbl(rs_obj$results,
                                function(x) mean(x$correct))
   },
+  caret=train(x = attrition[, c("JobSatisfaction", "Gender",
+                                "MonthlyIncome")],
+              y = attrition$Attrition,
+              method = glm_mod,
+              trControl = trainControl(method="LOOCV")),
   direct={
     n <- nrow(attrition)
     yhat <- numeric(n)
@@ -848,7 +876,7 @@ microbenchmark::microbenchmark(
   times=10
 )
 ```
-Computing time for \pkg{rsample} for this problem is similar to direct computation of LOO CV and to \code{cv()} with \code{method="exact"}, but more than an order of magnitude slower than \code{cv()} with \code{method="Woodbury"}, and more than three orders of magnitude slower then \code{cv()} with \code{method="hatvalues"}.
+Computing time for \pkg{rsample} and \pkg{caret} for this problem is similar to direct computation of LOO CV and to \code{cv()} with \code{method="exact"}, but more than an order of magnitude slower than \code{cv()} with \code{method="Woodbury"}, and more than three orders of magnitude slower then \code{cv()} with \code{method="hatvalues"}.
 
 
 # Computational notes

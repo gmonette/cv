@@ -382,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 716237
+R RNG seed set to 799417
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.28027
-bias-adjusted cross-validation criterion = 19.2646
-95% CI for bias-adjusted CV criterion = (15.81196, 22.71725)
+cross-validation criterion = 19.20609
+bias-adjusted cross-validation criterion = 19.19442
+95% CI for bias-adjusted CV criterion = (15.73743, 22.6514)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1903,7 +1903,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x126d8b808>
+<bytecode: 0x1118adc78>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2146,17 +2146,23 @@ programming effort and skill.
 
 We illustrate with an example adapted from a vignette in the
 \pkg{rsample} package, which uses the \code{attrition} data set from the
-\pkg{modeldata} package \citep{Kuhn:2024} (and which is by a wide margin
-the most downloaded from the RStudio CRAN mirror of the CV packages
-mentioned in the preceding paragraph). Here, with minimal explanation,
-is how one would perform LOO CV for this example using
-\pkg{rsample}:\footnote{The example in the \pkg{rsample} vignette uses
-  10-fold rather than LOO CV, but otherwise the code from the vignette
-  is only trivially modified here.}
+\pkg{modeldata} package \citep{Kuhn:2024}, comparing LOO CV computed
+using the \code{cv()} function in the \pkg{cv} package to LOO CV
+computed using the \pkg{caret} and \pkg{rsample} packages. At more than
+15 million cumulative downloads, \pkg{caret} is by a very wide margin
+the most downloaded from the RStudio CRAN mirror of the \proglang{R}
+packages mentioned above. Among the packages that focus more on
+cross-validation, \pkg{rsample} is the most downloaded, at nearly 4
+million downloads.
+
+Here, with minimal explanation, is how one would perform LOO CV for this
+example using \pkg{rsample}:\footnote{The example in the \pkg{rsample}
+  vignette uses 10-fold rather than LOO CV, but otherwise the code from
+  the vignette is only trivially modified here.}
 
 \begin{CodeChunk}
 \begin{CodeInput}
-R> library(rsample)
+R> library("rsample")
 R> 
 R> data("attrition", package = "modeldata")
 R> nrow(attrition)
@@ -2182,7 +2188,7 @@ R> holdout_results <- function(splits, ...) {
 +   res
 + }
 R> 
-R> library(purrr, warn.conflicts=FALSE)
+R> library("purrr", warn.conflicts=FALSE)
 R> # apply CV:
 R> rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
 R> # summarize results:
@@ -2216,6 +2222,46 @@ R> mean(((attrition$Attrition == "Yes") - round(yhat))^2)
 \end{CodeOutput}
 \end{CodeChunk}
 
+The \pkg{caret} package doesn't directly support generalized linear
+models fit by \code{glm()}, but it can be made to do so by defining a
+custom ``method'' for the binary logistic regression fit to the
+\code{attrition} data:
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library("caret", quietly=TRUE, warn.conflicts=FALSE)
+R> 
+R> glm_mod <- getModelInfo("glm", regex = FALSE)[[1]]
+R> glm_mod$fit <- function(x, y, wts, param, lev, last, classProbs, ...) {
++   x$Attrition <- y
++   glm(Attrition ~ JobSatisfaction + Gender + MonthlyIncome,
++       family = binomial, data = x)
++ }
+R> 
+R> mod <- train(x = attrition[, c("JobSatisfaction", "Gender",
++                                "MonthlyIncome")],
++              y = attrition$Attrition,
++              method = glm_mod,
++              trControl = trainControl(method="LOOCV"))
+R> mod # reports complement of Bayes-rule criterion
+\end{CodeInput}
+\begin{CodeOutput}
+Generalized Linear Model 
+
+1470 samples
+   3 predictor
+   2 classes: 'No', 'Yes' 
+
+No pre-processing
+Resampling: Leave-One-Out Cross-Validation 
+Summary of sample sizes: 1469, 1469, 1469, 1469, 1469, 1469, ... 
+Resampling results:
+
+  Accuracy   Kappa
+  0.8387755  0    
+\end{CodeOutput}
+\end{CodeChunk}
+
 And here's how we can perform the same computation using the \code{cv()}
 function in the \pkg{cv} package:
 
@@ -2241,8 +2287,8 @@ R> all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy),
 \end{CodeOutput}
 \end{CodeChunk}
 
-Let's compare the computational efficiency of the three implementations,
-also showing the use of \code{method="Woodbury"} and
+Let's compare the computational efficiency of the various
+implementations, also showing the use of \code{method="Woodbury"} and
 \code{method="hatvalues"} for \code{cv()}, which, in this example,
 produce numerically identical results to the default
 \code{method="exact"}:
@@ -2273,6 +2319,11 @@ R> microbenchmark::microbenchmark(
 +     rs_obj$accuracy <- map_dbl(rs_obj$results,
 +                                function(x) mean(x$correct))
 +   },
++   caret=train(x = attrition[, c("JobSatisfaction", "Gender",
++                                 "MonthlyIncome")],
++               y = attrition$Attrition,
++               method = glm_mod,
++               trControl = trainControl(method="LOOCV")),
 +   direct={
 +     n <- nrow(attrition)
 +     yhat <- numeric(n)
@@ -2296,26 +2347,28 @@ times to avoid potential integer overflows
 \end{CodeOutput}
 \begin{CodeOutput}
 Unit: milliseconds
-         expr         min          lq        mean      median         uq
-      rsample 5707.408772 5711.011032 5810.464433 5828.739437 5853.64979
-       direct 5187.215696 5206.152940 5281.503347 5230.005408 5348.24496
-     cv.exact 4659.560948 4691.022749 4735.789317 4737.251540 4790.76759
-      cv.wood   99.232628  104.541882  106.917914  106.051051  108.49436
- cv.hatvalues    1.187401    1.224875    2.751965    1.356813    1.56374
-        max neval
- 5999.09487    10
- 5500.60457    10
- 4811.15176    10
-  119.72115    10
-   15.35548    10
+         expr         min          lq        mean      median          uq
+      rsample 5853.035606 5948.291603 6163.101903 6121.042951 6144.223100
+        caret 6804.763276 6951.219335 7097.717763 7061.439656 7255.566640
+       direct 5310.127259 5350.848336 5554.513023 5484.144809 5690.480487
+     cv.exact 4751.498733 4797.980556 4879.481352 4870.303039 4927.941413
+      cv.wood  101.606159  103.891294  108.285899  108.577430  112.075263
+ cv.hatvalues    1.206999    1.471613    1.514548    1.554679    1.614416
+         max neval
+ 6981.899881    10
+ 7541.571242    10
+ 6081.412412    10
+ 5118.834994    10
+  116.574603    10
+    1.759433    10
 \end{CodeOutput}
 \end{CodeChunk}
 
-Computing time for \pkg{rsample} for this problem is similar to direct
-computation of LOO CV and to \code{cv()} with \code{method="exact"}, but
-more than an order of magnitude slower than \code{cv()} with
-\code{method="Woodbury"}, and more than three orders of magnitude slower
-then \code{cv()} with \code{method="hatvalues"}.
+Computing time for \pkg{rsample} and \pkg{caret} for this problem is
+similar to direct computation of LOO CV and to \code{cv()} with
+\code{method="exact"}, but more than an order of magnitude slower than
+\code{cv()} with \code{method="Woodbury"}, and more than three orders of
+magnitude slower then \code{cv()} with \code{method="hatvalues"}.
 
 \section{Computational notes}\label{computational-notes}
 
