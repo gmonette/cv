@@ -382,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 507470
+R RNG seed set to 45649
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.41715
-bias-adjusted cross-validation criterion = 19.39447
-95% CI for bias-adjusted CV criterion = (15.86881, 22.92014)
+cross-validation criterion = 19.13181
+bias-adjusted cross-validation criterion = 19.12404
+95% CI for bias-adjusted CV criterion = (15.69034, 22.55774)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1903,7 +1903,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x14ad5f380>
+<bytecode: 0x145d6f3a0>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2222,28 +2222,18 @@ R> mean(((attrition$Attrition == "Yes") - round(yhat))^2)
 \end{CodeOutput}
 \end{CodeChunk}
 
-The \pkg{caret} package doesn't directly support generalized linear
-models fit by \code{glm()}, but it can be made to do so by defining a
-custom ``method'' for the binary logistic regression fit to the
-\code{attrition} data:
+The \pkg{caret} package supports generalized linear models fit by
+\code{glm()} and can straightforwardly perform LOO CV:
 
 \begin{CodeChunk}
 \begin{CodeInput}
 R> library("caret", quietly=TRUE, warn.conflicts=FALSE)
-R> 
-R> glm_mod <- getModelInfo("glm", regex = FALSE)[[1]]
-R> glm_mod$fit <- function(x, y, wts, param, lev, last, classProbs, ...) {
-+   x$Attrition <- y
-+   glm(Attrition ~ JobSatisfaction + Gender + MonthlyIncome,
-+       family = binomial, data = x)
-+ }
-R> 
-R> mod <- train(x = attrition[, c("JobSatisfaction", "Gender",
+R> # reports complement of Bayes-rule criterion:
+R> train(x = attrition[, c("JobSatisfaction", "Gender",
 +                                "MonthlyIncome")],
 +              y = attrition$Attrition,
-+              method = glm_mod,
++              method = "glm",
 +              trControl = trainControl(method="LOOCV"))
-R> mod # reports complement of Bayes-rule criterion
 \end{CodeInput}
 \begin{CodeOutput}
 Generalized Linear Model 
@@ -2261,9 +2251,6 @@ Resampling results:
   0.8387755  0    
 \end{CodeOutput}
 \end{CodeChunk}
-
-In fairness, \pkg{caret} really isn't intended for this kind of simple
-CV computation.
 
 And here's how we can perform the same computation using the \code{cv()}
 function in the \pkg{cv} package:
@@ -2325,7 +2312,7 @@ R> microbenchmark::microbenchmark(
 +   caret=train(x = attrition[, c("JobSatisfaction", "Gender",
 +                                 "MonthlyIncome")],
 +               y = attrition$Attrition,
-+               method = glm_mod,
++               method = "glm",
 +               trControl = trainControl(method="LOOCV")),
 +   direct={
 +     n <- nrow(attrition)
@@ -2351,19 +2338,19 @@ times to avoid potential integer overflows
 \begin{CodeOutput}
 Unit: milliseconds
          expr         min          lq        mean      median          uq
-      rsample 5853.035606 5948.291603 6163.101903 6121.042951 6144.223100
-        caret 6804.763276 6951.219335 7097.717763 7061.439656 7255.566640
-       direct 5310.127259 5350.848336 5554.513023 5484.144809 5690.480487
-     cv.exact 4751.498733 4797.980556 4879.481352 4870.303039 4927.941413
-      cv.wood  101.606159  103.891294  108.285899  108.577430  112.075263
- cv.hatvalues    1.206999    1.471613    1.514548    1.554679    1.614416
+      rsample 5741.137299 5867.248666 6155.761099 6095.937708 6218.031915
+        caret 6805.241869 6931.865408 7135.256404 7052.951569 7377.336681
+       direct 5262.786773 5312.612884 5455.994681 5388.428711 5475.565416
+     cv.exact 4740.642384 4771.993936 4870.961647 4847.941434 4981.140799
+      cv.wood  104.161361  106.036578  112.172855  113.107500  115.602534
+ cv.hatvalues    1.262554    1.462716    1.497295    1.520198    1.569685
          max neval
- 6981.899881    10
- 7541.571242    10
- 6081.412412    10
- 5118.834994    10
-  116.574603    10
-    1.759433    10
+ 7162.266671    10
+ 7648.302729    10
+ 6045.941344    10
+ 5054.087753    10
+  120.361527    10
+    1.666896    10
 \end{CodeOutput}
 \end{CodeChunk}
 

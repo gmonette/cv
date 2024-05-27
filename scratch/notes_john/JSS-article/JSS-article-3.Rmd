@@ -810,25 +810,16 @@ for (i in 1:n){
 mean(((attrition$Attrition == "Yes") - round(yhat))^2)
 ```
 
-The \pkg{caret} package doesn't directly support generalized linear models fit by \code{glm()}, but it can be made to do so by defining a custom "method" for the binary logistic regression fit to the \code{attrition} data:
+The \pkg{caret} package supports generalized linear models fit by \code{glm()} and can straightforwardly perform LOO CV:
 ```{r rsample-example-using-caret, cache=TRUE}
 library("caret", quietly=TRUE, warn.conflicts=FALSE)
-
-glm_mod <- getModelInfo("glm", regex = FALSE)[[1]]
-glm_mod$fit <- function(x, y, wts, param, lev, last, classProbs, ...) {
-  x$Attrition <- y
-  glm(Attrition ~ JobSatisfaction + Gender + MonthlyIncome,
-      family = binomial, data = x)
-}
-
-mod <- train(x = attrition[, c("JobSatisfaction", "Gender",
+# reports complement of Bayes-rule criterion:
+train(x = attrition[, c("JobSatisfaction", "Gender",
                                "MonthlyIncome")],
              y = attrition$Attrition,
-             method = glm_mod,
+             method = "glm",
              trControl = trainControl(method="LOOCV"))
-mod # reports complement of Bayes-rule criterion
 ```
-In fairness, \pkg{caret} really isn't intended for this kind of simple CV computation.
 
 And here's how we can perform the same computation using the \code{cv()} function in the \pkg{cv} package:
 ```{r rsample-example-using-cv, cache=TRUE}
@@ -857,7 +848,7 @@ microbenchmark::microbenchmark(
   caret=train(x = attrition[, c("JobSatisfaction", "Gender",
                                 "MonthlyIncome")],
               y = attrition$Attrition,
-              method = glm_mod,
+              method = "glm",
               trControl = trainControl(method="LOOCV")),
   direct={
     n <- nrow(attrition)
