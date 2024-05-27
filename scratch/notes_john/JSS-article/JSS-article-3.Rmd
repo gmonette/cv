@@ -753,13 +753,13 @@ The \pkg{cv} package is far from unique in implementing cross-validation of regr
 
 Our goal in implementing CV is to make it conveniently available to \proglang{R} users with limited programming skills,[^cv-by-programming] and hence to encourage its use. Towards this end, the \pkg{cv} package provides a simple, consistent interface through the \code{cv()} generic function, with specific methods for different classes of standard \proglang{R} statistical models. Moreover, we have tried to make writing methods for additional classes of statistical models as simple and straightforward as possible. Because CV is computationally intensive, we also aim for efficiency, by enabling parallel computations generally, and by exploiting properties of specific classes of statistical models (in particular, computations based on hatvalues and the Woodbury matrix identity for linear and generalized linear model). Finally, the package includes some unusual features, such as general support for mixed-effects models and for cross-validating complex model-specification procedures.
 
-[^cv-by-programming]: \proglang{R} users with sophisticated programming skills would generally find it unchallenging to implement CV directly for specific applications. Even in this case, however, there's an argument for using a simple pre-programmed interface to CV, to minimize programming effort and to avoid mistakes.
+[^cv-by-programming]: \proglang{R} users with sophisticated programming skills would generally find it unchallenging to implement CV directly for specific applications (as we illustrate below). Even in this case, however, there's an argument for using a simple pre-programmed interface to CV, to minimize programming effort and to avoid mistakes.
 
 Some \proglang{R} packages for statistical learning include facilities for cross-validation. Notable examples are the \pkg{caret} package [@Kuhn:2008] and the \pkg{tidyfit} package [@Pfitzinger:2024]; the latter employs \pkg{rsample} [@FrickEtAl:2024] for CV, which we will discuss presently. This contrasts with the approach taken in the \pkg{cv} package, which, as we have explained, directly supports classes of standard \proglang{R} statistical models.
 
 Other packages, including \pkg{cvms} [@OlsenZachariae:2024], \pkg{mlexperiments} [@Kapsner:2024], \pkg{origami} [@CoyleEtAl:2022], and \pkg{rsample} (which also supports bootstrapping), modularize the CV process to a greater or lesser extent. Advantages of this approach include flexibility and generality, but a disadvantage is that use of these packages entails nontrivial programming effort and skill. 
 
-We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package [@Kuhn:2024] (and which is by a wide margin the most downloaded of the CV packages mentioned in the preceding paragraph). Here, with minimal explanation, is how one would perform LOO CV for this example using \pkg{rsample}:[^k-fold-used-in-rsample]
+We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package [@Kuhn:2024] (and which is by a wide margin the most downloaded from the RStudio CRAN mirror of the CV packages mentioned in the preceding paragraph). Here, with minimal explanation, is how one would perform LOO CV for this example using \pkg{rsample}:[^k-fold-used-in-rsample]
 ```{r rsample-example, cache=TRUE}
 library(rsample)
 
@@ -794,15 +794,27 @@ rs_obj$accuracy <- map_dbl(rs_obj$results,
 ```
 [^k-fold-used-in-rsample]: The example in the \pkg{rsample} vignette uses 10-fold rather than LOO CV, but otherwise the code from the vignette is only trivially modified here.
 
+In this case, it's simple (and, in our opinion, simpler) to program LOO CV directly. For example
+```{r direct-loo-cv, cache=TRUE}
+mod.attrition <- glm(mod_form, data=attrition, family=binomial)
+n <- nrow(attrition)
+yhat <- numeric(n)
+for (i in 1:n){
+  m <- update(mod.attrition, data=attrition[-i, ])
+  yhat[i] <- predict(m, newdata=attrition[i, ], type="response")
+}
+mean(((attrition$Attrition == "Yes") - round(yhat))^2)
+```
+
+
 And here's how we can perform the same computation using the \code{cv()} function in the \pkg{cv} package:
 ```{r rsample-example-using-cv, cache=TRUE}
-mod.attrition <- glm(mod_form, data=attrition, family=binomial)
 (cv.attrition <- cv(mod.attrition, k="loo", criterion=BayesRule))
 all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy), 
           check.attributes=FALSE)
 ```
 
-Let's compare the computational efficiency of the two implementations, also showing the use of \code{method="Woodbury"} and \code{method="hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method="exact"}:
+Let's compare the computational efficiency of the three implementations, also showing the use of \code{method="Woodbury"} and \code{method="hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method="exact"}:
 ```{r compare-rsample-cv, cache=TRUE}
 all.equal(cv.attrition$`CV crit`,
           cv(mod.attrition, k="loo", criterion=BayesRule,
@@ -819,6 +831,15 @@ microbenchmark::microbenchmark(
     rs_obj$accuracy <- map_dbl(rs_obj$results,
                                function(x) mean(x$correct))
   },
+  direct={
+    n <- nrow(attrition)
+    yhat <- numeric(n)
+    for (i in 1:n){
+      m <- update(mod.attrition, data=attrition[-i, ])
+      yhat[i] <- predict(m, newdata=attrition[i, ], type="response")
+    }
+    mean(((attrition$Attrition == "Yes") - round(yhat))^2)
+  },
   cv.exact=cv(mod.attrition, k="loo", criterion=BayesRule),
   cv.wood=cv(mod.attrition, k="loo", criterion=BayesRule,
              method="Woodbury"),
@@ -827,7 +848,7 @@ microbenchmark::microbenchmark(
   times=10
 )
 ```
-Computing time for \pkg{rsample} for this problem is similar to \code{cv()} with \code{method="exact"}, but more than an order of magnitude slower than \code{cv()} with \code{method="Woodbury"}, and more than three orders of magnitude slower then \code{cv()} with \code{method="hatvalues"}.
+Computing time for \pkg{rsample} for this problem is similar to direct computation of LOO CV and to \code{cv()} with \code{method="exact"}, but more than an order of magnitude slower than \code{cv()} with \code{method="Woodbury"}, and more than three orders of magnitude slower then \code{cv()} with \code{method="hatvalues"}.
 
 
 # Computational notes

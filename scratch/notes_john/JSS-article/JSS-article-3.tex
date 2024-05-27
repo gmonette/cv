@@ -382,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 968919
+R RNG seed set to 716237
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.22048
-bias-adjusted cross-validation criterion = 19.20805
-95% CI for bias-adjusted CV criterion = (15.74739, 22.66871)
+cross-validation criterion = 19.28027
+bias-adjusted cross-validation criterion = 19.2646
+95% CI for bias-adjusted CV criterion = (15.81196, 22.71725)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -487,10 +487,10 @@ less accurate nanosecond times to avoid potential integer overflows
 \begin{CodeOutput}
 Unit: microseconds
       expr        min         lq       mean     median         uq        max
- hatvalues    992.282   1149.681   1181.427   1199.188   1223.235   1356.485
-  Woodbury  12297.663  12375.317  14678.447  12908.952  16017.675  22227.535
-     naive 217204.347 222086.545 249652.690 250411.416 277112.440 279141.530
-    cv.glm 379237.823 382052.063 401064.952 388823.726 435052.394 440563.573
+ hatvalues    984.369   1182.604   1188.963   1202.345   1220.242   1293.468
+  Woodbury  12366.543  12508.690  13408.099  12769.347  12815.124  16566.050
+     naive 216467.126 217748.581 225187.170 219534.685 222515.077 276207.898
+    cv.glm 373527.917 380937.683 393430.301 382341.584 389266.341 443234.190
  neval
     10
     10
@@ -1903,7 +1903,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x142fa0f70>
+<bytecode: 0x126d8b808>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2110,22 +2110,23 @@ that support CV.
 Our goal in implementing CV is to make it conveniently available to
 \proglang{R} users with limited programming skills,\footnote{\proglang{R}
   users with sophisticated programming skills would generally find it
-  unchallenging to implement CV directly for specific applications. Even
-  in this case, however, there's an argument for using a simple
-  pre-programmed interface to CV, to minimize programming effort and to
-  avoid mistakes.} and hence to encourage its use. Towards this end, the
-\pkg{cv} package provides a simple, consistent interface through the
-\code{cv()} generic function, with specific methods for different
-classes of standard \proglang{R} statistical models. Moreover, we have
-tried to make writing methods for additional classes of statistical
-models as simple and straightforward as possible. Because CV is
-computationally intensive, we also aim for efficiency, by enabling
-parallel computations generally, and by exploiting properties of
-specific classes of statistical models (in particular, computations
-based on hatvalues and the Woodbury matrix identity for linear and
-generalized linear model). Finally, the package includes some unusual
-features, such as general support for mixed-effects models and for
-cross-validating complex model-specification procedures.
+  unchallenging to implement CV directly for specific applications (as
+  we illustrate below). Even in this case, however, there's an argument
+  for using a simple pre-programmed interface to CV, to minimize
+  programming effort and to avoid mistakes.} and hence to encourage its
+use. Towards this end, the \pkg{cv} package provides a simple,
+consistent interface through the \code{cv()} generic function, with
+specific methods for different classes of standard \proglang{R}
+statistical models. Moreover, we have tried to make writing methods for
+additional classes of statistical models as simple and straightforward
+as possible. Because CV is computationally intensive, we also aim for
+efficiency, by enabling parallel computations generally, and by
+exploiting properties of specific classes of statistical models (in
+particular, computations based on hatvalues and the Woodbury matrix
+identity for linear and generalized linear model). Finally, the package
+includes some unusual features, such as general support for
+mixed-effects models and for cross-validating complex
+model-specification procedures.
 
 Some \proglang{R} packages for statistical learning include facilities
 for cross-validation. Notable examples are the \pkg{caret} package
@@ -2146,11 +2147,12 @@ programming effort and skill.
 We illustrate with an example adapted from a vignette in the
 \pkg{rsample} package, which uses the \code{attrition} data set from the
 \pkg{modeldata} package \citep{Kuhn:2024} (and which is by a wide margin
-the most downloaded of the CV packages mentioned in the preceding
-paragraph). Here, with minimal explanation, is how one would perform LOO
-CV for this example using \pkg{rsample}:\footnote{The example in the
-  \pkg{rsample} vignette uses 10-fold rather than LOO CV, but otherwise
-  the code from the vignette is only trivially modified here.}
+the most downloaded from the RStudio CRAN mirror of the CV packages
+mentioned in the preceding paragraph). Here, with minimal explanation,
+is how one would perform LOO CV for this example using
+\pkg{rsample}:\footnote{The example in the \pkg{rsample} vignette uses
+  10-fold rather than LOO CV, but otherwise the code from the vignette
+  is only trivially modified here.}
 
 \begin{CodeChunk}
 \begin{CodeInput}
@@ -2195,12 +2197,30 @@ R> 1 - summary(rs_obj$accuracy)
 \end{CodeOutput}
 \end{CodeChunk}
 
+In this case, it's simple (and, in our opinion, simpler) to program LOO
+CV directly. For example
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> mod.attrition <- glm(mod_form, data=attrition, family=binomial)
+R> n <- nrow(attrition)
+R> yhat <- numeric(n)
+R> for (i in 1:n){
++   m <- update(mod.attrition, data=attrition[-i, ])
++   yhat[i] <- predict(m, newdata=attrition[i, ], type="response")
++ }
+R> mean(((attrition$Attrition == "Yes") - round(yhat))^2)
+\end{CodeInput}
+\begin{CodeOutput}
+[1] 0.1612245
+\end{CodeOutput}
+\end{CodeChunk}
+
 And here's how we can perform the same computation using the \code{cv()}
 function in the \pkg{cv} package:
 
 \begin{CodeChunk}
 \begin{CodeInput}
-R> mod.attrition <- glm(mod_form, data=attrition, family=binomial)
 R> (cv.attrition <- cv(mod.attrition, k="loo", criterion=BayesRule))
 \end{CodeInput}
 \begin{CodeOutput}
@@ -2221,7 +2241,7 @@ R> all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy),
 \end{CodeOutput}
 \end{CodeChunk}
 
-Let's compare the computational efficiency of the two implementations,
+Let's compare the computational efficiency of the three implementations,
 also showing the use of \code{method="Woodbury"} and
 \code{method="hatvalues"} for \code{cv()}, which, in this example,
 produce numerically identical results to the default
@@ -2253,6 +2273,15 @@ R> microbenchmark::microbenchmark(
 +     rs_obj$accuracy <- map_dbl(rs_obj$results,
 +                                function(x) mean(x$correct))
 +   },
++   direct={
++     n <- nrow(attrition)
++     yhat <- numeric(n)
++     for (i in 1:n){
++       m <- update(mod.attrition, data=attrition[-i, ])
++       yhat[i] <- predict(m, newdata=attrition[i, ], type="response")
++     }
++     mean(((attrition$Attrition == "Yes") - round(yhat))^2)
++   },
 +   cv.exact=cv(mod.attrition, k="loo", criterion=BayesRule),
 +   cv.wood=cv(mod.attrition, k="loo", criterion=BayesRule,
 +              method="Woodbury"),
@@ -2262,25 +2291,31 @@ R> microbenchmark::microbenchmark(
 + )
 \end{CodeInput}
 \begin{CodeOutput}
+Warning in microbenchmark::microbenchmark(rsample = {: less accurate nanosecond
+times to avoid potential integer overflows
+\end{CodeOutput}
+\begin{CodeOutput}
 Unit: milliseconds
-         expr         min          lq        mean      median          uq
-      rsample 5858.845429 5918.511745 6182.166132 6032.719008 6513.721496
-     cv.exact 4823.821011 4879.622175 4986.028516 4973.975331 5051.786505
-      cv.wood  103.815690  107.823973  112.389204  112.138341  117.148398
- cv.hatvalues    1.248655    1.299823    1.540665    1.587007    1.654432
-         max neval
- 6707.589832    10
- 5305.047728    10
-  121.483287    10
-    1.916832    10
+         expr         min          lq        mean      median         uq
+      rsample 5707.408772 5711.011032 5810.464433 5828.739437 5853.64979
+       direct 5187.215696 5206.152940 5281.503347 5230.005408 5348.24496
+     cv.exact 4659.560948 4691.022749 4735.789317 4737.251540 4790.76759
+      cv.wood   99.232628  104.541882  106.917914  106.051051  108.49436
+ cv.hatvalues    1.187401    1.224875    2.751965    1.356813    1.56374
+        max neval
+ 5999.09487    10
+ 5500.60457    10
+ 4811.15176    10
+  119.72115    10
+   15.35548    10
 \end{CodeOutput}
 \end{CodeChunk}
 
-Computing time for \pkg{rsample} for this problem is similar to
-\code{cv()} with \code{method="exact"}, but more than an order of
-magnitude slower than \code{cv()} with \code{method="Woodbury"}, and
-more than three orders of magnitude slower then \code{cv()} with
-\code{method="hatvalues"}.
+Computing time for \pkg{rsample} for this problem is similar to direct
+computation of LOO CV and to \code{cv()} with \code{method="exact"}, but
+more than an order of magnitude slower than \code{cv()} with
+\code{method="Woodbury"}, and more than three orders of magnitude slower
+then \code{cv()} with \code{method="hatvalues"}.
 
 \section{Computational notes}\label{computational-notes}
 
