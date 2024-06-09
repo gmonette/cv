@@ -10,7 +10,7 @@ nestedCV.default <- function(model, data=insight::get_data(model),
                              seed, level=0.90, ...){
 
   innerCV <- function(j.omit){
-    y <- getResponse(model)
+    y <- GetResponse(model)
     folds <- (1:k)[-j.omit] # omit the current fold
     # indices of cases in the included folds:
     indices <- as.vector(unlist(mapply(function(s, e) s:e,
@@ -51,7 +51,7 @@ nestedCV.default <- function(model, data=insight::get_data(model),
   folds <- rep(nk, k) + c(rep(1, rem), rep(0, k - rem)) # allocate remainder
   ends <- cumsum(folds) # end of each fold
   starts <- c(1, ends + 1)[-(k + 1)] # start of each fold
-  y <- getResponse(model)
+  y <- GetResponse(model)
 
   # ordinary cv:
   data <- data[sample(n, n), ] # permute cases
@@ -165,7 +165,7 @@ nestedCV.lm <- function(model, data=insight::get_data(model),
   }
 
   innerCV <- function(j.omit){
-    y <- getResponse(model)
+    y <- GetResponse(model)
     folds <- (1:k)[-j.omit]
     indices <- as.vector(unlist(mapply(function(s, e) s:e,
                                        starts[folds], ends[folds])))
@@ -221,7 +221,7 @@ nestedCV.lm <- function(model, data=insight::get_data(model),
     }
 
     X <- model.matrix(model)
-    y <- getResponse(model)
+    y <- GetResponse(model)
     w <- weights(model)
     if (is.null(w)) w <- rep(1, length(y))
     XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
@@ -252,7 +252,7 @@ nestedCV.lm <- function(model, data=insight::get_data(model),
     model <- update(model, data=data)
 
     X <- model.matrix(model)
-    y <- getResponse(model)
+    y <- GetResponse(model)
     w <- weights(model)
     if (is.null(w)) w <- rep(1, length(y))
     XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])

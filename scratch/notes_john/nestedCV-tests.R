@@ -1,5 +1,6 @@
 library(cv)
 library(nestedcv)
+library(insight)
 source("~/Documents/R-package-sources/cv/scratch/notes_john/nestedCV.R")
 
 data("Duncan", package="carData")
