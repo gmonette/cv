@@ -1,7 +1,7 @@
 library(cv)
+# devtools::install_github("stephenbates19/nestedcv")
 library(nestedcv)
-library(insight)
-source("~/Documents/R-package-sources/cv/scratch/notes_john/nestedCV.R")
+source("scratch/notes_john/nestedCV/nestedCV.R")
 
 data("Duncan", package="carData")
 m <- lm(prestige ~ income + education, data=Duncan)
@@ -55,8 +55,8 @@ summary(ls.line)
 
 ## -------
 
-source("~/temp/nested_cv.R")
-source("~/temp/nested_cv_helper.R")
+source("scratch/notes_john/nestedCV/nested_cv.R")
+source("scratch/notes_john/nestedCV/nested_cv_helper.R")
 library(cv)
 
 se_loss <- function(y1, y2, funcs_params = NA) {
@@ -87,7 +87,12 @@ y <- rnorm(n)
 D <- data.frame(X, y)
 ms <- lm(y ~ . - 1, data=D)
 
-system.time(summary(nestedCV(ms, seed=432)))
+system.time(summary(nestedCV.default(ms, seed=432, debug=TRUE)))
+
 nestedcv::naive_cv(X, y, ols_funs)[1:3]
 
 system.time(print(nested_cv(X, y, ols_funs, reps=200)[1:7]))
+
+colMeans(ab0) # nested_cv()
+mean(a) # nestedCV()
+mean(b)
