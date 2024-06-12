@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-06-09</h4>
+            <h4 data-toc-skip class="date">2024-06-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-extend.Rmd" class="external-link"><code>vignettes/cv-extend.Rmd</code></a></small>
       <div class="d-none name"><code>cv-extend.Rmd</code></div>
@@ -204,7 +204,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt;     attr(result, "casewise loss") &lt;- "(y - yhat)^2"</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x13a0094d8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x111d4d928&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -213,7 +213,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x13a088e48&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x111dc0338&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>"(y - yhat)^2"</code>, that evaluates to an expression that is a
@@ -616,7 +616,7 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt;             newdata = data, level = 1), blups = blups, fixed.effects = fixed.effects, </span></span>
 <span><span class="co">#&gt;         ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x13dd06d30&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x117a7e9e8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cv.merMod.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvCompute.html">cvMixed()</a></code>, which does the computational work.</p>
