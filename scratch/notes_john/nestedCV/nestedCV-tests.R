@@ -9,18 +9,18 @@ cv(m, k=5, criterion=mse, seed=123)
 
 summary(nestedCV(m, seed=123, k=5, reps=10))
 
-all.equal(
-  summary(nestedCV.default(m, seed=123, k=5, reps=10)),
-  summary(nestedCV(m, seed=123, k=5, reps=10))
-)
+# all.equal(
+#   nestedCV.default(m, seed=123, k=5, reps=10),
+#   nestedCV(m, seed=123, k=5, reps=10)
+# )
 
 summary(nestedCV(m, seed=123, k=10, reps=200))
 
-microbenchmark::microbenchmark(
-  update=nestedCV.default(m, seed=123, k=10, reps=200),
-  Woodbury=nestedCV(m, seed=123, k=10, reps=200),
-  times=5
-)
+# microbenchmark::microbenchmark(
+#   update=nestedCV.default(m, seed=123, k=10, reps=200),
+#   Woodbury=nestedCV(m, seed=123, k=10, reps=200),
+#   times=5
+# )
 
 D <- Duncan[-2, ]
 rownames(D) <- NULL
@@ -57,7 +57,6 @@ summary(ls.line)
 
 source("scratch/notes_john/nestedCV/nested_cv.R")
 source("scratch/notes_john/nestedCV/nested_cv_helper.R")
-library(cv)
 
 se_loss <- function(y1, y2, funcs_params = NA) {
   (y1 - y2)^2
@@ -87,7 +86,7 @@ y <- rnorm(n)
 D <- data.frame(X, y)
 ms <- lm(y ~ . - 1, data=D)
 
-system.time(summary(nestedCV.default(ms, seed=432, debug=TRUE)))
+system.time(summary(nestedCV(ms, seed=432, debug=TRUE)))
 
 nestedcv::naive_cv(X, y, ols_funs)[1:3]
 
