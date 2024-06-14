@@ -322,6 +322,13 @@ nestedCV.default <- function(model, data=insight::get_data(model),
     e.in # return
   }
 
+  outerCV <- function(j){
+    indices.j <- fold(folds, j) # indices of cases in jth fold
+    mod <- update(model, data=data[-indices.j, ]) # omitting jth fold
+    yhat <- predict(mod, newdata=data[indices.j, ]) # for cases in jth fold
+    loss(y[names(yhat)], yhat) # for cases in jth fold
+  }
+
   n <- nrow(data)
   if (is.character(k)){
     if (k == "n" || k == "loo") {
@@ -343,11 +350,7 @@ nestedCV.default <- function(model, data=insight::get_data(model),
   # ordinary cv:
   e <- numeric(n) # to accumulate cv components
   for(j in all.folds){
-    # indices of cases in jth fold
-    indices.j <- fold(folds, j)
-    mod <- update(model, data=data[-indices.j, ]) # omitting cases in jth fold
-    yhat <- predict(mod, data[indices.j, ]) # for cases in jth fold
-    e[indices.j] <- loss(y[names(yhat)], yhat) # for cases in jth fold
+    e[fold(folds, j)] <- outerCV(j)
   }
   err.cv <- mean(e)
   se.cv <- sd(e)/sqrt(n)
@@ -360,11 +363,9 @@ nestedCV.default <- function(model, data=insight::get_data(model),
   for (r in 1:reps){
     data <- data[sample(n, n), ] # permute data
     for (j in all.folds){ # loop over folds
+      indices.j <- fold(folds, j)
       e.in <- innerCV(j)
-      indices.j <- fold(folds, j) # indices of cases in jth fold
-      mod <- update(model, data[-indices.j, ]) # omitting jth fold
-      yhat <- predict(mod, newdata=data[indices.j, ]) # for cases in jth fold
-      e.out <- loss(y[names(yhat)], yhat) # for cases in jth fold
+      e.out <- outerCV(j)
       i.ab <- i.ab + 1
       a[i.ab] <- (mean(e.in) - mean(e.out))^2
       b[i.ab] <-  var(e.out)/length(indices.j)
@@ -394,6 +395,7 @@ nestedCV.default <- function(model, data=insight::get_data(model),
   if (debug){
     assign("a", a, envir=.GlobalEnv)
     assign("b", b, envir=.GlobalEnv)
+    assign("e", e, envir=.GlobalEnv)
   }
   result
 }
