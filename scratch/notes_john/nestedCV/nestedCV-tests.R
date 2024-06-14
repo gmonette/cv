@@ -14,11 +14,17 @@ all.equal(
   nestedCV(m, seed=123, k=5, reps=10)
 )
 
+all.equal(
+  nestedCV.default(m, seed=123, k=5, reps=10),
+  nestedCV(m, seed=123, k=5, reps=10, method="naive")
+)
+
 summary(nestedCV(m, seed=123, k=10, reps=200))
 
 # timeconsuming
 microbenchmark::microbenchmark(
-  update=nestedCV.default(m, seed=123, k=10, reps=200),
+  default=nestedCV.default(m, seed=123, k=10, reps=200),
+  naive=nestedCV(m, seed=123, k=10, reps=200, method="naive"),
   Woodbury=nestedCV(m, seed=123, k=10, reps=200),
   times=5,
   check="equal"

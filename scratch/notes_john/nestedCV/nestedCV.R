@@ -3,7 +3,7 @@ nestedCV <- function(model, data, loss, k=10, reps=200,
   UseMethod("nestedCV")
 }
 
-squaredErrorLoss <- function(y, yhat) (y - yhat)^2
+# squaredErrorLoss <- function(y, yhat) (y - yhat)^2
 
 # nestedCV.default <- function(model, data=insight::get_data(model),
 #                              loss=squaredErrorLoss, k=10, reps=200,
@@ -301,8 +301,12 @@ print.nestedCV <- function(x, digits=getOption("digits"), ...){
 # }
 
 nestedCV.default <- function(model, data=insight::get_data(model),
-                             loss=squaredErrorLoss, k=10, reps=200,
+                             criterion=mse, k=10, reps=200,
                              seed, level=0.90, debug=FALSE, ...){
+
+  loss <- cv:::getLossFn(criterion(0:1, 0:1))
+  if (is.null(loss)) stop(deparse(substitute(criterion)),
+                          " is not a casewise cost function")
 
   innerCV <- function(j.omit){
     indices.j.omit <- fold(folds, j.omit)
@@ -401,8 +405,16 @@ nestedCV.default <- function(model, data=insight::get_data(model),
 }
 
 nestedCV.lm <- function(model, data=insight::get_data(model),
-                        loss=squaredErrorLoss, k=10, reps=200,
-                        seed, level=0.90, debug=FALSE, ...){
+                        criterion=mse, k=10, reps=200,
+                        seed, level=0.90, debug=FALSE,
+                        method=c("Woodbury", "naive"), ...){
+
+  loss <- cv:::getLossFn(criterion(0:1, 0:1))
+  if (is.null(loss)) stop(deparse(substitute(criterion)),
+                          " is not a casewise cost function")
+
+  method <- match.arg(method)
+  if (method == "naive") return(NextMethod())
 
   UpdateLM <- function(omit){
     # compute coefficients with omit cases deleted
