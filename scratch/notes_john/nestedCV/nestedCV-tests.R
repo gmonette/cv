@@ -9,18 +9,20 @@ cv(m, k=5, criterion=mse, seed=123)
 
 summary(nestedCV(m, seed=123, k=5, reps=10))
 
-# all.equal(
-#   nestedCV.default(m, seed=123, k=5, reps=10),
-#   nestedCV(m, seed=123, k=5, reps=10)
-# )
+all.equal(
+  nestedCV.default(m, seed=123, k=5, reps=10),
+  nestedCV(m, seed=123, k=5, reps=10)
+)
 
 summary(nestedCV(m, seed=123, k=10, reps=200))
 
-# microbenchmark::microbenchmark(
-#   update=nestedCV.default(m, seed=123, k=10, reps=200),
-#   Woodbury=nestedCV(m, seed=123, k=10, reps=200),
-#   times=5
-# )
+# timeconsuming
+microbenchmark::microbenchmark(
+  update=nestedCV.default(m, seed=123, k=10, reps=200),
+  Woodbury=nestedCV(m, seed=123, k=10, reps=200),
+  times=5,
+  check="equal"
+)
 
 D <- Duncan[-2, ]
 rownames(D) <- NULL

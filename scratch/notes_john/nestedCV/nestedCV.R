@@ -399,3 +399,135 @@ nestedCV.default <- function(model, data=insight::get_data(model),
   }
   result
 }
+
+nestedCV.lm <- function(model, data=insight::get_data(model),
+                        loss=squaredErrorLoss, k=10, reps=200,
+                        seed, level=0.90, debug=FALSE, ...){
+
+  UpdateLM <- function(omit){
+    # compute coefficients with omit cases deleted
+    #  uses the Woodbury matrix identity
+    # <https://en.wikipedia.org/wiki/Woodbury_matrix_identity>
+    x <- X[omit, , drop=FALSE]
+    dg <- if (length(omit) > 1L) diag(1/w[omit]) else 1/w[omit]
+    XXi.u <- XXi + (XXi %*% t(x) %*% solve(dg - x %*% XXi %*% t(x)) %*% x %*% XXi)
+    b.u <- XXi.u %*% (Xy - t(X[omit, , drop=FALSE]) %*% (w[omit] * y[omit]))
+    as.vector(b.u)
+  }
+
+  innerCV <- function(j.omit){
+    indices.j.omit <- fold(folds, j.omit)
+    indices <- all.indices[-indices.j.omit]
+    e.in <- numeric(length(indices)) # to accumulate result
+    e.in.start <- 1
+    for (j in all.folds[-j.omit]){ # loop over included folds
+      indices.j <- fold(folds, j) # indices of cases in hold-out fold
+
+      b.j <- UpdateLM(c(indices.j.omit, indices.j))
+      yhat <- (X[indices.j, ] %*% b.j)[, 1]
+
+      e.in.end <- e.in.start + length(yhat) - 1
+      e.in[e.in.start:e.in.end] <- loss(y[names(yhat)], yhat) # for hold-out fold
+      e.in.start <- e.in.end + 1
+    }
+    e.in # return
+  }
+
+  outerCV <- function(j){
+    indices.j <- fold(folds, j) # indices of cases in jth fold
+    b.j <- UpdateLM(indices.j)
+    yhat <- (X[indices.j, ] %*% b.j)[, 1]
+    loss(y[names(yhat)], yhat) # for cases in jth fold
+  }
+
+  n <- nrow(data)
+  if (is.character(k)){
+    if (k == "n" || k == "loo") {
+      k <- n
+    }
+  }
+  if (!is.numeric(k) || length(k) > 1L || k > n || k < 2 || k != round(k)){
+    stop('k must be an integer between 2 and n or "n" or "loo"')
+  }
+  if (missing(seed)) seed <- sample(1e6, 1L)
+  set.seed(seed)
+  message("R RNG seed set to ", seed)
+
+  folds <- folds(n, k)
+  all.folds <- 1:k
+  all.indices <- 1:n
+
+  X <- model.matrix(model)
+  y <- GetResponse(model)
+  w <- weights(model)
+  if (is.null(w)) w <- rep(1, length(y))
+  B <- coef(model)
+  p <- length(B)
+  if (p > model$rank) {
+    stop(paste0("The model has ", if (sum(is.na(B)) == 1L) "an ",
+                "aliased coefficient", if (sum(is.na(B)) > 1L) "s", ":\n",
+                paste(names(B[is.na(B)]), collapse=", ")))
+  }
+  XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
+  Xy <- t(X) %*% (w * y)
+
+  # ordinary cv:
+  e <- numeric(n) # to accumulate cv components
+  for(j in all.folds){
+    e[fold(folds, j)] <- outerCV(j)
+  }
+  err.cv <- mean(e)
+  se.cv <- sd(e)/sqrt(n)
+
+  es <- numeric(sum(rep(n, k) - folds$folds)*reps) # to accumulate cv components
+  a <- numeric(reps*k) # to accumulate components for MSE calculation
+  b <- numeric(reps*k) # to accumulate components for MSE calculation
+  i.es.start <- 1
+  i.ab <- 0
+  for (r in 1:reps){
+    data <- data[sample(n, n), ] # permute cases
+    model <- update(model, data=data)
+    X <- model.matrix(model)
+    y <- GetResponse(model)
+    w <- weights(model)
+    if (is.null(w)) w <- rep(1, length(y))
+    XXi <- chol2inv(model$qr$qr[1L:p, 1L:p, drop = FALSE])
+    Xy <- t(X) %*% (w * y)
+
+    for (j in all.folds){ # loop over folds
+      indices.j <- fold(folds, j)
+      e.in <- innerCV(j)
+      e.out <- outerCV(j)
+      i.ab <- i.ab + 1
+      a[i.ab] <- (mean(e.in) - mean(e.out))^2
+      b[i.ab] <-  var(e.out)/length(indices.j)
+      i.es.end <- (i.es.start + length(e.in)) - 1
+      es[i.es.start:i.es.end] <- e.in
+      i.es.start <- i.es.end + 1
+    }
+  }
+  mse <- mean(a) - mean(b)
+  adj.mse <- ((k - 1)/k)*mse
+  if (adj.mse < se.cv^2) adj.mse <- se.cv^2
+  if (adj.mse > k*se.cv^2) adj.mse <- k*se.cv^2
+  err.ncv <- mean(es)
+  err.ncv.sd <- sd(es)
+  bias <- (1 + ((k - 2)/k)^1.5)*(err.ncv - err.cv) # ^1.5 to match Bates code?
+  halfwidth <- qnorm(1 - (1 - level)/2)*sqrt(mse) # for NCV CI
+  ci.lower.ncv <- err.ncv - bias - halfwidth
+  ci.upper.ncv <- err.ncv - bias + halfwidth
+  halfwidth <- qnorm(1 - (1 - level)/2)*se.cv # for naive CI
+  ci.lower.cv <- err.cv - halfwidth
+  ci.upper.cv <- err.cv + halfwidth
+  result <- c(mse=mse, adj.mse=adj.mse, err.ncv=err.ncv, err.ncv.sd=err.ncv.sd, err.cv=err.cv, se.cv=se.cv,
+              bias=bias, ci.lower.ncv=ci.lower.ncv, ci.upper.ncv=ci.upper.ncv,
+              ci.lower.cv=ci.lower.cv, ci.upper.cv=ci.upper.cv, level=level,
+              k=k, reps=reps)
+  class(result) <- "nestedCV"
+  if (debug){
+    assign("a", a, envir=.GlobalEnv)
+    assign("b", b, envir=.GlobalEnv)
+    assign("e", e, envir=.GlobalEnv)
+  }
+  result
+}
