@@ -182,7 +182,8 @@ cv.modList <-
 #' @export
 models <- function(...) {
   models <- list(...)
-  if (length(models) == 1 && is.list(models[[1]]))
+  if (length(models) == 1 &&
+      inherits(models[[1]], "list", which=TRUE)[1] == 1)
     models <- models[[1]]
   if (length(models) < 2L)
     stop("fewer than 2 models to be compared")
