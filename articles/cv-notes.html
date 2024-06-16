@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-06-14</h4>
+            <h4 data-toc-skip class="date">2024-06-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-notes.Rmd" class="external-link"><code>vignettes/cv-notes.Rmd</code></a></small>
       <div class="d-none name"><code>cv-notes.Rmd</code></div>
@@ -272,12 +272,12 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :</span></span>
 <span><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
-<span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    954.44    990.36   1142.4   1195.2   1227.1   1291.1    10</span></span>
-<span><span class="co">#&gt;   Woodbury  12244.36  12579.66  13556.8  12718.5  15357.5  16250.9    10</span></span>
-<span><span class="co">#&gt;      naive 220790.86 223278.66 258972.7 225179.6 339790.2 343251.2    10</span></span>
-<span><span class="co">#&gt;     cv.glm 381203.85 384217.35 401333.4 387135.7 395736.6 471276.3    10</span></span></code></pre></div>
+<span><span class="co">#&gt; Unit: milliseconds</span></span>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    1.8073    3.3777    3.4894    3.6535    3.9293    4.005    10</span></span>
+<span><span class="co">#&gt;   Woodbury   40.9235   41.4309   42.5990   42.2691   42.9186   47.770    10</span></span>
+<span><span class="co">#&gt;      naive  424.0823  707.9119  692.0714  710.5623  743.9997  855.596    10</span></span>
+<span><span class="co">#&gt;     cv.glm 1022.2532 1055.8071 1137.3328 1123.4167 1184.1580 1360.253    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -379,11 +379,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    1.1071    1.1823    1.7319    1.4125    1.4633    5.0927    10</span></span>
-<span><span class="co">#&gt;   Woodbury   40.0416   42.2121   43.2522   43.2659   44.5798   45.2104    10</span></span>
-<span><span class="co">#&gt;      exact 1776.2343 1797.3446 1816.2132 1815.2618 1837.8326 1851.0511    10</span></span>
-<span><span class="co">#&gt;     cv.glm 2018.5416 2042.3843 2095.7281 2096.9051 2152.2171 2179.0707    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    1.785    3.5982    3.7332    4.1014    4.3971    4.4843    10</span></span>
+<span><span class="co">#&gt;   Woodbury   71.768  101.8008  110.6572  115.9579  126.4516  136.6318    10</span></span>
+<span><span class="co">#&gt;      exact 3980.866 4643.0954 4751.8219 4866.7850 4993.8164 5260.6024    10</span></span>
+<span><span class="co">#&gt;     cv.glm 4683.835 5511.1852 5572.1874 5684.9001 5895.2532 6047.3532    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
