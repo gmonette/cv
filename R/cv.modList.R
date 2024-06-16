@@ -34,7 +34,10 @@
 #' applied to each model.
 #'
 #' For \code{models()}, two or more competing models fit to the
-#' the same data; the several models may be named.
+#' the same data; the several models may be named. It is also possible
+#' to specify a single argument, which should then be list of models
+#' (which has the effect of turning a list of models into a \code{"modList"}
+#' object).
 #'
 #' For the \code{print()} method, arguments to be passed to the \code{print()} method for
 #' the individual model cross-validations.
@@ -179,6 +182,8 @@ cv.modList <-
 #' @export
 models <- function(...) {
   models <- list(...)
+  if (length(models) == 1 && is.list(models[[1]]))
+    models <- models[[1]]
   if (length(models) < 2L)
     stop("fewer than 2 models to be compared")
   classes <- sapply(models, function(m)

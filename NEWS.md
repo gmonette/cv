@@ -2,6 +2,8 @@
 
 - Small fix to docs.
 
+- Small improvements.
+
 # cv 2.0.0
 
 - New cv.function() method meant to replace cvSelect(), direct use of which is now discouraged.
