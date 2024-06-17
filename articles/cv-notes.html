@@ -273,11 +273,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :</span></span>
 <span><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
 <span><span class="co">#&gt; Unit: microseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq   mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    965.1   1011.1   1161   1221.7   1237.6   1313.4    10</span></span>
-<span><span class="co">#&gt;   Woodbury  12408.5  12586.5  13875  12998.5  16082.6  16733.0    10</span></span>
-<span><span class="co">#&gt;      naive 222270.1 224126.9 225055 224371.3 226598.0 227898.6    10</span></span>
-<span><span class="co">#&gt;     cv.glm 383481.9 390162.3 408077 391625.8 403270.8 504229.1    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min       lq     mean   median       uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    977.48   1011.1   1171.4   1226.8   1243.3   1327.4    10</span></span>
+<span><span class="co">#&gt;   Woodbury  12287.82  12566.5  13722.5  12857.8  15515.1  16861.1    10</span></span>
+<span><span class="co">#&gt;      naive 221623.37 223584.1 230399.6 224731.5 226890.2 278597.2    10</span></span>
+<span><span class="co">#&gt;     cv.glm 382977.19 383398.8 409103.3 393383.5 444127.5 453630.9    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -379,11 +379,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    1.1013    1.1131    1.3171    1.3763    1.4123    1.502    10</span></span>
-<span><span class="co">#&gt;   Woodbury   40.5557   43.2862   43.4717   43.5535   43.6614   45.089    10</span></span>
-<span><span class="co">#&gt;      exact 1776.7656 1795.5003 1824.8558 1831.7556 1849.7761 1862.514    10</span></span>
-<span><span class="co">#&gt;     cv.glm 2049.6816 2062.8932 2095.7566 2077.4007 2145.5377 2172.829    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr      min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    1.101    1.1195    1.3158    1.3676    1.3976    1.4894    10</span></span>
+<span><span class="co">#&gt;   Woodbury   42.121   43.1626   43.7772   43.9826   44.3066   45.2219    10</span></span>
+<span><span class="co">#&gt;      exact 1790.356 1801.1208 1835.2348 1832.9767 1864.5966 1891.8430    10</span></span>
+<span><span class="co">#&gt;     cv.glm 2024.153 2076.7894 2109.6781 2111.1521 2127.2606 2198.7803    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
