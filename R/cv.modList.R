@@ -182,11 +182,13 @@ cv.modList <-
 #' @export
 models <- function(...) {
   models <- list(...)
-  if (length(models) == 1 &&
-      inherits(models[[1]], "list", which=TRUE)[1] == 1)
+  cls <- class(models[[1]])
+  if (length(models) == 1 && length(cls) == 1 && cls == "list")
     models <- models[[1]]
   if (length(models) < 2L)
-    stop("fewer than 2 models to be compared")
+    stop("fewer than 2 models to be compared\n",
+         "or inappropriate argument, ",
+         deparse(substitute(...)))
   classes <- sapply(models, function(m)
     class(m)[1L])
   n <- sapply(models, function(m)
