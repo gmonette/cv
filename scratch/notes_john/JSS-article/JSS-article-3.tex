@@ -382,15 +382,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 45649
+R RNG seed set to 969978
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.13181
-bias-adjusted cross-validation criterion = 19.12404
-95% CI for bias-adjusted CV criterion = (15.69034, 22.55774)
+cross-validation criterion = 19.18252
+bias-adjusted cross-validation criterion = 19.17193
+95% CI for bias-adjusted CV criterion = (15.72359, 22.62027)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -487,10 +487,10 @@ less accurate nanosecond times to avoid potential integer overflows
 \begin{CodeOutput}
 Unit: microseconds
       expr        min         lq       mean     median         uq        max
- hatvalues    984.369   1182.604   1188.963   1202.345   1220.242   1293.468
-  Woodbury  12366.543  12508.690  13408.099  12769.347  12815.124  16566.050
-     naive 216467.126 217748.581 225187.170 219534.685 222515.077 276207.898
-    cv.glm 373527.917 380937.683 393430.301 382341.584 389266.341 443234.190
+ hatvalues    996.956   1181.292   1496.971   1216.777   1233.157   4243.664
+  Woodbury  12189.054  12270.726  13187.437  12580.645  12664.121  16369.455
+     naive 216220.101 218010.571 231464.303 220980.816 223550.942 280828.393
+    cv.glm 381634.027 383670.456 404475.689 390533.979 441471.559 442930.011
  neval
     10
     10
@@ -544,7 +544,7 @@ argument is required):
 \begin{CodeChunk}
 \begin{CodeInput}
 R> # 10-fold CV
-R> mlist <- do.call(models, mlist) # create "modList" object
+R> mlist <- models(mlist) # create "modList" object
 R> 
 R> cv.auto.10 <- cv(mlist, data=Auto, seed=2120)
 R> cv.auto.10[2] # e.g., for quadratic model
@@ -574,12 +574,11 @@ cross-validation criterion = 19.24821
 
 The \code{models()} function takes an arbitrary number of regression
 models as its arguments, which are optionally named, to create a
-\code{"modList"} object. Because we generated the polynomial regression
-models in a named list, we conveniently employ \code{do.call()} to
-supply the models as arguments to \code{models()}. The names created for
-the list (e.g., \code{"m.2"}) are then used for the models. We can also
-invoke the \code{plot()} method for \code{"cvModList"} objects to
-compare the models (see Figure
+\code{"modList"} object. Alternatively, as here, we can supply a
+pre-constructed, optionally named, list of models as the single argument
+to \code{models()}. To visualize the results, comparing the models, we
+invoke the \code{plot()} method for the \code{"cvModList"} object
+returned by \code{cv()} (see Figure
 \ref{fig:polynomial-regression-CV-graph-2}):
 
 \begin{CodeChunk}
@@ -828,7 +827,7 @@ R RNG seed set to 1575
 \end{CodeOutput}
 \begin{CodeOutput}
 Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :
-Model failed to converge with max|grad| = 0.00587207 (tol = 0.002, component 1)
+Model failed to converge with max|grad| = 0.00587131 (tol = 0.002, component 1)
 \end{CodeOutput}
 \begin{CodeOutput}
 boundary (singular) fit: see help('isSingular')
@@ -1903,7 +1902,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x145d6f3a0>
+<bytecode: 0x13b56c108>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -2228,6 +2227,22 @@ The \pkg{caret} package supports generalized linear models fit by
 \begin{CodeChunk}
 \begin{CodeInput}
 R> library("caret", quietly=TRUE, warn.conflicts=FALSE)
+\end{CodeInput}
+\begin{CodeOutput}
+
+Attaching package: 'ggplot2'
+\end{CodeOutput}
+\begin{CodeOutput}
+The following object is masked _by_ '.GlobalEnv':
+
+    mpg
+\end{CodeOutput}
+\begin{CodeOutput}
+The following object is masked from 'package:latticeExtra':
+
+    layer
+\end{CodeOutput}
+\begin{CodeInput}
 R> # reports complement of Bayes-rule criterion:
 R> train(x = attrition[, c("JobSatisfaction", "Gender",
 +                                "MonthlyIncome")],
@@ -2332,25 +2347,21 @@ R> microbenchmark::microbenchmark(
 + )
 \end{CodeInput}
 \begin{CodeOutput}
-Warning in microbenchmark::microbenchmark(rsample = {: less accurate nanosecond
-times to avoid potential integer overflows
-\end{CodeOutput}
-\begin{CodeOutput}
 Unit: milliseconds
-         expr         min          lq        mean      median          uq
-      rsample 5741.137299 5867.248666 6155.761099 6095.937708 6218.031915
-        caret 6805.241869 6931.865408 7135.256404 7052.951569 7377.336681
-       direct 5262.786773 5312.612884 5455.994681 5388.428711 5475.565416
-     cv.exact 4740.642384 4771.993936 4870.961647 4847.941434 4981.140799
-      cv.wood  104.161361  106.036578  112.172855  113.107500  115.602534
- cv.hatvalues    1.262554    1.462716    1.497295    1.520198    1.569685
+         expr         min          lq        mean     median          uq
+      rsample 5892.991705 5997.040644 6197.075663 6180.82761 6298.898798
+        caret 6863.187210 6952.637853 7008.026442 7024.60940 7072.257280
+       direct 5483.414538 5488.340073 5603.901283 5564.68712 5655.604370
+     cv.exact 4829.717139 4885.941915 5049.808394 5021.14425 5155.600842
+      cv.wood  104.694812  110.656458  114.844686  117.06384  119.173552
+ cv.hatvalues    1.281824    1.513761    1.656785    1.59406    1.668454
          max neval
- 7162.266671    10
- 7648.302729    10
- 6045.941344    10
- 5054.087753    10
-  120.361527    10
-    1.666896    10
+ 6871.248999    10
+ 7095.635316    10
+ 5972.080828    10
+ 5486.199381    10
+  121.229702    10
+    2.391448    10
 \end{CodeOutput}
 \end{CodeChunk}
 

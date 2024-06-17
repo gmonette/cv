@@ -208,7 +208,7 @@ mlist[2] # e.g., the quadratic fit
 We then apply \code{cv()} to the list of 10 models (the \code{data} argument is required):
 ```{r polynomial-regression-CV}
 # 10-fold CV
-mlist <- do.call(models, mlist) # create "modList" object
+mlist <- models(mlist) # create "modList" object
 
 cv.auto.10 <- cv(mlist, data=Auto, seed=2120)
 cv.auto.10[2] # e.g., for quadratic model
@@ -217,7 +217,7 @@ cv.auto.10[2] # e.g., for quadratic model
 cv.auto.loo <- cv(mlist, data=Auto, k="loo")
 cv.auto.loo[2] # e.g., for quadratic model
 ```
-The \code{models()} function takes an arbitrary number of regression models as its arguments, which are optionally named, to create a \code{"modList"} object. Because we generated the polynomial regression models in a named list, we conveniently employ \code{do.call()} to supply the models as arguments to \code{models()}. The names created for the list (e.g., \code{"m.2"}) are then used for the models. We can also invoke the \code{plot()} method for \code{"cvModList"} objects to compare the models (see Figure \ref{fig:polynomial-regression-CV-graph-2}):
+The \code{models()} function takes an arbitrary number of regression models as its arguments, which are optionally named, to create a \code{"modList"} object. Alternatively, as here, we can supply a pre-constructed, optionally named, list of models as the single argument to \code{models()}. To visualize the results, comparing the models, we invoke the \code{plot()} method for the \code{"cvModList"} object returned by \code{cv()} (see Figure \ref{fig:polynomial-regression-CV-graph-2}):
 
 ```{r, polynomial-regression-CV-graph-2, fig.show="hold"}
 #| fig.height = 5,
