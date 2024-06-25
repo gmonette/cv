@@ -184,6 +184,7 @@ cv.glmmTMB <-
            blups = coef,
            fixed.effects = glmmTMB::fixef,
            ...) {
+    if(isFALSE(model$call$doFit)) model <- update(model, doFit = TRUE)
     cvMixed(
       model,
       package = "glmmTMB",
