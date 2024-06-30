@@ -373,9 +373,9 @@ cvs_clusters <-
 For a given dataset, we can plot the results for a list of models using the plot method for `"cvList"` objects. For example
 ```{r}
 #| out.width = "60%",
-#| fig.height = 3,
+#| fig.height = 6,
 #| fig.cap = "10-fold cluster-based cross-validation comparing random intercept mixed models with varying fixed effects."
-plot(cvs_clusters[[2]])
+plot(cvs_clusters[[2]], main="Comparison of Fixed Effects")
 ```
 We assemble the results for all datasets to show them in a common figure.
 ```{r}
@@ -398,6 +398,7 @@ dsummary$clusters <-
 #| fig.cap = "10-fold cluster- and case-based cross-validation comparing mixed models with random intercepts and various fixed effects."
 xyplot(cases + clusters ~ model|SD_ratio_i, dsummary,
        auto.key = list(space = 'top', reverse.rows = T, columns = 2), type = 'b',
+       xlab = "Fixed Effects",
        ylab = 'CV criterion (MSE)',
        layout= c(Nv,1),
        par.settings =
