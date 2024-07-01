@@ -1,5 +1,7 @@
 # cv 2.0.1
 
+- New examples for cross-validation with mixed models.
+
 - Updated GetResponse.glmmTMB() method.
 
 - Small fix to docs.
