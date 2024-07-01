@@ -136,12 +136,26 @@ thus omitting individual cases and refitting the model <span class="math inline"
 <p>Because the <span class="math inline">\(n\)</span> models are each
 fit to <span class="math inline">\(n - 1\)</span> cases, LOO CV produces
 a nearly unbiased estimate of prediction error. The <span class="math inline">\(n\)</span> regression models are highly
-statistical dependent, however, based as they are on nearly the same
-data, and so the resulting estimate of prediction error has relatively
-large variance. In contrast, estimated prediction error for <span class="math inline">\(k\)</span>-fold CV with <span class="math inline">\(k = 5\)</span> or <span class="math inline">\(10\)</span> (commonly employed choices) are
-somewhat biased but have smaller variance. It is also possible to
-correct <span class="math inline">\(k\)</span>-fold CV for bias (see
-below).</p>
+statistically dependent, however, based as they are on nearly the same
+data, and so the resulting estimate of prediction error has larger
+variance than if the predictions from the models fit to the <span class="math inline">\(n\)</span> data sets were independent.</p>
+<p>Because predictions are based on smaller data sets, each of size
+approximately <span class="math inline">\(n - n/k\)</span>, estimated
+prediction error for <span class="math inline">\(k\)</span>-fold CV with
+<span class="math inline">\(k = 5\)</span> or <span class="math inline">\(10\)</span> (commonly employed choices) is more
+biased than estimated prediction error for LOO CV. It is possible,
+however, to correct <span class="math inline">\(k\)</span>-fold CV for
+bias (see below).</p>
+<p>The relative <em>variance</em> of prediction error for LOO CV and
+<span class="math inline">\(k\)</span>-fold CV (with <span class="math inline">\(k &lt; n\)</span>) is more complicated: Because
+the overlap between the data sets with each fold omitted is smaller for
+<span class="math inline">\(k\)</span>-fold CV than for LOO CV, the
+dependencies among the predictions are smaller for the former than for
+the latter, tending to produce smaller variance in prediction error for
+<span class="math inline">\(k\)</span>-fold CV. In contrast, there are
+factors that tend to inflate the variance of prediction error in <span class="math inline">\(k\)</span>-fold CV, including the reduced size of
+the data sets with each fold omitted and the randomness induced by the
+selection of folds—in LOO CV the folds are not random.</p>
 </div>
 <div class="section level2">
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
@@ -1251,7 +1265,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  21.160   0.492  21.733</span></span></code></pre></div>
+<span><span class="co">#&gt;  19.943   0.352  20.316</span></span></code></pre></div>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
@@ -1266,7 +1280,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.189   0.037  12.232</span></span></code></pre></div>
+<span><span class="co">#&gt;   0.167   0.026  11.421</span></span></code></pre></div>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
