@@ -104,3 +104,4 @@ selectModelList
 CVs
 cvCompute
 multinom
+glmmTMB

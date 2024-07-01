@@ -1,5 +1,7 @@
 # cv 2.0.1
 
+- Updated GetResponse.glmmTMB() method.
+
 - Small fix to docs.
 
 - Small improvements.

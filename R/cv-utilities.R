@@ -973,7 +973,15 @@ GetResponse.lme <- function(model, ...)
 
 #' @describeIn cvCompute \code{"glmmTMB"} method.
 #' @export
-GetResponse.glmmTMB <- GetResponse.merMod
+GetResponse.glmmTMB <- function (model, ...){
+  y <- insight::get_response(model)
+  if (length(dim(y)) == 2 && dim(y)[2] == 1) y <- y[, 1]
+  if (!is.vector(y))
+    stop("non-vector response")
+  if (!is.numeric(y))
+    stop("non-numeric response")
+  y
+}
 
 #' @describeIn cvCompute \code{"modList"} method.
 #' @export
