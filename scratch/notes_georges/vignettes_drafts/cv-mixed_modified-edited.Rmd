@@ -44,29 +44,16 @@ colorize <- function(x, color) {
 }
 
   # temporary fix 
-
-  GetResponse.glmmTMB <- function (model, ...)
-  {
-    y <- insight::get_response(model)
-    if(is.matrix(y) && dim(y)[2] == 1) y <- as.vector(y)
-    if (is.factor(y)) {
-      levels <- levels(y)
-      failure <- levels[1L]
-      if (length(levels) > 2L) {
-        message("Note: the response has more than 2 levels.\n",
-                " The first level ('", failure, "') denotes failure (0),\n",
-                " the others success (1)")
-      }
-      y <- as.numeric(y != failure)
-    }
-    if (!is.vector(y))
-      stop("non-vector response")
-    if (!is.numeric(y))
-      stop("non-numeric response")
-    y
-  }
-  assignInNamespace("GetResponse.glmmTMB", GetResponse.glmmTMB, ns = 'cv')
-
+GetResponse.glmmTMB <- function (model, ...){
+   y <- insight::get_response(model)
+   if (length(dim(y)) == 2 && dim(y)[2] == 1) y <- y[, 1]
+   if (!is.vector(y))
+     stop("non-vector response")
+   if (!is.numeric(y))
+     stop("non-numeric response")
+   y
+}
+assignInNamespace("GetResponse.glmmTMB", GetResponse.glmmTMB, ns = 'cv')
 
 .opts <- options(digits = 5)
 ```
