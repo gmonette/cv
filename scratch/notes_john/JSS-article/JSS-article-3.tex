@@ -113,13 +113,28 @@ termed ``leave-one-out (LOO) cross-validation.''
 
 Because the \(n\) models are each fit to \(n - 1\) cases, LOO CV
 produces a nearly unbiased estimate of prediction error. The \(n\)
-regression models are highly statistical dependent, however, based as
+regression models are highly statistically dependent, however, based as
 they are on nearly the same data, and so the resulting estimate of
-prediction error has relatively large variance. In contrast, estimated
-prediction error for \(k\)-fold CV with \(k = 5\) or \(10\) (commonly
-employed choices) are somewhat biased but have smaller variance. It is
-also possible to correct \(k\)-fold CV for bias (see Section
+prediction error has larger variance than if the predictions from the
+models fit to the \(n\) data sets were independent.
+
+Because predictions are based on smaller data sets, each of size
+approximately \(n - n/k\), estimated prediction error for \(k\)-fold CV
+with \(k = 5\) or \(10\) (commonly employed choices) is more biased than
+estimated prediction error for LOO CV. It is possible, however, to
+correct \(k\)-fold CV for bias (see Section
 \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
+
+The relative \emph{variance} of prediction error for LOO CV and
+\(k\)-fold CV (with \(k < n\)) is more complicated: Because the overlap
+between the data sets with each fold omitted is smaller for \(k\)-fold
+CV than for LOO CV, the dependencies among the predictions are smaller
+for the former than for the latter, tending to produce smaller variance
+in prediction error for \(k\)-fold CV. In contrast, there are factors
+that tend to inflate the variance of prediction error in \(k\)-fold CV,
+including the reduced size of the data sets with each fold omitted and
+the randomness induced by the selection of folds---in LOO CV the folds
+are not random.
 
 The \pkg{cv} package for \proglang{R} automates the process of
 cross-validation for standard \proglang{R} statistical model objects.
@@ -382,15 +397,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 969978
+R RNG seed set to 431467
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.18252
-bias-adjusted cross-validation criterion = 19.17193
-95% CI for bias-adjusted CV criterion = (15.72359, 22.62027)
+cross-validation criterion = 19.192
+bias-adjusted cross-validation criterion = 19.18107
+95% CI for bias-adjusted CV criterion = (15.71858, 22.64356)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1902,7 +1917,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x13b56c108>
+<bytecode: 0x13fb26ea8>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
