@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-07-03</h4>
+            <h4 data-toc-skip class="date">2024-07-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-notes.Rmd" class="external-link"><code>vignettes/cv-notes.Rmd</code></a></small>
       <div class="d-none name"><code>cv-notes.Rmd</code></div>
@@ -272,12 +272,12 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :</span></span>
 <span><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
-<span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   1.0031   1.1965   1.4749   1.2201   1.2364   3.9289    10</span></span>
-<span><span class="co">#&gt;   Woodbury  12.3312  12.8326  14.5229  14.4026  16.3590  17.1508    10</span></span>
-<span><span class="co">#&gt;      naive 221.4148 222.4739 230.1863 224.4569 225.7855 281.7515    10</span></span>
-<span><span class="co">#&gt;     cv.glm 378.7723 389.1330 402.3713 391.9469 397.7209 459.4214    10</span></span></code></pre></div>
+<span><span class="co">#&gt; Unit: microseconds</span></span>
+<span><span class="co">#&gt;       expr       min        lq     mean   median       uq    max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    984.41    991.79   1149.8   1189.9   1226.4   1322    10</span></span>
+<span><span class="co">#&gt;   Woodbury  12289.34  12521.11  12936.0  12596.8  12749.7  15979    10</span></span>
+<span><span class="co">#&gt;      naive 222273.51 223583.45 236925.4 225602.1 228839.7 284506    10</span></span>
+<span><span class="co">#&gt;     cv.glm 383003.59 386739.76 401799.9 391463.1 396023.1 455782    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -379,11 +379,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median       uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    1.0934    1.1236    1.2972    1.3611    1.394    1.4034    10</span></span>
-<span><span class="co">#&gt;   Woodbury   40.7002   42.1448   43.7931   42.8887   44.546   48.6146    10</span></span>
-<span><span class="co">#&gt;      exact 1738.5068 1805.8109 1823.3993 1815.1968 1837.883 1940.9127    10</span></span>
-<span><span class="co">#&gt;     cv.glm 2040.5689 2049.8249 2087.6877 2094.7717 2121.809 2144.1209    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    1.1118    1.1249    1.4753    1.3972    1.5962    2.4933    10</span></span>
+<span><span class="co">#&gt;   Woodbury   40.1035   42.4126   43.4604   42.8242   43.5559   50.4165    10</span></span>
+<span><span class="co">#&gt;      exact 1766.8157 1815.6386 1840.2068 1843.4457 1865.1367 1908.5391    10</span></span>
+<span><span class="co">#&gt;     cv.glm 2051.9724 2068.1231 2094.8553 2097.4447 2118.9823 2135.3178    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
