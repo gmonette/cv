@@ -141,7 +141,7 @@ We used the same random-number generator seeds as in the previous example cross-
 
 [^optimizer]: The observant reader will notice that we set the argument `control=list(opt="optim")` in the call to `lme()`, changing the optimizer employed from the default `"nlminb"`. We did this because with the default optimizer, `lme()` encountered the same convergence issue as `lmer()`, but rather than issuing a warning, `lme()` failed, reporting an error. As it turns out, setting the optimizer to `"optim"` avoids this problem.
 
-## Example: Contrived hierarchical data
+## Example: Contrasting cluster-based and case-based CV
 
 We introduce four artificial data sets that exemplify aspects of cross-validation particular to hierarchical models. Using these data sets, we show that model comparisons employing cluster-based and those employing case-based cross-validation may not agree on a "best" model. Furthermore, commonly used measures of fit, such as mean-squared error, do not necessarily become smaller as models become larger, even when the models are nested, and even when the measure of fit is computed for the whole data set. 
 
@@ -229,15 +229,15 @@ Here is a scatterplot of the data sets showing estimated 50% concentration ellip
 ```{r plot1}
 #| out.width = "100%",
 #| fig.height = 4.5,
-#| fig.cap = "Data sets showing identical within-patient configurations with increasing between-patient variance. The labels above each panel show the between-patient SD/within-patient SD. The population between-patient regression line, $E(y) = 10 + x$, is shown in each panel."
+#| fig.cap = "Data sets showing identical within-patient configurations with increasing between-patient variance. The labels above each panel show the between-patient SD/within-patient SD. The ellipses are estimated 50% concentration ellipses for each patient. The population between-patient regression line, $E(y) = 10 + x$, is shown in each panel."
 library("lattice")
 library("latticeExtra")
-plot <- xyplot(y ~ x | SD_ratio, data=Data, group=patient,
+plot <- xyplot(y ~ x | SD_ratio, data = Data, group = patient,
            layout = c(Nv, 1),
-           par.settings=list(superpose.symbol=list(pch=1, cex=0.7))) +
+           par.settings = list(superpose.symbol = list(pch = 1, cex = 0.7))) +
       layer(panel.ellipse(..., center.pch = 16, center.cex = 1.5,  
                           level = 0.5),
-            panel.abline(a=10, b=1))
+            panel.abline(a = 10, b = 1))
 plot # display graph
 ```
 The population from which these datasets is generated has a between-patient effect of dosage of 1 and a within-patient effect of $-0.5$. The researcher may attempt to obtain an estimate of the within-patient effect of dosage through the use of mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variance at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models have sequentially nested fixed effects: (1)`~ 1`, intercept only; (2)`~ 1 + x`, intercept and effect of `x`; and (3) `~ 1 + x + xm`, intercept, effect of `x`, and a contextual variable, `xm`, consisting of the within-patient mean of `x`. The fourth model, `~ 1 + I(x - xm)`, uses an intercept and the centered-within-group variable `x - xm`. We thus fit four models to four datasets for a total of 16 models.
@@ -271,7 +271,7 @@ Dataf <- lapply(split(Data, ~ SD_ratio),
                       lapply(names(model.formulas), 
                              function(form) cbind(d, formula = form))
                     }) |> 
-             lapply(function(dlist) do.call(rbind, dlist) ) |> 
+             lapply(function(dlist) do.call(rbind, dlist)) |> 
              do.call(rbind, args = _)
     
 Dataf <- within(
@@ -279,28 +279,52 @@ Dataf <- within(
   {
     pred.fixed <- unlist(pred.fixed)
     pred.BLUPs <- unlist(pred.BLUPs)
-    formula <- factor(formula, levels = names(model.formulas))
+    panel <- factor(formula, levels = c(names(model.formulas), 'data'))
   }
 )
+
+Data$panel <- factor('data', levels = c(names(model.formulas), 'data'))
 ```
 
 The fixed-effects predictions from these models are shown in the following graph:
+
 ```{r plot-fits-fixed}
 #| out.width = "100%",
 #| fig.height = 6,
-#| fig.cap = "Fixed-effect predictions using each model applied to data sets with varying between- and within-patient variance ratios."
-xyplot(pred.fixed  ~ x |SD_ratio * formula, Dataf, type = 'l', groups = patient,
-       ylab = 'fixed-effect predictions') |> 
+#| fig.cap = "Fixed-effect predictions using each model applied to data sets with varying between- and within-patient variance ratios.  The top row shows summaries of the within-patient data using estimated 50% concentration ellipses for each patient."
+{
+  xyplot(y ~ x |SD_ratio * panel, Data,
+         groups = patient, type = 'n', 
+         par.strip.text = list(cex = 0.7),
+         drop.unused.levels = FALSE) +
+    glayer(panel.ellipse(..., center.pch = 16, center.cex = 0.5,  
+                         level = 0.5),
+           panel.abline(a = 10, b = 1)) +
+    xyplot(pred.fixed  ~ x |SD_ratio * panel, Dataf, type = 'l', 
+           groups = patient,
+           drop.unused.levels = F,
+           ylab = 'fixed-effect predictions') 
+}|> 
   useOuterStrips() |> print()
 ```
 The BLUPs from these models are shown in the following graph:
 ```{r plot-fits-blups}
 #| out.width = "100%",
 #| fig.height = 6,
-#| fig.cap = "Fixed- and random-effect predictions (BLUPs) using each model applied to data sets with varying between- and within-patient variance ratios."
-xyplot(pred.BLUPs  ~ x |SD_ratio * formula, 
-       Dataf, type = 'l', groups = patient,
-       ylab = 'fixed- and random-effect predictions (BLUPS)') |> 
+#| fig.cap = "Fixed- and random-effect predictions (BLUPs) using each model applied to data sets with varying between- and within-patient variance ratios. The top row shows summaries of the within-patient data using estimated 50% concentration ellipses for each patient."
+{
+  xyplot(y ~ x | SD_ratio * panel, Data,
+         groups = patient, type = 'n',
+         drop.unused.levels = F, 
+         par.strip.text = list(cex = 0.7),
+         ylab = 'fixed- and random-effect predictions (BLUPS)') +
+    glayer(panel.ellipse(..., center.pch = 16, center.cex = 0.5,  
+                         level = 0.5),
+           panel.abline(a = 10, b = 1)) +
+    xyplot(pred.BLUPs  ~ x | SD_ratio * panel, Dataf, type = 'l', 
+           groups = patient,
+           drop.unused.levels = F) 
+}|> 
   useOuterStrips() |> print()
 ```
 Data sets with relatively low between-patient variance result in strong shrinkage of fixed-effects predictions and also of BLUPs towards the between-patient relationship between `y` and `x` in the model with an intercept and `x` as fixed-effect predictors, `~ 1 + x`. The inclusion of a contextual variable in the model corrects this problem.
