@@ -320,14 +320,14 @@ Between patients, however, higher dosages are associated with higher levels of s
 
 The four data sets differ in the between-patient variance of patient centroids from a common between-patients regression line. The data sets exhibit a progression from low to high variance around the common regression line.  
 
-We start by generating a data set to serve as a common template for the four sample data sets.  We then apply different multipliers to the between-patient variation using parameters consistent with the description above to highlight the issues that arise in cross-validating mixed-effects models:[^data-template]
+<!-- We start by generating a data set to serve as a common template for the four sample data sets.  We then apply different multipliers to the between-patient variation using parameters consistent with the description above to highlight the issues that arise in cross-validating mixed-effects models:[^data-template] -->
 
-[^data-template]: We invite the interested reader to experiment with varying the parameters of our example. 
+<!-- [^data-template]: We invite the interested reader to experiment with varying the parameters of our example.  -->
 
 ```{r include=FALSE, echo=FALSE}
 library("glmmTMB") # necessary for some reason to knit vignette in RStudio, harmless otherwise
 ```
-```{r parameters}
+```{r parameters, include=FALSE}
 # Parameters:
 Nb <- 20     # number of patients
 Nw <- 5      # number of occasions for each patient
@@ -400,7 +400,7 @@ xyplot(y ~ x | SD_ratio, data = Data, group = patient,
 ```
 The population from which these datasets are generated has a between-patient effect of dosage of 1 and a within-patient effect of $-0.5$. The researcher may attempt to obtain an estimate of the within-patient effect of dosage through the use of mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variance at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models have sequentially nested fixed effects: (1)`~ 1`, intercept only; (2)`~ 1 + x`, intercept and effect of `x`; and (3) `~ 1 + x + xm`, intercept, effect of `x`, and a contextual variable, `xm`, consisting of the within-patient mean of `x`. The fourth model, `~ 1 + I(x - xm)`, uses an intercept and the centered-within-group variable `x - xm`. We thus fit four models to four datasets for a total of 16 models.
 
-```{r model-fits}
+```{r model-fits,include=FALSE}
 model.formulas <- c(
   ' ~ 1'             =  y ~ 1 + (1 | patient),
   '~ 1 + x'          =  y ~ 1 + x + (1 | patient),
@@ -415,7 +415,7 @@ fits <- lapply(split(Data, ~ SD_ratio),
                })
 ```
 We proceed to obtain predictions from each model based on fixed effects alone, as would be used for cross-validation based on clusters (i.e., patients), and for fixed and random effects---so-called best linear unbiased predictions or "BLUPs"---as would be used for cross-validation based on cases (i.e., occasions within patients):
-```{r predict}
+```{r predict,include=FALSE}
 pred.fixed <- lapply(fits, lapply, predict, re.form = ~0)  
 pred.BLUPs <- lapply(fits, lapply, predict)
 ```
@@ -495,7 +495,7 @@ We next carry out case-based cross-validation, which, as we have explained, is b
 library(cv) # unclear why it's necessary to reload cv
 .opts <- options(warn = -2) 
 ```
-```{r cross-validation,cache=TRUE,message=FALSE}
+```{r cross-validation,cache=TRUE,message=FALSE,include=FALSE}
 model_lists <- lapply(fits, function(fitlist) do.call(models, fitlist))
 cvs_cases <-
   lapply(1:Nv,
@@ -511,14 +511,15 @@ cvs_clusters <-
               clusterVariables = 'patient')
          })
 ```
-For a given dataset, we can plot the results for a list of models using the plot method for `"cvList"` objects. For example, this code produces Figure \ref{fig:plot-cv-example}.
-```{r plot-cv-example}
+For a given dataset, we can plot the results for a list of models using the plot method for `"cvList"` objects. 
+For example, a comparison cluster-based cross-validation using fixed effects for the models fit to the third dataset (with "SD ratio = 6 / 2.5") is shown in Figure \ref{fig:plot-cv-example}.
+```{r plot-cv-example,echo=FALSE}
 #| out.width = "60%",
-#| fig.height = 3.5,
+#| fig.height = 3.8,
 #| fig.cap = "10-fold cluster-based cross-validation comparing random intercept mixed models with varying fixed effects."
-plot(cvs_clusters[[2]], main="Comparison of Fixed Effects",)
+plot(cvs_clusters[[3]], main="Comparison of Fixed Effects",)
 ```
-The results for all datasets are assembled and shown in Figure \ref{fig:cross-validation-data-plot}.
+The results for all datasets, using both cluster-based and case-based cross-validation, are assembled and shown in Figure \ref{fig:cross-validation-data-plot}.
 ```{r cross-validation-data,include=FALSE}
 names(cvs_clusters) <- names(cvs_cases) <- SD_ratio 
 dsummary <- expand.grid(SD_ratio_i = names(cvs_cases), model = names(cvs_cases[[1]]))
@@ -533,18 +534,19 @@ dsummary$clusters <-
 ```
 ```{r cross-validation-data-plot,echo=FALSE}
 #| out.width = "100%",
-#| fig.height = 3.5,
+#| fig.height = 3.3,
 #| fig.cap = "10-fold cluster- and case-based cross-validation comparing mixed models with random intercepts and various fixed effects."
-xyplot(cases + clusters ~ model|SD_ratio_i, dsummary,
-       auto.key = list(space = 'top', reverse.rows = T, columns = 2), 
-       type = 'b', ylab = 'CV criterion (MSE)',
+xyplot(clusters + cases ~ model|SD_ratio_i, dsummary,
+       auto.key = list(space = 'top', reverse.rows = T, columns = 2, cex = 0.7), 
+       type = 'b', ylab = list('CV criterion (MSE)', cex = .7),
+       xlab = '',
        par.strip.text = list(cex = 0.7),
        layout= c(Nv, 1),
        par.settings =
-         list(superpose.line=list(lty = c(1, 2), lwd = 2),
-              superpose.symbol=list(pch = 15:16, cex = 1)),
-       scales = list(y = list(log = TRUE), 
-                     x = list(alternating = F, rot = 45))) 
+         list(superpose.line=list(lty = c(1, 2), lwd = 1),
+              superpose.symbol=list(cex = 0.7)),
+       scales = list(y = list(log = TRUE, cex = 0.7), 
+                     x = list(alternating = F, rot = 45, cex = 0.7))) 
 ```
 In summary, when between-cluster variance is relatively large, the model `~ 1 + x`, with `x` alone and without the contextual mean of `x`, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. With all our examples, the model `~ 1 + x + xm`, which includes both `x` and its contextual mean, produces better results using both cluster-based and case-based CV.  These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
 
