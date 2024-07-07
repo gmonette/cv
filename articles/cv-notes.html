@@ -5,70 +5,52 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="cv">
 <title>Computational and technical notes on cross-validating regression models • cv</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Computational and technical notes on cross-validating regression models">
-<meta property="og:description" content="cv">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Computational and technical notes on cross-validating regression models">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../articles/cv.html">Get started</a>
-</li>
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../articles/cv.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/cv-extend.html">Extending the cv package</a>
-    <a class="dropdown-item" href="../articles/cv-mixed.html">Cross-validating mixed-effects models</a>
-    <a class="dropdown-item" href="../articles/cv-notes.html">Computational and technical notes on cross-validating regression models</a>
-    <a class="dropdown-item" href="../articles/cv-selection.html">Cross-validating model selection</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/cv-extend.html">Extending the cv package</a></li>
+    <li><a class="dropdown-item" href="../articles/cv-mixed.html">Cross-validating mixed-effects models</a></li>
+    <li><a class="dropdown-item" href="../articles/cv-notes.html">Computational and technical notes on cross-validating regression models</a></li>
+    <li><a class="dropdown-item" href="../articles/cv-selection.html">Cross-validating model selection</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/gmonette/cv/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/gmonette/cv/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -77,13 +59,14 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Computational and technical notes on cross-validating regression models</h1>
+
+      <h1>Computational and technical notes on cross-validating regression models</h1>
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-07-04</h4>
+            <h4 data-toc-skip class="date">2024-07-07</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/HEAD/vignettes/cv-notes.Rmd" class="external-link"><code>vignettes/cv-notes.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv-notes.Rmd" class="external-link"><code>vignettes/cv-notes.Rmd</code></a></small>
       <div class="d-none name"><code>cv-notes.Rmd</code></div>
     </div>
 
@@ -104,76 +87,117 @@ large.</p>
 <p>The <code>"lm"</code> and <code>"glm"</code> methods for
 <code><a href="../reference/cv.html">cv()</a></code> take advantage of computational efficiencies by
 avoiding refitting the model with each fold removed. Consider, in
-particular, the weighted linear model <span class="math inline">\(\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times
-p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times
-1}\)</span>, where <span class="math inline">\(\boldsymbol{\varepsilon}
-\sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times
-n}\right)\)</span>. Here, <span class="math inline">\(\mathbf{y}\)</span> is the response vector, <span class="math inline">\(\mathbf{X}\)</span> the model matrix, and <span class="math inline">\(\boldsymbol{\varepsilon}\)</span> the error
-vector, each for <span class="math inline">\(n\)</span> cases, and <span class="math inline">\(\boldsymbol{\beta}\)</span> is the vector of <span class="math inline">\(p\)</span> population regression coefficients. The
-errors are assumed to be multivariately normally distributed with 0
-means and covariance matrix <span class="math inline">\(\sigma^2
-\mathbf{W}^{-1}\)</span>, where <span class="math inline">\(\mathbf{W} =
-\mathrm{diag}(w_i)\)</span> is a diagonal matrix of inverse-variance
-weights. For the linear model with constant error variance, the weight
-matrix is taken to be <span class="math inline">\(\mathbf{W} =
-\mathbf{I}_n\)</span>, the order-<span class="math inline">\(n\)</span>
+particular, the weighted linear model
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐲</mi><mrow><mi>n</mi><mo>×</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>𝐗</mi><mrow><mi>n</mi><mo>×</mo><mi>p</mi></mrow></msub><msub><mi>𝛃</mi><mrow><mi>p</mi><mo>×</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>𝛆</mi><mrow><mi>n</mi><mo>×</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛆</mi><mo>∼</mo><msub><mi>𝐍</mi><mi>n</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>𝟎</mn><mo>,</mo><msup><mi>σ</mi><mn>2</mn></msup><msubsup><mi>𝐖</mi><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)</annotation></semantics></math>.
+Here,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐲</mi><annotation encoding="application/x-tex">\mathbf{y}</annotation></semantics></math>
+is the response vector,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐗</mi><annotation encoding="application/x-tex">\mathbf{X}</annotation></semantics></math>
+the model matrix, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛆</mi><annotation encoding="application/x-tex">\boldsymbol{\varepsilon}</annotation></semantics></math>
+the error vector, each for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+cases, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol{\beta}</annotation></semantics></math>
+is the vector of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
+population regression coefficients. The errors are assumed to be
+multivariately normally distributed with 0 means and covariance matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>σ</mi><mn>2</mn></msup><msup><mi>𝐖</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\sigma^2 \mathbf{W}^{-1}</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐖</mi><mo>=</mo><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">g</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>w</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathbf{W} = \mathrm{diag}(w_i)</annotation></semantics></math>
+is a diagonal matrix of inverse-variance weights. For the linear model
+with constant error variance, the weight matrix is taken to be
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐖</mi><mo>=</mo><msub><mi>𝐈</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{W} = \mathbf{I}_n</annotation></semantics></math>,
+the
+order-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
 identity matrix.</p>
-<p>The weighted-least-squares (WLS) estimator of <span class="math inline">\(\boldsymbol{\beta}\)</span> is <span class="citation">(see, e.g., Fox, 2016, sec. 12.2.2)</span> <a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;This is a definitional formula, which assumes that the
-model matrix &lt;span class="math inline"&gt;\(\mathbf{X}\)&lt;/span&gt; is of full
-column rank, and which can be subject to numerical instability when
-&lt;span class="math inline"&gt;\(\mathbf{X}\)&lt;/span&gt; is ill-conditioned.
-&lt;code&gt;&lt;a href="https://rdrr.io/r/stats/lm.html" class="external-link"&gt;lm()&lt;/a&gt;&lt;/code&gt; uses the singular-value decomposition of the model
-matrix to obtain computationally more stable results.&lt;/p&gt;'><sup>1</sup></a> <span class="math display">\[
-\mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X}
-\right)^{-1}
+<p>The weighted-least-squares (WLS) estimator of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol{\beta}</annotation></semantics></math>
+is <span class="citation">(see, e.g., Fox, 2016, sec. 12.2.2)</span> <a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;This is a definitional formula, which assumes that the
+model matrix
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mi&gt;𝐗&lt;/mi&gt;&lt;annotation encoding="application/x-tex"&gt;\mathbf{X}&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+is of full column rank, and which can be subject to numerical
+instability when
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mi&gt;𝐗&lt;/mi&gt;&lt;annotation encoding="application/x-tex"&gt;\mathbf{X}&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+is ill-conditioned. &lt;code&gt;&lt;a href="https://rdrr.io/r/stats/lm.html" class="external-link"&gt;lm()&lt;/a&gt;&lt;/code&gt; uses the singular-value
+decomposition of the model matrix to obtain computationally more stable
+results.&lt;/p&gt;'><sup>1</sup></a>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐛</mi><mrow><mi mathvariant="normal">W</mi><mi mathvariant="normal">L</mi><mi mathvariant="normal">S</mi></mrow></msub><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>𝐗</mi><mi>T</mi></msup><mi>𝐖</mi><mi>𝐗</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mi>𝐗</mi><mi>T</mi></msup><mi>𝐖</mi><mi>𝐲</mi></mrow><annotation encoding="application/x-tex">
+\mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} 
   \mathbf{X}^T \mathbf{W} \mathbf{y}
-\]</span></p>
-<p>Fitted values are then <span class="math inline">\(\widehat{\mathbf{y}} =
-\mathbf{X}\mathbf{b}_{\mathrm{WLS}}\)</span>.</p>
-<p>The LOO fitted value for the <span class="math inline">\(i\)</span>th
-case can be efficiently computed by <span class="math inline">\(\widehat{y}_{-i} = y_i - e_i/(1 - h_i)\)</span>
-where <span class="math inline">\(h_i = \mathbf{x}^T_i \left(
-\mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i\)</span>
-(the so-called “hatvalue”). Here, <span class="math inline">\(\mathbf{x}^T_i\)</span> is the <span class="math inline">\(i\)</span>th row of <span class="math inline">\(\mathbf{X}\)</span>, and <span class="math inline">\(\mathbf{x}_i\)</span> is the <span class="math inline">\(i\)</span>th row written as a column vector. This
-approach can break down when one or more hatvalues are equal to 1, in
-which case the formula for <span class="math inline">\(\widehat{y}_{-i}\)</span> requires division by
-0.</p>
+</annotation></semantics></math></p>
+<p>Fitted values are then
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mo>=</mo><mi>𝐗</mi><msub><mi>𝐛</mi><mrow><mi mathvariant="normal">W</mi><mi mathvariant="normal">L</mi><mi mathvariant="normal">S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\widehat{\mathbf{y}} = \mathbf{X}\mathbf{b}_{\mathrm{WLS}}</annotation></semantics></math>.</p>
+<p>The LOO fitted value for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+case can be efficiently computed by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mrow><mo>−</mo><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mi>e</mi><mi>i</mi></msub><mi>/</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msub><mi>h</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widehat{y}_{-i} = y_i - e_i/(1 - h_i)</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>i</mi></msub><mo>=</mo><msubsup><mi>𝐱</mi><mi>i</mi><mi>T</mi></msubsup><msup><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>𝐗</mi><mi>T</mi></msup><mi>𝐖</mi><mi>𝐗</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><msub><mi>𝐱</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">h_i = \mathbf{x}^T_i \left( \mathbf{X}^T \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i</annotation></semantics></math>
+(the so-called “hatvalue”). Here,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>𝐱</mi><mi>i</mi><mi>T</mi></msubsup><annotation encoding="application/x-tex">\mathbf{x}^T_i</annotation></semantics></math>
+is the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+row of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐗</mi><annotation encoding="application/x-tex">\mathbf{X}</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐱</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\mathbf{x}_i</annotation></semantics></math>
+is the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+row written as a column vector. This approach can break down when one or
+more hatvalues are equal to 1, in which case the formula for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mrow><mo>−</mo><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">\widehat{y}_{-i}</annotation></semantics></math>
+requires division by 0.</p>
 <p>To compute cross-validated fitted values when the folds contain more
-than one case, we make use of the Woodbury matrix identity <span class="citation">(Hager, 1989)</span>, <span class="math display">\[
-\left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k}
-\mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} =
-\mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} +
+than one case, we make use of the Woodbury matrix identity <span class="citation">(Hager, 1989)</span>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>𝐀</mi><mrow><mi>m</mi><mo>×</mo><mi>m</mi></mrow></msub><mo>+</mo><msub><mi>𝐔</mi><mrow><mi>m</mi><mo>×</mo><mi>k</mi></mrow></msub><msub><mi>𝐂</mi><mrow><mi>k</mi><mo>×</mo><mi>k</mi></mrow></msub><msub><mi>𝐕</mi><mrow><mi>k</mi><mo>×</mo><mi>m</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>=</mo><msup><mi>𝐀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>−</mo><msup><mi>𝐀</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝐔</mi><msup><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>𝐂</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>+</mo><msup><mrow><mi>𝐕</mi><mi>𝐀</mi></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mi>𝐔</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><msup><mrow><mi>𝐕</mi><mi>𝐀</mi></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">
+\left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k} 
+\mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} = \mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} + 
 \mathbf{VA}^{-1}\mathbf{U} \right)^{-1} \mathbf{VA}^{-1}
-\]</span> where <span class="math inline">\(\mathbf{A}\)</span> is a
-nonsingular order-<span class="math inline">\(n\)</span> matrix. We
-apply this result by letting <span class="math display">\[\begin{align*}
+</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐀</mi><annotation encoding="application/x-tex">\mathbf{A}</annotation></semantics></math>
+is a nonsingular
+order-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+matrix. We apply this result by letting
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mi>𝐀</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msup><mi>𝐗</mi><mi>T</mi></msup><mi>𝐖</mi><mi>𝐗</mi></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>𝐔</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msubsup><mi>𝐗</mi><mi>𝐣</mi><mi>T</mi></msubsup></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>𝐕</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>−</mo><msub><mi>𝐗</mi><mi>𝐣</mi></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>𝐂</mi></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>𝐖</mi><mi>𝐣</mi></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align*}
     \mathbf{A} &amp;= \mathbf{X}^T \mathbf{W} \mathbf{X} \\
     \mathbf{U} &amp;= \mathbf{X}_\mathbf{j}^T \\
     \mathbf{V} &amp;= - \mathbf{X}_\mathbf{j} \\
     \mathbf{C} &amp;= \mathbf{W}_\mathbf{j} \\
-\end{align*}\]</span> where the subscript <span class="math inline">\(\mathbf{j} = (i_{j1}, \ldots, i_{jm})^T\)</span>
-represents the vector of indices for the cases in the <span class="math inline">\(j\)</span>th fold, <span class="math inline">\(j =
-1, \ldots, k\)</span>. The negative sign in <span class="math inline">\(\mathbf{V} = - \mathbf{X}_\mathbf{j}\)</span>
+\end{align*}</annotation></semantics></math> where the subscript
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐣</mi><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>i</mi><mrow><mi>j</mi><mn>1</mn></mrow></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>i</mi><mrow><mi>j</mi><mi>m</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{j} = (i_{j1}, \ldots, i_{jm})^T</annotation></semantics></math>
+represents the vector of indices for the cases in the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+fold,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">j = 1, \ldots, k</annotation></semantics></math>.
+The negative sign in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐕</mi><mo>=</mo><mo>−</mo><msub><mi>𝐗</mi><mi>𝐣</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{V} = - \mathbf{X}_\mathbf{j}</annotation></semantics></math>
 reflects the <em>removal</em>, rather than addition, of the cases in
-<span class="math inline">\(\mathbf{j}\)</span>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐣</mi><annotation encoding="application/x-tex">\mathbf{j}</annotation></semantics></math>.</p>
 <p>Applying the Woodbury identity isn’t quite as fast as using the
 hatvalues, but it is generally much faster than refitting the model. A
 disadvantage of the Woodbury identity, however, is that it entails
 explicit matrix inversion and thus may be numerically unstable. The
-inverse of <span class="math inline">\(\mathbf{A} = \mathbf{X}^T
-\mathbf{W} \mathbf{X}\)</span> is available directly in the
-<code>"lm"</code> object, but the second term on the right-hand side of
-the Woodbury identity requires a matrix inversion with each fold
-deleted. (In contrast, the inverse of each <span class="math inline">\(\mathbf{C} = \mathbf{W}_\mathbf{j}\)</span> is
-straightforward because <span class="math inline">\(\mathbf{W}\)</span>
+inverse of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐀</mi><mo>=</mo><msup><mi>𝐗</mi><mi>T</mi></msup><mi>𝐖</mi><mi>𝐗</mi></mrow><annotation encoding="application/x-tex">\mathbf{A} = \mathbf{X}^T \mathbf{W} \mathbf{X}</annotation></semantics></math>
+is available directly in the <code>"lm"</code> object, but the second
+term on the right-hand side of the Woodbury identity requires a matrix
+inversion with each fold deleted. (In contrast, the inverse of each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐂</mi><mo>=</mo><msub><mi>𝐖</mi><mi>𝐣</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf{C} = \mathbf{W}_\mathbf{j}</annotation></semantics></math>
+is straightforward because
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐖</mi><annotation encoding="application/x-tex">\mathbf{W}</annotation></semantics></math>
 is diagonal.)</p>
 <p>The Woodbury identity also requires that the model matrix be of full
 rank. We impose that restriction in our code by removing redundant
 regressors from the model matrix for all of the cases, but that doesn’t
 preclude rank deficiency from surfacing when a fold is removed. Rank
-deficiency of <span class="math inline">\(\mathbf{X}\)</span> doesn’t
-disqualify cross-validation because all we need are fitted values under
-the estimated model.</p>
+deficiency of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐗</mi><annotation encoding="application/x-tex">\mathbf{X}</annotation></semantics></math>
+doesn’t disqualify cross-validation because all we need are fitted
+values under the estimated model.</p>
 <p><code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> computes the maximum-likelihood estimates for a
 generalized linear model by iterated weighted least squares <span class="citation">(see, e.g., Fox &amp; Weisberg, 2019, sec.
 6.12)</span>. The last iteration is therefore just a WLS fit of the
@@ -272,12 +296,12 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :</span></span>
 <span><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
-<span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   1.1775   1.2314   1.3796   1.3955   1.4416   1.6512    10</span></span>
-<span><span class="co">#&gt;   Woodbury  13.6367  13.9425  14.5967  14.0846  14.9317  18.2993    10</span></span>
-<span><span class="co">#&gt;      naive 252.5165 257.1618 272.2712 267.4726 275.6384 337.2589    10</span></span>
-<span><span class="co">#&gt;     cv.glm 451.0562 459.6114 482.6827 467.0073 513.0150 548.8552    10</span></span></code></pre></div>
+<span><span class="co">#&gt; Unit: microseconds</span></span>
+<span><span class="co">#&gt;       expr       min       lq     mean   median       uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    981.25   1051.1   1154.2   1173.4   1222.8   1297.6    10</span></span>
+<span><span class="co">#&gt;   Woodbury  12286.39  12390.4  13665.0  12503.8  15865.6  17312.0    10</span></span>
+<span><span class="co">#&gt;      naive 218470.22 220276.3 228174.8 222193.9 224623.3 283153.0    10</span></span>
+<span><span class="co">#&gt;     cv.glm 382651.07 383828.4 403691.8 390267.5 436666.1 445972.8    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -379,11 +403,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median       uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    1.3186    1.5691    1.6721    1.6428    1.730    2.2592    10</span></span>
-<span><span class="co">#&gt;   Woodbury   47.3912   48.1862   49.7125   49.5937   51.466   52.1707    10</span></span>
-<span><span class="co">#&gt;      exact 2200.5008 2233.5089 2279.8446 2274.0459 2312.649 2430.2829    10</span></span>
-<span><span class="co">#&gt;     cv.glm 2478.6539 2538.7236 2622.5844 2608.7282 2741.607 2799.4598    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    1.1019    1.1272    1.2935    1.3489    1.3789    1.4106    10</span></span>
+<span><span class="co">#&gt;   Woodbury   40.4352   42.1667   42.7570   42.6567   43.3719   45.4418    10</span></span>
+<span><span class="co">#&gt;      exact 1748.4293 1779.4688 1811.7018 1819.2628 1840.1997 1877.7925    10</span></span>
+<span><span class="co">#&gt;     cv.glm 2014.6775 2051.7293 2069.8860 2065.7699 2089.9194 2126.5639    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -391,51 +415,86 @@ computations.</p>
 <h2 id="computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals">Computation of the bias-corrected CV criterion and confidence
 intervals<a class="anchor" aria-label="anchor" href="#computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals"></a>
 </h2>
-<p>Let <span class="math inline">\(\mathrm{CV}(\mathbf{y},
-\widehat{\mathbf{y}})\)</span> represent a cross-validation cost
-criterion, such as mean-squared error, computed for all of the <span class="math inline">\(n\)</span> values of the response <span class="math inline">\(\mathbf{y}\)</span> based on fitted values <span class="math inline">\(\widehat{\mathbf{y}}\)</span> from the model fit
-to all of the data. We require that <span class="math inline">\(\mathrm{CV}(\mathbf{y},
-\widehat{\mathbf{y}})\)</span> is the mean of casewise components, that
-is, <span class="math inline">\(\mathrm{CV}(\mathbf{y},
-\widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i,
-\widehat{y}_i)\)</span>.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;&lt;span class="citation"&gt;Arlot &amp;amp; Celisse (2010)&lt;/span&gt;
-term the casewise loss, &lt;span class="math inline"&gt;\(\mathrm{cv}(y_i,
-\widehat{y}_i)\)&lt;/span&gt;, the “contrast function.”&lt;/p&gt;'><sup>3</sup></a> For example, <span class="math inline">\(\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) =
-\frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\)</span>.</p>
-<p>We divide the <span class="math inline">\(n\)</span> cases into <span class="math inline">\(k\)</span> folds of approximately <span class="math inline">\(n_j \approx n/k\)</span> cases each, where <span class="math inline">\(n = \sum n_j\)</span>. As above, let <span class="math inline">\(\mathbf{j}\)</span> denote the indices of the
-cases in the <span class="math inline">\(j\)</span>th fold.</p>
-<p>Now define <span class="math inline">\(\mathrm{CV}_j =
-\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})\)</span>. The
-superscript <span class="math inline">\((j)\)</span> on <span class="math inline">\(\widehat{\mathbf{y}}^{(j)}\)</span> represents
-fitted values computed for all of the cases from the model with fold
-<span class="math inline">\(j\)</span> omitted. Let <span class="math inline">\(\widehat{\mathbf{y}}^{(-i)}\)</span> represent the
-vector of fitted values for all <span class="math inline">\(n\)</span>
-cases where the fitted value for the <span class="math inline">\(i\)</span>th case is computed from the model fit
-with the fold including the <span class="math inline">\(i\)</span>th
-case omitted (i.e., fold <span class="math inline">\(j\)</span> for
-which <span class="math inline">\(i \in \mathbf{j}\)</span>).</p>
-<p>Then the cross-validation criterion is just <span class="math inline">\(\mathrm{CV} = \mathrm{CV}(\mathbf{y},
-\widehat{\mathbf{y}}^{(-i)})\)</span>. Following <span class="citation">Davison &amp; Hinkley (1997, pp. 293–295)</span>, the
-bias-adjusted cross-validation criterion is <span class="math display">\[
-\mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y},
-\widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
-\]</span></p>
-<p>We compute the standard error of CV as <span class="math display">\[
-\mathrm{SE}(\mathrm{CV}) = \frac{1}{\sqrt n} \sqrt{ \frac{\sum_{i=1}^n
-\left[ \mathrm{cv}(y_i, \widehat{y}_i^{(-i)} ) - \mathrm{CV} \right]^2
-}{n - 1} }
-\]</span> that is, as the standard deviation of the casewise components
-of CV divided by the square-root of the number of cases.</p>
-<p>We then use <span class="math inline">\(\mathrm{SE}(\mathrm{CV})\)</span> to construct a
-<span class="math inline">\(100 \times (1 - \alpha)\)</span>% confidence
-interval around the <em>adjusted</em> CV estimate of error: <span class="math display">\[
-\left[ \mathrm{CV}_{\mathrm{adj}} - z_{1 -
-\alpha/2}\mathrm{SE}(\mathrm{CV}), \mathrm{CV}_{\mathrm{adj}} + z_{1 -
-\alpha/2}\mathrm{SE}(\mathrm{CV})  \right]
-\]</span> where <span class="math inline">\(z_{1 - \alpha/2}\)</span> is
-the <span class="math inline">\(1 - \alpha/2\)</span> quantile of the
-standard-normal distribution (e.g, <span class="math inline">\(z \approx
-1.96\)</span> for a 95% confidence interval, for which <span class="math inline">\(1 - \alpha/2 = .975\)</span>).</p>
+<p>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo>,</mo><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})</annotation></semantics></math>
+represent a cross-validation cost criterion, such as mean-squared error,
+computed for all of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+values of the response
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐲</mi><annotation encoding="application/x-tex">\mathbf{y}</annotation></semantics></math>
+based on fitted values
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\widehat{\mathbf{y}}</annotation></semantics></math>
+from the model fit to all of the data. We require that
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo>,</mo><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})</annotation></semantics></math>
+is the mean of casewise components, that is,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo>,</mo><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>,</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i, \widehat{y}_i)</annotation></semantics></math>.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;&lt;span class="citation"&gt;Arlot &amp;amp; Celisse (2010)&lt;/span&gt;
+term the casewise loss,
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mrow&gt;&lt;mi mathvariant="normal"&gt;c&lt;/mi&gt;&lt;mi mathvariant="normal"&gt;v&lt;/mi&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;/msub&gt;&lt;mo&gt;,&lt;/mo&gt;&lt;msub&gt;&lt;mover&gt;&lt;mi&gt;y&lt;/mi&gt;&lt;mo accent="true"&gt;̂&lt;/mo&gt;&lt;/mover&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;/msub&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;\mathrm{cv}(y_i, \widehat{y}_i)&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;,
+the “contrast function.”&lt;/p&gt;'><sup>3</sup></a> For
+example,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">M</mi><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo>,</mo><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2</annotation></semantics></math>.</p>
+<p>We divide the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+cases into
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+folds of approximately
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>j</mi></msub><mo>≈</mo><mi>n</mi><mi>/</mi><mi>k</mi></mrow><annotation encoding="application/x-tex">n_j \approx n/k</annotation></semantics></math>
+cases each, where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mo>∑</mo><msub><mi>n</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">n = \sum n_j</annotation></semantics></math>.
+As above, let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐣</mi><annotation encoding="application/x-tex">\mathbf{j}</annotation></semantics></math>
+denote the indices of the cases in the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>th
+fold.</p>
+<p>Now define
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mi>j</mi></msub><mo>=</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo>,</mo><msup><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{CV}_j = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(j)})</annotation></semantics></math>.
+The superscript
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(j)</annotation></semantics></math>
+on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\widehat{\mathbf{y}}^{(j)}</annotation></semantics></math>
+represents fitted values computed for all of the cases from the model
+with fold
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+omitted. Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\widehat{\mathbf{y}}^{(-i)}</annotation></semantics></math>
+represent the vector of fitted values for all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+cases where the fitted value for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+case is computed from the model fit with the fold including the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>th
+case omitted (i.e., fold
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+for which
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>∈</mo><mi>𝐣</mi></mrow><annotation encoding="application/x-tex">i \in \mathbf{j}</annotation></semantics></math>).</p>
+<p>Then the cross-validation criterion is just
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mo>=</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo>,</mo><msup><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{CV} = \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}^{(-i)})</annotation></semantics></math>.
+Following <span class="citation">Davison &amp; Hinkley (1997, pp.
+293–295)</span>, the bias-adjusted cross-validation criterion is
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">j</mi></mrow></msub><mo>=</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mo>+</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐲</mi><mo>,</mo><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>k</mi></munderover><msub><mi>n</mi><mi>j</mi></msub><msub><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">
+\mathrm{CV}_{\mathrm{adj}} = \mathrm{CV} + \mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) - \frac{1}{n} \sum_{j=1}^{k} n_j \mathrm{CV}_j
+</annotation></semantics></math></p>
+<p>We compute the standard error of CV as
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><msqrt><mi>n</mi></msqrt></mfrac><msqrt><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">[</mo><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>,</mo><msubsup><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mi>i</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup></mrow><mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></mfrac></msqrt></mrow><annotation encoding="application/x-tex">
+\mathrm{SE}(\mathrm{CV}) = \frac{1}{\sqrt n} \sqrt{ \frac{\sum_{i=1}^n \left[ \mathrm{cv}(y_i, \widehat{y}_i^{(-i)} ) - \mathrm{CV} \right]^2 }{n - 1} }
+</annotation></semantics></math> that is, as the standard deviation of
+the casewise components of CV divided by the square-root of the number
+of cases.</p>
+<p>We then use
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{SE}(\mathrm{CV})</annotation></semantics></math>
+to construct a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100</mn><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">100 \times (1 - \alpha)</annotation></semantics></math>%
+confidence interval around the <em>adjusted</em> CV estimate of error:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><msub><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">j</mi></mrow></msub><mo>−</mo><msub><mi>z</mi><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mi>/</mi><mn>2</mn></mrow></msub><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msub><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">d</mi><mi mathvariant="normal">j</mi></mrow></msub><mo>+</mo><msub><mi>z</mi><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mi>/</mi><mn>2</mn></mrow></msub><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">E</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mrow><mi mathvariant="normal">C</mi><mi mathvariant="normal">V</mi></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">
+\left[ \mathrm{CV}_{\mathrm{adj}} - z_{1 - \alpha/2}\mathrm{SE}(\mathrm{CV}), \mathrm{CV}_{\mathrm{adj}} + z_{1 - \alpha/2}\mathrm{SE}(\mathrm{CV})  \right]
+</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>z</mi><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mi>/</mi><mn>2</mn></mrow></msub><annotation encoding="application/x-tex">z_{1 - \alpha/2}</annotation></semantics></math>
+is the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">1 - \alpha/2</annotation></semantics></math>
+quantile of the standard-normal distribution (e.g,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>z</mi><mo>≈</mo><mn>1.96</mn></mrow><annotation encoding="application/x-tex">z \approx 1.96</annotation></semantics></math>
+for a 95% confidence interval, for which
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mi>/</mi><mn>2</mn><mo>=</mo><mn>.975</mn></mrow><annotation encoding="application/x-tex">1 - \alpha/2 = .975</annotation></semantics></math>).</p>
 <p><span class="citation">Bates, Hastie, &amp; Tibshirani (2023)</span>
 show that the coverage of this confidence interval is poor for small
 samples, and they suggest a much more computationally intensive
@@ -443,58 +502,85 @@ procedure, called <em>nested cross-validation</em>, to compute better
 estimates of error and confidence intervals with better coverage for
 small samples. We may implement Bates et al.’s approach in a later
 release of the <strong>cv</strong> package. At present we use the
-confidence interval above for sufficiently large <span class="math inline">\(n\)</span>, which, based on Bates et al.’s
-results, we take by default to be <span class="math inline">\(n \ge
-400\)</span>.</p>
+confidence interval above for sufficiently large
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>,
+which, based on Bates et al.’s results, we take by default to be
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≥</mo><mn>400</mn></mrow><annotation encoding="application/x-tex">n \ge 400</annotation></semantics></math>.</p>
 </div>
 <div class="section level2">
 <h2 id="why-the-complement-of-auc-isnt-a-casewise-cv-criterion">Why the complement of AUC isn’t a casewise CV criterion<a class="anchor" aria-label="anchor" href="#why-the-complement-of-auc-isnt-a-casewise-cv-criterion"></a>
 </h2>
 <p>Consider calculating AUC for folds in which a validation set contains
-<span class="math inline">\(n_v\)</span> observations. To calculate AUC
-in the validation set, we need the vector of prediction criteria, <span class="math inline">\(\widehat{\mathbf{y}}_{v_{(n_v \times 1)}} =
-(\widehat{y}_1, ..., \widehat{y}_{n_v})^T\)</span>, and the vector of
-observed responses in the validation set, <span class="math inline">\(\mathbf{y}_{v_{(n_v \times 1)}} = (y_1, \ldots,
-y_{n_v})^T\)</span> with <span class="math inline">\(y_i \in \{0,1\}, \;
-i = 1, \ldots, n_v\)</span>.</p>
-<p>To construct the ROC curve, only the ordering of the values in <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> is relevant. Thus,
-assuming that there are no ties, and reordering observations if
-necessary, we can set <span class="math inline">\(\mathbf{\widehat{y}}_v
-= (1, 2, \ldots, n_v)^T\)</span>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>v</mi></msub><annotation encoding="application/x-tex">n_v</annotation></semantics></math>
+observations. To calculate AUC in the validation set, we need the vector
+of prediction criteria,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><msub><mi>v</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>n</mi><mi>v</mi></msub><mo>×</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msub></msub><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mn>1</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><msub><mi>n</mi><mi>v</mi></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\widehat{\mathbf{y}}_{v_{(n_v \times 1)}} = (\widehat{y}_1, ..., \widehat{y}_{n_v})^T</annotation></semantics></math>,
+and the vector of observed responses in the validation set,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐲</mi><msub><mi>v</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>n</mi><mi>v</mi></msub><mo>×</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msub></msub><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>y</mi><msub><mi>n</mi><mi>v</mi></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{y}_{v_{(n_v \times 1)}} = (y_1, \ldots, y_{n_v})^T</annotation></semantics></math>
+with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>y</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo><mo>,</mo><mspace width="0.278em"></mspace><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>n</mi><mi>v</mi></msub></mrow><annotation encoding="application/x-tex">y_i \in \{0,1\}, \; i = 1, \ldots, n_v</annotation></semantics></math>.</p>
+<p>To construct the ROC curve, only the ordering of the values in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{\widehat{y}}_v</annotation></semantics></math>
+is relevant. Thus, assuming that there are no ties, and reordering
+observations if necessary, we can set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mi>v</mi></msub><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>n</mi><mi>v</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{\widehat{y}}_v = (1, 2, \ldots, n_v)^T</annotation></semantics></math>.</p>
 <p>If the AUC can be expressed as the casewise mean or sum of a function
-<span class="math inline">\(\mathrm{cv}(\widehat{y}_i,y_i)\)</span>,
-where <span class="math inline">\(\mathrm{cv}:
-\{1,2,...,n_v\}\times\{0,1\} \rightarrow [0,1]\)</span>, then <span class="math display">\[\begin{equation}
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{cv}(\widehat{y}_i,y_i)</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mo>:</mo><mo stretchy="false" form="prefix">{</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>n</mi><mi>v</mi></msub><mo stretchy="false" form="postfix">}</mo><mo>×</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo><mo>→</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{cv}: \{1,2,...,n_v\}\times\{0,1\} \rightarrow [0,1]</annotation></semantics></math>,
+then
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>n</mi><mi>v</mi></msub></munderover><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mrow><mi mathvariant="normal">A</mi><mi mathvariant="normal">U</mi><mi mathvariant="normal">C</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mi>v</mi></msub><mo>,</mo><msub><mi>𝐲</mi><mi>v</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\begin{equation}
 \label{eq:cw}
 \tag{1}
-\sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) =
-\mathrm{AUC}(\mathbf{\widehat{y}}_v,\mathbf{y}_v)
-\end{equation}\]</span> must hold for all <span class="math inline">\(2^{n_v}\)</span> possible values of <span class="math inline">\(\mathbf{y}_v = (y_1,...,y_{n_v})^T\)</span>. If
-all <span class="math inline">\(y\mathrm{s}\)</span> have the same
-value, either 1 or 0, then the definition of AUC is ambiguous. AUC could
-be considered undefined, or it could be set to 0 if all <span class="math inline">\(y\)</span>s are 0 and to 1 if all <span class="math inline">\(y\)</span>s are 1. If AUC is considered to be
-undefined in these cases, we have <span class="math inline">\(2^{n_v} -
-2\)</span> admissible values for <span class="math inline">\(\mathbf{y}_v\)</span>.</p>
-<p>Thus, equation (<span class="math inline">\(\ref{eq:cw}\)</span>)
-produces either <span class="math inline">\(2^{n_v}\)</span> or <span class="math inline">\(2^{n_v}-2\)</span> constraints. Although there are
-only <span class="math inline">\(2n_v\)</span> possible values for the
-<span class="math inline">\(\mathrm{cv(\cdot)}\)</span> function,
-equation (<span class="math inline">\(\ref{eq:cw}\)</span>) could,
-nevertheless, have consistent solutions. We therefore need to determine
-whether there is a value of <span class="math inline">\(n_v\)</span> for
-which (<span class="math inline">\(\ref{eq:cw}\)</span>) has no
-consistent solution for all admissible values of <span class="math inline">\(\mathbf{y}_v\)</span>. In that eventuality, we
-will have shown that AUC cannot, in general, be expressed through a
-casewise sum.</p>
-<p>If <span class="math inline">\(n_v=3\)</span>, we show below that
-(<span class="math inline">\(\ref{eq:cw}\)</span>) has no consistent
-solution if we include all possibilities for <span class="math inline">\(\mathbf{y}_v\)</span>, but does if we exclude
-cases where all <span class="math inline">\(y\)</span>s have the same
-value. If <span class="math inline">\(n_v=4\)</span>, we show that there
-are no consistent solutions in either case.</p>
-<p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> and <span class="math inline">\(\mathbf{y}_v\)</span>, accommodating the cases
-where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
-1s:</p>
+\sum_{i=1}^{n_v} \mathrm{cv}(\widehat{y}_i,y_i) = \mathrm{AUC}(\mathbf{\widehat{y}}_v,\mathbf{y}_v)
+\end{equation}</annotation></semantics></math> must hold for all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><annotation encoding="application/x-tex">2^{n_v}</annotation></semantics></math>
+possible values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐲</mi><mi>v</mi></msub><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mn>1</mn></msub><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><msub><mi>y</mi><msub><mi>n</mi><mi>v</mi></msub></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{y}_v = (y_1,...,y_{n_v})^T</annotation></semantics></math>.
+If all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mi mathvariant="normal">s</mi></mrow><annotation encoding="application/x-tex">y\mathrm{s}</annotation></semantics></math>
+have the same value, either 1 or 0, then the definition of AUC is
+ambiguous. AUC could be considered undefined, or it could be set to 0 if
+all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>s
+are 0 and to 1 if all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>s
+are 1. If AUC is considered to be undefined in these cases, we have
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">2^{n_v} - 2</annotation></semantics></math>
+admissible values for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐲</mi><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{y}_v</annotation></semantics></math>.</p>
+<p>Thus, equation () produces either
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><annotation encoding="application/x-tex">2^{n_v}</annotation></semantics></math>
+or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><mo>−</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">2^{n_v}-2</annotation></semantics></math>
+constraints. Although there are only
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></mrow><annotation encoding="application/x-tex">2n_v</annotation></semantics></math>
+possible values for the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi><mrow><mo stretchy="true" form="prefix" mathvariant="normal">(</mo><mo mathvariant="normal">⋅</mo><mo stretchy="true" form="postfix" mathvariant="normal">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{cv(\cdot)}</annotation></semantics></math>
+function, equation () could, nevertheless, have consistent solutions. We
+therefore need to determine whether there is a value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>v</mi></msub><annotation encoding="application/x-tex">n_v</annotation></semantics></math>
+for which () has no consistent solution for all admissible values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐲</mi><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{y}_v</annotation></semantics></math>.
+In that eventuality, we will have shown that AUC cannot, in general, be
+expressed through a casewise sum.</p>
+<p>If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n_v=3</annotation></semantics></math>,
+we show below that () has no consistent solution if we include all
+possibilities for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐲</mi><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{y}_v</annotation></semantics></math>,
+but does if we exclude cases where all
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>s
+have the same value. If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">n_v=4</annotation></semantics></math>,
+we show that there are no consistent solutions in either case.</p>
+<p>The following R function computes AUC from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>𝐲</mi><mo accent="true">̂</mo></mover><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{\widehat{y}}_v</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐲</mi><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{y}_v</annotation></semantics></math>,
+accommodating the cases where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐲</mi><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{y}_v</annotation></semantics></math>
+is all 0s or all 1s:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">AUC</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
@@ -504,7 +590,12 @@ where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span>  <span class="fu">Metrics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Metrics/man/auc.html" class="external-link">auc</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">yhat</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}_v\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
+<p>We then define a function to generate all possible
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐲</mi><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{y}_v</annotation></semantics></math>s
+of length
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>v</mi></msub><annotation encoding="application/x-tex">n_v</annotation></semantics></math>
+as rows of the matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐘</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><mo>×</mo><msub><mi>n</mi><mi>v</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></msub><annotation encoding="application/x-tex">\mathbf{Y}_{(2^{n_v} \times n_v)}</annotation></semantics></math>:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Ymat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>, <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="va">n_v</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;&amp;</span></span>
@@ -522,7 +613,8 @@ where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 <span>  <span class="kw">else</span></span>
 <span>    <span class="va">ret</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>For <span class="math inline">\(n_v=3\)</span>,</p>
+<p>For
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n_v=3</annotation></semantics></math>,</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3</span></span>
@@ -534,8 +626,9 @@ where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 <span><span class="co">#&gt; [6,]  1  0  1</span></span>
 <span><span class="co">#&gt; [7,]  0  1  1</span></span>
 <span><span class="co">#&gt; [8,]  1  1  1</span></span></code></pre></div>
-<p>If we exclude <span class="math inline">\(\mathbf{y}_v\)</span>s with
-identical values, then</p>
+<p>If we exclude
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐲</mi><mi>v</mi></msub><annotation encoding="application/x-tex">\mathbf{y}_v</annotation></semantics></math>s
+with identical values, then</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3</span></span>
@@ -545,8 +638,9 @@ identical values, then</p>
 <span><span class="co">#&gt; [4,]  0  0  1</span></span>
 <span><span class="co">#&gt; [5,]  1  0  1</span></span>
 <span><span class="co">#&gt; [6,]  0  1  1</span></span></code></pre></div>
-<p>Here is <span class="math inline">\(\mathbf{Y}\)</span> with
-corresponding values of AUC:</p>
+<p>Here is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐘</mi><annotation encoding="application/x-tex">\mathbf{Y}</annotation></semantics></math>
+with corresponding values of AUC:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, AUC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="fu">Ymat</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">AUC</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      y1 y2 y3 AUC</span></span>
@@ -558,11 +652,15 @@ corresponding values of AUC:</p>
 <span><span class="co">#&gt; [6,]  1  0  1 0.5</span></span>
 <span><span class="co">#&gt; [7,]  0  1  1 1.0</span></span>
 <span><span class="co">#&gt; [8,]  1  1  1 1.0</span></span></code></pre></div>
-<p>The values of <span class="math inline">\(\mathrm{cv}(\widehat{y}_i,
-y_i)\)</span> that express AUC as a sum of casewise values are solutions
-of equation (<span class="math inline">\(\ref{eq:cw}\)</span>), which
-can be written as solutions of the following system of <span class="math inline">\(2^{n_v}\)</span> linear simultaneous equations in
-<span class="math inline">\(2n_v\)</span> unknowns: <span class="math display">\[\begin{equation}
+<p>The values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo>,</mo><msub><mi>y</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\mathrm{cv}(\widehat{y}_i, y_i)</annotation></semantics></math>
+that express AUC as a sum of casewise values are solutions of equation
+(), which can be written as solutions of the following system of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><annotation encoding="application/x-tex">2^{n_v}</annotation></semantics></math>
+linear simultaneous equations in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></mrow><annotation encoding="application/x-tex">2n_v</annotation></semantics></math>
+unknowns:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝐔</mi><mo>−</mo><mi>𝐘</mi><mo stretchy="true" form="postfix">)</mo></mrow><msub><mi>𝐜</mi><mn>0</mn></msub><mo>+</mo><mi>𝐘</mi><msub><mi>𝐜</mi><mn>1</mn></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mi>𝐔</mi><mo>−</mo><mi>𝐘</mi><mo>,</mo><mi>𝐘</mi><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>𝐜</mi><mn>0</mn></msub></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mi>𝐜</mi><mn>1</mn></msub></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mo>=</mo><mrow><mi mathvariant="normal">A</mi><mi mathvariant="normal">U</mi><mi mathvariant="normal">C</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝐘</mi><mo accent="true">̂</mo></mover><mo>,</mo><mi>𝐘</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\begin{equation}
 \label{eq:lin}
 \tag{2}
 (\mathbf{U} -\mathbf{Y}) \mathbf{c}_0 + \mathbf{Y} \mathbf{c}_1
@@ -572,23 +670,30 @@ can be written as solutions of the following system of <span class="math inline"
 \mathbf{c}_0 \\ \mathbf{c}_1
 \end{bmatrix}
 = \mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})
-\end{equation}\]</span> where <span class="math inline">\(\mathbf{U}_{(2^{n_v} \times n_v)}\)</span> is a
-matrix of 1s conformable with <span class="math inline">\(\mathbf{Y}\)</span>; <span class="math inline">\(\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ...,
-\mathrm{cv}(n_v,0)]^T\)</span>; <span class="math inline">\(\mathbf{c}_1
-= [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T\)</span>; <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v}
-\times 2n_v)}\)</span> and <span class="math inline">\(\begin{bmatrix}\begin{aligned}
+\end{equation}</annotation></semantics></math> where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐔</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><mo>×</mo><msub><mi>n</mi><mi>v</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></msub><annotation encoding="application/x-tex">\mathbf{U}_{(2^{n_v} \times n_v)}</annotation></semantics></math>
+is a matrix of 1s conformable with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐘</mi><annotation encoding="application/x-tex">\mathbf{Y}</annotation></semantics></math>;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐜</mi><mn>0</mn></msub><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>c</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>n</mi><mi>v</mi></msub><mo>,</mo><mn>0</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{c}_0 = [\mathrm{cv}(1,0), c(2,0), ..., \mathrm{cv}(n_v,0)]^T</annotation></semantics></math>;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐜</mi><mn>1</mn></msub><mo>=</mo><msup><mrow><mo stretchy="true" form="prefix">[</mo><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>c</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mi>.</mi><mi>.</mi><mi>.</mi><mo>,</mo><mrow><mi mathvariant="normal">c</mi><mi mathvariant="normal">v</mi></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>n</mi><mi>v</mi></msub><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mi>T</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{c}_1 = [\mathrm{cv}(1,1), c(2,1), ..., \mathrm{cv}(n_v,1)]^T</annotation></semantics></math>;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mrow><mo stretchy="true" form="prefix">[</mo><mi>𝐔</mi><mo>−</mo><mi>𝐘</mi><mo>,</mo><mi>𝐘</mi><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><mo>×</mo><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></msub><annotation encoding="application/x-tex">[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]_{(2^{n_v} \times 2n_v)}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mrow><mo stretchy="true" form="prefix">[</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝐜</mi><mn>0</mn></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>𝐜</mi><mn>1</mn></msub></mtd></mtr></mtable></mtd></mtr></mtable><mo stretchy="true" form="postfix">]</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub><mo>×</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msub><annotation encoding="application/x-tex">\begin{bmatrix}\begin{aligned}
 \mathbf{c}_0 \\ \mathbf{c}_1
 \end{aligned}
-\end{bmatrix}_{(2n_v \times 1)}\)</span> are partitioned matrices; and
-<span class="math inline">\(\mathbf{\widehat{Y}}_{(2^{n_v} \times
-n_v)}\)</span> is a matrix each of whose rows consists of the integers 1
-to <span class="math inline">\(n_v\)</span>.</p>
-<p>We can test whether equation (<span class="math inline">\(\ref{eq:lin}\)</span>) has a solution for any
-given <span class="math inline">\(n_v\)</span> by trying to solve it as
-a least-squares problem, considering whether the residuals of the
-associated linear model are all 0, using the “design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> to
-predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v}
-\times 1)}\)</span>:</p>
+\end{bmatrix}_{(2n_v \times 1)}</annotation></semantics></math> are
+partitioned matrices; and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>𝐘</mi><mo accent="true">̂</mo></mover><mrow><mo stretchy="true" form="prefix">(</mo><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><mo>×</mo><msub><mi>n</mi><mi>v</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></msub><annotation encoding="application/x-tex">\mathbf{\widehat{Y}}_{(2^{n_v} \times n_v)}</annotation></semantics></math>
+is a matrix each of whose rows consists of the integers 1 to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>v</mi></msub><annotation encoding="application/x-tex">n_v</annotation></semantics></math>.</p>
+<p>We can test whether equation () has a solution for any given
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>v</mi></msub><annotation encoding="application/x-tex">n_v</annotation></semantics></math>
+by trying to solve it as a least-squares problem, considering whether
+the residuals of the associated linear model are all 0, using the
+“design matrix”
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mi>𝐔</mi><mo>−</mo><mi>𝐘</mi><mo>,</mo><mi>𝐘</mi><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[\mathbf{U} -\mathbf{Y}, \mathbf{Y}]</annotation></semantics></math>
+to predict the “outcome”
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">A</mi><mi mathvariant="normal">U</mi><mi mathvariant="normal">C</mi></mrow><msub><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>𝐘</mi><mo accent="true">̂</mo></mover><mo>,</mo><mi>𝐘</mi><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><msup><mn>2</mn><msub><mi>n</mi><mi>v</mi></msub></msup><mo>×</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></msub></mrow><annotation encoding="application/x-tex">\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v} \times 1)}</annotation></semantics></math>:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">resids</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_v</span>,</span>
 <span>                   <span class="va">exclude_identical</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -609,21 +714,26 @@ predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\wide
 <span>  <span class="op">}</span></span>
 <span>  <span class="va">ret</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>The case <span class="math inline">\(n_v=3\)</span>, excluding
-identical <span class="math inline">\(y\)</span>s, has a solution:</p>
+<p>The case
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">n_v=3</annotation></semantics></math>,
+excluding identical
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>s,
+has a solution:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; attr(,"solution")</span></span>
 <span><span class="co">#&gt; c(1,0) c(2,0) c(3,0) c(1,1) c(2,1) c(3,1) </span></span>
 <span><span class="co">#&gt;    1.0    0.0   -0.5    0.5    0.0    0.0</span></span></code></pre></div>
-<p>But, if identical <span class="math inline">\(y\)</span>s are
-included, the equation is not consistent:</p>
+<p>But, if identical
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>s
+are included, the equation is not consistent:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">3</span>, exclude_identical <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.125</span></span></code></pre></div>
-<p>For <span class="math inline">\(n_v=4\)</span>, there are no
-solutions in either case:</p>
+<p>For
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>v</mi></msub><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">n_v=4</annotation></semantics></math>,
+there are no solutions in either case:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">resids</span><span class="op">(</span><span class="fl">4</span>, exclude_identical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.083333</span></span></code></pre></div>
@@ -677,7 +787,7 @@ Retrieved from <a href="https://CRAN.R-project.org/package=microbenchmark" class
 </div>
 </div>
 
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
@@ -688,15 +798,15 @@ Retrieved from <a href="https://CRAN.R-project.org/package=microbenchmark" class
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
