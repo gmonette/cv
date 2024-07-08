@@ -252,11 +252,11 @@ measurement: for details see \texttt{help("Auto",\ package="ISLR2")}.
 \begin{CodeChunk}
 \begin{figure}
 
-{\centering \includegraphics[width=0.5\linewidth]{JSS-article-3_files/figure-latex/mpg-horsepower-scatterplot-polynomials-1} 
+{\centering \subfloat[\label{fig:mpg-horsepower-polynomials-1}]{\includegraphics[width=0.45\linewidth]{JSS-article-3_files/figure-latex/mpg-horsepower-polynomials-1} }\subfloat[\label{fig:mpg-horsepower-polynomials-2}]{\includegraphics[width=0.45\linewidth]{JSS-article-3_files/figure-latex/mpg-horsepower-polynomials-2} }
 
 }
 
-\caption{\code{mpg} vs. \code{horsepower} for the \code{Auto} data, showing fitted polynomials of degree 1 through 5.}\label{fig:mpg-horsepower-scatterplot-polynomials}
+\caption{(a) \code{mpg} vs. \code{horsepower} for the \code{Auto} data, showing fitted polynomials of degree 1 through 5. (b) Estimated squared error as a function of polynomial degree, $p$.}\label{fig:mpg-horsepower-polynomials}
 \end{figure}
 \end{CodeChunk}
 
@@ -290,17 +290,6 @@ The former necessarily declines with \(p\) (or, more strictly, can't
 increase with \(p\)), while the latter gets slightly larger for the
 largest values of \(p\), with the ``best'' value, by a small margin, for
 \(p = 7\).
-
-\begin{CodeChunk}
-\begin{figure}
-
-{\centering \includegraphics[width=0.5\linewidth]{JSS-article-3_files/figure-latex/mpg-horsepower-MSE-se-1} 
-
-}
-
-\caption[Estimated squared error as a function of polynomial degree, $p$]{Estimated squared error as a function of polynomial degree, $p$}\label{fig:mpg-horsepower-MSE-se}
-\end{figure}
-\end{CodeChunk}
 
 The generic \texttt{cv()} function has an \texttt{"lm"} method,
 
@@ -397,15 +386,15 @@ F-statistic:   428 on 2 and 389 DF,  p-value: < 2.2e-16
 R> cv(m.auto, confint=TRUE)
 \end{CodeInput}
 \begin{CodeOutput}
-R RNG seed set to 431467
+R RNG seed set to 180983
 \end{CodeOutput}
 \begin{CodeOutput}
 10-Fold Cross Validation
 method: Woodbury
 criterion: mse
-cross-validation criterion = 19.192
-bias-adjusted cross-validation criterion = 19.18107
-95% CI for bias-adjusted CV criterion = (15.71858, 22.64356)
+cross-validation criterion = 19.37365
+bias-adjusted cross-validation criterion = 19.35319
+95% CI for bias-adjusted CV criterion = (15.87805, 22.82834)
 full-sample criterion = 18.98477 
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1245,15 +1234,33 @@ R> Auto$name <- NULL
 R> 
 R> scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
 +                   smooth=list(spread=FALSE), data=Auto, pch=".")
+R> 
+R> m.auto <- lm(mpg ~ ., data = Auto)
+R> crPlots(m.auto, pch=".")
 \end{CodeInput}
 \begin{figure}
 
-{\centering \includegraphics[width=0.6\linewidth]{JSS-article-3_files/figure-latex/Auto-explore-1} 
+{\centering \subfloat[\label{fig:Auto-explore-1}]{\includegraphics[width=0.45\linewidth]{JSS-article-3_files/figure-latex/Auto-explore-1} }\subfloat[\label{fig:Auto-explore-2}]{\includegraphics[width=0.45\linewidth]{JSS-article-3_files/figure-latex/Auto-explore-2} }
 
 }
 
-\caption[Scatterplot matrix for the numeric variables in the \code{Auto} data]{Scatterplot matrix for the numeric variables in the \code{Auto} data. In each panel, the solid line shows the linear least-squares fit and the broken line is for a nonparametric regression.}\label{fig:Auto-explore}
+\caption{(a) Scatterplot matrix for the numeric variables in the \code{Auto} data. In each panel, the solid line shows the linear least-squares fit and the broken line is for a nonparametric regression. (b) Component+residual plots for the working model fit to the \code{Auto} data. The broken blue lines show linear least-squares fits, while the solid magenta lines are nonparametric-regression smooths.}\label{fig:Auto-explore}
 \end{figure}
+\end{CodeChunk}
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> Auto$cylinders <- factor(Auto$cylinders,
++                          labels=c("3-4", "3-4", "5-6", "5-6", "8"))
+R> Auto$year <- as.factor(Auto$year)
+R> Auto$origin <- factor(Auto$origin,
++                       labels=c("America", "Europe", "Japan"))
+R> rownames(Auto) <- make.names(Auto$name, unique=TRUE)
+R> Auto$name <- NULL
+R> 
+R> scatterplotMatrix(~ mpg + displacement + horsepower + weight + acceleration, 
++                   smooth=list(spread=FALSE), data=Auto, pch=".")
+\end{CodeInput}
 \end{CodeChunk}
 
 A comment before we proceed: \code{origin} is clearly categorical and so
@@ -1283,14 +1290,6 @@ relationships of the response to the numeric predictors:
 R> m.auto <- lm(mpg ~ ., data = Auto)
 R> crPlots(m.auto, pch=".")
 \end{CodeInput}
-\begin{figure}
-
-{\centering \includegraphics[width=0.6\linewidth]{JSS-article-3_files/figure-latex/Auto-working-model-1} 
-
-}
-
-\caption[Component+residual plots for the working model fit to the \code{Auto} data]{Component+residual plots for the working model fit to the \code{Auto} data. The broken blue lines show linear least-squares fits, while the solid magenta lines are nonparametric-regression smooths.}\label{fig:Auto-working-model}
-\end{figure}
 \end{CodeChunk}
 
 The component+residual plots in Figure \ref{fig:Auto-working-model}
@@ -1394,19 +1393,22 @@ The transformed numeric variables are much better-behaved (cf., Figure
 \ref{fig:Auto-transformed-scatterplot-matrix}):
 
 \begin{CodeChunk}
+\begin{figure}
+
+{\centering \subfloat[\label{fig:Auto-transformed-scatterplot-matrix-1}]{\includegraphics[width=0.45\linewidth]{JSS-article-3_files/figure-latex/Auto-transformed-scatterplot-matrix-1} }\subfloat[\label{fig:Auto-transformed-scatterplot-matrix-2}]{\includegraphics[width=0.45\linewidth]{JSS-article-3_files/figure-latex/Auto-transformed-scatterplot-matrix-2} }
+
+}
+
+\caption{(a) Scatterplot matrix for the transformed numeric variables in the \code{Auto} data. (b) Component+residual plots for the working model fit to the transformed \code{Auto} data.}\label{fig:Auto-transformed-scatterplot-matrix}
+\end{figure}
+\end{CodeChunk}
+
+\begin{CodeChunk}
 \begin{CodeInput}
 R> scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight 
 +                   + acceleration, 
 +                   smooth=list(spread=FALSE), data=A, pch=".")
 \end{CodeInput}
-\begin{figure}
-
-{\centering \includegraphics[width=0.6\linewidth]{JSS-article-3_files/figure-latex/Auto-transformed-scatterplot-matrix-1} 
-
-}
-
-\caption[Scatterplot matrix for the transformed numeric variables in the \code{Auto} data]{Scatterplot matrix for the transformed numeric variables in the \code{Auto} data}\label{fig:Auto-transformed-scatterplot-matrix}
-\end{figure}
 \end{CodeChunk}
 
 And the partial relationships in the model fit to the transformed data
@@ -1418,14 +1420,6 @@ on page \pageref{fig:Auto-working-model}, and Figure
 \begin{CodeInput}
 R> crPlots(m, pch=".")
 \end{CodeInput}
-\begin{figure}
-
-{\centering \includegraphics[width=0.6\linewidth]{JSS-article-3_files/figure-latex/Auto-CR-plots-transformed-1} 
-
-}
-
-\caption[Component+residual plots for the model fit to the transformed \code{Auto} data]{Component+residual plots for the model fit to the transformed \code{Auto} data}\label{fig:Auto-CR-plots-transformed}
-\end{figure}
 \end{CodeChunk}
 
 After transforming both the numeric predictors and the response, we
@@ -1675,7 +1669,7 @@ data\footnote{What we call here ``recursive CV'' has also been termed
   ``nested CV'' \citep[e.g., in the \pkg{cvms} package
   by][]{OlsenZachariae:2024}. We prefer, however, to reserve the term
   ``nested CV'' for the procedure described by
-  \citet{BatesHastieTibshirani:2023}.}}{Example: Applying recursive CV to polynomial regression for the Auto data}}\label{example-applying-recursive-cv-to-polynomial-regression-for-the-auto-datarecursive-cv}
+  \citet{BatesHastieTibshirani:2023}.}}{Example: Applying recursive CV to polynomial regression for the Auto data}}\label{example-applying-recursive-cv-to-polynomial-regression-for-the-auto-data9}
 
 In Section \ref{comparing-competing-models}, following \citet[Secs. 5.1,
 5.3]{JamesEtAl:2021}, we fit polynomial regressions up to degree 10 to
@@ -1917,7 +1911,7 @@ function(y, yhat) {
   attr(result, "casewise loss") <- "y != round(yhat)"
   result
 }
-<bytecode: 0x13fb26ea8>
+<bytecode: 0x10f0f2c50>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
