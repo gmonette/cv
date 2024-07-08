@@ -77,7 +77,7 @@ The data for the example in this section are drawn from the \pkg{ISLR2} package 
 
 [^boot]: @JamesEtAl:2021 use the `cv.glm()` function in the \pkg{boot} package [@CantyRipley2022; @DavisonHinkley:1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function. The \pkg{boot} package is part of the standard \proglang{R} distribution.
 
-The \code{Auto} dataset contains information about 392 cars:
+The \code{Auto} data set contains information about 392 cars:
 
 ```{r Auto}
 data("Auto", package="ISLR2")
@@ -308,21 +308,19 @@ If the \code{clusterVariables} argument is omitted, then case-level CV is employ
 
 We introduce four artificial data sets that exemplify aspects of cross-validation particular to hierarchical models. Using these data sets, we show that model comparisons employing cluster-based and those employing case-based cross-validation may not agree on a "best" model. Furthermore, commonly used measures of fit, such as mean-squared error, do not necessarily become smaller as models become larger, even when the models are nested, and even when the measure of fit is computed for the whole data set. 
 
-The four datasets differ in the relative magnitude of between-cluster variance compared with within-cluster variance. They serve to illustrate how fitting mixed models, and, consequently, the cross-validation of mixed models, is sensitive to relative variance, which affects the degree of shrinkage of within-cluster estimates of effects towards between-cluster estimates.           
+The four data sets differ in the relative magnitude of between-cluster variance compared with within-cluster variance. They serve to illustrate how fitting mixed models, and, consequently, the cross-validation of mixed models, is sensitive to relative variance, which affects the degree of shrinkage of within-cluster estimates of effects towards between-cluster estimates.           
 
 For these analyses, we use the `glmmTMB()` function in the **glmmTMB** package [@BrooksEtAl] because, in our experience, it is more likely to converge than functions in the **nlme** and the **lme4** packages for models with low between-cluster variance.
 
 Consider a researcher studying the effect of the dosage of a drug on the severity of symptoms for a hypothetical disease. The researcher has longitudinal data on 20 patients, each of whom was observed on five occasions in which patients received different dosages of the drug.  The data are observational, with dosages prescribed by the patients' physicians, so that patients who were more severely affected by the disease received higher dosages of the drug.
 
-Our four contrived data sets (see below) illustrate possible results for data obtained in such a scenario. The relative configuration of dosages `x` and symptoms `y` are identical within patients in each of the four datasets. Within patients, higher dosages are generally associated with a reduction in symptoms. 
+Within patients, higher dosages are generally associated with a reduction in symptoms. Between patients, however, higher dosages are associated with higher levels of symptoms. A plausible mechanism is a reversal of causality: Within patients, higher dosages alleviate symptoms, but, between patients, higher morbidity causes the prescription of higher dosages.
 
-Between patients, however, higher dosages are associated with higher levels of symptoms. A plausible mechanism is a reversal of causality: Within patients, higher dosages alleviate symptoms, but, between patients, higher morbidity causes the prescription of higher dosages.
+To construct the four data sets, we first construct a template data set from a population with a between patient effect of dosage of $1.0$ and a within-patient effect of $-0.5$. We then apply four different multipliers to the between-patient variation from the regression line of patient centroids. The resulting data sets, shown in Figure \ref{fig:plot1}, differ in the between-patient variance of patient centroids from a common between-patient regression line, exhibiting a progression from low to high variance around the common regression line.[^lattice]  
 
-The four data sets differ in the between-patient variance of patient centroids from a common between-patients regression line. The data sets exhibit a progression from low to high variance around the common regression line.  
+Note that each patient has the same relative configuration of dosages and symptoms in each of the four data sets. To help visualize the structure of the data, estimated 50% concentration ellipses are shown for each patient.
 
-<!-- We start by generating a data set to serve as a common template for the four sample data sets.  We then apply different multipliers to the between-patient variation using parameters consistent with the description above to highlight the issues that arise in cross-validating mixed-effects models:[^data-template] -->
-
-<!-- [^data-template]: We invite the interested reader to experiment with varying the parameters of our example.  -->
+Using such data, the researcher may attempt to obtain an estimate of the within-patient effect of dosage through the use of mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variance at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models are sequentially nested with fixed effects: (1)`~ 1`, intercept only; (2)`~ 1 + x`, intercept and effect of `x`; and (3) `~ 1 + x + xm`, intercept, effect of `x`, and a contextual variable, `xm`, consisting of the within-patient mean of `x`. The fourth model, `~ 1 + I(x - xm)`, uses an intercept and the centered-within-group variable `x - xm`. We thus fit four models to four data sets for a total of 16 models.
 
 ```{r include=FALSE, echo=FALSE}
 library("glmmTMB") # necessary for some reason to knit vignette in RStudio, harmless otherwise
@@ -378,27 +376,27 @@ Data <- within(
   }
 )
 ```
-Figure \ref{fig:plot1} displays scatterplots of each data set showing estimated 50% concentration ellipses for each cluster.[^lattice]
 
 [^lattice]: We find it convenient to use the **lattice** [@Sarkar:2008] and **latticeExtra** [@SarkarAndrews:2022] packages for this and other graphs in this section.
 
 ```{r plot1, echo=FALSE}
 #| out.width = "100%",
-#| fig.height = 3.5,
+#| fig.height = 3.0,
 #| fig.cap = "Data sets showing identical within-patient configurations with increasing between-patient variance. The labels above each panel show the between-patient SD/within-patient SD. The ellipses are estimated 50% concentration ellipses for each patient. The population between-patient regression line, $E(y) = 10 + x$, is shown in each panel."
 library("lattice")
 library("latticeExtra")
 layer <- latticeExtra::layer # to avert conflicts with ggplot2::layer
 xyplot(y ~ x | SD_ratio, data = Data, group = patient,
+       ylab = list('symptoms', cex = 0.7),
+       xlab = list('dosage', cex = 0.7),
        par.strip.text = list(cex = 0.7),
-       scales = list(x = list(alternating = FALSE)),
+       scales = list(cex = 0.7, x = list(alternating = FALSE)),
        layout = c(Nv, 1),
        par.settings = list(superpose.symbol = list(pch = 1, cex = 0.7))) +
   layer(panel.ellipse(..., center.pch = 16, center.cex = 0.5,  
                       level = 0.5),
         panel.abline(a = 10, b = 1))
 ```
-The population from which these datasets are generated has a between-patient effect of dosage of 1 and a within-patient effect of $-0.5$. The researcher may attempt to obtain an estimate of the within-patient effect of dosage through the use of mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variance at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models have sequentially nested fixed effects: (1)`~ 1`, intercept only; (2)`~ 1 + x`, intercept and effect of `x`; and (3) `~ 1 + x + xm`, intercept, effect of `x`, and a contextual variable, `xm`, consisting of the within-patient mean of `x`. The fourth model, `~ 1 + I(x - xm)`, uses an intercept and the centered-within-group variable `x - xm`. We thus fit four models to four datasets for a total of 16 models.
 
 ```{r model-fits,include=FALSE}
 model.formulas <- c(
@@ -419,8 +417,6 @@ We proceed to obtain predictions from each model based on fixed effects alone, a
 pred.fixed <- lapply(fits, lapply, predict, re.form = ~0)  
 pred.BLUPs <- lapply(fits, lapply, predict)
 ```
-<!-- We then prepare the data for plotting: -->
-
 ```{r data-predictions,include=FALSE}
 Dataf <- lapply(split(Data, ~ SD_ratio),
                 function(d) {
@@ -436,60 +432,69 @@ Dataf <- lapply(split(Data, ~ SD_ratio),
       panel <- factor(formula, levels = c(names(model.formulas), 'data'))
     }
   )
+Datap <- reshape(Dataf, direction = "long", sep = '.',
+                 varying = c('pred.fixed', 'pred.BLUPs'),
+                 timevar = 'prediction_type')
+Datap$panel2 <- with(Datap, paste0(formula,":",prediction_type))
+flevels <- c(unique(Datap$panel2), 'data')
+Datap$panel2 <- factor(Datap$panel2, levels = flevels)
 Data$panel <- factor('data', levels = c(names(model.formulas), 'data'))
+Data$panel2 <- factor('data', levels = flevels)
 ```
-The fixed-effects predictions from these models are displayed in Figure \ref{fig:plot-fits-fixed} along with a summary of the data using 50% concentration ellipses.  Figure \ref{fig:plot-fits-blups} similarly displays predicted BLUPs. 
-```{r plot-fits-fixed,echo=FALSE}
-#| out.width = "100%",
-#| fig.height = 6,
-#| fig.cap = "Fixed-effect predictions using each model applied to data sets with varying between- and within-patient variance ratios.  The top row shows summaries of the within-patient data using estimated 50% concentration ellipses."
-{
-  xyplot(y ~ x |SD_ratio * panel, Data,
-         groups = patient, type = 'n',    
-         par.strip.text = list(cex = 0.6),
-         scales = list(x = list(alternating = FALSE)),
-         drop.unused.levels = FALSE,
-         ylab = list('fixed-effect predictions',cex=.7)) + 
-    glayer(panel.ellipse(..., center.pch = 16, center.cex = 0.5,  
-                         level = 0.5),
-           panel.abline(a = 10, b = 1)) +
-    xyplot(pred.fixed  ~ x |SD_ratio * panel, Dataf, type = 'l', 
-           groups = patient,
-           drop.unused.levels = F)
-}|> useOuterStrips()
-```
-<!-- The BLUPs from these models, shown in Figure \ref{fig:plot-fits-blups}, are produced as follows: -->
-```{r plot-fits-blups,echo=FALSE}
+The fixed- and random-effects predictions from these models are displayed in Figure \ref{fig:plot-fits-combined} along with a summary of the data using 50% concentration ellipses.
+
+```{r plot-fits-combined,echo=FALSE}
 #| out.width = "100%",
 #| fig.height = 6,
 #| fig.cap = "Fixed- and random-effect predictions (BLUPs) using each model applied to data sets with varying between- and within-patient variance ratios. The top row shows summaries of the within-patient data using estimated 50% concentration ellipses."
-{   xyplot(y ~ x | SD_ratio * panel, Data,
+levs3 <- levels(Data$panel2)
+levs3 <- sub(':fixed','', levs3)
+levs3 <- sub(':BLUPs',' ', levs3)
+Data$panel3 <- factor(sub(':fixed','', Data$panel2,), levels = levs3)
+Datap$panel3 <- factor(sub(':BLUPs',' ', Data$panel2,), levels = levs3)
+
+{   xyplot(y ~ x | SD_ratio * panel3, Data,
          groups = patient, type = 'n',
-         drop.unused.levels = F, 
-         par.strip.text = list(cex = 0.6),
-         scales = list(x = list(alternating = FALSE)),
-         ylab = list('fixed- and random-effect predictions (BLUPS)', cex = 0.7)) +
-    glayer(panel.ellipse(..., center.pch = 16, center.cex = 0.5,  
+         drop.unused.levels = F,
+         par.strip.text = list(cex = 0.4),
+         scales = list(x = list(alternating = FALSE, cex = 0.7),
+                       y = list(alternating =2, cex = 0.5)),
+         xlab = list('dosage', cex = 0.7),
+         between =
+             list(y = c(0,0,0,0.25,0,0,0,.25)),
+         ylab = list(
+           paste0(
+             paste0(rep(' ',18),  collapse = ''),
+                  'fixed-effects',
+             paste0(rep(' ',52), collapse = ''),
+             'BLUPs',
+             paste0(rep(' ',32), collapse = ''),
+             'data'),
+           cex = 0.7)) +
+    glayer(panel.ellipse(..., center.pch = 16, center.cex = 0.5,
                          level = 0.5),
            panel.abline(a = 10, b = 1)) +
-    xyplot(pred.BLUPs  ~ x | SD_ratio * panel, Dataf, type = 'l', 
+    xyplot(pred  ~ x | SD_ratio * panel2, Datap, type = 'l',
            groups = patient,
-           drop.unused.levels = F) 
-}|> useOuterStrips()
+           drop.unused.levels = F)
+} -> re.plot
+useOuterStrips(re.plot)
+
 ```
+
 Data sets with relatively low between-patient variance result in strong shrinkage of fixed-effects predictions and also of BLUPs towards the between-patient relationship between `y` and `x` in the model with an intercept and `x` as fixed-effect predictors, `~ 1 + x`. The inclusion of a contextual variable in the model corrects this problem.
 
-Although the BLUPs fit the observed data more closely than predictions based on fixed effects alone, the slopes of within-patient BLUPs do not conform with the within-patient slopes for the `~ 1 + x` model in the two datasets with the smallest between-patient variances. 
+Although the BLUPs fit the observed data more closely than predictions based on fixed effects alone, the slopes of within-patient BLUPs do not conform with the within-patient slopes for the `~ 1 + x` model in the two data sets with the smallest between-patient variances. 
 
-For data with a small between-patient variance, fixed-effects predictions for the `~ 1 + x` model have a slope that is close to the between-patient slope but provide better overall predictions than the fixed-effect predictions for datasets with larger between-subject variance.  With data whose between-patient variance is relatively large, predictions based on the model with a common intercept and slope for all clusters, are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model.
+For data with a small between-patient variance, fixed-effects predictions for the `~ 1 + x` model have a slope that is close to the between-patient slope but provide better overall predictions than the fixed-effect predictions for data sets with larger between-subject variance.  With data whose between-patient variance is relatively large, predictions based on the model with a common intercept and slope for all clusters, are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model.
 
 We therefore anticipate (and show later in this section) that case-based cross-validation may prefer the intercept-only model, `~ 1`  to the larger `~ 1 + x` model when the between-cluster variance is relatively small, but that cluster-based cross-validation will prefer the latter to the former.
 
-We will discover that case-based cross-validation prefers the `~ 1 + x` model to the `~ 1` model for the '5 / 2.5' dataset, but cluster-based cross-validation prefers the latter model to the former. The situation is entirely reversed with the '8 / 2.5' dataset. 
+We will discover that case-based cross-validation prefers the `~ 1 + x` model to the `~ 1` model for the '5 / 2.5' data set, but cluster-based cross-validation prefers the latter model to the former. The situation is entirely reversed with the '8 / 2.5' data set. 
 
 The third model, `~ 1 + x + xm`, includes a contextual effect of `x`---that is, the cluster mean `xm`---along with `x` and the intercept in the fixed-effect part of the model, along with a random intercept. This model is equivalent to fitting `y ~ I(x - xm) + xm + (1 | patient)`, which is the model that generated the data.  The fit of the mixed model `~ 1 + x + xm` is consequently similar to that of a fixed-effects only model with `x` and a categorical predictor for individual patients (i.e., `y ~ factor(patient) + x`, treating patients as a factor, and not shown here). 
 
-We next carry out case-based cross-validation, which, as we have explained, is based on both fixed and predicted random effects (i.e., BLUPs), and cluster-based cross-validation, which is based on fixed effects only. In order to reduce between-model random variability in comparisons of models on the same dataset, we apply `cv()` to the list of models created by the `models()` function (introduced previously), performing cross-validation with the same folds for each model.
+We next carry out case-based cross-validation, which, as we have explained, is based on both fixed and predicted random effects (i.e., BLUPs), and cluster-based cross-validation, which is based on fixed effects only. In order to reduce between-model random variability in comparisons of models on the same data set, we apply `cv()` to the list of models created by the `models()` function (introduced previously), performing cross-validation with the same folds for each model.
 
 ```{r echo=FALSE,include=FALSE}
 library(cv) # unclear why it's necessary to reload cv
@@ -511,15 +516,7 @@ cvs_clusters <-
               clusterVariables = 'patient')
          })
 ```
-For a given dataset, we can plot the results for a list of models using the plot method for `"cvList"` objects. 
-For example, a comparison cluster-based cross-validation using fixed effects for the models fit to the third dataset (with "SD ratio = 6 / 2.5") is shown in Figure \ref{fig:plot-cv-example}.
-```{r plot-cv-example,echo=FALSE}
-#| out.width = "60%",
-#| fig.height = 3.8,
-#| fig.cap = "10-fold cluster-based cross-validation comparing random intercept mixed models with varying fixed effects."
-plot(cvs_clusters[[3]], main="Comparison of Fixed Effects",)
-```
-The results for all datasets, using both cluster-based and case-based cross-validation, are assembled and shown in Figure \ref{fig:cross-validation-data-plot}.
+The results for all data sets, using both cluster-based and case-based cross-validation, are assembled and shown in Figure \ref{fig:cross-validation-data-plot}.
 ```{r cross-validation-data,include=FALSE}
 names(cvs_clusters) <- names(cvs_cases) <- SD_ratio 
 dsummary <- expand.grid(SD_ratio_i = names(cvs_cases), model = names(cvs_cases[[1]]))
@@ -537,7 +534,7 @@ dsummary$clusters <-
 #| fig.height = 3.3,
 #| fig.cap = "10-fold cluster- and case-based cross-validation comparing mixed models with random intercepts and various fixed effects."
 xyplot(clusters + cases ~ model|SD_ratio_i, dsummary,
-       auto.key = list(space = 'top', reverse.rows = T, columns = 2, cex = 0.7), 
+       auto.key = list(space = 'top', columns = 2, cex = 0.7), 
        type = 'b', ylab = list('CV criterion (MSE)', cex = .7),
        xlab = '',
        par.strip.text = list(cex = 0.7),
@@ -632,6 +629,7 @@ scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight
                   + acceleration, 
                   smooth=list(spread=FALSE), data=A, pch=".")
 ```
+
 And the partial relationships in the model fit to the transformed data are much more nearly linear (cf., Figure \ref{fig:Auto-working-model}, on page \pageref{fig:Auto-working-model}, and Figure \ref{fig:Auto-CR-plots-transformed}):
 ```{r Auto-CR-plots-transformed}
 #| out.width = "60%",
@@ -646,14 +644,17 @@ library("MASS")
 m.step <- stepAIC(m, k=log(nrow(A)), trace=FALSE)
 summary(m.step)
 ```
+
 The selected model includes three of the numeric predictors, \code{horsepower}, \code{weight}, and \code{acceleration}, along with the factors \code{year} and \code{origin}. We can calculate the MSE for this model, but we expect that the result will be optimistic because we used the whole data to help specify the model:
 ```{r MSE-whole-selected-model}
 mse(Auto$mpg, exp(fitted(m.step)))
 ```
+
 This is considerably smaller than the MSE for the original working model:
 ```{r MSE-working-model}
 mse(Auto$mpg, fitted(m.auto))
 ```
+
 A perhaps subtle point is that we compute the MSE for the selected model on the original \code{mpg} response scale rather than the log scale, so as to make the selected model comparable to the working model.[^medAbsErr] 
 
 [^medAbsErr]: That's slightly uncomfortable given the skewed distribution of \code{mpg}. An alternative is to use a robust measure of model lack-of-fit, such as the median absolute error instead of the mean-squared error, employing the \code{medAbsErr()} function from the \pkg{cv} package. The median absolute error, however, cannot be expressed as a casewise average (see Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
@@ -669,6 +670,7 @@ cvs
 
 compareFolds(cvs)
 ```
+
 The other arguments to \code{cv()} are (see \code{?cv:::cv.function} for additional optional arguments and details):
 
 * \code{data}, the data set to which the model is fit.
