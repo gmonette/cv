@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-07-07</h4>
+            <h4 data-toc-skip class="date">2024-07-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv-selection.Rmd" class="external-link"><code>vignettes/cv-selection.Rmd</code></a></small>
       <div class="d-none name"><code>cv-selection.Rmd</code></div>
@@ -147,9 +147,8 @@ is associated with a large
 <span><span class="co">#&gt;     X.92 + X.93 + X.94 + X.95 + X.96 + X.97 + X.98 + X.99 + X.100</span></span>
 <span><span class="co">#&gt;   Res.Df RSS  Df Sum of Sq    F Pr(&gt;F)</span></span>
 <span><span class="co">#&gt; 1    999 974                          </span></span>
-<span><span class="co">#&gt; 2    899 888 100      85.2 0.86   0.82</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; 2    899 888 100      85.2 0.86   0.82</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.null</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -177,7 +176,7 @@ elimination. In this demonstration, however, where all of the
 &lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mi&gt;β&lt;/mi&gt;&lt;annotation encoding="application/x-tex"&gt;\beta&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;s
 are really 0, the selected model will be small, and so we proceed by
 forward selection from the null model to save computing time.&lt;/p&gt;'><sup>1</sup></a></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">"MASS"</a></span><span class="op">)</span>  <span class="co"># for stepAIC()</span></span>
 <span><span class="va">m.select</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.null</span>,</span>
@@ -218,16 +217,14 @@ forward selection from the null model to save computing time.&lt;/p&gt;'><sup>1<
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residual standard error: 0.973 on 984 degrees of freedom</span></span>
 <span><span class="co">#&gt; Multiple R-squared:  0.0442, Adjusted R-squared:  0.0296 </span></span>
-<span><span class="co">#&gt; F-statistic: 3.03 on 15 and 984 DF,  p-value: 8.34e-05</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; F-statistic: 3.03 on 15 and 984 DF,  p-value: 8.34e-05</span></span>
+<span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gmonette.github.io/cv/">"cv"</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: doParallel</span></span>
 <span><span class="co">#&gt; Loading required package: foreach</span></span>
 <span><span class="co">#&gt; Loading required package: iterators</span></span>
-<span><span class="co">#&gt; Loading required package: parallel</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">D</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.select</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: parallel</span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">D</span><span class="op">$</span><span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.select</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.93063</span></span>
 <span><span class="co">#&gt; attr(,"casewise loss")</span></span>
 <span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
@@ -246,7 +243,7 @@ as is the estimated error variance for the selected model,
 <p>If we cross-validate the selected model, we also obtain an optimistic
 estimate of its predictive power (although the confidence interval for
 the bias-adjusted MSE includes 1):</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gmonette.github.io/cv/">"cv"</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.select</span>, seed <span class="op">=</span> <span class="fl">2529</span><span class="op">)</span></span>
@@ -265,7 +262,7 @@ the model with a fold omitted and returning a CV criterion. The
 <code><a href="../reference/cv.function.html">selectStepAIC()</a></code> function, in the <strong>cv</strong>
 package and based on <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code>, is suitable for use with
 <code><a href="../reference/cv.html">cv()</a></code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.select</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">selectStepAIC</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">D</span>,</span>
@@ -274,9 +271,8 @@ package and based on <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" c
 <span>  direction <span class="op">=</span> <span class="st">"forward"</span>,</span>
 <span>  scope <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lower <span class="op">=</span>  <span class="op">~</span> <span class="fl">1</span>, upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/formula.html" class="external-link">formula</a></span><span class="op">(</span><span class="va">m.full</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 3791</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cv.select</span></span>
+<span><span class="co">#&gt; R RNG seed set to 3791</span></span>
+<span><span class="va">cv.select</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 1.0687</span></span>
@@ -306,7 +302,7 @@ than the true error variance,
 the <code><a href="../reference/cv.function.html">compareFolds()</a></code> function reveals that the variables
 retained by the model-selection process in the several folds are quite
 different:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.select</span><span class="op">)</span></span>
 <span><span class="co">#&gt; CV criterion by folds:</span></span>
 <span><span class="co">#&gt;  fold.1  fold.2  fold.3  fold.4  fold.5  fold.6  fold.7  fold.8  fold.9 fold.10 </span></span>
@@ -397,7 +393,7 @@ function <code><a href="../reference/cv.function.html">selectModelList()</a></co
 <code><a href="../reference/cv.html">cv()</a></code>, implements this idea.</p>
 <p>Applying <code><a href="../reference/cv.function.html">selectModelList()</a></code> to the <code>Auto</code>
 polynomial-regression models, and using 10-fold CV, we obtain:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">recursiveCV.auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">selectModelList</span>,</span>
 <span>  <span class="va">Auto</span>,</span>
@@ -406,16 +402,14 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span>  save.model <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">2120</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 2120</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">recursiveCV.auto</span></span>
+<span><span class="co">#&gt; R RNG seed set to 2120</span></span>
+<span><span class="va">recursiveCV.auto</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.105</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.68</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.746</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">recursiveCV.auto</span><span class="op">$</span><span class="va">selected.model</span></span>
+<span><span class="co">#&gt; full-sample criterion = 18.746</span></span>
+<span><span class="va">recursiveCV.auto</span><span class="op">$</span><span class="va">selected.model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; lm(formula = mpg ~ poly(horsepower, 7), data = Auto)</span></span>
@@ -426,9 +420,8 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span><span class="co">#&gt; poly(horsepower, 7)3  poly(horsepower, 7)4  poly(horsepower, 7)5  </span></span>
 <span><span class="co">#&gt;                -3.95                 -5.19                 13.27  </span></span>
 <span><span class="co">#&gt; poly(horsepower, 7)6  poly(horsepower, 7)7  </span></span>
-<span><span class="co">#&gt;                -8.55                  7.98</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.7</span>, seed <span class="op">=</span> <span class="fl">2120</span><span class="op">)</span> <span class="co"># same seed for same folds</span></span>
+<span><span class="co">#&gt;                -8.55                  7.98</span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.7</span>, seed <span class="op">=</span> <span class="fl">2120</span><span class="op">)</span> <span class="co"># same seed for same folds</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
@@ -441,7 +434,7 @@ selected 7th degree polynomial model than CV applied directly to this
 model.</p>
 <p>We can equivalently call <code><a href="../reference/cv.html">cv()</a></code> with the list of models as
 the first argument and set <code>recursive=TRUE</code>:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">recursiveCV.auto.alt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/cv.modList.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
 <span>         <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
@@ -450,9 +443,8 @@ the first argument and set <code>recursive=TRUE</code>:</p>
 <span>  recursive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  save.model <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 2120</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">recursiveCV.auto</span>, <span class="va">recursiveCV.auto.alt</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R RNG seed set to 2120</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">recursiveCV.auto</span>, <span class="va">recursiveCV.auto.alt</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Component \"criterion\": 1 string mismatch"</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -463,7 +455,7 @@ married women’s labor-force participation, also discussed in the
 introductory vignette on cross-validating regression models. First,
 recall the logistic regression model that we fit to the
 <code>Mroz</code> data:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Mroz"</span>, package <span class="op">=</span> <span class="st">"carData"</span><span class="op">)</span></span>
 <span><span class="va">m.mroz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">lfp</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">Mroz</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz</span><span class="op">)</span></span>
@@ -495,7 +487,7 @@ recall the logistic regression model that we fit to the
 BIC as the model-selection criterion (via the argument
 <code>k=log(nrow(Mroz))</code> to <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code>) selects 5 of
 the 7 original predictors:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.mroz.sel</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m.mroz</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                      trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz.sel</span><span class="op">)</span></span>
@@ -521,9 +513,8 @@ the 7 original predictors:</p>
 <span><span class="co">#&gt; Residual deviance:  906.46  on 747  degrees of freedom</span></span>
 <span><span class="co">#&gt; AIC: 918.5</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Number of Fisher Scoring iterations: 3</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">BayesRule</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">$</span><span class="va">lfp</span> <span class="op">==</span> <span class="st">"yes"</span>,</span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 3</span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">BayesRule</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">$</span><span class="va">lfp</span> <span class="op">==</span> <span class="st">"yes"</span>,</span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">m.mroz.sel</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.31873</span></span>
 <span><span class="co">#&gt; attr(,"casewise loss")</span></span>
@@ -532,7 +523,7 @@ the 7 original predictors:</p>
 cases in the <code>Mroz</code> data.</p>
 <p>Cross-validating the selected model produces a similar, slightly
 larger, estimate of misclassification, about 33%:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz.sel</span>, criterion <span class="op">=</span> <span class="va">BayesRule</span>, seed <span class="op">=</span> <span class="fl">345266</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 345266</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -545,7 +536,7 @@ larger, estimate of misclassification, about 33%:</p>
 <p>Is this estimate of predictive performance optimistic?</p>
 <p>We proceed to apply the model-selection procedure by
 cross-validation, producing more or less the same result:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">selectStepAIC</span>,</span>
 <span>  <span class="va">Mroz</span>,</span>
@@ -554,9 +545,8 @@ cross-validation, producing more or less the same result:</p>
 <span>  working.model <span class="op">=</span> <span class="va">m.mroz</span>,</span>
 <span>  AIC <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 6681</span></span></code></pre></div>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m.mroz.sel.cv</span></span>
+<span><span class="co">#&gt; R RNG seed set to 6681</span></span>
+<span><span class="va">m.mroz.sel.cv</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; criterion: BayesRule</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.33068</span></span>
@@ -568,7 +558,7 @@ the BIC rather than the AIC as the model-selection criterion. As it
 turns out, exactly the same predictors are selected when each of the 10
 folds are omitted, and the several coefficient estimates are very
 similar, as we show using <code><a href="../reference/cv.function.html">compareFolds()</a></code>:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span><span class="op">)</span></span>
 <span><span class="co">#&gt; CV criterion by folds:</span></span>
 <span><span class="co">#&gt;  fold.1  fold.2  fold.3  fold.4  fold.5  fold.6  fold.7  fold.8  fold.9 fold.10 </span></span>
@@ -617,7 +607,7 @@ Chapter 3 on transforming data), using data on the prestige and other
 characteristics of 102 Canadian occupations circa 1970. The data are in
 the <code>Prestige</code> data frame in the <strong>carData</strong>
 package:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Prestige"</span>, package <span class="op">=</span> <span class="st">"carData"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                     education income women prestige census type</span></span>
@@ -626,9 +616,8 @@ package:</p>
 <span><span class="co">#&gt; accountants             12.77   9271 15.70     63.4   1171 prof</span></span>
 <span><span class="co">#&gt; purchasing.officers     11.42   8865  9.11     56.8   1175 prof</span></span>
 <span><span class="co">#&gt; chemists                14.62   8403 11.68     73.5   2111 prof</span></span>
-<span><span class="co">#&gt; physicists              15.64  11030  5.13     77.6   2113 prof</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">)</span></span>
+<span><span class="co">#&gt; physicists              15.64  11030  5.13     77.6   2113 prof</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    education         income          women          prestige        census    </span></span>
 <span><span class="co">#&gt;  Min.   : 6.38   Min.   :  611   Min.   : 0.00   Min.   :14.8   Min.   :1113  </span></span>
 <span><span class="co">#&gt;  1st Qu.: 8.45   1st Qu.: 4106   1st Qu.: 3.59   1st Qu.:35.2   1st Qu.:3120  </span></span>
@@ -671,11 +660,10 @@ in the data reveals that the distributions of <code>income</code> and
 <code>women</code> are positively skewed, and that some of the
 relationships among the three predictors, and between the predictors and
 the response (i.e., <code>prestige</code>), are nonlinear:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://r-forge.r-project.org/projects/car/" class="external-link">"car"</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: carData</span></span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix</a></span><span class="op">(</span></span>
+<span><span class="co">#&gt; Loading required package: carData</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix</a></span><span class="op">(</span></span>
 <span>  <span class="op">~</span> <span class="va">prestige</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">Prestige</span>,</span>
 <span>  smooth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spread <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
@@ -695,7 +683,7 @@ Box-Cox family to data that may include negative values and zeros: the
 Box-Cox-with-negatives family and the Yeo-Johnson family; see <span class="citation">Weisberg (2014, Chapter 8)</span>, and <span class="citation">Fox &amp; Weisberg (2019, Chapter 3)</span> for
 details. Because <code>women</code> has some zero values, we use the
 Yeo-Johnson family:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">income</span>, <span class="va">education</span>, <span class="va">women</span><span class="op">)</span> <span class="op">~</span> <span class="fl">1</span>,</span>
 <span>                        data <span class="op">=</span> <span class="va">Prestige</span>,</span>
 <span>                        family <span class="op">=</span> <span class="st">"yjPower"</span><span class="op">)</span></span>
@@ -717,13 +705,12 @@ power) and <code>women</code> (by the
 power—which is close to the “0” power, i.e., the log transformation),
 but not <code>education</code>. Applying the “rounded” power
 transformations makes the predictors better-behaved:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">P</span> <span class="op">&lt;-</span> <span class="va">Prestige</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"prestige"</span>, <span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="op">(</span><span class="va">lambdas</span> <span class="op">&lt;-</span> <span class="va">trans</span><span class="op">$</span><span class="va">roundlam</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    income education     women </span></span>
-<span><span class="co">#&gt;   0.33000   1.00000   0.16302</span></span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lambdas</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   0.33000   1.00000   0.16302</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lambdas</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">var</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"income"</span>, <span class="st">"education"</span>, <span class="st">"women"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">P</span><span class="op">[</span>, <span class="va">var</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/bcPower.html" class="external-link">yjPower</a></span><span class="op">(</span><span class="va">P</span><span class="op">[</span>, <span class="va">var</span><span class="op">]</span>, lambda <span class="op">=</span> <span class="va">lambdas</span><span class="op">[</span><span class="va">var</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -734,9 +721,8 @@ transformations makes the predictors better-behaved:</p>
 <span><span class="co">#&gt;  Median :43.6   Median :50.3   Median :10.54   Median :3.36  </span></span>
 <span><span class="co">#&gt;  Mean   :46.8   Mean   :50.8   Mean   :10.74   Mean   :3.50  </span></span>
 <span><span class="co">#&gt;  3rd Qu.:59.3   3rd Qu.:56.2   3rd Qu.:12.65   3rd Qu.:5.59  </span></span>
-<span><span class="co">#&gt;  Max.   :87.2   Max.   :83.6   Max.   :15.97   Max.   :6.83</span></span></code></pre></div>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt;  Max.   :87.2   Max.   :83.6   Max.   :15.97   Max.   :6.83</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix</a></span><span class="op">(</span></span>
 <span>  <span class="op">~</span> <span class="va">prestige</span> <span class="op">+</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">P</span>,</span>
@@ -750,15 +736,14 @@ predictors transformed.
 </div>
 <p>Comparing the MSE for the regressions with the original and
 transformed predictors shows a advantage to the latter:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.pres</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data <span class="op">=</span> <span class="va">Prestige</span><span class="op">)</span></span>
 <span><span class="va">m.pres.trans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">women</span>, data <span class="op">=</span> <span class="va">P</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Prestige</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 59.153</span></span>
 <span><span class="co">#&gt; attr(,"casewise loss")</span></span>
-<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">P</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">P</span><span class="op">$</span><span class="va">prestige</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 50.6</span></span>
 <span><span class="co">#&gt; attr(,"casewise loss")</span></span>
 <span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
@@ -770,7 +755,7 @@ but the transformation of <code>women</code> fails to capture what
 appears to be a slight quadratic partial relationship; the partial
 relationship of <code>prestige</code> to <code>education</code> is close
 to linear in both regressions:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/CR-plots-untransformed-1.png" alt="Component+residual plots for the `Prestige` regression with the original predictors." width="672"><p class="caption">
@@ -778,7 +763,7 @@ Component+residual plots for the <code>Prestige</code> regression with
 the original predictors.
 </p>
 </div>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/CR-plots-transformed-1.png" alt="Component+residual plots for the `Prestige` regression with transformed predictors." width="672"><p class="caption">
@@ -790,7 +775,7 @@ transformed predictors.
 consider whether there’s evidence for transforming the response (using
 <code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform()</a></code> for Box and Cox’s original method), and we
 discover that there’s not:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; bcPower Transformation to Normality </span></span>
 <span><span class="co">#&gt;    Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd</span></span>
@@ -820,7 +805,7 @@ the zeros in <code>women</code>. <code><a href="../reference/cv.function.html">s
 result of applying a lack-of-fit criterion to the model after the
 selected transformation is applied, with the default
 <code>criterion=mse</code>:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.function.html">selectTrans</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">Prestige</span>,</span>
 <span>  model <span class="op">=</span> <span class="va">m.pres</span>,</span>
@@ -839,7 +824,7 @@ selected transformation is applied, with the default
 <code>indices</code> argument, making it suitable for doing computations
 on a subset of the data (i.e., a CV fold), and hence for use with
 <code><a href="../reference/cv.html">cv()</a></code> (see <code><a href="../reference/cv.function.html">?selectTrans</a></code> for details):</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">selectTrans</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">Prestige</span>,</span>
@@ -849,16 +834,14 @@ on a subset of the data (i.e., a CV fold), and hence for use with
 <span>  response <span class="op">=</span> <span class="st">"prestige"</span>,</span>
 <span>  family <span class="op">=</span> <span class="st">"yjPower"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 1463</span></span></code></pre></div>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cvs</span></span>
+<span><span class="co">#&gt; R RNG seed set to 1463</span></span>
+<span><span class="va">cvs</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 54.487</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 54.308</span></span>
-<span><span class="co">#&gt; full-sample criterion = 50.6</span></span></code></pre></div>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; full-sample criterion = 50.6</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pres</span>, seed <span class="op">=</span> <span class="fl">1463</span><span class="op">)</span> <span class="co"># untransformed model with same folds</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1463</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -866,9 +849,8 @@ on a subset of the data (i.e., a CV fold), and hence for use with
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 63.293</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.073</span></span>
-<span><span class="co">#&gt; full-sample criterion = 59.153</span></span></code></pre></div>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; full-sample criterion = 59.153</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">cvs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; CV criterion by folds:</span></span>
 <span><span class="co">#&gt;  fold.1  fold.2  fold.3  fold.4  fold.5  fold.6  fold.7  fold.8  fold.9 fold.10 </span></span>
@@ -930,7 +912,7 @@ model-selection procedure with each fold omitted. The
 <strong>cv</strong> package, does exactly that.</p>
 <p>To illustrate this process, we return to the <code>Auto</code> data
 set:</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       mpg         cylinders     displacement   horsepower        weight    </span></span>
 <span><span class="co">#&gt;  Min.   : 9.0   Min.   :3.00   Min.   : 68   Min.   : 46.0   Min.   :1613  </span></span>
@@ -947,19 +929,16 @@ set:</p>
 <span><span class="co">#&gt;  Mean   :15.5   Mean   :76   Mean   :1.58   amc gremlin       :  4  </span></span>
 <span><span class="co">#&gt;  3rd Qu.:17.0   3rd Qu.:79   3rd Qu.:2.00   amc hornet        :  4  </span></span>
 <span><span class="co">#&gt;  Max.   :24.8   Max.   :82   Max.   :3.00   chevrolet chevette:  4  </span></span>
-<span><span class="co">#&gt;                                             (Other)           :365</span></span></code></pre></div>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">year</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                                             (Other)           :365</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">year</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; year</span></span>
 <span><span class="co">#&gt; 70 71 72 73 74 75 76 77 78 79 80 81 82 </span></span>
-<span><span class="co">#&gt; 29 27 28 40 26 30 34 28 36 29 27 28 30</span></span></code></pre></div>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">origin</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 29 27 28 40 26 30 34 28 36 29 27 28 30</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">origin</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; origin</span></span>
 <span><span class="co">#&gt;   1   2   3 </span></span>
-<span><span class="co">#&gt; 245  68  79</span></span></code></pre></div>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">cylinders</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 245  68  79</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/xtabs.html" class="external-link">xtabs</a></span><span class="op">(</span> <span class="op">~</span> <span class="va">cylinders</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; cylinders</span></span>
 <span><span class="co">#&gt;   3   4   5   6   8 </span></span>
 <span><span class="co">#&gt;   4 199   3  83 103</span></span></code></pre></div>
@@ -970,7 +949,7 @@ Here, we consider more generally the problem of predicting
 <code>mpg</code> from the other variables in the <code>Auto</code> data.
 We begin with a bit of data management, and then examine the pairwise
 relationships among the numeric variables in the data set:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Auto</span><span class="op">$</span><span class="va">cylinders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">cylinders</span>,</span>
 <span>                         labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"3.4"</span>, <span class="st">"3.4"</span>, <span class="st">"5.6"</span>, <span class="st">"5.6"</span>, <span class="st">"8"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">Auto</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">year</span><span class="op">)</span></span>
@@ -1010,7 +989,7 @@ positively skewed and that many of the pairwise relationships among them
 are nonlinear.</p>
 <p>We begin with a “working model” that specifies linear partial
 relationships of the response to the numeric predictors:</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1049,9 +1028,8 @@ relationships of the response to the numeric predictors:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residual standard error: 2.92 on 371 degrees of freedom</span></span>
 <span><span class="co">#&gt; Multiple R-squared:  0.867,  Adjusted R-squared:  0.86 </span></span>
-<span><span class="co">#&gt; F-statistic:  121 on 20 and 371 DF,  p-value: &lt;2e-16</span></span></code></pre></div>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; F-statistic:  121 on 20 and 371 DF,  p-value: &lt;2e-16</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">Anova</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Anova Table (Type II tests)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1066,9 +1044,8 @@ relationships of the response to the numeric predictors:</p>
 <span><span class="co">#&gt; origin          190   2   11.13 2.0e-05 ***</span></span>
 <span><span class="co">#&gt; Residuals      3173 371                    </span></span>
 <span><span class="co">#&gt; ---</span></span>
-<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/Auto-working-model-1.png" alt="Component+residual plots for the working model fit to the `Auto` data" width="100%"><p class="caption">
@@ -1081,7 +1058,7 @@ function in the previously loaded <strong>car</strong> package, clearly
 reveal the inadequacy of the model.</p>
 <p>We proceed to transform the numeric predictors towards
 multi-normality:</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">num.predictors</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"displacement"</span>, <span class="st">"horsepower"</span>, <span class="st">"weight"</span>, <span class="st">"acceleration"</span><span class="op">)</span></span>
 <span><span class="va">tr.x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">[</span>, <span class="va">num.predictors</span><span class="op">]</span><span class="op">)</span></span>
@@ -1103,7 +1080,7 @@ multi-normality:</p>
 <span><span class="co">#&gt; LR test, lambda = (1 1 1 1) 390.08  4 &lt;2e-16</span></span></code></pre></div>
 <p>We then apply the (rounded) transformations—all, as it turns out,
 logs—to the data and re-estimate the model:</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">A</span> <span class="op">&lt;-</span> <span class="va">Auto</span></span>
 <span><span class="va">powers</span> <span class="op">&lt;-</span> <span class="va">tr.x</span><span class="op">$</span><span class="va">roundlam</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">pred</span> <span class="kw">in</span> <span class="va">num.predictors</span><span class="op">)</span> <span class="op">{</span></span>
@@ -1123,13 +1100,12 @@ logs—to the data and re-estimate the model:</p>
 <span><span class="co">#&gt; plymouth.satellite              2.3979   70 America</span></span>
 <span><span class="co">#&gt; amc.rebel.sst                   2.4849   70 America</span></span>
 <span><span class="co">#&gt; ford.torino                     2.3514   70 America</span></span>
-<span><span class="co">#&gt; ford.galaxie.500                2.3026   70 America</span></span></code></pre></div>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; ford.galaxie.500                2.3026   70 America</span></span>
+<span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m.auto</span>, data <span class="op">=</span> <span class="va">A</span><span class="op">)</span></span></code></pre></div>
 <p>Finally, we perform Box-Cox regression to transform the response
 (also obtaining a log transformation):</p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; bcPower Transformation to Normality </span></span>
 <span><span class="co">#&gt;    Est Power Rounded Pwr Wald Lwr Bnd Wald Upr Bnd</span></span>
@@ -1142,9 +1118,8 @@ logs—to the data and re-estimate the model:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Likelihood ratio test that no transformation is needed</span></span>
 <span><span class="co">#&gt;                          LRT df   pval</span></span>
-<span><span class="co">#&gt; LR test, lambda = (1) 124.13  1 &lt;2e-16</span></span></code></pre></div>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; LR test, lambda = (1) 124.13  1 &lt;2e-16</span></span>
+<span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">m</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span> <span class="op">~</span> <span class="va">.</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1184,9 +1159,8 @@ logs—to the data and re-estimate the model:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residual standard error: 0.104 on 371 degrees of freedom</span></span>
 <span><span class="co">#&gt; Multiple R-squared:  0.911,  Adjusted R-squared:  0.906 </span></span>
-<span><span class="co">#&gt; F-statistic:  189 on 20 and 371 DF,  p-value: &lt;2e-16</span></span></code></pre></div>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; F-statistic:  189 on 20 and 371 DF,  p-value: &lt;2e-16</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">Anova</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Anova Table (Type II tests)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1203,7 +1177,7 @@ logs—to the data and re-estimate the model:</p>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 <p>The transformed numeric variables are much better-behaved:</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/scatterplotMatrix.html" class="external-link">scatterplotMatrix</a></span><span class="op">(</span></span>
 <span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">)</span> <span class="op">+</span> <span class="va">displacement</span> <span class="op">+</span> <span class="va">horsepower</span> <span class="op">+</span> <span class="va">weight</span></span>
 <span>  <span class="op">+</span> <span class="va">acceleration</span>,</span>
@@ -1218,7 +1192,7 @@ Scatterplot matrix for the transformed numeric variables in the
 </div>
 <p>And the partial relationships in the model fit to the transformed
 data are much more nearly linear:</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/Auto-CR-plots-transformed-1.png" alt="Component+residual plots for the model fit to the transformed `Auto` data" width="100%"><p class="caption">
@@ -1232,7 +1206,7 @@ proceed to use the <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" cla
 the BIC model-selection criterion (by setting the <code>k</code>
 argument of <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC()</a></code> to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\log(n)</annotation></semantics></math>):</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.step</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="external-link">stepAIC</a></span><span class="op">(</span><span class="va">m</span>, k<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">A</span><span class="op">)</span><span class="op">)</span>, trace<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1269,9 +1243,8 @@ argument of <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="ext
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residual standard error: 0.105 on 374 degrees of freedom</span></span>
 <span><span class="co">#&gt; Multiple R-squared:  0.909,  Adjusted R-squared:  0.905 </span></span>
-<span><span class="co">#&gt; F-statistic:  220 on 17 and 374 DF,  p-value: &lt;2e-16</span></span></code></pre></div>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; F-statistic:  220 on 17 and 374 DF,  p-value: &lt;2e-16</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/car/man/Anova.html" class="external-link">Anova</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Anova Table (Type II tests)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1291,14 +1264,14 @@ argument of <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" class="ext
 <code>origin</code>. We can calculate the MSE for this model, but we
 expect that the result will be optimistic because we used the whole data
 to help specify the model</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 6.5121</span></span>
 <span><span class="co">#&gt; attr(,"casewise loss")</span></span>
 <span><span class="co">#&gt; [1] "(y - yhat)^2"</span></span></code></pre></div>
 <p>This is considerably smaller than the MSE for the original working
 model:</p>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 8.0932</span></span>
 <span><span class="co">#&gt; attr(,"casewise loss")</span></span>
@@ -1311,20 +1284,18 @@ model. That’s slightly uncomfortable given the skewed distribution of
 instead of the mean-squared error, employing the
 <code><a href="../reference/cost-functions.html">medAbsErr()</a></code> function from the <strong>cv</strong>
 package:</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">medAbsErr</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.step</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1.3396</span></span></code></pre></div>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cost-functions.html">medAbsErr</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1.3396</span></span>
+<span><span class="fu"><a href="../reference/cost-functions.html">medAbsErr</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">mpg</span>, <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 1.6661</span></span></code></pre></div>
 <p>Now let’s use <code><a href="../reference/cv.html">cv()</a></code> with
 <code>selectTransAndStepAIC()</code> to automate and cross-validate the
 whole model-specification process:</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">num.predictors</span></span>
-<span><span class="co">#&gt; [1] "displacement" "horsepower"   "weight"       "acceleration"</span></span></code></pre></div>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
+<span><span class="co">#&gt; [1] "displacement" "horsepower"   "weight"       "acceleration"</span></span>
+<span><span class="va">cvs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">selectTransStepAIC</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">Auto</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">76692</span>,</span>
@@ -1334,15 +1305,13 @@ whole model-specification process:</p>
 <span>  AIC <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  criterion <span class="op">=</span> <span class="va">medAbsErr</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; R RNG seed set to 76692</span></span></code></pre></div>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cvs</span></span>
+<span><span class="co">#&gt; R RNG seed set to 76692</span></span>
+<span><span class="va">cvs</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; criterion: medAbsErr</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 1.4951</span></span>
-<span><span class="co">#&gt; full-sample criterion = 1.3396</span></span></code></pre></div>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; full-sample criterion = 1.3396</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">cvs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; CV criterion by folds:</span></span>
 <span><span class="co">#&gt;  fold.1  fold.2  fold.3  fold.4  fold.5  fold.6  fold.7  fold.8  fold.9 fold.10 </span></span>

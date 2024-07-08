@@ -66,7 +66,7 @@ package</h3>
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-07-07</h4>
+            <h4 data-toc-skip class="date">2024-07-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -200,9 +200,8 @@ cars:</p>
 <span><span class="co">#&gt; 3        plymouth satellite</span></span>
 <span><span class="co">#&gt; 4             amc rebel sst</span></span>
 <span><span class="co">#&gt; 5               ford torino</span></span>
-<span><span class="co">#&gt; 6          ford galaxie 500</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 6          ford galaxie 500</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 392   9</span></span></code></pre></div>
 <p>With the exception of <code>origin</code> (which we don’t use here),
 these variables are largely self-explanatory, except possibly for units
@@ -211,7 +210,7 @@ of measurement: for details see
 <p>We’ll focus here on the relationship of <code>mpg</code> (miles per
 gallon) to <code>horsepower</code>, as displayed in the following
 scatterplot:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">horsepower</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="fig/mpg-horsepower-scatterplot-1.png" alt="`mpg` vs `horsepower` for the `Auto` data" width="100%"><p class="caption">
@@ -234,7 +233,7 @@ which is left to the reader).&lt;/p&gt;'><sup>2</sup></a> Polynomial fits for
 to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>
 are shown in the following figure:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">horsepower</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
 <span><span class="va">horsepower</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">Auto</span>,</span>
 <span>                   <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">horsepower</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">horsepower</span><span class="op">)</span>,</span>
@@ -286,14 +285,13 @@ while the latter gets slightly larger for the largest values of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>,
 with the “best” value, by a small margin, for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>=</mo><mn>7</mn></mrow><annotation encoding="application/x-tex">p = 7</annotation></semantics></math>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://gmonette.github.io/cv/">"cv"</a></span><span class="op">)</span> <span class="co"># for mse() and other functions</span></span>
 <span><span class="co">#&gt; Loading required package: doParallel</span></span>
 <span><span class="co">#&gt; Loading required package: foreach</span></span>
 <span><span class="co">#&gt; Loading required package: iterators</span></span>
-<span><span class="co">#&gt; Loading required package: parallel</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; Loading required package: parallel</span></span>
+<span></span>
 <span><span class="va">var</span> <span class="op">&lt;-</span> <span class="va">mse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">p</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">horsepower</span>, <span class="va">p</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
@@ -349,7 +347,7 @@ Estimated squared error as a function of polynomial degree,
 method, which by default performs
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">k = 10</annotation></semantics></math>-fold
 CV:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/poly.html" class="external-link">poly</a></span><span class="op">(</span><span class="va">horsepower</span>, <span class="fl">2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">Auto</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -370,9 +368,8 @@ CV:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Residual standard error: 4.37 on 389 degrees of freedom</span></span>
 <span><span class="co">#&gt; Multiple R-squared:  0.688,  Adjusted R-squared:  0.686 </span></span>
-<span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 841111</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -397,7 +394,7 @@ seed directly via the <code>seed</code> argument to
 <code><a href="../reference/cv.html">cv()</a></code> to the number of cases in the data, here
 <code>k=392</code>, or, more conveniently, to <code>k="loo"</code> or
 <code>k="n"</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: hatvalues</span></span>
@@ -410,16 +407,15 @@ Woodbury matrix identity or the “naive” approach of literally refitting
 the model with each case omitted. All three methods produce exact
 results for a linear model (within the precision of floating-point
 computations):</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"naive"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: naive</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; full-sample criterion = 18.985</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: Woodbury</span></span>
@@ -450,16 +446,15 @@ folds).</p>
 <p>We illustrate with the polynomial regression models of varying degree
 for the <code>Auto</code> data (discussed previously), beginning by
 fitting and saving the 10 models:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">p</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">command</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"m."</span>, <span class="va">p</span>, <span class="st">"&lt;- lm(mpg ~ poly(horsepower, "</span>, <span class="va">p</span>,</span>
 <span>                    <span class="st">"), data=Auto)"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">parse</a></span><span class="op">(</span>text <span class="op">=</span> <span class="va">command</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">objects</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"m\\.[0-9]"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "m.1"  "m.10" "m.2"  "m.3"  "m.4"  "m.5"  "m.6"  "m.7"  "m.8"  "m.9"</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.2</span><span class="op">)</span> <span class="co"># for example, the quadratic fit</span></span>
+<span><span class="co">#&gt;  [1] "m.1"  "m.10" "m.2"  "m.3"  "m.4"  "m.5"  "m.6"  "m.7"  "m.8"  "m.9"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.2</span><span class="op">)</span> <span class="co"># for example, the quadratic fit</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; lm(formula = mpg ~ poly(horsepower, 2), data = Auto)</span></span>
@@ -487,7 +482,7 @@ separate vignette, where we consider cross-validating the
 model-selection process.</p>
 <p>We then apply <code><a href="../reference/cv.html">cv()</a></code> to the list of 10 models (the
 <code>data</code> argument is required):</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 10-fold CV</span></span>
 <span><span class="va">cv.auto.10</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/cv.modList.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
@@ -509,9 +504,8 @@ model-selection process.</p>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.346</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.327</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; full-sample criterion = 18.985</span></span>
+<span></span>
 <span><span class="co"># LOO CV</span></span>
 <span><span class="va">cv.auto.loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.modList.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
 <span>                         <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
@@ -534,7 +528,7 @@ model-selection process.</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>-fold
 CV and the MSEs for LOO CV (see the section below on manipulating
 <code>"cv"</code> objects:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.mse.10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cv.auto.10</span>, </span>
 <span>                           rows<span class="op">=</span><span class="st">"cv"</span>,             </span>
 <span>                           columns<span class="op">=</span><span class="st">"criteria"</span></span>
@@ -585,7 +579,7 @@ Cross-validated 10-fold and LOO MSE as a function of polynomial degree,
 <p>Alternatively, we can use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method for
 <code>"cvModList"</code> objects to compare the models, though with
 separate graphs for 10-fold and LOO CV:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.auto.10</span>, main<span class="op">=</span><span class="st">"Polynomial Regressions, 10-Fold CV"</span>,</span>
 <span>     axis.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>labels<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>, xlab<span class="op">=</span><span class="st">"Degree of Polynomial, p"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.auto.loo</span>, main<span class="op">=</span><span class="st">"Polynomial Regressions, LOO CV"</span>,</span>
@@ -614,15 +608,14 @@ logistic regression; see, in particular <span class="citation">Fox &amp;
 Weisberg (2019)</span>. The data were originally drawn from the U.S.
 Panel Study of Income Dynamics and pertain to married women. Here are a
 few cases in the data set:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Mroz"</span>, package <span class="op">=</span> <span class="st">"carData"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">Mroz</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   lfp k5 k618 age wc hc    lwg   inc</span></span>
 <span><span class="co">#&gt; 1 yes  1    0  32 no no 1.2102 10.91</span></span>
 <span><span class="co">#&gt; 2 yes  0    2  30 no no 0.3285 19.50</span></span>
-<span><span class="co">#&gt; 3 yes  1    3  35 no no 1.5141 12.04</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">Mroz</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 3 yes  1    3  35 no no 1.5141 12.04</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">Mroz</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     lfp k5 k618 age wc hc     lwg    inc</span></span>
 <span><span class="co">#&gt; 751  no  0    0  43 no no 0.88814  9.952</span></span>
 <span><span class="co">#&gt; 752  no  0    0  60 no no 1.22497 24.984</span></span>
@@ -655,7 +648,7 @@ income.</li>
 </ul>
 <p>We use the <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> function to fit a binary logistic
 regression to the <code>Mroz</code> data:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m.mroz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">lfp</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">Mroz</span>, family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m.mroz</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -681,9 +674,8 @@ regression to the <code>Mroz</code> data:</p>
 <span><span class="co">#&gt; Residual deviance:  905.27  on 745  degrees of freedom</span></span>
 <span><span class="co">#&gt; AIC: 921.3</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cost-functions.html">BayesRule</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">Mroz</span><span class="op">$</span><span class="va">lfp</span> <span class="op">==</span> <span class="st">"yes"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>          <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted</a></span><span class="op">(</span><span class="va">m.mroz</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.30677</span></span>
@@ -734,7 +726,7 @@ with each fold removed (and is thus equivalent to
 generalized linear models, <code>method="Woodbury"</code> or (for LOO
 CV) <code>method="hatvalues"</code> provide approximate results (see the
 computational and technical vignette for details):</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, criterion <span class="op">=</span> <span class="va">BayesRule</span>, seed <span class="op">=</span> <span class="fl">248</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 248</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
@@ -743,9 +735,8 @@ computational and technical vignette for details):</p>
 <span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31952</span></span>
 <span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28607, 0.35297)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
 <span>   seed <span class="op">=</span> <span class="fl">248</span>,</span>
@@ -774,7 +765,7 @@ for Bayes rule. See the final section of the vignette for details of the
 computation of confidence intervals for bias-adjusted CV criteria.</p>
 <p>Here are results of applying LOO CV to the Mroz model, using both the
 exact and the approximate methods:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, k <span class="op">=</span> <span class="st">"loo"</span>, criterion <span class="op">=</span> <span class="va">BayesRule</span><span class="op">)</span></span>
 <span><span class="co">#&gt; n-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; method: exact</span></span>
@@ -782,9 +773,8 @@ exact and the approximate methods:</p>
 <span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
 <span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
@@ -795,9 +785,8 @@ exact and the approximate methods:</p>
 <span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
 <span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
@@ -848,7 +837,7 @@ controlled by the <code>reps</code> argument, which defaults to
 <code>1</code>.</p>
 <p>Here, for example, is 10-fold CV for the Mroz logistic regression,
 repeated 5 times:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz</span>,</span>
 <span>  criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
@@ -942,7 +931,7 @@ Recall our comparison of polynomial regressions of varying degree fit to
 the <code>Auto</code> data; we performed 10-fold CV for each of 10
 models. Here, we replicate that process 5 times for each model and graph
 the results:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.auto.reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/cv.modList.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
 <span>         <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
@@ -976,7 +965,7 @@ accessible to the user.&lt;/p&gt;'><sup>5</sup></a> There is also a
 information in the resulting data frames.</p>
 <p>We’ll illustrate with the replicated CV that we performed for the 10
 polynomial-regression models fit to the <code>Auto</code> data:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.auto.reps</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model model.1 averaged across 5 replications (with SDs):</span></span>
@@ -1047,25 +1036,23 @@ polynomial-regression models fit to the <code>Auto</code> data:</p>
 <span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.427 (0.24337)</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.339 (0.22818)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.01</span></span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span>
+<span><span class="co">#&gt; full-sample criterion = 18.01</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "cvModList"</span></span></code></pre></div>
 <p>In this case, there are 5 replications of 10-fold CV.</p>
 <p>Converting <code>cv.auto.reps</code> into a data frame produces, by
 default:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">D</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 550  62</span></span></code></pre></div>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">D</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 550  62</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">D</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "cvModListDataFrame" "cvListDataFrame"    "cvDataFrame"       </span></span>
 <span><span class="co">#&gt; [4] "data.frame"</span></span></code></pre></div>
 <p>The resulting data frame has
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝗋</mi><mi>𝖾</mi><mi>𝗉</mi><mi>𝗅</mi><mi>𝗂</mi><mi>𝖼</mi><mi>𝖺</mi><mi>𝗍</mi><mi>𝗂</mi><mi>𝗈</mi><mi>𝗇</mi><mi>𝗌</mi></mrow><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mrow><mi>𝖿</mi><mi>𝗈</mi><mi>𝗅</mi><mi>𝖽</mi><mi>𝗌</mi></mrow><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mrow><mi>𝗆</mi><mi>𝗈</mi><mi>𝖽</mi><mi>𝖾</mi><mi>𝗅</mi><mi>𝗌</mi></mrow><mo>=</mo><mn>5</mn><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>10</mn><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mn>10</mn><mo>=</mo><mn>550</mn></mrow><annotation encoding="application/x-tex">\mathsf{replications} \times (\mathsf{folds} + 1) \times \mathsf{models} = 5 \times (10 + 1) \times 10 = 550</annotation></semantics></math>
 rows, the first few of which are</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">D</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     model rep fold criterion adjusted.criterion full.criterion coef.Intercept</span></span>
 <span><span class="co">#&gt; 1 model.1   1    0      24.2               24.2           23.9           23.4</span></span>
@@ -1223,7 +1210,7 @@ polynomial term, the other coefficients are all <code>NA</code>.</p>
 <p>It’s possible to suppress the regression coefficients by specifying
 the argument <code>columns="criteria"</code> to
 <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code>:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">D</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cv.auto.reps</span>, columns<span class="op">=</span><span class="st">"criteria"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">D</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     model rep fold criterion adjusted.criterion full.criterion</span></span>
@@ -1232,9 +1219,8 @@ the argument <code>columns="criteria"</code> to
 <span><span class="co">#&gt; 3 model.1   1    2      24.5                 NA             NA</span></span>
 <span><span class="co">#&gt; 4 model.1   1    3      13.9                 NA             NA</span></span>
 <span><span class="co">#&gt; 5 model.1   1    4      15.5                 NA             NA</span></span>
-<span><span class="co">#&gt; 6 model.1   1    5      28.6                 NA             NA</span></span></code></pre></div>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">fold</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 6 model.1   1    5      28.6                 NA             NA</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">fold</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      model rep fold criterion adjusted.criterion full.criterion</span></span>
 <span><span class="co">#&gt; 1  model.1   1    0      24.2               24.2           23.9</span></span>
 <span><span class="co">#&gt; 12 model.1   2    0      24.1               24.1           23.9</span></span>
@@ -1245,7 +1231,7 @@ the argument <code>columns="criteria"</code> to
 <p>The <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for <code>"cvDataFrame"</code> and
 related objects has a formula interface, and may be used, for example,
 as follows:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">adjusted.criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span><span class="op">)</span> <span class="co"># fold "0" only</span></span>
 <span><span class="co">#&gt;           rep</span></span>
 <span><span class="co">#&gt; model           1      2      3      4      5</span></span>
@@ -1258,9 +1244,8 @@ as follows:</p>
 <span><span class="co">#&gt;   model.7  18.935 19.056 18.960 18.596 18.715</span></span>
 <span><span class="co">#&gt;   model.8  19.043 19.174 19.111 18.675 18.861</span></span>
 <span><span class="co">#&gt;   model.9  19.133 19.286 19.161 18.811 18.880</span></span>
-<span><span class="co">#&gt;   model.10 19.524 19.586 19.345 19.027 19.214</span></span></code></pre></div>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span>, </span>
+<span><span class="co">#&gt;   model.10 19.524 19.586 19.345 19.027 19.214</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span>, </span>
 <span>        include<span class="op">=</span><span class="st">"folds"</span><span class="op">)</span> <span class="co"># mean over folds</span></span>
 <span><span class="co">#&gt;           rep</span></span>
 <span><span class="co">#&gt; model           1      2      3      4      5</span></span>
@@ -1273,9 +1258,8 @@ as follows:</p>
 <span><span class="co">#&gt;   model.7  18.954 19.135 18.997 18.601 18.787</span></span>
 <span><span class="co">#&gt;   model.8  19.071 19.259 19.162 18.686 18.944</span></span>
 <span><span class="co">#&gt;   model.9  19.171 19.379 19.214 18.834 18.965</span></span>
-<span><span class="co">#&gt;   model.10 19.603 19.710 19.416 19.068 19.329</span></span></code></pre></div>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span>, fun<span class="op">=</span><span class="va">sd</span>, </span>
+<span><span class="co">#&gt;   model.10 19.603 19.710 19.416 19.068 19.329</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span>, fun<span class="op">=</span><span class="va">sd</span>, </span>
 <span>        include<span class="op">=</span><span class="st">"folds"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           rep</span></span>
 <span><span class="co">#&gt; model           1      2      3      4      5</span></span>
@@ -1304,7 +1288,7 @@ the program.</p>
 regression, repeating the computation as performed previously (but with
 LOO CV to lengthen the calculation) and then doing it in parallel using
 2 cores:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>    <span class="va">selectStepAIC</span>,</span>
@@ -1316,9 +1300,8 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  19.897   0.448  20.369</span></span></code></pre></div>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt;  23.859   0.668  24.585</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>    <span class="va">selectStepAIC</span>,</span>
@@ -1331,9 +1314,8 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.178   0.024  11.750</span></span></code></pre></div>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   0.189   0.035  13.008</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>On our computer, the parallel computation with 2 cores is nearly
 twice as fast, and produces the same result as the non-parallel
