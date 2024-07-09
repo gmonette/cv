@@ -733,7 +733,7 @@ cv(mlist, data=Auto, seed=2120, recursive=TRUE, save.model=TRUE)
 
 # Extending the cv package
 
-The \pkg{cv} package is designed to be extensible in several directions. In order of increasing general complexity, we can add: (1) a cross-validation cost criterion; (2) a model class that's not directly accommodated by the \code{cv()} default method or by another directly inherited method; and (3) a new model-selection procedure suitable for use with the \code{"function"} method for \code{cv()}. In this section, we illustrate (1) and (2); more diverse and extensive examples may be found in the vignette on extending the \pkg{cv} package.
+The \pkg{cv} package is designed to be extensible in several directions. In order of increasing general complexity, we can add: (1) a cross-validation cost criterion; (2) a model class that's not directly accommodated by the \code{cv()} default method or by another directly inherited method; and (3) a new model-selection procedure suitable for use with the \code{"function"} method for \code{cv()}. In this section, we illustrate (1) and (2); more diverse and extensive examples (including of (3)) may be found in the vignette on extending the \pkg{cv} package.
 
 Suppose that we want to cross-validate a multinomial logistic regression model fit by the \code{multinom()} function in the \pkg{nnet} package [@VenablesRipley:2002]. We borrow an example from @Fox:2016 [Sec. 14.2.1], with data from the British Election Panel Study on vote choice in the 2001 British election. Data for the example are in the \code{BEPS} data set in the \pkg{carData} package:
 ```{r BEPS-data}
@@ -846,8 +846,6 @@ Some \proglang{R} packages for statistical learning include facilities for cross
 
 Other packages, including \pkg{cvms} [@OlsenZachariae:2024], \pkg{mlexperiments} [@Kapsner:2024], \pkg{origami} [@CoyleEtAl:2022], and \pkg{rsample} (which also supports bootstrapping), modularize the CV process to a greater or lesser extent. Advantages of this approach include flexibility and generality, but a disadvantage is that use of these packages entails nontrivial programming effort and skill. 
 
-<!-- We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package [@Kuhn:2024] (and which is by a wide margin the most downloaded from the RStudio CRAN mirror of the CV packages mentioned in the preceding paragraph).  -->
-
 We illustrate with an example adapted from a vignette in the \pkg{rsample} package, which uses the \code{attrition} data set from the \pkg{modeldata} package [@Kuhn:2024], comparing LOO CV computed using the \code{cv()} function in the \pkg{cv} package to LOO CV computed using the \pkg{caret} and \pkg{rsample} packages. At more than 15 million cumulative downloads, \pkg{caret} is by a very wide margin the most downloaded from the RStudio CRAN mirror of the \proglang{R} packages mentioned above. Among the packages that focus more on cross-validation, \pkg{rsample} is the most downloaded, at nearly 4 million downloads.
 
 Here, with minimal explanation, is how one would perform LOO CV for this example using \pkg{rsample}:[^k-fold-used-in-rsample]
@@ -899,7 +897,8 @@ mean(((attrition$Attrition == "Yes") - round(yhat))^2)
 
 The \pkg{caret} package supports generalized linear models fit by \code{glm()} and can straightforwardly perform LOO CV:
 ```{r rsample-example-using-caret, cache=TRUE}
-library("caret", quietly=TRUE, warn.conflicts=FALSE)
+library("ggplot2", warn.conflicts=FALSE) # used by caret
+library("caret", quietly=TRUE)
 # reports complement of Bayes-rule criterion:
 train(x = attrition[, c("JobSatisfaction", "Gender",
                                "MonthlyIncome")],
@@ -907,6 +906,7 @@ train(x = attrition[, c("JobSatisfaction", "Gender",
              method = "glm",
              trControl = trainControl(method="LOOCV"))
 ```
+where "accuracy" is the complement of the misclassification rate.
 
 And here's how we can perform the same computation using the \code{cv()} function in the \pkg{cv} package:
 ```{r rsample-example-using-cv, cache=TRUE}
@@ -915,17 +915,11 @@ all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy),
           check.attributes=FALSE)
 ```
 
-Let's compare the computational efficiency of the various implementations, also showing the use of \code{method="Woodbury"} and \code{method="hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method="exact"}:
-```{r compare-rsample-cv, cache=TRUE}
-all.equal(cv.attrition$`CV crit`,
-          cv(mod.attrition, k="loo", criterion=BayesRule,
-             method="Woodbury")$`CV crit`,
-          )
-all.equal(cv.attrition$`CV crit`,
-          cv(mod.attrition, k="loo", criterion=BayesRule,
-             method="hatvalues")$`CV crit`
-          )
+Let's compare the computational efficiency of the various implementations, also showing the use of \code{method="Woodbury"} and \code{method="hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method="exact"}:[^times-10]
 
+[^times-10]: As before, we ask \code{microbenchmark()} to report relative timings, and also as before, we set \code{times = 10} rather than the default \code{times = 100}, with the consequence that we fail to detect a statistically reliable difference between using the Woodbury matrix identity and using hatvalues for the \code{cv()} computations.
+
+```{r compare-rsample-cv, cache=TRUE}
 print(microbenchmark::microbenchmark(
   caret=train(x = attrition[, c("JobSatisfaction", "Gender",
                                 "MonthlyIncome")],
