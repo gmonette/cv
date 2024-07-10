@@ -45,20 +45,26 @@ library(car)     # included this to avoid scatterplotMatrix() error
 
 Cross-validation (CV) is an essentially simple and intuitively reasonable approach to estimating the predictive accuracy of regression models. CV is developed in many standard sources on regression modeling and "machine learning"---we particularly recommend @JamesEtAl:2021 [Secs. 5.1, 5.3]---and so we will describe the method only briefly here before taking up computational issues and some examples. See @ArlotCelisse:2010 for a wide-ranging, if technical, survey of cross-validation and related methods that emphasizes the statistical properties of CV.
 
-Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common [see, e.g., @Barnard:1974]: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit a statistical model; and then the second part is used to assess the adequacy of the model fit to the first part of the data. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, the results can vary substantially based on the random division of the data, particularly in smaller samples. See @Harrell:2015 [Sec. 5.3] for this and other remarks about data-division and cross-validation.
+Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common [see, e.g., @Barnard:1974]: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit a statistical model; and then the second part is used to assess the adequacy of the model fit to the first part of the data. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, the results can vary substantially based on the random division of the data, particularly in smaller samples. See @Harrell:2015 [Sec. 5.3] for cogent remarks about data-division and cross-validation.
 
-Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the cases in the omitted fold. A CV criterion (also termed a "cost" or "loss" measure), such as the mean-squared error ("MSE") of prediction, is then computed using these predicted values. In the extreme $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
+Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the cases in the omitted fold. A CV criterion (also termed a "cost" or "loss" measure), such as the mean-squared error ("MSE") of prediction, is then computed using these predicted values. In the extreme, $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
 
-Because the $n$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of prediction error. The $n$ regression models are highly statistical dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has relatively large variance. In contrast, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) are somewhat biased but have smaller variance. It is also possible to correct $k$-fold CV for bias (see Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
+Because the $n$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of prediction error. The $n$ regression models are highly statistically dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has larger variance than if the predictions from the models fit to the $n$ data sets were independent.
+
+Because predictions are based on smaller data sets, each of size approximately $n - n/k$, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) is more biased than estimated prediction error for LOO CV. It is possible, however, to correct $k$-fold CV for bias (see Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
+
+The relative *variance* of prediction error for LOO CV and $k$-fold CV (with $k < n$) is more complicated: Because the overlap between the data sets with each fold omitted is smaller for $k$-fold CV than for LOO CV, the dependencies among the predictions are smaller for the former than for the latter, tending to produce smaller variance in prediction error for $k$-fold CV. In contrast, there are factors that tend to inflate the variance of prediction error in $k$-fold CV, including the reduced size of the data sets with each fold omitted and the randomness induced by the selection of folds---in LOO CV the folds are not random.
 
 The \pkg{cv} package for \proglang{R} automates the process of cross-validation for standard \proglang{R} statistical model objects. The principal function in the packages, also named \code{cv()}, has methods for objects produced by a number of commonly employed regression-modeling functions, including those for mixed-effects models:
 ```{r cv-methods}
 library("cv", quietly=TRUE)
 methods("cv")
 ```
+ The \code{cv()} function is introduced in the context of a preliminary example in Section \ref{preliminary-example-polynomial-regression} of the paper.
+
 * The \code{"lm"} and \code{"glm"} methods are for linear and generalized-linear models fit respectively by the standard \proglang{R} \code{lm()} and \code{glm()} functions.
 
-* The \code{"modList"} method for \code{cv()} cross-validates several competing models, not necessarily of the same class, using the same division of the data into folds. The \code{cv()} function is introduced in the context of a preliminary example in Section \ref{preliminary-example-polynomial-regression} of the paper.
+* The \code{"modList"} method for \code{cv()} cross-validates several competing models, not necessarily of the same class, using the same division of the data into folds.
 
 * Cross-validating mixed-effects models, using the \code{"glmmTMB"}, \code{"lme"}, and  \code{"merMod"} methods for \code{cv()}, involves special considerations that we take up in Section \ref{cross-validating-mixed-effects-models}.
 
@@ -68,7 +74,7 @@ methods("cv")
 
 A number of existing \proglang{R} packages include functions for cross-validating regression models. We briefly situate the \pkg{cv} package relative to other \proglang{R} software for cross-validation in Section \ref{comparing-cv-to-other-r-software-for-cross-validation}.
 
-The final section of the paper (Section \ref{computational-notes}) describes some computational details, including efficient CV computations for linear and generalized-linear models and computation of bias-corrected CV criteria.
+The final section of the paper (Section \ref{computational-notes}) describes some computational details, including efficient CV computations for linear and generalized-linear models. and computation of bias-corrected CV criteria.
 
 In the interest of brevity, we won't describe all of the features of the \pkg{cv} package here, concentrating on the aspects of the package that are relatively novel. For example, the \code{cv()} function can perform computations in parallel and can independently replicate a cross-validation procedure several times. There are also data management facilities in the package, such as coercing the objects produced by the \code{cv()} function into data frames for further analysis. These and other features not discussed in this paper are taken up in the vignettes distributed with the package, which also provides greater detail on some of topics that we do describe, such as extensions to the package.
 
@@ -182,6 +188,7 @@ This is a small regression problem and all three computational approaches are es
 m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data=Auto)
 boot::cv.glm(Auto, m.auto.glm)$delta # MSE, biased-corrected MSE
 
+set.seed(19412) # for reproducibility
 print(microbenchmark::microbenchmark(
   hatvalues = cv(m.auto, k="loo"),
   Woodbury = cv(m.auto, k="loo", method="Woodbury"),
@@ -239,7 +246,7 @@ The fundamental analogy for cross-validation is to the collection of new data. T
 
 In contrast, mixed-effects models are fit to *dependent* data, in which cases are clustered, such as hierarchical data, where the clusters comprise higher-level units (e.g., students clustered in schools), or longitudinal data, where the clusters are individuals and the cases are repeated observations on the individuals over time.[^crossed-effects] 
 
-[^crossed-effects]: There are, however, more complex situations that give rise to so-called *crossed* (rather than *nested*) random effects. For example, consider students within classes within schools. In primary schools, students typically are in a single class, and so classes are nested within schools. In secondary schools, however, students typically take several classes and students who are together in a particular class may not be together in other classes; consequently, random effects based on classes within schools are crossed. The \code{lmer()} function in the \pkg{lme4} package, for example, is capable of modeling both nested and crossed random effects, and the \code{cv()} methods for mixed models in the \pkg{cv} package pertain to both nested and crossed random effects. We present an example of crossed random effects in a vignette for the \pkg{cv} package.
+[^crossed-effects]: There are, however, more complex situations that give rise to so-called *crossed* (rather than *nested*) random effects. For example, consider students within classes within schools. In primary schools, students typically are in a single class, and so classes are nested within schools. In secondary schools, however, students typically take several classes and students who are together in a particular class may not be together in other classes; consequently, random effects based on classes within schools are crossed. The \code{lmer()} function in the \pkg{lme4} package, for example, is capable of modeling both nested and crossed random effects, and the \code{cv()} methods for mixed models in the \pkg{cv} package pertain to both nested and crossed random effects. We present an example of crossed random effects in the \pkg{cv} package vignette on mixed models.
 
 We can think of two approaches to applying cross-validation to clustered data:[^cv-faq]
 
@@ -306,13 +313,15 @@ If the \code{clusterVariables} argument is omitted, then case-level CV is employ
 
 ## Example: Contrasting cluster-based and case-based CV
 
-We introduce four artificial data sets that exemplify aspects of cross-validation particular to hierarchical models. Using these data sets, we show that model comparisons employing cluster-based and those employing case-based cross-validation may not agree on a "best" model. Furthermore, commonly used measures of fit, such as mean-squared error, do not necessarily become smaller as models become larger, even when the models are nested, and even when the measure of fit is computed for the whole data set. 
+In this section, we introduce four artificial data sets that exemplify aspects of cross-validation particular to hierarchical models. Using these data sets, we show that model comparisons employing cluster-based and those employing case-based cross-validation may not agree on a "best" model. Furthermore, commonly used measures of fit, such as mean-squared error, do not necessarily become smaller as models become larger, even when the models are nested, and even when the measure of fit is computed for the whole data set. 
 
-The four data sets differ in the magnitude of between-cluster variance compared to within-cluster variance. They serve to illustrate how fitting mixed models, and, consequently, the cross-validation of mixed models, is sensitive to relative variance, which affects the degree of shrinkage of within-cluster estimates of effects towards between-cluster estimates.[^code-in-complements]  
+The four data sets differ in the magnitude of between-cluster variance compared to within-cluster variance. They serve to illustrate how fitting mixed models, and, consequently, the cross-validation of mixed models, is sensitive to relative variance, which affects the degree of shrinkage of within-cluster estimates of effects towards between-cluster estimates.
 
-[^code-in-complements]: The purpose of this section is to explain some of the complexities of cross-validating mixed-effects models, which motivates the approach that we take for mixed models in the \pkg{cv} package. The examples in this section introduce no features of the \pkg{cv} package that we haven't already encountered, and the generation of data for these examples involves unenlightening data management. Consequently, we don't show the code for data generation, model fitting, and graphs in this section; the code is in the complementary materials for the paper, however. For these analyses, we used the `glmmTMB()` function in the \pkg{glmmTMB} package [@BrooksEtAl] because, in our experience, it is more likely to converge than functions in the \pkg{nlme} and the \pkg{lme4} packages for models with low between-cluster variance. We used the \pkg{lattice} [@Sarkar:2008] and \pkg{latticeExtra} [@SarkarAndrews:2022] packages for the graphs in this section.
+The purpose of this section is to explain some of the complexities of cross-validating mixed-effects models, which motivates the approach that we take for mixed models in the \pkg{cv} package. The examples in this section introduce no features of the \pkg{cv} package that we haven't already encountered, and the generation of data for these examples involves unenlightening data management. Consequently, we don't show the code for data generation, model fitting, and graphs in this section.[^code-in-complements]  
 
-Consider a researcher studying the effect of the dosage of a drug on the severity of symptoms for a hypothetical disease. The researcher has longitudinal data on 20 patients, each of whom was observed on 5 occasions in which patients received different dosages of the drug.  The data are observational, with dosages prescribed by the patients' physicians, so that patients who were more severely affected by the disease received higher dosages of the drug.
+[^code-in-complements]: The code for this section is in the complementary materials for the paper. We used the `glmmTMB()` function in the \pkg{glmmTMB} package [@BrooksEtAl] for the models fit here because, in our experience, it is more likely to converge than functions in the \pkg{nlme} and the \pkg{lme4} packages for models with low between-cluster variance. We used the \pkg{lattice} [@Sarkar:2008] and \pkg{latticeExtra} [@SarkarAndrews:2022] packages for the graphs.
+
+Consider a researcher studying the effect of the dosage $x$ of a drug on the severity of symptoms $y$ for a hypothetical disease. The researcher has longitudinal data on 20 patients, each of whom was observed on 5 occasions in which patients received different dosages of the drug.  The data are observational, with dosages prescribed by the patients' physicians, so that patients who were more severely affected by the disease received higher dosages of the drug.
 
 Within patients, higher dosages are generally associated with a reduction in symptoms. Between patients, however, higher dosages are associated with higher levels of symptoms. A plausible mechanism is a reversal of causality: Within patients, higher dosages alleviate symptoms, but, between patients, higher morbidity causes the prescription of higher dosages.
 
@@ -376,7 +385,7 @@ Data <- within(
 ```{r plot1, echo=FALSE, cache=TRUE}
 #| out.width = "75%",
 #| fig.height = 2.5,
-#| fig.cap = "Data sets showing identical within-patient configurations with increasing between-patient variance. The labels above each panel show the between-patient SD/within-patient SD. The ellipses are estimated 50% concentration ellipses for each patient. The population between-patient regression line, $E(y) = 10 + x$, is shown in each panel, where $y$ is symptoms and $x$ is dosage."
+#| fig.cap = "Data sets showing identical within-patient configurations with increasing between-patient variance. The labels above each panel show the ratio of between-patient SD to within-patient SD. The ellipses are estimated 50% Gaussian concentration ellipses for each patient. The population between-patient regression line, $E(y) = 10 + x$, is shown in each panel, where $y$ is symptoms and $x$ is dosage."
 library("lattice")
 library("latticeExtra")
 layer <- latticeExtra::layer # to avert conflicts with ggplot2::layer
@@ -392,7 +401,7 @@ xyplot(y ~ x | SD_ratio, data = Data, group = patient,
         panel.abline(a = 10, b = 1))
 ```
 
-Using data like these, a researcher may attempt to obtain an estimate of the within-patient effect of dosage by fitting mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variance at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models are sequentially nested in their fixed effects: (1) `~ 1`, intercept only; (2) `~ 1 + x`, intercept and effect of `x`; and (3) `~ 1 + x + xm`, intercept, effect of `x`, and a contextual variable, `xm`, consisting of the within-patient mean of `x`. The fourth model, `~ 1 + I(x - xm)`, uses an intercept and the centered-within-group variable `x - xm`. We thus fit four models to four data sets for a total of 16 models.
+Using data like these, a researcher may attempt to obtain an estimate of the within-patient effect of dosage by fitting mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variance at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models are sequentially nested in their fixed effects: (1) `~ 1`, intercept only; (2) `~ 1 + x`, intercept and effect of `x`; and (3) `~ 1 + x + xm`, intercept, effect of `x`, and a contextual variable, `xm`, consisting of the within-patient mean of `x`. The final model, (4) `~ 1 + I(x - xm)`, uses an intercept and the centered-within-group variable `x - xm`. We thus fit four models to four data sets for a total of 16 models.
 
 ```{r model-fits,include=FALSE, cache=TRUE}
 model.formulas <- c(
@@ -409,7 +418,7 @@ fits <- lapply(split(Data, ~ SD_ratio),
                })
 ```
 
-We proceed to obtain predictions from each model based on fixed effects alone, as would be used for cross-validation based on clusters (i.e., patients), and for fixed and random effects---that is, the BLUPs---as would be used for cross-validation based on cases (i.e., occasions within patients):
+We proceed to obtain predictions from each model (1) using only the fixed effects, as for cross-validation based on clusters (i.e., patients), and (2) using both fixed and random effects---that is, the BLUPs---as for cross-validation based on cases (i.e., occasions within patients). The fixed- and random-effects predictions from these models are displayed in Figure \ref{fig:plot-fits-combined} along with a summary of the data using 50% concentration ellipses (see the top row of the figure).
 ```{r predict,include=FALSE}
 pred.fixed <- lapply(fits, lapply, predict, re.form = ~0)  
 pred.BLUPs <- lapply(fits, lapply, predict)
@@ -438,12 +447,11 @@ Datap$panel2 <- factor(Datap$panel2, levels = flevels)
 Data$panel <- factor('data', levels = c(names(model.formulas), 'data'))
 Data$panel2 <- factor('data', levels = flevels)
 ```
-The fixed- and random-effects predictions from these models are displayed in Figure \ref{fig:plot-fits-combined} along with a summary of the data using 50% concentration ellipses (see the top row of the figure).
 
 ```{r plot-fits-combined,echo=FALSE}
 #| out.width = "100%",
 #| fig.height = 6,
-#| fig.cap = "Fixed- and random-effect predictions (BLUPs) using each model applied to data sets with varying between- and within-patient variance ratios. The top row shows summaries of the within-patient data using estimated 50% concentration ellipses."
+#| fig.cap = "Fixed- and random-effect predictions (BLUPs) using each model applied to data sets with varying between- and within-patient variance ratios. The top row shows summaries of the within-patient data using estimated 50% concentration ellipses, along with the patient centroids."
 levs3 <- levels(Data$panel2)
 levs3 <- sub(':fixed','', levs3)
 levs3 <- sub(':BLUPs',' ', levs3)
@@ -481,15 +489,11 @@ useOuterStrips(re.plot)
 
 ```
 
-Data sets with relatively low between-patient variance result in strong shrinkage of fixed-effects predictions, and also of BLUPs, towards the between-patient relationship between `y` and `x` in the model with an intercept and `x` as fixed-effect predictors, `~ 1 + x`. The inclusion of a contextual variable in the model corrects this problem.
+Data sets with relatively low between-patient variance result in strong shrinkage of fixed-effects predictions, and also of BLUPs, towards the between-patient relationship between `y` and `x` in the model with an intercept and `x` as fixed-effect predictors, `~ 1 + x`. The inclusion of the contextual variable `xm` in the model corrects this problem.
 
-Although the BLUPs fit the observed data more closely than predictions based on fixed effects alone, the slopes of within-patient BLUPs do not conform to the within-patient slopes for the `~ 1 + x` model in the two data sets with the smallest between-patient variances. 
+Although the BLUPs fit the observed data more closely than predictions based on fixed effects alone, the slopes of within-patient BLUPs do not conform to the within-patient slopes for the `~ 1 + x` model in the two data sets with the smallest between-patient variances. For data with a small between-patient variance, fixed-effects predictions for the `~ 1 + x` model have a slope that is close to the between-patient slope but provide better overall predictions than the fixed-effect predictions for data sets with larger between-subject variance.  With data whose between-patient variance is relatively large, predictions based on the model with a common intercept and slope for all clusters are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model.
 
-For data with a small between-patient variance, fixed-effects predictions for the `~ 1 + x` model have a slope that is close to the between-patient slope but provide better overall predictions than the fixed-effect predictions for data sets with larger between-subject variance.  With data whose between-patient variance is relatively large, predictions based on the model with a common intercept and slope for all clusters are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model.
-
-We therefore anticipate (and show later in this section) that case-based cross-validation may prefer the intercept-only model, `~ 1`  to the larger `~ 1 + x` model when the between-cluster variance is relatively small, but that cluster-based cross-validation will prefer the latter to the former.
-
-We will discover that case-based cross-validation prefers the `~ 1 + x` model to the `~ 1` model for the '5 / 2.5' data set, but cluster-based cross-validation prefers the latter model to the former. The situation is entirely reversed with the '8 / 2.5' data set. 
+We therefore anticipate (and show later in this section) that case-based cross-validation may prefer the intercept-only model, `~ 1`  to the larger `~ 1 + x` model when the between-cluster variance is relatively small, but that cluster-based cross-validation will prefer the latter to the former. We will discover that case-based cross-validation prefers the `~ 1 + x` model to the `~ 1` model for the '5 / 2.5' data set, but cluster-based cross-validation prefers the latter model to the former. The situation is entirely reversed with the '8 / 2.5' data set. 
 
 The third model, `~ 1 + x + xm`, includes a contextual effect of `x`---that is, the cluster mean `xm`---along with `x` and the intercept in the fixed-effect part of the model, and with a random intercept. This model is equivalent to fitting `y ~ I(x - xm) + xm + (1 | patient)`, which is the model that generated the data.  The fit of the mixed model `~ 1 + x + xm` is consequently similar to that of a fixed-effects-only model with `x` and a categorical predictor for individual patients (i.e., `y ~ factor(patient) + x`, treating patients as a factor, and not shown here). 
 
@@ -546,7 +550,7 @@ xyplot(clusters + cases ~ model|SD_ratio_i, dsummary,
        scales = list(y = list(log = TRUE, cex = 0.7), 
                      x = list(alternating = F, rot = 45, cex = 0.7))) 
 ```
-In summary, when between-cluster variance is relatively large, the model `~ 1 + x`, with `x` alone and without the contextual mean of `x`, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. With all our examples, the model `~ 1 + x + xm`, which includes both `x` and its contextual mean, produces better results using both cluster-based and case-based CV.  These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
+In summary, when between-cluster variance is relatively large, the model `~ 1 + x`, with `x` alone and without the contextual mean `xm` of `x`, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. In all of our examples, the model `~ 1 + x + xm`, which includes both `x` and its contextual mean, produces better results using both cluster-based and case-based CV.  These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
 
 # Cross-validating model specification
 
