@@ -96,7 +96,8 @@ With the exception of `origin` (which we don't use here), these variables are la
 #| out.width = "45%",
 #| fig.height = 5,
 #| fig.cap = "(a) \\code{mpg} vs. \\code{horsepower} for the \\code{Auto} data, showing fitted polynomials of degree 1 through 5. (b) Estimated squared error as a function of polynomial degree, $p = 1, \\ldots, 10$.",
-#| fig.subcap=rep("", 2)
+#| fig.subcap=rep("", 2),
+#| fig.sep = "~~~"
 plot(mpg ~ horsepower, data=Auto)
 horsepower <- with(Auto, 
                    seq(min(horsepower), max(horsepower), 
@@ -229,7 +230,8 @@ The \code{models()} function takes an arbitrary number of regression models as i
 #| fig.height = 5,
 #| fig.cap = "Cross-validated (a) 10-fold and (b) LOO MSE as a function of polynomial degree, $p = 1, 2, \\ldots, 10$.",
 #| fig.subcap=c('', ''),
-#| fig.ncol = 2, out.width = "50%", fig.align = "center"
+#| fig.ncol = 2, out.width = "50%", fig.align = "center",
+#| fig.sep = "~~~"
 plot(cv.auto.10, main = "Polynomial Regressions, 10-Fold CV",
      axis.args = list(labels = 1:10), xlab = "Degree of Polynomial, p")
 plot(cv.auto.loo, main = "Polynomial Regressions, LOO CV",
@@ -574,7 +576,7 @@ The \code{Auto} data appeared in a preliminary example in Section \ref{prelimina
 ```{r Auto-explore, fig.show="hold", echo=FALSE}
 #| out.width = "65%",
 #| fig.align = 'center',
-#| fig.height = 5,
+#| fig.height = 4.5,
 #| fig.ncol = 1,
 #| fig.cap = "(a) Scatterplot matrix for the numeric variables in the \\code{Auto} data.  (b) Component + residual plots for the working model fit to the \\code{Auto} data.",
 #| fig.subcap=rep("", 2)
@@ -648,7 +650,7 @@ The transformed numeric variables are much better-behaved (cf., Figure \ref{fig:
 ```{r Auto-transformed, fig.show="hold", echo=FALSE}
 #| out.width = "65%",
 #| fig.align = 'center',
-#| fig.height = 5,
+#| fig.height = 4.5,
 #| fig.ncol = 1,
 #| fig.cap = "(a) Scatterplot matrix for the transformed numeric variables in the \\code{Auto} data. (b) Component + residual plots for the regression model fit to the transformed \\code{Auto} data.",
 #| fig.subcap=rep("", 2)
