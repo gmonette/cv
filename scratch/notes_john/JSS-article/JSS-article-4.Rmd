@@ -593,7 +593,7 @@ scatterplotMatrix(~ mpg + displacement + horsepower + weight
                   smooth = list(spread = FALSE), data = Auto, pch= ".")
 
 m.auto <- lm(mpg ~ ., data = Auto)
-crPlots(m.auto, pch = ".")
+crPlots(m.auto, pch = ".", ylab = "C+R", las = 2)
 ```
 
 ```{r Auto-explore-show, eval=FALSE}
@@ -617,7 +617,7 @@ A comment before we proceed: \code{origin} is clearly categorical and so convert
 We start with a "working model" that specifies linear partial relationships of the response to the numeric predictors:
 ```{r Auto-working-model, eval=FALSE}
 m.auto <- lm(mpg ~ ., data = Auto)
-crPlots(m.auto, pch = ".")
+crPlots(m.auto, pch = ".", ylab = "C+R", las = 2)
 ```
 The component + residual (C+R) plots in Figure \ref{fig:Auto-explore} (b), produced by the \code{cvPlots()} function in the \pkg{car} package, clearly reveal the inadequacy of the model. The broken blue lines in the C+R plots show linear least-squares fits, while the solid magenta lines are nonparametric-regression smooths.
 
@@ -657,7 +657,7 @@ The transformed numeric variables are much better-behaved (cf., Figure \ref{fig:
 scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight 
                   + acceleration, 
                   smooth=list(spread = FALSE), data = A, pch = ".")
-crPlots(m, pch = ".")
+crPlots(m.auto, pch = ".", ylab = "C+R", las = 2)
 ```
 
 ```{r Auto-transformed-scatterplot-matrix-show, eval=FALSE}
@@ -668,7 +668,7 @@ scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight
 
 And the partial relationships in the model fit to the transformed data are much more nearly linear (cf., Figure \ref{fig:Auto-explore} (b), on page \pageref{fig:Auto-explore}, and Figure \ref{fig:Auto-transformed} (b)):
 ```{r Auto-CR-plots-transformed, eval=FALSE}
-crPlots(m, pch = ".")
+crPlots(m.auto, pch = ".", ylab = "C+R", las = 2)
 ```
 
 After transforming both the numeric predictors and the response, we proceed to use the \code{stepAIC()} function in the \pkg{MASS} package to perform predictor selection, employing the BIC model-selection criterion (by setting the `k` argument of `stepAIC()` to $\log n$):
