@@ -584,7 +584,7 @@ Auto$cylinders <- factor(Auto$cylinders,
                          labels = c("3-4", "3-4", "5-6", "5-6", "8"))
 Auto$year <- as.factor(Auto$year)
 Auto$origin <- factor(Auto$origin,
-                      labels = c("America", "Europe", "Japan"))
+                      labels = c("AMER", "EUR", "JAP"))
 rownames(Auto) <- make.names(Auto$name, unique = TRUE)
 Auto$name <- NULL
 
@@ -601,7 +601,7 @@ Auto$cylinders <- factor(Auto$cylinders,
                          labels = c("3-4", "3-4", "5-6", "5-6", "8"))
 Auto$year <- as.factor(Auto$year)
 Auto$origin <- factor(Auto$origin,
-                      labels = c("America", "Europe", "Japan"))
+                      labels = c("AMER", "EUR", "JAP"))
 rownames(Auto) <- make.names(Auto$name, unique = TRUE)
 Auto$name <- NULL
 
