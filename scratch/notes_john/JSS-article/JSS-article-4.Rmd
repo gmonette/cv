@@ -570,11 +570,13 @@ xtabs(~ cylinders, data = Auto)
 
 [^Venables]: This example benefits from an email conversation with Bill Venables, who of course isn't responsible for the use to which we've put his insightful remarks.
 
-The \code{Auto} data appeared in a preliminary example in Section \ref{preliminary-example-polynomial-regression}, where we employed CV to inform the selection of the degree of a polynomial regression of \code{mpg} on \code{horsepower}. Here, we consider more generally the problem of predicting \code{mpg} from the other variables in the \code{Auto} data. We begin with a bit of data management, and then examine the pairwise relationships among the numeric variables in the data set (Figure \ref{fig:Auto-explore} (a), produced by the \code{scatterplotMatrix()} function in the \pkg{car} package):
+The \code{Auto} data appeared in a preliminary example in Section \ref{preliminary-example-polynomial-regression}, where we employed CV to inform the selection of the degree of a polynomial regression of \code{mpg} on \code{horsepower}. Here, we consider more generally the problem of predicting \code{mpg} from the other variables in the \code{Auto} data. We begin with a bit of data management, and then examine the pairwise relationships among the numeric variables in the data set (Figure \ref{fig:Auto-explore} (a), produced by the \code{scatterplotMatrix()} function in the \pkg{car} package); in each panel, the solid line shows the linear least-squares fit and the broken line is for a nonparametric regression.:
 ```{r Auto-explore, fig.show="hold", echo=FALSE}
-#| out.width = "45%",
+#| out.width = "65%",
+#| fig.align = 'center',
 #| fig.height = 5,
-#| fig.cap = "(a) Scatterplot matrix for the numeric variables in the \\code{Auto} data. In each panel, the solid line shows the linear least-squares fit and the broken line is for a nonparametric regression. (b) Component + residual plots for the working model fit to the \\code{Auto} data. The broken blue lines show linear least-squares fits, while the solid magenta lines are nonparametric-regression smooths.",
+#| fig.ncol = 1,
+#| fig.cap = "(a) Scatterplot matrix for the numeric variables in the \\code{Auto} data.  (b) Component + residual plots for the working model fit to the \\code{Auto} data.",
 #| fig.subcap=rep("", 2)
 Auto$cylinders <- factor(Auto$cylinders,
                          labels = c("3-4", "3-4", "5-6", "5-6", "8"))
@@ -615,7 +617,7 @@ We start with a "working model" that specifies linear partial relationships of t
 m.auto <- lm(mpg ~ ., data = Auto)
 crPlots(m.auto, pch = ".")
 ```
-The component + residual plots in Figure \ref{fig:Auto-explore} (b), produced by the \code{cvPlots()} function in the \pkg{car} package, clearly reveal the inadequacy of the model.
+The component + residual (C+R) plots in Figure \ref{fig:Auto-explore} (b), produced by the \code{cvPlots()} function in the \pkg{car} package, clearly reveal the inadequacy of the model. The broken blue lines in the C+R plots show linear least-squares fits, while the solid magenta lines are nonparametric-regression smooths.
 
 Some background: As @Weisberg:2014 [Sec. 8.2] explains, there are technical advantages to having (numeric) predictors in linear regression analysis that are themselves linearly related. If the predictors *aren't* linearly related, then the relationships between them can often be straightened by power transformations. Transformations can be selected after graphical examination of the data, or by analytic methods, such as transforming the predictors towards multivariate normality, which implies linearity. Once the relationships between the predictors are linearized, it can be advantageous similarly to transform the conditional distribution of the response variable towards normality. Selecting transformations analytically raises the possibility of automating the process, as required for cross-validation.
 
@@ -644,8 +646,10 @@ m <- update(m, log(mpg) ~ .)
 
 The transformed numeric variables are much better-behaved (cf., Figure \ref{fig:Auto-explore} (a), on page \pageref{fig:Auto-explore}, and Figure \ref{fig:Auto-transformed} (a)):
 ```{r Auto-transformed, fig.show="hold", echo=FALSE}
-#| out.width = "45%",
+#| out.width = "65%",
+#| fig.align = 'center',
 #| fig.height = 5,
+#| fig.ncol = 1,
 #| fig.cap = "(a) Scatterplot matrix for the transformed numeric variables in the \\code{Auto} data. (b) Component + residual plots for the regression model fit to the transformed \\code{Auto} data.",
 #| fig.subcap=rep("", 2)
 scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight 
