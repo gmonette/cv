@@ -80,9 +80,9 @@ In the interest of brevity, we won't describe all of the features of the \pkg{cv
 
 # Preliminary Example: Polynomial regression
 
-The data for the example in this section are drawn from the \pkg{ISLR2} package for \proglang{R}, associated with @JamesEtAl:2021. The presentation here is close (though not identical) to that in the original source [@JamesEtAl:2021 Secs. 5.1, 5.3], and it demonstrates the use of the `cv()` function.[^boot] 
+The data for the example in this section are drawn from the \pkg{ISLR2} package for \proglang{R}, associated with @JamesEtAl:2021. The presentation here is close (though not identical) to that in the original source [@JamesEtAl:2021 Secs. 5.1, 5.3], and it demonstrates the use of the \code{cv()} function.[^boot] 
 
-[^boot]: @JamesEtAl:2021 use the `cv.glm()` function in the \pkg{boot} package [@CantyRipley2022; @DavisonHinkley:1997]. Despite its name, `cv.glm()` is an independent function and not a method of a `cv()` generic function. The \pkg{boot} package is part of the standard \proglang{R} distribution.
+[^boot]: @JamesEtAl:2021 use the \code{cv.glm()} function in the \pkg{boot} package [@CantyRipley2022; @DavisonHinkley:1997]. Despite its name, \code{cv.glm()} is an independent function and not a method of a \code{cv()} generic function. The \pkg{boot} package is part of the standard \proglang{R} distribution.
 
 The \code{Auto} data set contains information about 392 cars:
 
@@ -90,7 +90,7 @@ The \code{Auto} data set contains information about 392 cars:
 data("Auto", package = "ISLR2")
 summary(Auto)
 ```
-With the exception of `origin` (which we don't use here), these variables are largely self-explanatory, except possibly for units of measurement: for details see `help("Auto", package="ISLR2")`.
+With the exception of \code{origin} (which we don't use here), these variables are largely self-explanatory, except possibly for units of measurement: for details see \code{help("Auto", package="ISLR2")}.
 
 ```{r mpg-horsepower-polynomials, fig.show="hold", echo=FALSE}
 #| out.width = "45%",
@@ -127,13 +127,13 @@ legend("topright", inset=0.02,
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 ```
 
-We'll focus on the relationship of \code{mpg} (miles per gallon) to \code{horsepower}, as displayed in Figure \ref{fig:mpg-horsepower-polynomials} (a). The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2021, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^log-trans] Polynomial fits  for $p = 1$ to $5$ are shown in Figure \ref{fig:mpg-horsepower-polynomials} (a). The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ may over-fit the data by chasing one or two relatively high `mpg` values at the right (but see the CV results reported below).
+We'll focus on the relationship of \code{mpg} (miles per gallon) to \code{horsepower}, as displayed in Figure \ref{fig:mpg-horsepower-polynomials} (a). The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2021, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^log-trans] Polynomial fits  for $p = 1$ to $5$ are shown in Figure \ref{fig:mpg-horsepower-polynomials} (a). The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the fit for $p = 5$ may over-fit the data by chasing one or two relatively high \code{mpg} values at the right (but see the CV results reported below).
 
-[^log-trans]: Although it serves to illustrate the use of CV, a polynomial is not the best choice here. Consider, for example the scatterplot for log-transformed `mpg` and `horsepower`, produced by `plot(mpg ~ horsepower, data=Auto, log="xy")` (execution of which is left to the reader). We revisit the \code{Auto} data in Section \ref{cross-validating-model-specification}.
+[^log-trans]: Although it serves to illustrate the use of CV, a polynomial is not the best choice here. Consider, for example the scatterplot for log-transformed \code{mpg} and \code{horsepower}, produced by \code{plot(mpg ~ horsepower, data=Auto, log="xy")} (execution of which is left to the reader). We revisit the \code{Auto} data in Section \ref{cross-validating-model-specification}.
 
 Figure \ref{fig:mpg-horsepower-polynomials} (b) shows two measures of estimated (squared) error as a function of polynomial-regression degree: The mean-squared error ("MSE"), defined as $\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$, and the usual residual variance, defined as $\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
 
-The generic `cv()` function has an `"lm"` method,
+The generic \code{cv()} function has an \code{"lm"} method,
 ```{r cv-lm-method}
 args(cv:::cv.lm)
 ```
@@ -175,7 +175,7 @@ The function reports the CV estimate of MSE, a bias-adjusted estimate of the MSE
 
 To perform LOO CV:
 
-```{r cv.lm-2`}
+```{r cv.lm-2}
 cv(m.auto, k = "loo")
 ```
 The \code{"hatvalues"} method reports only the CV estimate of MSE. Alternative methods are to use the Woodbury matrix identity or the "naive" approach of literally refitting the model with each case omitted. All three methods produce exact results for a linear model (within the precision of floating-point computations); for example:
@@ -319,7 +319,7 @@ The four data sets differ in the magnitude of between-cluster variance compared 
 
 The purpose of this section is to explain some of the complexities of cross-validating mixed-effects models, which motivates the approach that we take for mixed models in the \pkg{cv} package. The examples in this section introduce no features of the \pkg{cv} package that we haven't already encountered, and the generation of data for these examples involves unenlightening data management. Consequently, we don't show the code for data generation, model fitting, and graphs in this section.[^code-in-complements]  
 
-[^code-in-complements]: The code for this section is in the complementary materials for the paper. We used the `glmmTMB()` function in the \pkg{glmmTMB} package [@BrooksEtAl] for the models fit here because, in our experience, it is more likely to converge than functions in the \pkg{nlme} and the \pkg{lme4} packages for models with low between-cluster variance. We used the \pkg{lattice} [@Sarkar:2008] and \pkg{latticeExtra} [@SarkarAndrews:2022] packages for the graphs.
+[^code-in-complements]: The code for this section is in the complementary materials for the paper. We used the \code{glmmTMB()} function in the \pkg{glmmTMB} package [@BrooksEtAl] for the models fit here because, in our experience, it is more likely to converge than functions in the \pkg{nlme} and the \pkg{lme4} packages for models with low between-cluster variance. We used the \pkg{lattice} [@Sarkar:2008] and \pkg{latticeExtra} [@SarkarAndrews:2022] packages for the graphs.
 
 Consider a researcher studying the effect of the dosage $x$ of a drug on the severity of symptoms $y$ for a hypothetical disease. The researcher has longitudinal data on 20 patients, each of whom was observed on 5 occasions in which patients received different dosages of the drug.  The data are observational, with dosages prescribed by the patients' physicians, so that patients who were more severely affected by the disease received higher dosages of the drug.
 
@@ -385,7 +385,7 @@ Data <- within(
 ```{r plot1, echo=FALSE, cache=TRUE}
 #| out.width = "75%",
 #| fig.height = 2.5,
-#| fig.cap = "Data sets showing identical within-patient configurations with increasing between-patient variance. The labels above each panel show the ratio of between-patient SD to within-patient SD. The ellipses are estimated 50% Gaussian concentration ellipses for each patient. The population between-patient regression line, $E(y) = 10 + x$, is shown in each panel, where $y$ is symptoms and $x$ is dosage."
+#| fig.cap = "Data sets showing identical within-patient configurations with increasing between-patient variance. The labels above each panel show the ratio of between-patient SD to within-patient SD. The ellipses are estimated 50% Gaussian concentration ellipses for each patient. The population between-patient regression line, $\\E(y) = 10 + x$, is shown in each panel, where $y$ is symptoms and $x$ is dosage."
 library("lattice")
 library("latticeExtra")
 layer <- latticeExtra::layer # to avert conflicts with ggplot2::layer
@@ -401,7 +401,7 @@ xyplot(y ~ x | SD_ratio, data = Data, group = patient,
         panel.abline(a = 10, b = 1))
 ```
 
-Using data like these, a researcher may attempt to obtain an estimate of the within-patient effect of dosage by fitting mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variance at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models are sequentially nested in their fixed effects: (1) `~ 1`, intercept only; (2) `~ 1 + x`, intercept and effect of `x`; and (3) `~ 1 + x + xm`, intercept, effect of `x`, and a contextual variable, `xm`, consisting of the within-patient mean of `x`. The final model, (4) `~ 1 + I(x - xm)`, uses an intercept and the centered-within-group variable `x - xm`. We thus fit four models to four data sets for a total of 16 models.
+Using data like these, a researcher may attempt to obtain an estimate of the within-patient effect of dosage by fitting mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variance at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models are sequentially nested in their fixed effects: (1) \code{~ 1}, intercept only; (2) \code{~ 1 + x}, intercept and effect of \code{x}; and (3) \code{~ 1 + x + xm}, intercept, effect of \code{x}, and a contextual variable, \code{xm}, consisting of the within-patient mean of \code{x}. The final model, (4) \code{~ 1 + I(x - xm)}, uses an intercept and the centered-within-group variable \code{x - xm}. We thus fit four models to four data sets for a total of 16 models.
 
 ```{r model-fits,include=FALSE, cache=TRUE}
 model.formulas <- c(
@@ -489,17 +489,17 @@ useOuterStrips(re.plot)
 
 ```
 
-Data sets with relatively low between-patient variance result in strong shrinkage of fixed-effects predictions, and also of BLUPs, towards the between-patient relationship between `y` and `x` in the model with an intercept and `x` as fixed-effect predictors, `~ 1 + x`. The inclusion of the contextual variable `xm` in the model corrects this problem.
+Data sets with relatively low between-patient variance result in strong shrinkage of fixed-effects predictions, and also of BLUPs, towards the between-patient relationship between \code{y} and \code{x} in the model with an intercept and \code{x} as fixed-effect predictors, \code{~ 1 + x}. The inclusion of the contextual variable \code{xm} in the model corrects this problem.
 
-Although the BLUPs fit the observed data more closely than predictions based on fixed effects alone, the slopes of within-patient BLUPs do not conform to the within-patient slopes for the `~ 1 + x` model in the two data sets with the smallest between-patient variances. For data with a small between-patient variance, fixed-effects predictions for the `~ 1 + x` model have a slope that is close to the between-patient slope but provide better overall predictions than the fixed-effect predictions for data sets with larger between-subject variance.  With data whose between-patient variance is relatively large, predictions based on the model with a common intercept and slope for all clusters are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model.
+Although the BLUPs fit the observed data more closely than predictions based on fixed effects alone, the slopes of within-patient BLUPs do not conform to the within-patient slopes for the \code{~ 1 + x} model in the two data sets with the smallest between-patient variances. For data with a small between-patient variance, fixed-effects predictions for the \code{~ 1 + x} model have a slope that is close to the between-patient slope but provide better overall predictions than the fixed-effect predictions for data sets with larger between-subject variance.  With data whose between-patient variance is relatively large, predictions based on the model with a common intercept and slope for all clusters are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model.
 
-We therefore anticipate (and show later in this section) that case-based cross-validation may prefer the intercept-only model, `~ 1`  to the larger `~ 1 + x` model when the between-cluster variance is relatively small, but that cluster-based cross-validation will prefer the latter to the former. We will discover that case-based cross-validation prefers the `~ 1 + x` model to the `~ 1` model for the '5 / 2.5' data set, but cluster-based cross-validation prefers the latter model to the former. The situation is entirely reversed with the '8 / 2.5' data set. 
+We therefore anticipate (and show later in this section) that case-based cross-validation may prefer the intercept-only model, \code{~ 1}  to the larger \code{~ 1 + x} model when the between-cluster variance is relatively small, but that cluster-based cross-validation will prefer the latter to the former. We will discover that case-based cross-validation prefers the \code{~ 1 + x} model to the \code{~ 1} model for the '5 / 2.5' data set, but cluster-based cross-validation prefers the latter model to the former. The situation is entirely reversed with the '8 / 2.5' data set. 
 
-The third model, `~ 1 + x + xm`, includes a contextual effect of `x`---that is, the cluster mean `xm`---along with `x` and the intercept in the fixed-effect part of the model, and with a random intercept. This model is equivalent to fitting `y ~ I(x - xm) + xm + (1 | patient)`, which is the model that generated the data.  The fit of the mixed model `~ 1 + x + xm` is consequently similar to that of a fixed-effects-only model with `x` and a categorical predictor for individual patients (i.e., `y ~ factor(patient) + x`, treating patients as a factor, and not shown here). 
+The third model, \code{~ 1 + x + xm}, includes a contextual effect of \code{x}---that is, the cluster mean \code{xm}---along with \code{x} and the intercept in the fixed-effect part of the model, and with a random intercept. This model is equivalent to fitting \code{y ~ I(x - xm) + xm + (1 | patient)}, which is the model that generated the data.  The fit of the mixed model \code{~ 1 + x + xm} is consequently similar to that of a fixed-effects-only model with \code{x} and a categorical predictor for individual patients (i.e., \code{y ~ factor(patient) + x}, treating patients as a factor, and not shown here). 
 
 We next carry out case-based cross-validation, which, as we have explained, is based on both fixed and predicted random effects (i.e., BLUPs), and cluster-based cross-validation, which is based on fixed effects only.[^cv-list] The results for all data sets, using both cluster-based and case-based cross-validation, are assembled and shown in Figure \ref{fig:cross-validation-data-plot}.
 
-[^cv-list]: In order to reduce between-model random variability in comparisons of models on the same data set, we applied `cv()` to a list of models created by the `models()` function (introduced previously), performing cross-validation with the same folds for each model.
+[^cv-list]: In order to reduce between-model random variability in comparisons of models on the same data set, we applied \code{cv()} to a list of models created by the \code{models()} function (introduced previously), performing cross-validation with the same folds for each model.
 
 ```{r echo=FALSE,include=FALSE,cache=TRUE}
 library(cv) # unclear why it's necessary to reload cv
@@ -550,7 +550,7 @@ xyplot(clusters + cases ~ model|SD_ratio_i, dsummary,
        scales = list(y = list(log = TRUE, cex = 0.7), 
                      x = list(alternating = F, rot = 45, cex = 0.7))) 
 ```
-In summary, when between-cluster variance is relatively large, the model `~ 1 + x`, with `x` alone and without the contextual mean `xm` of `x`, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. In all of our examples, the model `~ 1 + x + xm`, which includes both `x` and its contextual mean, produces better results using both cluster-based and case-based CV.  These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
+In summary, when between-cluster variance is relatively large, the model \code{~ 1 + x}, with \code{x} alone and without the contextual mean \code{xm} of \code{x}, is assessed as fitting very poorly by cluster-based CV, but relatively much better by case-based CV. In all of our examples, the model \code{~ 1 + x + xm}, which includes both \code{x} and its contextual mean, produces better results using both cluster-based and case-based CV.  These conclusions are consistent with our observations based on graphing predictions from the various models, and they illustrate the desirability of assessing mixed-effect models at different hierarchical levels.
 
 # Cross-validating model specification
 
@@ -671,7 +671,7 @@ And the partial relationships in the model fit to the transformed data are much 
 crPlots(m.auto, pch = ".", ylab = "C+R", las = 2)
 ```
 
-After transforming both the numeric predictors and the response, we proceed to use the \code{stepAIC()} function in the \pkg{MASS} package to perform predictor selection, employing the BIC model-selection criterion (by setting the `k` argument of `stepAIC()` to $\log n$):
+After transforming both the numeric predictors and the response, we proceed to use the \code{stepAIC()} function in the \pkg{MASS} package to perform predictor selection, employing the BIC model-selection criterion (by setting the \code{k} argument of \code{stepAIC()} to $\log n$):
 ```{r stepAIC}
 library("MASS")
 m.step <- stepAIC(m, k = log(nrow(A)), trace = FALSE)
@@ -719,11 +719,11 @@ Some noteworthy points:
 
 [^recursive-cv]: What we call here "recursive CV" has also been termed "nested CV" [e.g., in the \pkg{cvms} package by @OlsenZachariae:2024]. We prefer, however, to reserve the term "nested CV" for the procedure described by @BatesHastieTibshirani:2023.
 
-In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of `mpg` to `horsepower` for the `Auto` data, saving the 10 models, named `m.1` through `m.10`, in the list `mlist`. We then used `cv()` to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
+In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of \code{mpg} to \code{horsepower} for the \code{Auto} data, saving the 10 models, named \code{m.1} through \code{m.10}, in the list \code{mlist}. We then used \code{cv()} to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
 
-If we select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
+If we select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function \code{selectModelList()}, which is suitable for use with \code{cv()}, implements this idea.
 
-Applying `selectModelList()` to the `Auto` polynomial-regression models, and using 10-fold CV, we obtain:
+Applying \code{selectModelList()} to the \code{Auto} polynomial-regression models, and using 10-fold CV, we obtain:
 ```{r recursive-CV-polynomials}
 recursiveCV.auto <- cv(selectModelList, data = Auto, 
                        working.model = mlist, save.model = TRUE, 
@@ -734,7 +734,7 @@ cv(mlist[[7]], seed = 2120)
 ```
 As expected, recursive CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model (using the same seed for \proglang{R}'s random-number generator to obtain the same folds).
 
-We can equivalently call `cv()` with the list of models as its first argument and set the argument `recursive=TRUE` (identical output not shown):
+We can equivalently call \code{cv()} with the list of models as its first argument and set the argument \code{recursive = TRUE} (identical output not shown):
 ```{r recursive-cv-alt, eval=FALSE}
 cv(mlist, data = Auto, seed = 2120, recursive = TRUE, save.model = TRUE)
 ```
@@ -834,7 +834,7 @@ cv.multinom <- function (model, data, criterion = BayesRuleMulti,
     )
   }
 ```
-That is, we simply call the default `cv()` method (via \code{NextMethod()}) with the `type` argument properly set. In addition to supplying the correct `type` argument, our method sets the default `criterion` for the `cv.multinom()` method to `BayesRuleMulti`. Adding the argument `criterion.name=` `deparse(substitute(criterion))` is inessential, but it insures that printed output will include the name of the criterion function that's employed, whether it's the default `BayesRuleMulti` or something else. Prior to invoking `NextMethod()`, we called `update()` with `trace=FALSE` to suppress the iteration history reported by default by `multinom()`---it would be tedious to see the iteration history for each fold. 
+That is, we simply call the default \code{cv()} method (via \code{NextMethod()}) with the \code{type} argument properly set. In addition to supplying the correct \code{type} argument, our method sets the default \code{criterion} for the \code{cv.multinom()} method to \code{BayesRuleMulti}. Adding the argument \code{criterion.name = deparse(substitute(criterion))} is inessential, but it insures that printed output will include the name of the criterion function that's employed, whether it's the default \code{BayesRuleMulti} or something else. Prior to invoking \code{NextMethod()}, we called \code{update()} with \code{trace = FALSE} to suppress the iteration history reported by default by \code{multinom()}---it would be tedious to see the iteration history for each fold. 
 
 Then:
 ```{r BEPS-cv}
