@@ -811,7 +811,7 @@ We check first whether the default \code{cv()} method works "out-of-the-box" for
 ```{r BEPS-test-default, error=TRUE}
 cv(m.beps, seed = 3465, criterion = BayesRuleMulti)
 ```
-The default method of \code{GetResponse()} (a function supplied by the \pkg{cv} package---see \code{?GetResponse}) fails for a \code{"multinom"} object. A straightforward solution is to supply a \code{GetResponse.multinom()} method that returns the factor response [using the `get_response()` function from the \pkg{insight} package, @LudeckeWaggonerMakowski:2019],
+The default method of \code{GetResponse()} (a function supplied by the \pkg{cv} package---see \code{?GetResponse}) fails for a \code{"multinom"} object. A straightforward solution is to supply a \code{GetResponse.multinom()} method that returns the factor response [using the \code{get\_response()} function from the \pkg{insight} package, @LudeckeWaggonerMakowski:2019],
 ```{r GetResponse.multinom}
 GetResponse.multinom <- function(model, ...) {
   insight::get_response(model)
