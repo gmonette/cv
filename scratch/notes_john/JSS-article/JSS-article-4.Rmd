@@ -11,9 +11,9 @@ author:
   - name: Georges Monette
     orcid: 0000-0003-0076-5532
     affiliation: 'York University'
-    # To add another line, use \AND at the end of the previous one as above
     address: |
       | Toronto, Ontario, Canada
+    email: \email{georges@yorku.ca}
 title:
   formatted: "\\pkg{cv}: An \\proglang{R} Package for Cross-Validating Regression Models"
   # If you use tex in the formatted title, also supply version without
