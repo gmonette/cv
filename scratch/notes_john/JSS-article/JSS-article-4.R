@@ -1,13 +1,16 @@
 # Replication Script for Fox and Monette,
 # cv: An R Package for Cross-Validating Regression Models
 
+# packages used: cv, car, microbenchmark, lme4, glmmTMB, lattice, latticeExtra,
+#    MASS, carData, nnet, effects, rsample, modeldata, purrr, ggplot2, caret
+
 # set some options
 options(digits=5)
 palette(car::carPalette())
 
 # code for Sec. 1: Introduction
 
-library("cv", quietly = TRUE)
+library("cv")
 methods("cv")
 
 # code for Sec. 2: Preliminary Example: Polynomial regression
@@ -42,6 +45,7 @@ for (p in 1:10){
 }
 
   # Fig. 1 (b)
+
 plot(c(1, 10), range(mse, var), type="n",
      xlab="Degree of polynomial, p",
      ylab="Estimated Squared Error")
@@ -55,7 +59,7 @@ legend("topright", inset=0.02,
   # the "lm" methods for cv()
 args(cv:::cv.lm)
 
-library("car", quietly = TRUE) # for brief() and other functions
+library("car") # for brief() and other functions
 
   # CV for second-degree polynomial
 
@@ -136,7 +140,7 @@ HSB <- within(HSB, {
 
     # fit mixed model
 
-library("lme4", quietly = TRUE)
+library("lme4")
 hsb.lmer <- lmer(mathach ~ mean.ses*cses + sector*cses
                    + (cses | school), data = HSB)
 S(hsb.lmer, brief = TRUE)
@@ -281,9 +285,7 @@ Datap$panel3 <- factor(sub(':BLUPs',' ', Data$panel2,), levels = levs3)
 
       # Fig. 4
 
-{ library("lattice")
-  library("latticeExtra")
-  xyplot(y ~ x | SD_ratio * panel3, Data,
+{ xyplot(y ~ x | SD_ratio * panel3, Data,
          groups = patient, type = 'n',
          drop.unused.levels = F,
          par.strip.text = list(cex = 0.4),
@@ -462,7 +464,7 @@ cv(mlist, data = Auto, seed = 2120, recursive = TRUE, save.model = TRUE)
 data("BEPS", package = "carData")
 summary(BEPS)
 
-library("nnet", quietly = TRUE)
+library("nnet")
 m.beps <- multinom(vote ~ age + gender + economic.cond.national
                         + economic.cond.household + Blair + Hague
                         + Kennedy + Europe * political.knowledge,
@@ -555,7 +557,7 @@ holdout_results <- function(splits, ...) {
   res
 }
 
-library("purrr", warn.conflicts=FALSE)
+library("purrr")
 
 rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
 rs_obj$accuracy <- map_dbl(rs_obj$results, function(x) mean(x$correct))
@@ -575,8 +577,8 @@ mean(((attrition$Attrition == "Yes") - round(yhat)) ^ 2)
 
     # LOO CV for the example using the caret package
 
-library("ggplot2", warn.conflicts = FALSE)
-library("caret", quietly = TRUE)
+library("ggplot2")
+library("caret")
 train(x = attrition[, c("JobSatisfaction", "Gender", "MonthlyIncome")],
       y = attrition$Attrition, method = "glm",
       trControl = trainControl(method = "LOOCV"))
