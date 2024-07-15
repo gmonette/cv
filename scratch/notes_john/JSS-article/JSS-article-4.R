@@ -4,6 +4,29 @@
 # packages used: cv, car, microbenchmark, lme4, glmmTMB, lattice, latticeExtra,
 #    MASS, carData, nnet, effects, rsample, modeldata, purrr, ggplot2, caret
 
+# session info at the start of the session
+# > sessionInfo()
+# R version 4.4.1 (2024-06-14)
+# Platform: aarch64-apple-darwin20
+# Running under: macOS Sonoma 14.5
+#
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+#
+# locale:
+# [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+#
+# time zone: America/Toronto
+# tzcode source: internal
+#
+# attached base packages:
+# [1] stats     graphics  grDevices utils     datasets  methods
+# [7] base
+#
+# loaded via a namespace (and not attached):
+# [1] compiler_4.4.1    tools_4.4.1       rstudioapi_0.16.0
+
 # set some options
 options(digits=5)
 palette(car::carPalette())
@@ -152,7 +175,7 @@ cv(hsb.lmer, k = 10, clusterVariables = "school", seed = 5240)
 
     # case-based CV
 
-cv(hsb.lmer, seed = 1575)
+cv(hsb.lmer, seed = 1575) # note one convergence failure
 
 
   # Sec. 3.2. Example: Contrasting cluster-based and case-based CV
@@ -442,6 +465,8 @@ cvs <- cv(selectTransStepAIC, data = Auto, seed = 76692,
           response = "mpg", AIC = FALSE)
 cvs
 
+compareFolds(cvs)
+
   # Sec. 4.2: Example: Applying recursive CV to polynomial regression for the Auto data
 
 recursiveCV.auto <- cv(selectModelList, data = Auto,
@@ -632,13 +657,13 @@ print(microbenchmark::microbenchmark(
 # LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
 #
 # locale:
-#   [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+# [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 #
 # time zone: America/Toronto
 # tzcode source: internal
 #
 # attached base packages:
-#   [1] parallel  stats     graphics  grDevices utils     datasets
+# [1] parallel  stats     graphics  grDevices utils     datasets
 # [7] methods   base
 #
 # other attached packages:
