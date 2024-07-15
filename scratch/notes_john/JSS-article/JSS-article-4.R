@@ -77,6 +77,7 @@ m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data = Auto)
 boot::cv.glm(Auto, m.auto.glm)$delta # MSE, biased-corrected MSE
 
 set.seed(19412)
+# set times = 100 for greater precision (and patience)
 print(microbenchmark::microbenchmark(
   hatvalues = cv(m.auto, k = "loo"),
   Woodbury = cv(m.auto, k = "loo", method = "Woodbury"),
@@ -312,9 +313,6 @@ Datap$panel3 <- factor(sub(':BLUPs',' ', Data$panel2,), levels = levs3)
 } -> re.plot
 useOuterStrips(re.plot)
 
-
-.opts <- options(warn = -2)
-
       # case-based and cluster-based CV for various data/model combinations
 
 model_lists <- lapply(fits, function(fitlist) do.call(models, fitlist))
@@ -514,6 +512,7 @@ GetResponse.multinom <- function(model, ...) {
 head(GetResponse(m.beps))
 
     # try it out (still fails)
+
 cv(m.beps, seed = 3465, criterion = BayesRuleMulti)
 traceback()
 
@@ -594,6 +593,7 @@ all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy),
     # comparative timings for the various computations
 
 set.seed(53437)
+# set times = 100 for greater precision (and much greater patience)
 print(microbenchmark::microbenchmark(
   cv.hatvalues = cv(mod.attrition, k = "loo", criterion = BayesRule,
                     method = "hatvalues"),
@@ -621,3 +621,63 @@ print(microbenchmark::microbenchmark(
               trControl = trainControl(method = "LOOCV")),
   times = 10, unit = "relative"), signif = 3)
 
+# session info at end of script:
+# > sessionInfo()
+# R version 4.4.1 (2024-06-14)
+# Platform: aarch64-apple-darwin20
+# Running under: macOS Sonoma 14.5
+#
+# Matrix products: default
+# BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+# LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+#
+# locale:
+#   [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+#
+# time zone: America/Toronto
+# tzcode source: internal
+#
+# attached base packages:
+#   [1] parallel  stats     graphics  grDevices utils     datasets
+# [7] methods   base
+#
+# other attached packages:
+# [1] caret_6.0-94        ggplot2_3.5.1       purrr_1.0.2
+# [4] rsample_1.2.1       nnet_7.3-19         MASS_7.3-61
+# [7] latticeExtra_0.6-30 lattice_0.22-6      glmmTMB_1.1.9
+# [10] lme4_1.1-35.5       Matrix_1.7-0        car_3.1-3
+# [13] carData_3.0-5       cv_2.0.1            doParallel_1.0.17
+# [16] iterators_1.0.14    foreach_1.5.2
+#
+# loaded via a namespace (and not attached):
+# [1] DBI_1.2.3             pROC_1.18.5           deldir_2.0-4
+# [4] sandwich_3.1-0        rlang_1.1.4           magrittr_2.0.3
+# [7] multcomp_1.4-25       furrr_0.3.1           e1071_1.7-14
+# [10] compiler_4.4.1        mgcv_1.9-1            png_0.1-8
+# [13] vctrs_0.6.5           reshape2_1.4.4        stringr_1.5.1
+# [16] pkgconfig_2.0.3       fastmap_1.2.0         backports_1.5.0
+# [19] utf8_1.2.4            rmarkdown_2.27        prodlim_2024.06.25
+# [22] nloptr_2.1.1          xfun_0.45             recipes_1.0.10
+# [25] jpeg_0.1-10           broom_1.0.6           R6_2.5.1
+# [28] stringi_1.8.4         RColorBrewer_1.1-3    parallelly_1.37.1
+# [31] boot_1.3-30           rpart_4.1.23          lubridate_1.9.3
+# [34] numDeriv_2016.8-1.1   Rcpp_1.0.12           knitr_1.47
+# [37] future.apply_1.11.2   zoo_1.8-12            splines_4.4.1
+# [40] timechange_0.3.0      tidyselect_1.2.1      rstudioapi_0.16.0
+# [43] effects_4.2-3         abind_1.4-5           yaml_2.3.8
+# [46] timeDate_4032.109     TMB_1.9.13            codetools_0.2-20
+# [49] listenv_0.9.1         tibble_3.2.1          plyr_1.8.9
+# [52] withr_3.0.0           evaluate_0.24.0       future_1.33.2
+# [55] survival_3.7-0        proxy_0.4-27          survey_4.4-2
+# [58] pillar_1.9.0          stats4_4.4.1          insight_0.20.1
+# [61] generics_0.1.3        munsell_0.5.1         scales_1.3.0
+# [64] minqa_1.2.7           globals_0.16.3        class_7.3-22
+# [67] glue_1.7.0            tools_4.4.1           interp_1.1-6
+# [70] data.table_1.15.4     ModelMetrics_1.2.2.2  gower_1.0.1
+# [73] mvtnorm_1.2-5         grid_4.4.1            tidyr_1.3.1
+# [76] mitools_2.4           ipred_0.9-14          colorspace_2.1-0
+# [79] nlme_3.1-165          Formula_1.2-5         cli_3.6.3
+# [82] fansi_1.0.6           lava_1.8.0            dplyr_1.1.4
+# [85] gtable_0.3.5          digest_0.6.36         TH.data_1.1-2
+# [88] htmltools_0.5.8.1     lifecycle_1.0.4       hardhat_1.4.0
+# [91] microbenchmark_1.4.10
