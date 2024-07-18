@@ -62,6 +62,11 @@ for (p in 1:5){
 legend("topright", legend=1:5, col=2:6, lty=1:5, lwd=4,
        title="Degree", inset=0.02)
 
+# (preferable to polynomial regression:)
+
+plot(mpg ~ horsepower, data=Auto, log="xy")
+abline(lm(log10(mpg) ~ log10(horsepower), data=Auto), lwd=2)
+
 var <- mse <- numeric(10)
 for (p in 1:10){
   m <- lm(mpg ~ poly(horsepower, p), data=Auto)
