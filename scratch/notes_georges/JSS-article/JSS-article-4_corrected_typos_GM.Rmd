@@ -13,7 +13,8 @@ author:
     affiliation: 'York University'
     address: |
       | Toronto, Ontario, Canada
-    email: \email{georges@yorku.ca}
+    email: \email
+    url: http://blackwell.math.yorku.ca/gmonette
 title:
   formatted: "\\pkg{cv}: An \\proglang{R} Package for Cross-Validating Regression Models"
   # If you use tex in the formatted title, also supply version without
@@ -76,7 +77,7 @@ A number of existing \proglang{R} packages include functions for cross-validatin
 
 The final section of the paper (Section \ref{computational-notes}) describes some computational details, including efficient CV computations for linear and generalized-linear models. and computation of bias-corrected CV criteria.
 
-In the interest of brevity, we won't describe all of the features of the \pkg{cv} package here, concentrating on the aspects of the package that are relatively novel. For example, the \code{cv()} function can perform computations in parallel and can independently replicate a cross-validation procedure several times. There are also data management facilities in the package, such as coercing the objects produced by the \code{cv()} function into data frames for further analysis. These and other features not discussed in this paper are taken up in the vignettes distributed with the package, which also provides greater detail on some of topics that we do describe, such as extensions to the package.
+In the interest of brevity, we won't describe all of the features of the \pkg{cv} package here, concentrating on the aspects of the package that are relatively novel. For example, the \code{cv()} function can perform computations in parallel and can independently replicate a cross-validation procedure several times. There are also data management facilities in the package, such as coercing the objects produced by the \code{cv()} function into data frames for further analysis. These and other features not discussed in this paper are taken up in the vignettes distributed with the package, which also provide greater detail on some topics that we do describe, such as extensions to the package.
 
 # Preliminary Example: Polynomial regression
 
@@ -957,7 +958,7 @@ Computing time for \pkg{rsample} and \pkg{caret} for this problem is similar to 
 
 ## Efficient computations for linear and generalized linear models
 
-The most straightforward way to implement cross-validation in \proglang{R} for statistical modeling functions that are written in the canonical manner is to use \code{update()} to refit the model with each fold removed. This is the approach taken in the default method for \code{cv()}, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds in modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.
+The most straightforward way to implement cross-validation in \proglang{R} for statistical modeling functions that are written in the canonical manner is to use \code{update()} to refit the model with each fold removed. This is the approach taken in the default method for \code{cv()}, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds is modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.
 
 The \code{"lm"} and \code{"glm"} methods for \code{cv()} take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the weight matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
 
@@ -967,13 +968,13 @@ $$
   \mathbf{X}^\top \mathbf{W} \mathbf{y}
 $$ 
 
-[^WLS]: This is a definitional formula, which assumes that the model matrix $\mathbf{X}$ is of full column rank, and which can be subject to numerical instability when $\mathbf{X}$ is ill-conditioned. \code{lm()} uses the singular-value decomposition of the model matrix to obtain computationally more stable results.
+[^WLS]: This is a definitional formula, which assumes that the model matrix $\mathbf{X}$ is of full column rank, and which can be subject to numerical instability when $\mathbf{X}$ is ill-conditioned. \code{lm()} uses the QR decomposition of the model matrix with pivoting to obtain computationally more stable results.
 
 Fitted values are then $\widehat{\mathbf{y}} = \mathbf{X}\mathbf{b}_{\mathrm{WLS}}$.
 
 The LOO fitted value for the $i$th case can be efficiently computed by $\widehat{y}_{-i} = y_i - e_i/(1 - h_i)$ where $h_i = \mathbf{x}^\top_i \left( \mathbf{X}^\top \mathbf{W} \mathbf{X} \right)^{-1} \mathbf{x}_i$ (the so-called "hatvalue"). Here, $\mathbf{x}^\top_i$ is the $i$th row of $\mathbf{X}$, and $\mathbf{x}_i$ is the $i$th row written as a column vector. This approach can break down when one or more hatvalues are equal to 1, in which case the formula for $\widehat{y}_{-i}$ requires division by 0. In this case, the "training" set omitting the observation with hatvalue = 1 is rank-deficient and the predictors for the left-out case are outside the linear span of the predictors in the training set.
 
-To compute cross-validated fitted values when the folds contain more than one case, we make use of the Woodbury matrix identify [@Hager:1989],
+To compute cross-validated fitted values when the folds contain more than one case, we make use of the Woodbury matrix identity [@Hager:1989],
 $$
 \left(\mathbf{A}_{m \times m} + \mathbf{U}_{m \times k} 
 \mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} = \mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} + 
