@@ -408,7 +408,7 @@ Auto$name <- NULL
 
     # scatterplot matrix of numeric variables
 
-      # Fig. 6 (a)
+      # Fig. 6
 
 scatterplotMatrix(~ mpg + displacement + horsepower + weight
                   + acceleration,
@@ -418,7 +418,7 @@ scatterplotMatrix(~ mpg + displacement + horsepower + weight
 
 m.auto <- lm(mpg ~ ., data = Auto)
 
-      # Fig. 6 (b)
+      # Fig. 7
 
 crPlots(m.auto, pch = ".", ylab = "C+R", las = 2)
 
@@ -444,13 +444,13 @@ m <- update(m.auto, data = A)
 summary(powerTransform(m))
 m <- update(m, log(mpg) ~ .)
 
-      # Fig. 7 (a)
+      # Fig. 8
 
 scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight
                   + acceleration,
                   smooth=list(spread = FALSE), data = A, pch = ".")
 
-      # Fig. 7 (b)
+      # Fig. 9
 
 crPlots(m.auto, pch = ".", ylab = "C+R", las = 2)
 
@@ -502,7 +502,7 @@ m.beps <- multinom(vote ~ age + gender + economic.cond.national
 
     # effect plot for the Europe x political knowledge interaction
 
-    # Fig. 8
+    # Fig. 10
 
 plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
             xlevels = list(Europe = 1:11, political.knowledge = 0:3),
