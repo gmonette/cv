@@ -10,7 +10,8 @@ knitr::opts_chunk$set(
   dev = "png",
   comment = "#>" #,
 )
-
+library(cv)
+library(lme4)
 # save some typing
 knitr::set_alias(w = "fig.width",
                  h = "fig.height",
@@ -26,7 +27,6 @@ colorize <- function(x, color) {
   } else x
 }
 
-
 .opts <- options(digits = 5)
 
 ## ----HSB-data-----------------------------------------------------------------
@@ -40,225 +40,201 @@ dim(MathAchSchool)
 head(MathAchSchool, 2)
 tail(MathAchSchool, 2)
 
-## ----data---------------------------------------------------------------------
-# Parameters:
-set.seed(9693)
-Nb <- 100     # number of groups
-Nw <- 5       # number of individuals within groups
-Bb <- 0       # between-group regression coefficient on group mean
-SDre <-
-  2.0   # between-group SD of random level relative to group mean of x
-SDwithin <- 0.5  # within group SD
-Bw <- 1          # within group effect of x
-Ay <- 10         # intercept for response
-Ax <- 20         # starting level of x
-Nx <- Nw * 10    # number of distinct x values
+## ----include=FALSE, echo=FALSE------------------------------------------------
+library("glmmTMB") # necessary for some reason to knit vignette in RStudio, harmless otherwise
 
-Data <- data.frame(group = factor(rep(1:Nb, each = Nw)),
-                   x = Ax + rep(1:Nx, length.out = Nw * Nb)) |>
+## ----parameters---------------------------------------------------------------
+
+# Parameters:
+
+Nb <- 20     # number of patients
+Nw <- 5      # number of occasions for each patient
+
+Bb <- 1.0    # between-patient regression coefficient on patient means
+Bw <- -0.5   # within-patient effect of x
+
+SD_between <- c(0, 5, 6, 8)               # SD between patients
+SD_within <- rep(2.5, length(SD_between)) # SD within patients
+
+Nv <- length(SD_within)       # number of variance profiles
+SD_ratio <- paste0('SD ratio = ', SD_between,' / ',SD_within)
+SD_ratio <- factor(SD_ratio, levels = SD_ratio)
+
+set.seed(833885) 
+
+Data_template <- expand.grid(patient = 1:Nb, obs = 1:Nw) |>
   within({
-    xm  <- ave(x, group, FUN = mean) # within-group mean
-    y <- Ay +
-      Bb * xm +                      # contextual effect
-      Bw * (x - xm) +                # within-group effect
-      rnorm(Nb, sd = SDre)[group] +  # random level by group
-      rnorm(Nb * Nw, sd = SDwithin)  # random error within groups
+    xw <- seq(-2, 2, length.out = Nw)[obs]
+    x <- patient + xw
+    xm  <- ave(x, patient)   # within-patient mean
+
+    # Scaled random error within each SD_ratio_i group
+
+    re_std <- scale(resid(lm(rnorm(Nb*Nw) ~ x)))
+    re_between <- ave(re_std, patient)
+    re_within <- re_std - re_between
+    re_between <- scale(re_between)/sqrt(Nw)
+    re_within <- scale(re_within)
   })
+
+Data <- do.call(
+  rbind,
+  lapply(
+    1:Nv,
+    function(i) {
+      cbind(Data_template, SD_ratio_i = i)
+    }
+  )
+)
+
+Data <- within(
+  Data,
+  {
+    SD_within_ <- SD_within[SD_ratio_i]
+    SD_between_ <- SD_between[SD_ratio_i]
+    SD_ratio <- SD_ratio[SD_ratio_i]
+    y <- 10 +
+      Bb * xm +                  # contextual effect
+      Bw * (x - xm) +            # within-patient effect
+      SD_within_ * re_within +   # within patient random effect
+      SD_between_ * re_between   # adjustment to between patient random effect
+  }
+)
 
 ## ----plot1--------------------------------------------------------------------
 library("lattice")
 library("latticeExtra")
-plot <- xyplot(
-  y ~ x,
-  data = Data[1:Nx,],
-  group = group,
-  ylim = c(4, 16),
-  par.settings = list(superpose.symbol = list(pch = 1, cex =
-                                                0.7))
-) +
-  layer(panel.ellipse(..., center.cex = 0))
+plot <- xyplot(y ~ x | SD_ratio, data = Data, group = patient,
+           layout = c(Nv, 1),
+           par.settings = list(superpose.symbol = list(pch = 1, cex = 0.7))) +
+      layer(panel.ellipse(..., center.pch = 16, center.cex = 1.5,  
+                          level = 0.5),
+            panel.abline(a = 10, b = 1))
 plot # display graph
 
-## -----------------------------------------------------------------------------
-summary(lm(y ~ x, data=Data))
-
-## ----include=FALSE, echo=FALSE------------------------------------------------
-library(lme4) # necessary for some reason to knit vignette in RStudio, harmless otherwise
-
-## -----------------------------------------------------------------------------
-# random intercept only:
-mod.0 <- lmer(y ~ 1 + (1 | group), Data)
-summary(mod.0)
-
-## -----------------------------------------------------------------------------
-# effect of x and random intercept:
-mod.1 <- lmer(y ~ x + (1 | group), Data)
-
-# effect of x, contextual (student) mean of x, and random intercept:
-mod.2 <- lmer(y ~ x + xm + (1 | group), Data)
-        # equivalent to y ~ I(x - xm) + xm + (1 | group)
-
-# model generating the data (where Bb = 0)
-mod.3 <- lmer(y ~ I(x - xm) + (1 | group), Data)
-
-## -----------------------------------------------------------------------------
-Data <- within(Data, {
-  fit_mod0.fe <- predict(mod.0, re.form = ~ 0) # fixed effects only
-  fit_mod0.re <- predict(mod.0) # fixed and random effects (BLUPs)
-  fit_mod1.fe <- predict(mod.1, re.form = ~ 0)
-  fit_mod1.re <- predict(mod.1)
-  fit_mod2.fe <- predict(mod.2, re.form = ~ 0)
-  fit_mod2.re <- predict(mod.2)
-  fit_mod3.fe <- predict(mod.3, re.form = ~ 0)
-  fit_mod3.re <- predict(mod.3)
-})
-
-## -----------------------------------------------------------------------------
-Data_long <- reshape(Data[1:Nx, ], direction = "long", sep = ".", 
-              timevar = "effect", varying = grep("\\.", names(Data[1:Nx, ])))
-Data_long$id <- 1:nrow(Data_long)
-Data_long <- reshape(Data_long, direction = "long", sep = "_", 
-              timevar = "modelcode",  varying = grep("_", names(Data_long)))
-Data_long$model <- factor(
-  c("~ 1", "~ 1 + x", "~ 1 + x + xm", "~ 1 + I(x - xm)")
-  [match(Data_long$modelcode, c("mod0", "mod1", "mod2", "mod3"))]
+## ----model-fits---------------------------------------------------------------
+model.formulas <- c(
+  ' ~ 1'             =  y ~ 1 + (1 | patient),
+  '~ 1 + x'          =  y ~ 1 + x + (1 | patient),
+  '~ 1 + x + xm'     =  y ~ 1 + x + xm + (1 | patient),
+  '~ 1 + I(x - xm)'  =  y ~ 1 + I(x - xm) + (1 | patient)
 )
 
-## ----plot-fits-mod0-----------------------------------------------------------
-(
-  plot +
-    xyplot(
-      fit ~ x,
-      subset(Data_long, modelcode == "mod0" & effect == "fe"),
-      groups = group,
-      type = "l",
-      lwd = 2
-    ) +
-    xyplot(
-      fit ~ x,
-      subset(Data_long, modelcode == "mod0" &  effect == "re"),
-      groups = group,
-      type = "l",
-      lwd = 2,
-      lty = 3
-    )
-) |> update(
-  main="Model: y ~ 1 + (1 | group)",
-  key=list(
-    corner=c(0.05, 0.05),
-    text=list(c("fixed effects only","fixed and random")),
-    lines=list(lty=c(1, 3))))
+fits <- lapply(split(Data, ~ SD_ratio),
+               function(d) {
+                 lapply(model.formulas, function(form) {
+                   glmmTMB(form, data = d)
+                 })
+               })
 
-## -----------------------------------------------------------------------------
-summary(mod.1)
+## ----predict------------------------------------------------------------------
+# predicted fixed and random effects:
+pred.BLUPs <- lapply(fits, lapply, predict)
+# predicted fixed effects:
+pred.fixed <- lapply(fits, lapply, predict, re.form = ~0)  
 
-## ----plot-fits-mod1-----------------------------------------------------------
-(
-  plot +
-    xyplot(
-      fit ~ x,
-      subset(Data_long, modelcode == "mod1" & effect == "fe"),
-      groups = group,
-      type = "l",
-      lwd = 2
-    ) +
-    xyplot(
-      fit ~ x,
-      subset(Data_long, modelcode == "mod1" & effect == "re"),
-      groups = group,
-      type = "l",
-      lwd = 2,
-      lty = 3
-    )
-) |> update(
-  main="Model: y ~ 1 + x + (1 | group)",
-  ylim=c(-15, 35),
-  key=list(
-    corner=c(0.95, 0.05),
-    text=list(c("fixed effects only","fixed and random")),
-    lines=list(lty=c(1, 3))))
+## ----data-predictions---------------------------------------------------------
+Dataf <- lapply(split(Data, ~ SD_ratio),
+                    function(d) {
+                      lapply(names(model.formulas), 
+                             function(form) cbind(d, formula = form))
+                    }) |> 
+             lapply(function(dlist) do.call(rbind, dlist)) |> 
+             do.call(rbind, args = _)
+    
+Dataf <- within(
+  Dataf,
+  {
+    pred.fixed <- unlist(pred.fixed)
+    pred.BLUPs <- unlist(pred.BLUPs)
+    panel <- factor(formula, levels = c(names(model.formulas), 'data'))
+  }
+)
 
-## -----------------------------------------------------------------------------
-summary(mod.2)
+Data$panel <- factor('data', levels = c(names(model.formulas), 'data'))
 
-## ----plot-fits-mod2-----------------------------------------------------------
-(
-  plot +
-    xyplot(
-      fit ~ x,
-      subset(Data_long, modelcode == "mod2" & effect == "fe"),
-      groups = group,
-      type = "l",
-      lwd = 2
-    ) +
-    xyplot(
-      fit ~ x,
-      subset(Data_long, modelcode == "mod2" & effect == "re"),
-      groups = group,
-      type = "l",
-      lwd = 2,
-      lty = 3
-    )
-) |> update(
-  main="Model: y ~ 1 + x + xm + (1 | group)",
-  ylim=c(4, 16),
-  key=list(
-    corner=c(0.05, 0.05),
-    text=list(c("fixed effects only","fixed and random")),
-    lines=list(lty=c(1, 3))))
+## ----plot-fits-fixed----------------------------------------------------------
+{
+  xyplot(y ~ x |SD_ratio * panel, Data,
+         groups = patient, type = 'n', 
+         par.strip.text = list(cex = 0.7),
+         drop.unused.levels = FALSE) +
+    glayer(panel.ellipse(..., center.pch = 16, center.cex = 0.5,  
+                         level = 0.5),
+           panel.abline(a = 10, b = 1)) +
+    xyplot(pred.fixed  ~ x |SD_ratio * panel, Dataf, type = 'l', 
+           groups = patient,
+           drop.unused.levels = F,
+           ylab = 'fixed-effect predictions') 
+}|> 
+  useOuterStrips() |> print()
 
-## -----------------------------------------------------------------------------
-summary(mod.3)
-
-## ----plot-fits-mod3-----------------------------------------------------------
-(
-  plot +
-    xyplot(
-      fit ~ x,
-      subset(Data_long, modelcode == "mod3" & effect == "fe"),
-      groups = group,
-      type = "l",
-      lwd = 2
-    ) +
-    xyplot(
-      fit ~ x,
-      subset(Data_long, modelcode == "mod3" & effect == "re"),
-      groups = group,
-      type = "l",
-      lwd = 2,
-      lty = 3
-    )
-) |> update(
-  main="Model: y ~ 1 + I(x - xm) + (1 | group)",
-  ylim=c(4, 16),
-  key=list(
-    corner=c(0.05, 0.05),
-    text=list(c("fixed effects only","fixed and random")),
-    lines=list(lty=c(1, 3))))
+## ----plot-fits-blups----------------------------------------------------------
+{
+  xyplot(y ~ x | SD_ratio * panel, Data,
+         groups = patient, type = 'n',
+         drop.unused.levels = F, 
+         par.strip.text = list(cex = 0.7),
+         ylab = 'fixed- and random-effect predictions (BLUPS)') +
+    glayer(panel.ellipse(..., center.pch = 16, center.cex = 0.5,  
+                         level = 0.5),
+           panel.abline(a = 10, b = 1)) +
+    xyplot(pred.BLUPs  ~ x | SD_ratio * panel, Dataf, type = 'l', 
+           groups = patient,
+           drop.unused.levels = F) 
+}|> 
+  useOuterStrips() |> print()
 
 ## ----echo=FALSE,include=FALSE-------------------------------------------------
 library(cv) # unclear why it's necessary to reload cv
+.opts <- options(warn = -2) 
 
-## ----cross-validation-clusters------------------------------------------------
-modlist <- models(
-  "~ 1" = mod.0,
-  "~ 1 + x" = mod.1,
-  "~ 1 + x + xm" = mod.2,
-  "~ 1 + I(x - xm)" = mod.3
-)
+## ----cross-validation,cache=TRUE----------------------------------------------
+
+model_lists <- lapply(fits, function(fitlist) do.call(models, fitlist))
+
+cvs_cases <-
+  lapply(1:Nv,
+         function(i){
+           cv(model_lists[[i]], k = 10, 
+              data = split(Data, ~ SD_ratio)[[i]])
+         })
+
 cvs_clusters <-
-  cv(
-    modlist,
-    data = Data,
-    cluster = "group",
-    k = 10,
-    seed = 6449
-  )
-plot(cvs_clusters, main = "Model Comparison, Cluster-Based CV")
+  lapply(1:Nv,
+         function(i){
+           cv(model_lists[[i]],  k = 10, 
+              data = split(Data, ~SD_ratio)[[i]], 
+              clusterVariables = 'patient')
+         })
 
-## ----cross-validation-cases---------------------------------------------------
-cvs_cases <- cv(modlist, data = Data, seed = 9693)
-plot(cvs_cases, main = "Model Comparison, Case-Based CV")
+## ----plot-cv-example----------------------------------------------------------
+plot(cvs_clusters[[2]], main="Comparison of Fixed Effects")
+
+## ----cross-validation-data----------------------------------------------------
+names(cvs_clusters) <- names(cvs_cases) <- SD_ratio 
+dsummary <- expand.grid(SD_ratio_i = names(cvs_cases), model = names(cvs_cases[[1]]))
+
+dsummary$cases <-
+  sapply(1:nrow(dsummary), function(i){
+    with(dsummary[i,], cvs_cases[[SD_ratio_i]][[model]][['CV crit']])
+  })
+
+dsummary$clusters <-
+  sapply(1:nrow(dsummary), function(i){
+    with(dsummary[i,], cvs_clusters[[SD_ratio_i]][[model]][['CV crit']])
+  })
+
+## ----cross-validation-data-plot-----------------------------------------------
+xyplot(cases + clusters ~ model|SD_ratio_i, dsummary,
+       auto.key = list(space = 'top', reverse.rows = T, columns = 2), type = 'b',
+       xlab = "Fixed Effects",
+       ylab = 'CV criterion (MSE)',
+       layout= c(Nv,1),
+       par.settings =
+         list(superpose.line=list(lty = c(2, 3), lwd = 3),
+              superpose.symbol=list(pch = 15:16, cex = 1.5)),
+       scales = list(y = list(log = TRUE), x = list(alternating = F, rot = 60))) |> print()
 
 ## ----pigs---------------------------------------------------------------------
 head(Pigs, 9)

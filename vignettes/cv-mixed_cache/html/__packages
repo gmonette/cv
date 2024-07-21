@@ -6,3 +6,6 @@ iterators
 doParallel
 cv
 nlme
+glmmTMB
+lattice
+latticeExtra
