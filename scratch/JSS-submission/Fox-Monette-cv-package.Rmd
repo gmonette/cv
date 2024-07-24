@@ -600,8 +600,8 @@ A comment before we proceed: \code{origin} is clearly categorical and so convert
 We start with a "working model" that specifies linear partial relationships of the response to the numeric predictors:
 
 ```{r Auto-explore-cr-plots}
-#| out.width = "75%",
-#| fig.height = 4.5,
+#| out.width = "70%",
+#| fig.height = 4.25,
 #| fig.align = 'center',
 #| fig.cap = "Component + residual plots for the numeric predictors in the working model fit to the \\code{Auto} data."
 m.auto <- lm(mpg ~ ., data = Auto)
@@ -651,9 +651,9 @@ scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight
 And the partial relationships in the model fit to the transformed data are much more nearly linear (cf., Figure \ref{fig:Auto-explore-cr-plots}, on page \pageref{fig:Auto-explore-cr-plots}, and Figure \ref{fig:Auto-transformed-cr-plots}:
 
 ```{r Auto-transformed-cr-plots}
-#| out.width = "75%",
+#| out.width = "70%",
 #| fig.align = 'center',
-#| fig.height = 4.5,
+#| fig.height = 4.25,
 #| fig.cap = "Component + residual plots for the regression model fit to the transformed \\code{Auto} data."
 crPlots(m, terms = ~ displacement + horsepower + weight + acceleration, 
         pch = ".", ylab = "C+R", las = 2)
