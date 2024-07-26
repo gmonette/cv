@@ -46,7 +46,7 @@ library(car)     # included this to avoid scatterplotMatrix() error
 
 Cross-validation (CV) is an essentially simple and intuitively reasonable approach to estimating the predictive accuracy of regression models. CV is developed in many standard sources on regression modeling and "machine learning"---we particularly recommend @JamesEtAl:2021 [Secs. 5.1, 5.3]---and so we will describe the method only briefly here before taking up computational issues and some examples. See @ArlotCelisse:2010 for a wide-ranging, if technical, survey of cross-validation and related methods that emphasizes the statistical properties of CV.
 
-Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common [see, e.g., @Barnard:1974]: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit a statistical model; and then the second part is used to assess the adequacy of the model fit to the first part of the data. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, the results can vary substantially based on the random division of the data, particularly in smaller samples. See @Harrell:2015 [Sec. 5.3] for cogent remarks about data-division and cross-validation.
+Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common [see, e.g., @Barnard:1974]: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit (in the language of machine leaning, "train") a statistical model; and then the second part is used to assess the adequacy of ("validate") the model fit to the first part of the data. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, the results can vary substantially based on the random division of the data, particularly in smaller samples. See @Harrell:2015 [Sec. 5.3] for cogent remarks about data-division and cross-validation.
 
 Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the cases in the omitted fold. A CV criterion (also termed a "cost" or "loss" measure), such as the mean-squared error ("MSE") of prediction, is then computed using these predicted values. In the extreme, $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
 
@@ -56,7 +56,7 @@ Because predictions are based on smaller data sets, each of size approximately $
 
 The relative *variance* of prediction error for LOO CV and $k$-fold CV (with $k < n$) is more complicated: Because the overlap between the data sets with each fold omitted is smaller for $k$-fold CV than for LOO CV, the dependencies among the predictions are smaller for the former than for the latter, tending to produce smaller variance in prediction error for $k$-fold CV. In contrast, there are factors that tend to inflate the variance of prediction error in $k$-fold CV, including the reduced size of the data sets with each fold omitted and the randomness induced by the selection of folds---in LOO CV the folds are not random.
 
-The \pkg{cv} package for \proglang{R} automates the process of cross-validation for standard \proglang{R} statistical models. The principal function in the packages, also named \code{cv()}, has methods for objects produced by a number of commonly employed regression-modeling functions, including those for mixed-effects models:
+The \pkg{cv} package for \proglang{R} automates the process of cross-validation for standard \proglang{R} statistical models. The principal function in the package, also named \code{cv()}, has methods for objects produced by a number of commonly employed regression-modeling functions, including those for mixed-effects models:
 ```{r cv-methods}
 library("cv", quietly = TRUE)
 methods("cv")
@@ -91,7 +91,7 @@ The \code{Auto} data set contains information about 392 cars:
 data("Auto", package = "ISLR2")
 summary(Auto)
 ```
-With the exception of \code{origin} (which we don't use here), these variables are largely self-explanatory, except possibly for units of measurement: for details see \code{help("Auto",} \code{package = "ISLR2")}.
+With the exception of \code{origin} (which we don't use here), these variables are largely self-explanatory, except possibly for units of measurement: For details see \code{help("Auto",} \code{package = "ISLR2")}.
 
 ```{r mpg-horsepower-polynomials, fig.show="hold", echo=FALSE}
 #| out.width = "45%",
@@ -156,7 +156,7 @@ which takes the following arguments:
 
 * \code{level}, the level for the confidence interval (defaulting to \code{0.95}).
 
-* \code{method}, the computational method to employ: \code{"hatvalues"} is relevant only for LOO CV and bases computation on the hatvalues for the linear model; \code{"Woodbury"} employs the Woodbury matrix identity to compute the CV criterion with each fold deleted; \code{"naive"} updates the model using the \code{update()} function; and \code{"auto"} (the default) selects \code{"hatvalues"} for LOO CV and \code{"Woodbury"} for $k$-fold CV, both of which are much more efficient than literally updating the least-squares fit (see below and Section \ref{efficient-computations-for-linear-and-generalized-linear-models}).
+* \code{method}, the computational method to employ: \code{"hatvalues"} is relevant only for LOO CV and bases computation on the hatvalues for the linear model; \code{"Woodbury"} employs the Woodbury matrix identity to compute the CV criterion with each fold deleted; \code{"naive"} updates the model using the \code{update()} function; and \code{"auto"} (the default) selects \code{"hatvalues"} for LOO CV and \code{"Woodbury"} for $k$-fold CV, both of which are much more efficient than directly recomputing the least-squares fit (see below and Section \ref{efficient-computations-for-linear-and-generalized-linear-models}).
 
 * \code{ncores}, the number of cores to employ for parallel computation; if \code{ncores = 1} (the default), the computations are not parallelized.
 
@@ -200,7 +200,7 @@ print(microbenchmark::microbenchmark(
 ```
 On our computer, using the hatvalues is about an order of magnitude faster than employing Woodbury matrix updates, and more than two orders of magnitude faster than refitting the model.[^microbenchmark]
 
-[^microbenchmark]: Out of impatience, we asked \code{microbenchmark()} to execute each command only 10 times rather than the default 100. With the exception of the last column, the output is self-explanatory. The last column shows which methods have average timings that are statistically distinguishable. Because of the small number of repetitions (i.e., 10), the \code{"hatvalues"} and \code{"Woodbury"} methods aren't distinguishable, but the difference between these methods persists when we perform more repetitions---we invite the patient reader to redo this computation with the default \code{times = 100} repetitions.
+[^microbenchmark]: Out of impatience, we asked \code{microbenchmark()} to execute each command only 10 times rather than the default 100. With the exception of the last column, the output is self-explanatory. The last column shows which methods have average timings that are statistically distinguishable (as indicated by different letters). Because of the small number of repetitions (i.e., 10), the \code{"hatvalues"} and \code{"Woodbury"} methods aren't distinguishable, but the difference between these methods persists when we perform more repetitions---we invite the patient reader to redo this computation with the default \code{times = 100} repetitions.
 
 ## Comparing competing models
 
@@ -326,7 +326,7 @@ Consider a researcher studying the effect of the dosage $x$ of a drug on the sev
 
 Within patients, higher dosages are generally associated with a reduction in symptoms. Between patients, however, higher dosages are associated with higher levels of symptoms. A plausible mechanism is a reversal of causality: Within patients, higher dosages alleviate symptoms, but, between patients, higher morbidity causes the prescription of higher dosages.
 
-To generate the four data sets, we first constructed a template data set from a population with a between-patient effect of dosage of $1.0$ and a within-patient effect of $-0.5$. We then applied four different multipliers to the between-patient variation from the regression line of patient centroids. The resulting data sets, shown in Figure \ref{fig:plot1}, differ in the between-patient variance of patient centroids from a common between-patient regression line, exhibiting a progression from low to high variance around the common regression line. Each patient has the same relative configuration of dosages and symptoms in each of the four data sets. To help visualize the structure of the data, estimated 50% Gaussian concentration ellipses are shown for each patient.
+To generate the four data sets, we first constructed a template data set from a population with a between-patient effect of dosage of $1.0$ and a within-patient effect of $-0.5$. We then applied four different multipliers to the between-patient standard deviation from the regression line of patient centroids. The resulting data sets, shown in Figure \ref{fig:plot1}, differ in the between-patient variation of patient centroids from a common between-patient regression line, exhibiting a progression from low to high variation around the common regression line. Each patient has the same relative configuration of dosages and symptoms in each of the four data sets. To help visualize the structure of the data, estimated 50% Gaussian concentration ellipses are shown for each patient.
 
 ```{r include=FALSE, echo=FALSE}
 library("glmmTMB") # necessary for some reason to knit vignette in RStudio, harmless otherwise
@@ -452,7 +452,7 @@ Data$panel2 <- factor('data', levels = flevels)
 ```{r plot-fits-combined,echo=FALSE}
 #| out.width = "100%",
 #| fig.height = 6,
-#| fig.cap = "Fixed- and random-effect predictions (BLUPs) using each model applied to data sets with varying between- and within-patient standard deviation ratios. The top row shows summaries of the within-patient data using estimated 50% concentration ellipses, along with the patient centroids."
+#| fig.cap = "Fixed- and random-effect predictions (BLUPs) using each model applied to data sets with varying between- and within-patient standard-deviation ratios. The top row shows summaries of the within-patient data using estimated 50% concentration ellipses, along with the patient centroids."
 levs3 <- levels(Data$panel2)
 levs3 <- sub(':fixed','', levs3)
 levs3 <- sub(':BLUPs',' ', levs3)
@@ -494,7 +494,7 @@ Data sets with relatively low between-patient variation result in strong shrinka
 
 Although the BLUPs fit the observed data more closely than predictions based on fixed effects alone, the slopes of within-patient BLUPs do not conform to the within-patient slopes for the \code{~ 1 + x} model in the two data sets with the smallest between-patient variation. For data with a small between-patient variation, fixed-effects predictions for the \code{~ 1 + x} model have a slope that is close to the between-patient slope but provide better overall predictions than the fixed-effect predictions for data sets with larger between-subject variation.  With data whose between-patient variation is relatively large, predictions based on the model with a common intercept and slope for all clusters are very poor---indeed, much worse than the fixed-effects-only predictions based on the simpler random-intercept model.
 
-We therefore anticipate (and show later in this section) that case-based cross-validation may prefer the intercept-only model, \code{~ 1}  to the larger \code{~ 1 + x} model when the between-cluster variation is relatively small, but that cluster-based cross-validation will prefer the latter to the former. We will discover that case-based cross-validation prefers the \code{~ 1 + x} model to the \code{~ 1} model for the '5 / 2.5' data set, but cluster-based cross-validation prefers the latter model to the former. The situation is entirely reversed with the '8 / 2.5' data set. 
+We therefore anticipate (and show later in this section) that case-based cross-validation may prefer the intercept-only model, \code{~ 1}  to the larger \code{~ 1 + x} model when the between-cluster variation is relatively small, but that cluster-based cross-validation will prefer the latter to the former. We will discover that case-based cross-validation prefers the \code{~ 1 + x} model to the \code{~ 1} model for the "5 / 2.5" data set, but cluster-based cross-validation prefers the latter model to the former. The situation is entirely reversed with the "8 / 2.5" data set. 
 
 The third model, \code{~ 1 + x + xm}, includes a contextual effect of \code{x}---that is, the cluster mean \code{xm}---along with \code{x}, the intercept in the fixed-effect part of the model, and a random intercept. This model is equivalent to fitting \code{y ~ I(x - xm) + xm + (1 | patient)}, which is the model that generated the data.  The fit of the mixed model \code{~ 1 + x + xm} is consequently similar to that of a fixed-effects-only model with \code{x} and a categorical predictor for individual patients (i.e., \code{y ~ factor(patient) + x}, treating patients as a factor, and not shown here). 
 
@@ -584,7 +584,7 @@ Auto$cylinders <- factor(Auto$cylinders,
                          labels = c("3-4", "3-4", "5-6", "5-6", "8"))
 Auto$year <- as.factor(Auto$year)
 Auto$origin <- factor(Auto$origin,
-                      labels = c("AMER", "EUR", "JAP"))
+                      labels = c("America", "Europe", "Japan"))
 rownames(Auto) <- make.names(Auto$name, unique = TRUE)
 Auto$name <- NULL
 
@@ -739,11 +739,11 @@ summary(BEPS)
 ```
 The polytomous (multi-category) response variable is \code{vote}, a factor with levels \code{"Conservative"}, \code{"Labour"}, and \code{"Liberal Democrat"}. The predictors of \code{vote} are:
 
-* \code{age}, in years;
-* \code{econ.cond.national} and \code{econ.cond.household}, the respondent's ratings of the state of the economy, on 1 to 5 scales;
-* \code{Blair}, \code{Hague}, and \code{Kennedy}, ratings of the leaders of the Labour, Conservative, and Liberal Democratic parties, on 1 to 5 scales;
-* \code{Europe}, an 11-point scale on attitude towards European integration, with high scores representing "Euro-skepticism";
-* \code{political.knowledge}, knowledge of the parties' positions on European integration, with scores from 0 to 3;
+* \code{age}, in years.
+* \code{econ.cond.national} and \code{econ.cond.household}, the respondent's ratings of the state of the economy, on 1 to 5 scales.
+* \code{Blair}, \code{Hague}, and \code{Kennedy}, ratings of the leaders of the Labour, Conservative, and Liberal Democratic parties, on 1 to 5 scales.
+* \code{Europe}, an 11-point scale on attitude towards European integration, with high scores representing "Euro-skepticism."
+* \code{political.knowledge}, knowledge of the parties' positions on European integration, with scores from 0 to 3.
 * \code{gender}, \code{"female"} or \code{"male"}.
 
 The model fit to the data includes an interaction between \code{Europe} and \code{political.knowledge}, which was the focus of the original research on which this example is based [@AndersenHeathSinnott:2002]; the other predictors enter the model additively:
@@ -872,7 +872,7 @@ rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
 rs_obj$accuracy <- map_dbl(rs_obj$results, function(x) mean(x$correct))
 1 - summary(rs_obj$accuracy) 
 ```
-The response variable in this example, \code{Attrition}, is binary. The function \code{holdout_results()} must be supplied by the user, and "\code{accuracy}" is the complement of the Bayes-rule classification error rate.
+The response variable in this example, \code{Attrition}, is binary. The function \code{holdout_results()} must be supplied by the user, and mean "\code{accuracy}" is the complement of the Bayes-rule classification error rate.
 
 [^k-fold-used-in-rsample]: The example in the \pkg{rsample} vignette uses 10-fold rather than LOO CV, but otherwise the code from the vignette is only trivially modified here.
 
@@ -896,7 +896,7 @@ train(x = attrition[, c("JobSatisfaction", "Gender", "MonthlyIncome")],
       y = attrition$Attrition, method = "glm",
       trControl = trainControl(method = "LOOCV"))
 ```
-where "\code{Accuracy}", again, is the complement of the misclassification rate.
+where "\code{Accuracy}," again, is the complement of the misclassification rate.
 
 And here's how we can perform the same computation using the \code{cv()} function in the \pkg{cv} package:
 ```{r rsample-example-using-cv, cache=TRUE}
@@ -949,7 +949,7 @@ The most straightforward way to implement cross-validation in \proglang{R} for s
 
 The \code{"lm"} and \code{"glm"} methods for \code{cv()} take advantage of computational efficiencies by avoiding refitting the model with each fold removed. Consider, in particular, the weighted linear model $\mathbf{y}_{n \times 1} = \mathbf{X}_{n \times p}\boldsymbol{\beta}_{p \times 1} + \boldsymbol{\varepsilon}_{n \times 1}$, where $\boldsymbol{\varepsilon} \sim \mathbf{N}_n \left(\mathbf{0}, \sigma^2 \mathbf{W}^{-1}_{n \times n}\right)$. Here, $\mathbf{y}$ is the response vector,  $\mathbf{X}$ the model matrix, and $\boldsymbol{\varepsilon}$ the error vector, each for $n$ cases, and $\boldsymbol{\beta}$ is the vector of $p$ population regression coefficients. The errors are assumed to be multivariately normally distributed with 0 means and covariance matrix $\sigma^2 \mathbf{W}^{-1}$, where $\mathbf{W} = \mathrm{diag}(w_i)$ is a diagonal matrix of inverse-variance weights. For the linear model with constant error variance, the weight matrix is taken to be $\mathbf{W} = \mathbf{I}_n$, the order-$n$ identity matrix.
 
-The weighted-least-squares (WLS) estimator of $\boldsymbol{\beta}$ is [see, e.g., @Fox:2016, Sec. 12.2.2] [^WLS]
+The weighted-least-squares ("WLS") estimator of $\boldsymbol{\beta}$ is [see, e.g., @Fox:2016, Sec. 12.2.2] [^WLS]
 $$
 \mathbf{b}_{\mathrm{WLS}} = \left( \mathbf{X}^\top \mathbf{W} \mathbf{X} \right)^{-1} 
   \mathbf{X}^\top \mathbf{W} \mathbf{y}
@@ -967,14 +967,14 @@ $$
 \mathbf{C}_{k \times k} \mathbf{V}_{k \times m} \right)^{-1} = \mathbf{A}^{-1} - \mathbf{A}^{-1}\mathbf{U} \left(\mathbf{C}^{-1} + 
 \mathbf{VA}^{-1}\mathbf{U} \right)^{-1} \mathbf{VA}^{-1}
 $$
-where $\mathbf{A}$ is a nonsingular order-$n$ matrix. We apply this result by letting
+where $\mathbf{A}$ is a nonsingular order-$m$ matrix. We apply this result by letting
 \begin{align*}
 	\mathbf{A} &= \mathbf{X}^\top \mathbf{W} \mathbf{X} \\
 	\mathbf{U} &= \mathbf{X}_\mathbf{j}^\top \\
 	\mathbf{V} &= - \mathbf{X}_\mathbf{j} \\
 	\mathbf{C} &= \mathbf{W}_\mathbf{j} \\
 \end{align*}
-where the subscript $\mathbf{j} = (i_{j1}, \ldots, i_{jm})^\top$ represents the vector of indices for the cases in the $j$th fold, $j = 1, \ldots, k$. The negative sign in $\mathbf{V} = - \mathbf{X}_\mathbf{j}$ reflects the *removal*, rather than addition, of the cases in $\mathbf{j}$. 
+where the subscript $\mathbf{j} = (i_{j1}, \ldots, i_{jn_j})^\top$ represents the vector of indices for the $n_j \approx n/k$ cases in the $j$th fold, $j = 1, \ldots, k$. The negative sign in $\mathbf{V} = - \mathbf{X}_\mathbf{j}$ reflects the *removal*, rather than addition, of the cases in $\mathbf{j}$. 
 
 Applying the Woodbury identity isn't quite as fast as using the hatvalues, but it is generally much faster than refitting the model. A disadvantage of the Woodbury identity, however, is that it entails explicit matrix inversion and thus may be numerically unstable. The inverse of $\mathbf{A} = \mathbf{X}^\top \mathbf{W} \mathbf{X}$ is available directly in the \code{"lm"} object, but the second term on the right-hand side of the Woodbury identity requires a matrix inversion with each fold deleted. (In contrast, the inverse of each $\mathbf{C} = \mathbf{W}_\mathbf{j}$ is straightforward because $\mathbf{W}$ is diagonal.)
 
