@@ -974,7 +974,7 @@ where $\mathbf{A}$ is a nonsingular order-$m$ matrix. We apply this result by le
 	\mathbf{V} &= - \mathbf{X}_\mathbf{j} \\
 	\mathbf{C} &= \mathbf{W}_\mathbf{j} \\
 \end{align*}
-where the subscript $\mathbf{j} = (i_{j1}, \ldots, i_{jn_j})^\top$ represents the vector of indices for the $n_j \approx n/k$ cases in the $j$th fold, $j = 1, \ldots, k$. The negative sign in $\mathbf{V} = - \mathbf{X}_\mathbf{j}$ reflects the *removal*, rather than addition, of the cases in $\mathbf{j}$. 
+where the subscript $\mathbf{j} = (i_{j1}, \ldots, i_{jm})^\top$ represents the vector of indices for the $m = n_j \approx n/k$ cases in the $j$th fold. The negative sign in $\mathbf{V} = - \mathbf{X}_\mathbf{j}$ reflects the *removal*, rather than addition, of the cases in $\mathbf{j}$. 
 
 Applying the Woodbury identity isn't quite as fast as using the hatvalues, but it is generally much faster than refitting the model. A disadvantage of the Woodbury identity, however, is that it entails explicit matrix inversion and thus may be numerically unstable. The inverse of $\mathbf{A} = \mathbf{X}^\top \mathbf{W} \mathbf{X}$ is available directly in the \code{"lm"} object, but the second term on the right-hand side of the Woodbury identity requires a matrix inversion with each fold deleted. (In contrast, the inverse of each $\mathbf{C} = \mathbf{W}_\mathbf{j}$ is straightforward because $\mathbf{W}$ is diagonal.)
 
