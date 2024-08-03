@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-07-29</h4>
+            <h4 data-toc-skip class="date">2024-08-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv-notes.Rmd" class="external-link"><code>vignettes/cv-notes.Rmd</code></a></small>
       <div class="d-none name"><code>cv-notes.Rmd</code></div>
@@ -293,10 +293,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   1.0079   1.2637   1.4038   1.3959   1.5848   1.7239    10</span></span>
-<span><span class="co">#&gt;   Woodbury  12.7123  13.1094  14.6716  14.0984  16.4205  17.4763    10</span></span>
-<span><span class="co">#&gt;      naive 243.0723 256.3295 280.4360 263.9952 282.7457 361.5302    10</span></span>
-<span><span class="co">#&gt;     cv.glm 417.6050 462.7441 490.7740 484.5874 511.5142 613.4354    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues   1.0109   1.0379   1.1739   1.2101   1.2535   1.3145    10</span></span>
+<span><span class="co">#&gt;   Woodbury  12.3226  12.4487  13.6251  12.5166  15.9965  16.5824    10</span></span>
+<span><span class="co">#&gt;      naive 217.0665 223.0781 224.0363 225.5558 226.4332 228.7781    10</span></span>
+<span><span class="co">#&gt;     cv.glm 383.1879 387.6791 400.1011 391.2901 394.6084 445.8587    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -396,10 +396,10 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    1.1603    1.4665    1.6727    1.8174    1.9127    1.9584    10</span></span>
-<span><span class="co">#&gt;   Woodbury   46.0716   47.7697   55.9453   49.1715   52.6062  112.8106    10</span></span>
-<span><span class="co">#&gt;      exact 1896.4480 2200.8322 2218.9843 2241.5815 2300.5199 2328.8337    10</span></span>
-<span><span class="co">#&gt;     cv.glm 2276.8832 2313.0026 2422.8955 2414.9909 2499.6714 2620.0037    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    1.1156    1.1859    1.3531    1.4031    1.4423    1.5377    10</span></span>
+<span><span class="co">#&gt;   Woodbury   40.6670   43.3435   45.0534   43.6487   46.0838   55.1063    10</span></span>
+<span><span class="co">#&gt;      exact 1760.6278 1778.5279 1831.2236 1845.8284 1878.9594 1904.9781    10</span></span>
+<span><span class="co">#&gt;     cv.glm 2048.6950 2063.4879 2110.2982 2104.4872 2153.1368 2181.4489    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>

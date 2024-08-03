@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-07-29</h4>
+            <h4 data-toc-skip class="date">2024-08-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv-mixed.Rmd" class="external-link"><code>vignettes/cv-mixed.Rmd</code></a></small>
       <div class="d-none name"><code>cv-mixed.Rmd</code></div>
@@ -172,6 +172,14 @@ to the HSB data, for which we use the <strong>dplyr</strong> package
 2023)</span>:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://dplyr.tidyverse.org" class="external-link">"dplyr"</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="va">MathAchieve</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">School</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>mean.ses <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">SES</span><span class="op">)</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">Temp</span></span>
 <span><span class="va">Temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">MathAchSchool</span>, <span class="va">Temp</span>, by <span class="op">=</span> <span class="st">"School"</span><span class="op">)</span></span>
@@ -273,6 +281,14 @@ a model fit by <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="ext
 illustrate with the mixed model fit to the HSB data:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://svn.r-project.org/R-packages/trunk/nlme/" class="external-link">"nlme"</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'nlme'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     collapse</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:lme4':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     lmList</span></span>
 <span><span class="va">hsb.lme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/lme.html" class="external-link">lme</a></span><span class="op">(</span></span>
 <span>  <span class="va">mathach</span> <span class="op">~</span> <span class="va">mean.ses</span> <span class="op">*</span> <span class="va">cses</span> <span class="op">+</span> <span class="va">sector</span> <span class="op">*</span> <span class="va">cses</span>,</span>
 <span>  random <span class="op">=</span> <span class="op">~</span> <span class="va">cses</span> <span class="op">|</span> <span class="va">school</span>,</span>

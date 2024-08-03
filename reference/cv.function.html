@@ -29,7 +29,7 @@ accuracy of this procedure.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -548,13 +548,13 @@ for the several folds and possibly average them.</p></li>
 <span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="op">(</span><span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span><span class="op">*</span><span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">selectModelList</span>, data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5962</span>,</span></span>
+<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">selectModelList</span>, data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>,</span></span>
 <span class="r-in"><span>   working.model<span class="op">=</span><span class="fu"><a href="cv.modList.html">models</a></span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span>, <span class="va">m3</span><span class="op">)</span><span class="op">)</span> <span class="co"># recursive CV</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 5962</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 5963</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 107.3751</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 135.4726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 112.0172</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 139.8472</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 113.7905 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
