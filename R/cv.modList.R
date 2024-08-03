@@ -82,11 +82,11 @@
 #' summary(D.cv.models, criterion ~ model + rep, include="folds")
 #' plot(cv.models)
 #' (cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
-#'                     data=Duncan, seed=5962, confint=TRUE, level=0.50))
+#'                     data=Duncan, seed=5963, confint=TRUE, level=0.50))
 #'                  # nb: n too small for accurate CIs
 #' plot(cv.models.ci)
 #' (cv.models.recursive <- cv(models(m1=m1, m2=m2, m3=m3),
-#'                            data=Duncan, seed=5962,
+#'                            data=Duncan, seed=5963,
 #'                            recursive=TRUE, save.model=TRUE))
 #' cv.models.recursive$selected.model
 

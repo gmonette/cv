@@ -302,7 +302,7 @@ data("Duncan", package="carData")
 m1 <- lm(prestige ~ income + education, data=Duncan)
 m2 <- lm(prestige ~ income + education + type, data=Duncan)
 m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
-cv(selectModelList, data=Duncan, seed=5962,
+cv(selectModelList, data=Duncan, seed=5963,
    working.model=models(m1, m2, m3)) # recursive CV
 
 }

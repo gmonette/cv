@@ -1,8 +1,8 @@
 Package: cv
 Type: Package
 Title: Cross-Validating Regression Models
-Version: 2.0.1
-Date: 2024-07-21
+Version: 2.0.2
+Date: 2024-08-01
 Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
   comment = c(ORCID = "0000-0002-1196-8012")),
 	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"))
