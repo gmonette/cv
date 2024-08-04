@@ -44,6 +44,8 @@ colorize <- function(x, color) {
 }
 
 .opts <- options(digits = 5)
+CACHE <- FALSE
+
 ```
 
 The fundamental analogy for cross-validation is to the collection of new data. That is, predicting the response in each fold from the model fit to data in the other folds is like using the model fit to all of the data to predict the response for new cases from the values of the predictors for those new cases. As we explained in the introductory vignette on cross-validating regression models, the application of this idea to independently sampled cases is straightforward---simply partition the data into random folds of equal size and leave each fold out in turn, or, in the case of LOO CV, simply omit each case in turn.
@@ -81,7 +83,7 @@ The first few students are in school number 1224 and the last few in school 9586
 We'll use only the `School`, `SES` (students' socioeconomic status), and `MathAch` (their score on a standardized math-achievement test) variables in the `MathAchieve` data set, and `Sector` (`"Catholic"` or `"Public"`) in the `MathAchSchool` data set.
 
 Some data-management is required before fitting a mixed-effects model to the HSB data, for which we use the **dplyr** package [@WickhamEtAl:2023]:
-```{r HSB-data-management, cache=TRUE}
+```{r HSB-data-management, cache=CACHE}
 library("dplyr")
 MathAchieve %>% group_by(School) %>%
   summarize(mean.ses = mean(SES)) -> Temp
@@ -95,7 +97,7 @@ HSB$cses <- with(HSB, ses - mean.ses)
 In the process, we created two new school-level variables: `meanses`, which is the average SES for students in each school; and `cses`, which is school-average SES centered at its mean. For details, see @FoxWeisberg:2019 [Sec. 7.2.2].
 
 Still following Fox and Weisberg, we proceed to use the `lmer()` function in the **lme4** package [@BatesEtAl:2015] to fit a mixed model for math achievement to the HSB data:
-```{r HSB-lmer, cache=TRUE}
+```{r HSB-lmer, cache=CACHE}
 library("lme4")
 hsb.lmer <- lmer(mathach ~ mean.ses * cses + sector * cses
                  + (cses | school), data = HSB)
@@ -103,7 +105,7 @@ summary(hsb.lmer, correlation = FALSE)
 ```
 
 We can then cross-validate at the cluster (i.e., school) level,
-```{r HSB-lmer-CV-cluster, cache=TRUE}
+```{r HSB-lmer-CV-cluster, cache=CACHE}
 library("cv")
 
 cv(hsb.lmer,
@@ -112,7 +114,7 @@ cv(hsb.lmer,
    seed = 5240)
 ```
 or at the case (i.e., student) level,
-```{r HSB-lmer-CV-case, cache=TRUE}
+```{r HSB-lmer-CV-case, cache=CACHE}
 cv(hsb.lmer, seed = 1575)
 ```
 For cluster-level CV, the `clusterVariables` argument tells `cv()` how the clusters are defined. Were there more than one clustering variable, say classes within schools, these would be provided as a character vector of variable names: `clusterVariables = c("school", "class")`. For cluster-level CV, the default is `k = "loo"`, that is, leave one cluster out at a time; we instead specify `k = 10` folds of clusters, each fold therefore comprising $160/10 = 16$ schools. 
@@ -120,7 +122,7 @@ For cluster-level CV, the `clusterVariables` argument tells `cv()` how the clust
 If the `clusterVariables` argument is omitted, then case-level CV is employed, with `k = 10` folds as the default, here each with $7185/10 \approx 719$ students. Notice that one of the 10 models refit with a fold removed failed to converge. Convergence problems are common in mixed-effects modeling. The apparent issue here is that an estimated variance component is close to or equal to 0, which is at a boundary of the parameter space. That shouldn't disqualify the fitted model for the kind of prediction required for cross-validation.
 
 There is also a `cv()` method for linear mixed models fit by the `lme()` function in the **nlme** package, and the arguments for `cv()` in this case are the same as for a model fit by `lmer()` or `glmer()`. We illustrate with the mixed model fit to the HSB data:
-```{r hsb-lme, cache=TRUE}
+```{r hsb-lme, cache=CACHE}
 library("nlme")
 hsb.lme <- lme(
   mathach ~ mean.ses * cses + sector * cses,
@@ -345,7 +347,7 @@ We next carry out case-based cross-validation, which, as we have explained, is b
 library(cv) # unclear why it's necessary to reload cv
 .opts <- options(warn = -2) 
 ```
-```{r cross-validation,cache=TRUE}
+```{r cross-validation,cache=CACHE}
 
 model_lists <- lapply(fits, function(fitlist) do.call(models, fitlist))
 

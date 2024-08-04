@@ -1,3 +1,7 @@
+# cv 2.0.2
+
+- changed cache options for cv-mixed vignette
+
 # cv 2.0.1
 
 - New examples for cross-validation with mixed models.

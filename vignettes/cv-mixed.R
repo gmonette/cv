@@ -28,6 +28,8 @@ colorize <- function(x, color) {
 }
 
 .opts <- options(digits = 5)
+CACHE <- FALSE
+
 
 ## ----HSB-data-----------------------------------------------------------------
 data("MathAchieve", package = "nlme")
@@ -39,6 +41,51 @@ data("MathAchSchool", package = "nlme")
 dim(MathAchSchool)
 head(MathAchSchool, 2)
 tail(MathAchSchool, 2)
+
+## ----HSB-data-management, cache=CACHE-----------------------------------------
+library("dplyr")
+MathAchieve %>% group_by(School) %>%
+  summarize(mean.ses = mean(SES)) -> Temp
+Temp <- merge(MathAchSchool, Temp, by = "School")
+HSB <- merge(Temp[, c("School", "Sector", "mean.ses")],
+             MathAchieve[, c("School", "SES", "MathAch")], by = "School")
+names(HSB) <- tolower(names(HSB))
+
+HSB$cses <- with(HSB, ses - mean.ses)
+
+## ----HSB-lmer, cache=CACHE----------------------------------------------------
+library("lme4")
+hsb.lmer <- lmer(mathach ~ mean.ses * cses + sector * cses
+                 + (cses | school), data = HSB)
+summary(hsb.lmer, correlation = FALSE)
+
+## ----HSB-lmer-CV-cluster, cache=CACHE-----------------------------------------
+library("cv")
+
+cv(hsb.lmer,
+   k = 10,
+   clusterVariables = "school",
+   seed = 5240)
+
+## ----HSB-lmer-CV-case, cache=CACHE--------------------------------------------
+cv(hsb.lmer, seed = 1575)
+
+## ----hsb-lme, cache=CACHE-----------------------------------------------------
+library("nlme")
+hsb.lme <- lme(
+  mathach ~ mean.ses * cses + sector * cses,
+  random = ~ cses | school,
+  data = HSB,
+  control = list(opt = "optim")
+)
+summary(hsb.lme)
+
+cv(hsb.lme,
+   k = 10,
+   clusterVariables = "school",
+   seed = 5240)
+
+cv(hsb.lme, seed = 1575)
 
 ## ----include=FALSE, echo=FALSE------------------------------------------------
 library("glmmTMB") # necessary for some reason to knit vignette in RStudio, harmless otherwise
@@ -189,7 +236,7 @@ Data$panel <- factor('data', levels = c(names(model.formulas), 'data'))
 library(cv) # unclear why it's necessary to reload cv
 .opts <- options(warn = -2) 
 
-## ----cross-validation,cache=TRUE----------------------------------------------
+## ----cross-validation,cache=CACHE---------------------------------------------
 
 model_lists <- lapply(fits, function(fitlist) do.call(models, fitlist))
 
