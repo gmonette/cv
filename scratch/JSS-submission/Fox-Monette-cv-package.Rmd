@@ -22,7 +22,7 @@ title:
   # For running headers, if needed
   short:     "\\pkg{cv}: Cross-Validating Regression Models"
 abstract: >
-  We describe the \pkg{cv} package, which implements cross-validation for standard \proglang{R} regression models through a uniform and simple to use generic function. Methods for the \code{cv()} function are provided for many commonly employed classes of statistical models, including mixed-effects models, and it is straightforward to extend the \pkg{cv} package by writing methods for additional classes of models. The \code{cv()} function also can cross-validate complex model-selection procedures, such as those that include variable transformations, predictor selection, and selection among competing models. The \code{cv()} function generally supports parallel computations, and the supplied methods for linear and generalized linear models take advantage of computational efficiencies.
+  We describe the \pkg{cv} package, which implements cross-validation for standard \proglang{R} regression models through a uniform and simple to use generic function. Methods for the \code{cv()} function are provided for many commonly employed classes of statistical models, including mixed-effects models, and it is straightforward to extend the \pkg{cv} package by writing methods for additional classes of models. The \code{cv()} function can also cross-validate complex model-selection procedures, such as those that include variable transformations, predictor selection, and selection among competing models. The \code{cv()} function generally supports parallel computations, and the supplied methods for linear and generalized linear models take advantage of computational efficiencies.
 keywords:
   # at least one keyword must be supplied
   formatted: [cross-validation, regression analysis, model selection, "\\proglang{R}"]
@@ -48,9 +48,9 @@ Cross-validation (CV) is an essentially simple and intuitively reasonable approa
 
 Validating research by replication on independently collected data is a common scientific norm. Emulating this process in a single study by data-division is less common [see, e.g., @Barnard:1974]: The data are randomly divided into two, possibly equal-size, parts; the first part is used to develop and fit (in the language of machine leaning, "train") a statistical model; and then the second part is used to assess the adequacy of ("validate") the model fit to the first part of the data. Data-division, however, suffers from two problems: (1) Dividing the data decreases the sample size and thus increases sampling error; and (2), even more disconcertingly, the results can vary substantially based on the random division of the data, particularly in smaller samples. See @Harrell:2015 [Sec. 5.3] for cogent remarks about data-division and cross-validation.
 
-Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the cases in the omitted fold. A CV criterion (also termed a "cost" or "loss" measure), such as the mean-squared error ("MSE") of prediction, is then computed using these predicted values. In the extreme, $k = n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
+Cross-validation speaks to both of these issues. In CV, the data are randomly divided as equally as possible into several, say $k$, parts, called "folds." The statistical model is fit $k$ times, leaving each fold out in turn. Each fitted model is then used to predict the response variable for the cases in the omitted fold. A CV criterion (also termed a "cost" or "loss" measure), such as the mean-squared error ("MSE") of prediction, is then computed using these predicted values. In the extreme, $k$ equals $n$, the number of cases in the data, thus omitting individual cases and refitting the model $n$ times---a procedure termed "leave-one-out (LOO) cross-validation."
 
-Because the $n$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of prediction error. The $n$ regression models are highly statistically dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has larger variance than if the predictions from the models fit to the $n$ data sets were independent.
+Because the $n$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of the prediction error with a model fit to $n$ cases. The $n$ regression models are highly statistically dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has larger variance than if the predictions from the models fit to the $n$ data sets were independent.
 
 Because predictions are based on smaller data sets, each of size approximately $n - n/k$, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) is more biased than estimated prediction error for LOO CV. It is possible, however, to correct $k$-fold CV for bias (see Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
 
@@ -75,7 +75,7 @@ methods("cv")
 
 A number of existing \proglang{R} packages include functions for cross-validating regression models. We briefly situate the \pkg{cv} package relative to other \proglang{R} software for cross-validation in Section \ref{comparing-cv-to-other-r-software-for-cross-validation}.
 
-The final section of the paper (Section \ref{computational-notes}) describes some computational details, including efficient CV computations for linear and generalized-linear models. and computation of bias-corrected CV criteria.
+The final section of the paper (Section \ref{computational-notes}) describes some computational details, including efficient CV computations for linear and generalized-linear models, and computation of bias-corrected CV criteria.
 
 In the interest of brevity, we won't describe all of the features of the \pkg{cv} package here, concentrating on the aspects of the package that are relatively novel. For example, the \code{cv()} function can perform computations in parallel and can independently replicate a cross-validation procedure several times. There are also data-management facilities in the package, such as coercing the objects produced by the \code{cv()} function into data frames for further analysis. These and other features not discussed in this paper are taken up in the vignettes distributed with the package, which also provide greater detail on some topics that we do describe, such as extensions to the package.
 
@@ -128,9 +128,9 @@ legend("topright", inset=0.02,
        lwd=2, lty=2:1, col=3:2, pch=17:16)
 ```
 
-We'll focus on the relationship of \code{mpg} (miles per gallon) to \code{horsepower}, as displayed in Figure \ref{fig:mpg-horsepower-polynomials} (a). The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2021, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^log-trans] Polynomial fits  for $p = 1$ to $5$ are shown in Figure \ref{fig:mpg-horsepower-polynomials} (a). The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the degree-5 polynomial may over-fit the data by chasing one or two relatively high \code{mpg} values at the right (but see the CV results reported below).
+We'll focus on the relationship of \code{mpg} (miles per gallon) to \code{horsepower}, as displayed in Figure\ \ref{fig:mpg-horsepower-polynomials} (a). The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2021, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^log-trans] Polynomial fits  for $p = 1$ to $5$ are shown in Figure \ref{fig:mpg-horsepower-polynomials} (a). The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the degree-5 polynomial may over-fit the data by chasing one or two relatively high \code{mpg} values at the right (but see the CV results reported below).
 
-[^log-trans]: Although it serves to illustrate the use of CV, a polynomial is not the best choice here. Consider, for example the scatterplot for log-transformed \code{mpg} and \code{horsepower}, produced by \code{plot(mpg ~ horsepower, data=Auto, log="xy")} (execution of which is left to the reader). We revisit the \code{Auto} data in Section \ref{cross-validating-model-specification}.
+[^log-trans]: Although it serves to illustrate the use of CV, a polynomial is not the best choice here. Consider, for example, the scatterplot for log-transformed \code{mpg} and \code{horsepower}, produced by \code{plot(mpg $\sim$ horsepower, data=Auto, log="xy")} (execution of which is left to the reader). We revisit the \code{Auto} data in Section \ref{cross-validating-model-specification}.
 
 Figure \ref{fig:mpg-horsepower-polynomials} (b) shows two measures of estimated (squared) error as a function of polynomial-regression degree: The mean-squared error ("MSE"), defined as $\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$, and the usual residual variance, defined as $\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
 
@@ -213,7 +213,7 @@ for (p in 1:10) mlist[[p]] <- lm(mpg ~ poly(horsepower, p), data = Auto)
 names(mlist) <- paste0("m.", 1:10)
 mlist[2]
 ```
-where, for example \code{mlist[2]} is the quadratic fit.
+where, for example, \code{mlist[2]} is the quadratic fit.
 
 We then apply \code{cv()} to the list of 10 models for both 10-fold and LOO CV (the \code{data} argument to \code{cv()} is required):
 ```{r polynomial-regression-CV}
@@ -240,6 +240,7 @@ plot(cv.auto.loo, main = "Polynomial Regressions, LOO CV",
 ```
 
 In this example, 10-fold and LOO CV produce generally similar results, and also results that are similar to those produced by the estimated error variance $\widehat{\sigma}^2$ for each model (cf., Figure \ref{fig:mpg-horsepower-polynomials} (b) on page \pageref{fig:mpg-horsepower-polynomials}), except for the highest-degree polynomials, where the CV results more clearly suggest over-fitting.
+\newpage
 
 # Cross-validating mixed-effects models
 
@@ -546,8 +547,9 @@ xyplot(clusters + cases ~ model|SD_ratio_i, dsummary,
        par.strip.text = list(cex = 0.7),
        layout= c(Nv, 1),
        par.settings =
-         list(superpose.line=list(lty = c(1, 2), lwd = 1),
-              superpose.symbol=list(cex = 0.7)),
+         list(layout.heights = list(bottom.padding = 0),
+              superpose.line = list(lty = c(1, 2), lwd = 1),
+              superpose.symbol = list(cex = 0.7)),
        scales = list(y = list(log = TRUE, cex = 0.7), 
                      x = list(alternating = F, rot = 45, cex = 0.7))) 
 ```
@@ -648,7 +650,7 @@ scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight
                   smooth=list(spread = FALSE), data = A, pch = ".")
 ```
 
-And the partial relationships in the model fit to the transformed data are much more nearly linear (cf., Figure \ref{fig:Auto-explore-cr-plots}, on page \pageref{fig:Auto-explore-cr-plots}, and Figure \ref{fig:Auto-transformed-cr-plots}:
+And the partial relationships in the model fit to the transformed data are much more nearly linear (cf., Figure \ref{fig:Auto-explore-cr-plots}, on page \pageref{fig:Auto-explore-cr-plots}, and Figure \ref{fig:Auto-transformed-cr-plots}):
 
 ```{r Auto-transformed-cr-plots}
 #| out.width = "70%",
@@ -771,7 +773,7 @@ To cross-validate this multinomial-logit model we need an appropriate cost crite
 ```{r BayesRule}
 BayesRule
 ```
-After doing some error checking, \code{BayesRule()} rounds the predicted proabability \code{yhat} of a 1 ("success") response in a binary regression model to 0 or 1 to obtain a categorical prediction, and then reports the proportion of incorrect predictions. Because the Bayes's rule criterion is an average of casewise components (as, e.g., is the MSE), a \code{"casewise loss"} attribute is attached to the result, enabling the computation of bias correction and confidence intervals (as discussed in Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
+After doing some error checking, \code{BayesRule()} rounds the predicted probability \code{yhat} of a 1 ("success") response in a binary regression model to 0 or 1 to obtain a categorical prediction, and then reports the proportion of incorrect predictions. Because the Bayes's rule criterion is an average of casewise components (as, e.g., is the MSE), a \code{"casewise loss"} attribute is attached to the result, enabling the computation of bias correction and confidence intervals (as discussed in Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
 
 It is straightforward to adapt Bayes's rule to a polytomous response:
 ```{r BayesRuleMulti}
