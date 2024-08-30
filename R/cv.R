@@ -748,7 +748,7 @@ as.data.frame.cv <- function(x,
       colnames(D3) <- colnames
       D2 <- cbind(D2, D3)
     }
-    D <- Merge(D, D2)
+    if (nrow(D2) > 0) D <- Merge(D, D2)
   }
   criterion <- x$criterion
   if (!is.null(criterion)) {
