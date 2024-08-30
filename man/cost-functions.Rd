@@ -69,6 +69,8 @@ the latter doesn't and is therefore faster.
 
 }}
 \examples{
+if (requireNamespace("carData", quietly=TRUE)){
+withAutoprint({
 data("Duncan", package="carData")
 m.lm <- lm(prestige ~ income + education, data=Duncan)
 mse(Duncan$prestige, fitted(m.lm))
@@ -76,6 +78,10 @@ mse(Duncan$prestige, fitted(m.lm))
 data("Mroz", package="carData")
 m.glm <- glm(lfp ~ ., data=Mroz, family=binomial)
 BayesRule(Mroz$lfp == "yes", fitted(m.glm))
+})
+} else {
+cat("\n install 'carData' package to run these examples\n")
+}
 }
 \seealso{
 \code{\link{cv}}, \code{\link{cv.merMod}},

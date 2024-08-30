@@ -293,6 +293,8 @@ models; see the "Extending the cv package" vignette
 
 }}
 \examples{
+if (requireNamespace("ISLR2", quietly=TRUE)){
+withAutoprint({
 data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ horsepower, data=Auto)
 cv(m.auto,  k="loo")
@@ -306,7 +308,13 @@ summary(D.auto.reps, mse ~ rep + fold, include = "folds",
         subset = fold <= 5) # first 5 folds
 summary(D.auto.reps, mse ~ rep, include="folds")
 summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")
+})
+} else {
+cat("\n install 'ISLR2' package to run these examples\n")
+}
 
+if (requireNamespace("carData", quietly=TRUE)){
+withAutoprint({
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
 cv(m.mroz, criterion=BayesRule, seed=123)
@@ -317,6 +325,10 @@ m.rlm <- MASS::rlm(prestige ~ income + education,
                    data=Duncan)
 cv(m.lm, k="loo", method="Woodbury")
 cv(m.rlm, k="loo")
+})
+} else {
+cat("\n install 'carData' package to run these examples\n")
+}
 
 }
 \seealso{

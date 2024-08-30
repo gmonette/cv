@@ -270,11 +270,19 @@ for the several folds and possibly average them.
 
 }}
 \examples{
+if (requireNamespace("ISLR2", quietly=TRUE)){
+withAutoprint({
 data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 cv(selectStepAIC, Auto, seed=123, working.model=m.auto)
 cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
          AIC=FALSE, k=5, reps=3) # via BIC
+})
+} else {
+cat("\n install the 'ISLR2' package to run these examples\n")
+}
+if (requireNamespace("carData", quietly=TRUE)){
+withAutoprint({
 data("Prestige", package="carData")
 m.pres <- lm(prestige ~ income + education + women,
              data=Prestige)
@@ -285,6 +293,12 @@ cvt
 compareFolds(cvt)
 coef(cvt, average=median, NAs=1) # NAs not really needed here
 cv(m.pres, seed=123)
+})
+} else {
+cat("install the 'carData' package to run these examples\n")
+}
+if (requireNamespace("ISLR2", quietly=TRUE)){
+withAutoprint({
 Auto$year <- as.factor(Auto$year)
 Auto$origin <- factor(Auto$origin,
                       labels=c("America", "Europe", "Japan"))
@@ -298,6 +312,8 @@ cvs <- cv(selectTransStepAIC, data=Auto, seed=76692, working.model=m.auto,
           response="mpg", AIC=FALSE)
 cvs
 compareFolds(cvs)
+})
+}
 data("Duncan", package="carData")
 m1 <- lm(prestige ~ income + education, data=Duncan)
 m2 <- lm(prestige ~ income + education + type, data=Duncan)

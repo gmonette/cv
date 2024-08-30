@@ -105,11 +105,17 @@
 #' is set accordingly (note that this is distinct from the number of
 #' folds \code{k}).
 #' @examples
+#' if (requireNamespace("ISLR2", quietly=TRUE)){
+#' withAutoprint({
 #' data("Auto", package="ISLR2")
 #' m.auto <- lm(mpg ~ . - name - origin, data=Auto)
 #' cv(selectStepAIC, Auto, seed=123, working.model=m.auto)
 #' cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
 #'          AIC=FALSE, k=5, reps=3) # via BIC
+#' })
+#' } else {
+#' cat("\n install the 'ISLR2' package to run these examples\n")
+#' }
 
 #' @describeIn cv.function \code{cv()} method for applying a model
 #' model-selection (or specification) procedure.
@@ -277,6 +283,8 @@ yjPowerInverse <- function(y, lambda) {
 #' @param rounded if \code{TRUE} (the default) use nicely rounded versions
 #' of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).
 #' @examples
+#' if (requireNamespace("carData", quietly=TRUE)){
+#' withAutoprint({
 #' data("Prestige", package="carData")
 #' m.pres <- lm(prestige ~ income + education + women,
 #'              data=Prestige)
@@ -287,6 +295,10 @@ yjPowerInverse <- function(y, lambda) {
 #' compareFolds(cvt)
 #' coef(cvt, average=median, NAs=1) # NAs not really needed here
 #' cv(m.pres, seed=123)
+#' })
+#' } else {
+#' cat("install the 'carData' package to run these examples\n")
+#' }
 #' @describeIn cv.function select transformations of the predictors and response
 #' using \code{\link[car]{powerTransform}()} in the \pkg{car} package.
 #' @export
@@ -422,6 +434,8 @@ selectTrans <- function(data,
 #' @describeIn cv.function select transformations of the predictors and response,
 #' and then select predictors.
 #' @examples
+#' if (requireNamespace("ISLR2", quietly=TRUE)){
+#' withAutoprint({
 #' Auto$year <- as.factor(Auto$year)
 #' Auto$origin <- factor(Auto$origin,
 #'                       labels=c("America", "Europe", "Japan"))
@@ -435,6 +449,8 @@ selectTrans <- function(data,
 #'           response="mpg", AIC=FALSE)
 #' cvs
 #' compareFolds(cvs)
+#' })
+#' }
 #' @export
 selectTransStepAIC <- function(data,
                                indices,

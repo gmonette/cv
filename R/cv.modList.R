@@ -71,6 +71,8 @@
 #' @seealso \code{\link{cv}}, \code{\link{cv.merMod}},
 #' \code{\link{selectModelList}}.
 #' @examples
+#' if (requireNamespace("carData", quietly=TRUE)){
+#' withAutoprint({
 #' data("Duncan", package="carData")
 #' m1 <- lm(prestige ~ income + education, data=Duncan)
 #' m2 <- lm(prestige ~ income + education + type, data=Duncan)
@@ -89,6 +91,10 @@
 #'                            data=Duncan, seed=5963,
 #'                            recursive=TRUE, save.model=TRUE))
 #' cv.models.recursive$selected.model
+#' })
+#' } else {
+#' cat("install the 'carData' package to run these examples\n")
+#' }
 
 #' @describeIn cv.modList \code{cv()} method for \code{"modList"} objects.
 #' @exportS3Method
