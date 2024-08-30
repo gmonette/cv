@@ -21,7 +21,7 @@ different response variables.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -260,35 +260,59 @@ or, when <code>recursive=TRUE</code>, an object of class <code>c("cvSelect", "cv
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Duncan"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"carData"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/source.html" class="external-link">withAutoprint</a></span><span class="op">(</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Duncan"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="op">(</span><span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span><span class="op">*</span><span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">(</span><span class="va">cv.models</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="fu">models</span><span class="op">(</span>m1<span class="op">=</span><span class="va">m1</span>, m2<span class="op">=</span><span class="va">m2</span>, m3<span class="op">=</span><span class="va">m3</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                 data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">7949</span>, reps<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">D.cv.models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cv.models</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">D.cv.models</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D.cv.models</span>, <span class="va">criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span>, include<span class="op">=</span><span class="st">"folds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.models</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">cv.models.ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="fu">models</span><span class="op">(</span>m1<span class="op">=</span><span class="va">m1</span>, m2<span class="op">=</span><span class="va">m2</span>, m3<span class="op">=</span><span class="va">m3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                    data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>, confint<span class="op">=</span><span class="cn">TRUE</span>, level<span class="op">=</span><span class="fl">0.50</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                 <span class="co"># nb: n too small for accurate CIs</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.models.ci</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="va">cv.models.recursive</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="fu">models</span><span class="op">(</span>m1<span class="op">=</span><span class="va">m1</span>, m2<span class="op">=</span><span class="va">m2</span>, m3<span class="op">=</span><span class="va">m3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                           data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>,</span></span>
+<span class="r-in"><span>                           recursive<span class="op">=</span><span class="cn">TRUE</span>, save.model<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cv.models.recursive</span><span class="op">$</span><span class="va">selected.model</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"install the 'carData' package to run these examples\n"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Duncan", package="carData")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m1 &lt;- lm(prestige ~ income + education, data=Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m2 &lt;- lm(prestige ~ income + education + type, data=Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m3 &lt;- lm(prestige ~ (income + education)*type, data=Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models &lt;- cv(models(m1=m1, m2=m2, m3=m3),</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +                  data=Duncan, seed=7949, reps=5))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m1 averaged across 5 replications (with SDs):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 195.0866 (2.307011)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 193.5434 (2.195082)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m2 averaged across 5 replications (with SDs):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 111.7281 (4.908514)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 110.1813 (4.623137)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 84.39899 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 84.39899</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m3 averaged across 5 replications (with SDs):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 142.3619 (5.682756)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 137.932 (5.264929)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 74.45878 </span>
-<span class="r-in"><span><span class="va">D.cv.models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cv.models</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">D.cv.models</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 74.45878</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; D.cv.models &lt;- as.data.frame(cv.models)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; head(D.cv.models)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   model rep fold criterion adjusted.criterion full.criterion coef.Intercept</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    m1   1    0   198.534             196.89         166.82        -6.0647</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    m1   1    1   139.227                 NA             NA        -5.3264</span>
@@ -310,16 +334,16 @@ or, when <code>recursive=TRUE</code>, an object of class <code>c("cvSelect", "cv
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4                 NA                      NA                    NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5                 NA                      NA                    NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6                 NA                      NA                    NA</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D.cv.models</span>, <span class="va">criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span>, include<span class="op">=</span><span class="st">"folds"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.cv.models, criterion ~ model + rep, include="folds")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      rep</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> model        1        2        3        4        5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    m1 204.7489 197.8415 192.9138 199.5759 200.2259</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    m2 110.5324 109.8870 121.7147 111.1913 120.0575</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    m3 141.9428 145.7092 143.0177 143.1847 155.0245</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.models</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.models)</span>
 <span class="r-plt img"><img src="cv.modList-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="op">(</span><span class="va">cv.models.ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="fu">models</span><span class="op">(</span>m1<span class="op">=</span><span class="va">m1</span>, m2<span class="op">=</span><span class="va">m2</span>, m3<span class="op">=</span><span class="va">m3</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                    data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>, confint<span class="op">=</span><span class="cn">TRUE</span>, level<span class="op">=</span><span class="fl">0.50</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models.ci &lt;- cv(models(m1=m1, m2=m2, m3=m3),</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +                     data=Duncan, seed=5963, confint=TRUE, level=0.50))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m1:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
@@ -327,7 +351,7 @@ or, when <code>recursive=TRUE</code>, an object of class <code>c("cvSelect", "cv
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 196.8033</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 195.1236</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 50% CI for bias-adjusted CV criterion = (162.0956, 228.1516)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m2:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
@@ -335,7 +359,7 @@ or, when <code>recursive=TRUE</code>, an object of class <code>c("cvSelect", "cv
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 112.0172</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 110.4557</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 50% CI for bias-adjusted CV criterion = (88.83787, 132.0735)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 84.39899 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 84.39899</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m3:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
@@ -343,19 +367,19 @@ or, when <code>recursive=TRUE</code>, an object of class <code>c("cvSelect", "cv
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 145.4901</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 140.7525</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 50% CI for bias-adjusted CV criterion = (110.554, 170.9511)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 74.45878 </span>
-<span class="r-in"><span>                 <span class="co"># nb: n too small for accurate CIs</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.models.ci</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="cv.modList-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="op">(</span><span class="va">cv.models.recursive</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="fu">models</span><span class="op">(</span>m1<span class="op">=</span><span class="va">m1</span>, m2<span class="op">=</span><span class="va">m2</span>, m3<span class="op">=</span><span class="va">m3</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                           data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>,</span></span>
-<span class="r-in"><span>                           recursive<span class="op">=</span><span class="cn">TRUE</span>, save.model<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 74.45878</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;                  # nb: n too small for accurate CIs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.models.ci)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models.recursive &lt;- cv(models(m1=m1, m2=m2, m3=m3),</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +                            data=Duncan, seed=5963,</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +                            recursive=TRUE, save.model=TRUE))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 5963</span>
+<span class="r-plt img"><img src="cv.modList-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 112.0172</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 139.8472</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 113.7905 </span>
-<span class="r-in"><span><span class="va">cv.models.recursive</span><span class="op">$</span><span class="va">selected.model</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 113.7905</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv.models.recursive$selected.model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> lm(formula = prestige ~ income + education + type, data = Duncan)</span>
