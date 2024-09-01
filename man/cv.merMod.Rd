@@ -47,7 +47,7 @@
   ncores = 1L,
   clusterVariables,
   blups = coef,
-  fixed.effects = glmmTMB::fixef,
+  fixed.effects = flattenFixefGlmmTMB,
   ...
 )
 }

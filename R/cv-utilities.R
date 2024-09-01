@@ -482,10 +482,14 @@ cvMixed <- function(model,
     }
     stopCluster(cl)
     for (i in 1L:k) {
-      yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
+      indices.i <- result[[i]]$indices.i
+      # yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
+      yhat[indices.i] <- result[[i]]$fit.i
       if (details) {
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
+        # crit.i[i] <- criterion(y[fold(folds, i)],
+        #                        yhat[fold(folds, i)])
+        crit.i[i] <- criterion(y[indices.i],
+                               yhat[indices.i])
         coef.i[[i]] <- result[[i]]$coef.i
       }
     }
@@ -493,10 +497,14 @@ cvMixed <- function(model,
     result <- vector(k, mode = "list")
     for (i in 1L:k) {
       result[[i]] <- f(i, predict.clusters.args, predict.cases.args, ...)
-      yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
+      indices.i <- result[[i]]$indices.i
+      # yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
+      yhat[indices.i] <- result[[i]]$fit.i
       if (details) {
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
+        # crit.i[i] <- criterion(y[fold(folds, i)],
+        #                        yhat[fold(folds, i)])
+        crit.i[i] <- criterion(y[indices.i],
+                               yhat[indices.i])
         coef.i[[i]] <- result[[i]]$coef.i
       }
     }

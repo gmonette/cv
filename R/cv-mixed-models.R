@@ -182,7 +182,7 @@ cv.glmmTMB <-
            ncores = 1L,
            clusterVariables,
            blups = coef,
-           fixed.effects = glmmTMB::fixef,
+           fixed.effects = flattenFixefGlmmTMB,
            ...) {
     if(isFALSE(model$call$doFit)) model <- update(model, doFit = TRUE)
     cvMixed(
@@ -215,6 +215,54 @@ cv.glmmTMB <-
       ...
     )
   }
+
+# not exported (or registered):
+
+coef.merMod <- function(object, ...) lme4::fixef(object)
+
+coef.lme <- function(object, ...) nlme::fixef(object)
+
+coef.glmmTMB <- function(object, ...) flattenFixefGlmmTMB(object)
+
+flattenFixefGlmmTMB <- function(model, ...){
+
+  coefs <- glmmTMB::fixef(model)
+
+  cond <- if (length(coefs$cond) > 0){
+    cond.coefs <- coefs$cond
+    coef.names <- names(cond.coefs)
+    coef.names[coef.names == "(Intercept)"] <- "Intercept"
+    coef.names <- paste0("cond.", coef.names)
+    names(cond.coefs) <- coef.names
+    cond.coefs
+  } else {
+    numeric(0)
+  }
+
+  zi <- if (length(coefs$zi) > 0){
+    zi.coefs <- coefs$zi
+    coef.names <- names(zi.coefs)
+    coef.names[coef.names == "(Intercept)"] <- "Intercept"
+    coef.names <- paste0("zi.", coef.names)
+    names(zi.coefs) <- coef.names
+    zi.coefs
+  } else {
+    numeric(0)
+  }
+
+  disp <- if (length(coefs$disp) > 0){
+    disp.coefs <- coefs$disp
+    coef.names <- names(disp.coefs)
+    coef.names[coef.names == "(Intercept)"] <- "Intercept"
+    coef.names <- paste0("disp.", coef.names)
+    names(disp.coefs) <- coef.names
+    disp.coefs
+  } else {
+    numeric(0)
+  }
+
+  c(cond, zi, disp)
+}
 
 
 defineClusters <- function(variables, data) {
