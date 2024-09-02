@@ -16,7 +16,6 @@
   details = NULL,
   ncores = 1L,
   clusterVariables,
-  blups = coef,
   fixed.effects = lme4::fixef,
   ...
 )
@@ -31,7 +30,6 @@
   details = NULL,
   ncores = 1L,
   clusterVariables,
-  blups = coef,
   fixed.effects = nlme::fixef,
   ...
 )
@@ -46,7 +44,6 @@
   details = NULL,
   ncores = 1L,
   clusterVariables,
-  blups = coef,
   fixed.effects = flattenFixefGlmmTMB,
   ...
 )
@@ -85,9 +82,7 @@ with that fold deleted.}
 \item{clusterVariables}{a character vector of names of the variables
 defining clusters for a mixed model with nested or crossed random effects;
 if missing, cross-validation is performed for individual cases rather than
-for clusters}
-
-\item{blups}{a function to be used to compute BLUPs for
+for clusters
 case-based CV when \code{details = TRUE}.}
 
 \item{fixed.effects}{a function to be used to compute fixed-effect

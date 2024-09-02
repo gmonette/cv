@@ -55,7 +55,6 @@ cvMixed(
   clusterVariables,
   predict.clusters.args = list(object = model, newdata = data),
   predict.cases.args = list(object = model, newdata = data),
-  blups,
   fixed.effects,
   ...
 )
@@ -187,9 +186,6 @@ the whole data set from a mixed model when performing CV on cases;
 the first two elements should be
 \code{model} and \code{newdata}; see the "Extending the cv package" vignette
 (\code{vignette("cv-extend", package="cv")}).}
-
-\item{blups}{a function to be used to compute BLUPs for
-case-based CV when \code{details = TRUE}.}
 
 \item{fixed.effects}{a function to be used to compute fixed-effect
 coefficients for cluster-based CV when \code{details = TRUE}.}

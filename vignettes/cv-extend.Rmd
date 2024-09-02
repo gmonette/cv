@@ -331,7 +331,7 @@ The remaining two arguments are unfamiliar:
 
 * Similarly, `predict.cases.args` is a named list of arguments to be passed to `predict()` for case-based CV. Setting `level = 1` includes random effects in the predictions.
 
-* `blups` and `fixed.effects` are used to compute detailed fold-based statistics for case-based and cluster-based CV, respectively.
+`fixed.effects` is used to compute detailed fold-based statistics.
 
 Finally, any additional arguments, absorbed by `...`, are passed to `update()` when the model is refit with each fold omitted. `cvMixed()` returns an object of class `"cv"`.
 
@@ -368,7 +368,6 @@ cv.glmmPQL <- function(model,
                        seed,
                        ncores = 1,
                        clusterVariables,
-                       blups = coef,
                        fixed.effects = nlme::fixef,
                        ...) {
   cvMixed(
@@ -393,7 +392,6 @@ cv.glmmPQL <- function(model,
       level = 1,
       type = "response"
     ),
-    blups = blups,
     fixed.effects = fixed.effects,
     verbose = FALSE,
     ...

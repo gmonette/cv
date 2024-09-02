@@ -68,8 +68,8 @@
 #' the first two elements should be
 #' \code{model} and \code{newdata}; see the "Extending the cv package" vignette
 #' (\code{vignette("cv-extend", package="cv")}).
-#' @param blups a function to be used to compute BLUPs for
-#' case-based CV when \code{details = TRUE}.
+# #' @param blups a function to be used to compute BLUPs for
+# #' case-based CV when \code{details = TRUE}.
 #' @param fixed.effects a function to be used to compute fixed-effect
 #' coefficients for cluster-based CV when \code{details = TRUE}.
 #' @param save.coef save the coefficients from the selected models? Deprecated
@@ -354,7 +354,7 @@ cvMixed <- function(model,
                                                    data),
                     predict.cases.args = list(object = model, newdata =
                                                 data),
-                    blups,
+                    # blups,
                     fixed.effects,
                     ...) {
   pkg.env <- getNamespace(package)
@@ -405,7 +405,7 @@ cvMixed <- function(model,
         fit.i = fit.i,
         crit.all.i = criterion(y, fit.all.i),
         indices.i = indices.i,
-        coef.i = blups(predict.cases.args$object)
+        coef.i = fixed.effects(predict.cases.args$object)
       )
     }
   y <- GetResponse(model)

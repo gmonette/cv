@@ -234,7 +234,6 @@ cv.glmmPQL <- function(model,
                        seed,
                        ncores = 1,
                        clusterVariables,
-                       blups = coef,
                        fixed.effects = nlme::fixef,
                        ...) {
   cvMixed(
@@ -259,7 +258,6 @@ cv.glmmPQL <- function(model,
       level = 1,
       type = "response"
     ),
-    blups = blups,
     fixed.effects = fixed.effects,
     verbose = FALSE,
     ...

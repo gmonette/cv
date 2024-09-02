@@ -33,7 +33,7 @@
 #' defining clusters for a mixed model with nested or crossed random effects;
 #' if missing, cross-validation is performed for individual cases rather than
 #' for clusters
-#' @param blups a function to be used to compute BLUPs for
+# #' @param blups a function to be used to compute BLUPs for
 #' case-based CV when \code{details = TRUE}.
 #' @param fixed.effects a function to be used to compute fixed-effect
 #' coefficients for cluster-based CV when \code{details = TRUE}.
@@ -92,7 +92,7 @@ cv.merMod <-
            details = NULL,
            ncores = 1L,
            clusterVariables,
-           blups = coef,
+           # blups = coef,
            fixed.effects = lme4::fixef,
            ...) {
     cvMixed(
@@ -120,7 +120,7 @@ cv.merMod <-
         re.form = NA,
         allow.new.levels = TRUE
       ),
-      blups = blups,
+      # blups = blups,
       fixed.effects = fixed.effects,
       ...
     )
@@ -139,7 +139,7 @@ cv.lme <-
            details = NULL,
            ncores = 1L,
            clusterVariables,
-           blups = coef,
+           # blups = coef,
            fixed.effects = nlme::fixef,
            ...) {
     cvMixed(
@@ -164,7 +164,7 @@ cv.lme <-
         newdata = data,
         level = 1
       ),
-      blups = blups,
+      # blups = blups,
       fixed.effects = fixed.effects,
       ...
     )
@@ -183,7 +183,7 @@ cv.glmmTMB <-
            details = NULL,
            ncores = 1L,
            clusterVariables,
-           blups = coef,
+           # blups = coef,
            fixed.effects = flattenFixefGlmmTMB,
            ...) {
     if(isFALSE(model$call$doFit)) model <- update(model, doFit = TRUE)
@@ -212,7 +212,7 @@ cv.glmmTMB <-
         re.form = NA,
         allow.new.levels = TRUE
       ),
-      blups = blups,
+      # blups = blups,
       fixed.effects = fixed.effects,
       ...
     )
