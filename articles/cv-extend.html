@@ -181,7 +181,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt;     attr(result, "casewise loss") &lt;- "(y - yhat)^2"</span></span>
 <span><span class="co">#&gt;     result</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x120cb1388&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x1373eefd0&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span>
 <span></span>
 <span><span class="fu">cv</span><span class="fu">:::</span><span class="fu">getLossFn</span><span class="op">(</span><span class="fu"><a href="../reference/cost-functions.html">mse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -189,7 +189,7 @@ casewise components of the criterion.</p>
 <span><span class="co">#&gt; {</span></span>
 <span><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x120d29270&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x137466eb8&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>"(y - yhat)^2"</code>, that evaluates to an expression that is a
@@ -425,9 +425,14 @@ default by <code><a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="ext
 iteration history for each fold.</p>
 <p>Then:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 3465</span></span>
-<span><span class="co">#&gt; cross-validation criterion (BayesRuleMulti) = 0.32459</span></span></code></pre></div>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; criterion: BayesRuleMulti</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
 <p>The cross-validated polytomous Bayes-rule criterion confirms that the
 fitted model does substantially better than the marginal Bayes-rule
 prediction that everyone votes for Labour.</p>
@@ -557,9 +562,14 @@ attached to the search path in the current R session via
 handle the scoping issue transparently by automatically locating
 &lt;code&gt;&lt;a href="https://rdrr.io/pkg/nnet/man/multinom.html" class="external-link"&gt;multinom()&lt;/a&gt;&lt;/code&gt;.&lt;/p&gt;'><sup>2</sup></a></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.beps</span>, seed<span class="op">=</span><span class="fl">3465</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 3465</span></span>
-<span><span class="co">#&gt; cross-validation criterion (BayesRuleMulti) = 0.32459</span></span></code></pre></div>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; criterion: BayesRuleMulti</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32459</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.32368</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.30017, 0.34718)</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.31869</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -583,7 +593,7 @@ facilitate this process, and to see how that works, consider the
 <span><span class="co">#&gt;             newdata = data, level = 1), fixed.effects = fixed.effects, </span></span>
 <span><span class="co">#&gt;         ...)</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x12288ecf8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x14113a320&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code><a href="../reference/cv.merMod.html">cv.lme()</a></code> sets up a call to
 <code><a href="../reference/cvCompute.html">cvMixed()</a></code>, which does the computational work.</p>
@@ -832,20 +842,34 @@ the <strong>lme4</strong> package:</p>
 <p>Finally, we try out our <code>cv.glmmPQL()</code> method,
 cross-validating both by clusters and by cases,</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pql</span>, clusterVariables<span class="op">=</span><span class="st">"ID"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pql</span>, clusterVariables<span class="op">=</span><span class="st">"ID"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation based on 50 {ID} clusters</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19545</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.19545</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pql</span>, data<span class="op">=</span><span class="va">bacteria</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">1490</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pql</span>, data<span class="op">=</span><span class="va">bacteria</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">1490</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1490</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.20909</span></span></code></pre></div>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.20909</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.20727</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.14545</span></span></code></pre></div>
 <p>and again compare to <code><a href="https://rdrr.io/pkg/lme4/man/glmer.html" class="external-link">glmer()</a></code>:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.glmer</span>, clusterVariables<span class="op">=</span><span class="st">"ID"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span></span>
-<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.19545</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.glmer</span>, clusterVariables<span class="op">=</span><span class="st">"ID"</span>, criterion<span class="op">=</span><span class="va">BayesRule</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation based on 50 {ID} clusters</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19545</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.19545</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.glmer</span>, data<span class="op">=</span><span class="va">bacteria</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">1490</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.glmer</span>, data<span class="op">=</span><span class="va">bacteria</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">1490</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1490</span></span>
-<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.19545</span></span></code></pre></div>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.19545</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.19364</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.15</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -950,9 +974,14 @@ as predictors in a linear least-squares regression:</p>
 <span><span class="co">#&gt; Multiple R-squared:  0.707,  Adjusted R-squared:  0.671 </span></span>
 <span><span class="co">#&gt; F-statistic: 19.8 on 5 and 41 DF,  p-value: 5.59e-10</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.swiss</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.swiss</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 8433</span></span>
-<span><span class="co">#&gt; cross-validation criterion (mse) = 59.683</span></span></code></pre></div>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 59.683</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 58.846</span></span>
+<span><span class="co">#&gt; full-sample criterion = 44.788</span></span></code></pre></div>
 <p>Thus, the MSE for the model fit to the complete data is considerably
 smaller than the CV estimate of the MSE. Can we do better by selecting a
 subset of the predictors, taking account of the additional uncertainty
@@ -1022,9 +1051,14 @@ and <code>Infant.Mortality</code>, but not <code>Examination</code>:</p>
 <span><span class="co">#&gt; Multiple R-squared:  0.699,  Adjusted R-squared:  0.671 </span></span>
 <span><span class="co">#&gt; F-statistic: 24.4 on 4 and 42 DF,  p-value: 1.72e-10</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.best</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span> <span class="co"># use same folds as before</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.best</span>, seed<span class="op">=</span><span class="fl">8433</span><span class="op">)</span><span class="op">)</span> <span class="co"># use same folds as before</span></span>
 <span><span class="co">#&gt; R RNG seed set to 8433</span></span>
-<span><span class="co">#&gt; cross-validation criterion (mse) = 58.467</span></span></code></pre></div>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 58.467</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 57.778</span></span>
+<span><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
 <p>The MSE for the selected model is (of course) slightly higher than
 for the full model fit previously, but the cross-validated MSE is a bit
 lower; as we explain in the vignette on cross-validating model
@@ -1157,14 +1191,19 @@ which includes 4 or the 5 predictors (and the intercept):</p>
 invoking the <code><a href="../reference/cv.function.html">cv.function()</a></code> method for <code><a href="../reference/cv.html">cv()</a></code>, we
 get:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span><span class="va">cv.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">cv.swiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">selectSubsets</span>,</span>
 <span>  working.model <span class="op">=</span> <span class="va">m.swiss</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">swiss</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">8433</span> <span class="co"># use same folds</span></span>
-<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 8433</span></span>
-<span><span class="co">#&gt; cross-validation criterion (mse) = 65.835</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv.swiss</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 65.835</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.644</span></span>
+<span><span class="co">#&gt; full-sample criterion = 45.916</span></span></code></pre></div>
 <p>Cross-validation shows that model selection exacts a penalty in MSE.
 Examining the models selected for the 10 folds reveals that there is
 some uncertainty in identifying the predictors in the “best” model, with

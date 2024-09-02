@@ -249,12 +249,25 @@ vignette, repeated here:</p>
 <span><span class="co">#&gt; Loading required package: foreach</span></span>
 <span><span class="co">#&gt; Loading required package: iterators</span></span>
 <span><span class="co">#&gt; Loading required package: parallel</span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span><span class="op">)</span>  <span class="co"># default method = "hatvalues"</span></span>
-<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"naive"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span><span class="op">)</span> <span class="op">)</span> <span class="co"># default method = "hatvalues"</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: hatvalues</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"naive"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: naive</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; full-sample criterion = 18.985</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: mse</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>This is a small regression problem and all three computational
 approaches are essentially instantaneous, but it is still of interest to
 investigate their relative speed. In this comparison, we include the
@@ -279,11 +292,11 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :</span></span>
 <span><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   1.0238   1.1469   1.3566   1.3693   1.4113   1.8401    10</span></span>
-<span><span class="co">#&gt;   Woodbury  12.9446  13.1648  15.1574  14.2921  16.3030  19.9002    10</span></span>
-<span><span class="co">#&gt;      naive 224.3132 239.9847 249.2867 248.7667 265.1713 274.0353    10</span></span>
-<span><span class="co">#&gt;     cv.glm 414.4538 445.1468 468.7912 454.4324 492.6055 552.4625    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr     min       lq     mean  median       uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues   1.006   1.0392   1.2118   1.228   1.2932   1.4928    10</span></span>
+<span><span class="co">#&gt;   Woodbury  12.382  12.4973  13.8547  12.826  15.6839  16.2178    10</span></span>
+<span><span class="co">#&gt;      naive 219.923 220.9473 222.8098 222.613 224.6022 226.3370    10</span></span>
+<span><span class="co">#&gt;     cv.glm 378.008 386.3754 410.5061 400.304 446.3432 453.5210    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -328,20 +341,35 @@ example in the introductory vignette:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, <span class="co"># default method = "exact"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, <span class="co"># default method = "exact"</span></span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>, </span>
-<span>   criterion <span class="op">=</span> <span class="va">BayesRule</span><span class="op">)</span></span>
-<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
+<span>   criterion <span class="op">=</span> <span class="va">BayesRule</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: exact</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
-<span>   method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
+<span>   method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: Woodbury</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
+<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
+<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
-<span>   method <span class="op">=</span> <span class="st">"hatvalues"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span></code></pre></div>
+<span>   method <span class="op">=</span> <span class="st">"hatvalues"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span><span class="co">#&gt; method: hatvalues</span></span>
+<span><span class="co">#&gt; criterion: BayesRule</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span></code></pre></div>
 <p>As for linear models, we report some timings for the various
 <code><a href="../reference/cv.html">cv()</a></code> methods of computation in LOO CV as well as for the
 <code><a href="../reference/cv.html">cv.glm()</a></code> function from the <strong>boot</strong> package
@@ -367,11 +395,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min        lq      mean   median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    1.309    1.3431    1.5588    1.584    1.6521    1.8353    10</span></span>
-<span><span class="co">#&gt;   Woodbury   41.450   44.9659   46.8216   46.152   48.0337   53.3118    10</span></span>
-<span><span class="co">#&gt;      exact 1956.981 1983.1567 2056.0690 2020.801 2047.9494 2395.8295    10</span></span>
-<span><span class="co">#&gt;     cv.glm 2245.881 2259.5118 2427.2581 2482.893 2524.3639 2641.5821    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    1.1169    1.1384    1.3188    1.3834    1.3967    1.4393    10</span></span>
+<span><span class="co">#&gt;   Woodbury   40.4267   42.6508   43.3040   43.6661   44.1602   44.6061    10</span></span>
+<span><span class="co">#&gt;      exact 1769.1429 1789.7221 1818.7859 1824.4306 1848.8894 1854.9489    10</span></span>
+<span><span class="co">#&gt;     cv.glm 2045.5000 2059.5379 2085.5372 2077.9853 2104.8367 2142.0890    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
