@@ -1,3 +1,9 @@
+# cv 2.0.3
+
+- Fixes to computing per-fold details for mixed-models cv() methods.
+
+- Small fixes.
+
 # cv 2.0.2
 
 - changed cache options for cv-mixed vignette
