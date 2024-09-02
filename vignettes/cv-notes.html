@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-05-23" />
+<meta name="date" content="2024-09-02" />
 
 <title>Computational and technical notes on cross-validating regression models</title>
 
@@ -364,7 +364,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Computational and technical notes on
 cross-validating regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-05-23</h4>
+<h4 class="date">2024-09-02</h4>
 
 
 
@@ -490,28 +490,28 @@ vignette, repeated here:</p>
 <span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; Residual standard error: 4.37 on 389 degrees of freedom</span></span>
 <span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; Multiple R-squared:  0.688,  Adjusted R-squared:  0.686 </span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;cv&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>)  <span class="co"># default method = &quot;hatvalues&quot;</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">method =</span> <span class="st">&quot;naive&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; method: naive</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">method =</span> <span class="st">&quot;Woodbury&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; F-statistic:  428 on 2 and 389 DF,  p-value: &lt;2e-16</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;cv&quot;</span>)</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>) ) <span class="co"># default method = &quot;hatvalues&quot;</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">method =</span> <span class="st">&quot;naive&quot;</span>))</span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="co">#&gt; method: naive</span></span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">method =</span> <span class="st">&quot;Woodbury&quot;</span>))</span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
+<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
+<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
+<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
 <p>This is a small regression problem and all three computational
 approaches are essentially instantaneous, but it is still of interest to
 investigate their relative speed. In this comparison, we include the
@@ -521,122 +521,115 @@ investigate their relative speed. In this comparison, we include the
 fit the linear model as an equivalent Gaussian GLM. We use the
 <code>microbenchmark()</code> function from the package of the same name
 for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>m.auto.glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(mpg <span class="sc">~</span> <span class="fu">poly</span>(horsepower, <span class="dv">2</span>), <span class="at">data =</span> Auto)</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>boot<span class="sc">::</span><span class="fu">cv.glm</span>(Auto, m.auto.glm)<span class="sc">$</span>delta</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; [1] 19.248 19.248</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">hatvalues =</span> <span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>),</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">Woodbury =</span> <span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">method =</span> <span class="st">&quot;Woodbury&quot;</span>),</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="at">naive =</span> <span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">method =</span> <span class="st">&quot;naive&quot;</span>),</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">cv.glm =</span> boot<span class="sc">::</span><span class="fu">cv.glm</span>(Auto, m.auto.glm),</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>)</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = &quot;loo&quot;), :</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; Unit: microseconds</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt;       expr       min       lq     mean   median       uq      max neval cld</span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues    989.45   1160.7   1169.5   1174.7   1192.5   1282.5    10 a  </span></span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  12141.29  12179.6  12375.9  12332.0  12566.1  12746.2    10 a  </span></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt;      naive 216572.41 219644.3 220622.5 220570.7 222222.3 223352.0    10  b </span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 377859.03 381541.5 399800.4 384608.7 430889.8 451316.4    10   c</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>m.auto.glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(mpg <span class="sc">~</span> <span class="fu">poly</span>(horsepower, <span class="dv">2</span>), <span class="at">data =</span> Auto)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>boot<span class="sc">::</span><span class="fu">cv.glm</span>(Auto, m.auto.glm)<span class="sc">$</span>delta</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; [1] 19.248 19.248</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="at">hatvalues =</span> <span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">Woodbury =</span> <span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">method =</span> <span class="st">&quot;Woodbury&quot;</span>),</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">naive =</span> <span class="fu">cv</span>(m.auto, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">method =</span> <span class="st">&quot;naive&quot;</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">cv.glm =</span> boot<span class="sc">::</span><span class="fu">cv.glm</span>(Auto, m.auto.glm),</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;  hatvalues   1.3345   1.5178   1.5347   1.5442   1.5801   1.6284    10</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;   Woodbury  14.9877  15.0436  15.2659  15.2147  15.4062  15.7366    10</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;      naive 315.0382 316.9830 320.9941 321.9218 323.7760 330.4423    10</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt;     cv.glm 550.5770 557.5320 579.8248 565.4353 581.3043 666.1158    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
 <p>Similarly, let’s return to the logistic-regression model fit to
 Mroz’s data on women’s labor-force participation, also employed as an
 example in the introductory vignette:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Mroz&quot;</span>, <span class="at">package=</span><span class="st">&quot;carData&quot;</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>m.mroz <span class="ot">&lt;-</span> <span class="fu">glm</span>(lfp <span class="sc">~</span> ., <span class="at">data =</span> Mroz, <span class="at">family =</span> binomial)</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">summary</span>(m.mroz)</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; glm(formula = lfp ~ ., family = binomial, data = Mroz)</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; (Intercept)  3.18214    0.64438    4.94  7.9e-07 ***</span></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; k5          -1.46291    0.19700   -7.43  1.1e-13 ***</span></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; k618        -0.06457    0.06800   -0.95  0.34234    </span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; age         -0.06287    0.01278   -4.92  8.7e-07 ***</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; wcyes        0.80727    0.22998    3.51  0.00045 ***</span></span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; hcyes        0.11173    0.20604    0.54  0.58762    </span></span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; lwg          0.60469    0.15082    4.01  6.1e-05 ***</span></span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; inc         -0.03445    0.00821   -4.20  2.7e-05 ***</span></span>
-<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
-<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; Residual deviance:  905.27  on 745  degrees of freedom</span></span>
-<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; AIC: 921.3</span></span>
-<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">cv</span>(m.mroz, <span class="co"># default method = &quot;exact&quot;</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>   <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, </span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>   <span class="at">criterion =</span> BayesRule)</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; method: exact</span></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">cv</span>(m.mroz,</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>   <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>   <span class="at">criterion =</span> BayesRule,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>   <span class="at">method =</span> <span class="st">&quot;Woodbury&quot;</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">cv</span>(m.mroz,</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>   <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>,</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>   <span class="at">criterion =</span> BayesRule,</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>   <span class="at">method =</span> <span class="st">&quot;hatvalues&quot;</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Mroz&quot;</span>, <span class="at">package=</span><span class="st">&quot;carData&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>m.mroz <span class="ot">&lt;-</span> <span class="fu">glm</span>(lfp <span class="sc">~</span> ., <span class="at">data =</span> Mroz, <span class="at">family =</span> binomial)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">summary</span>(m.mroz)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; glm(formula = lfp ~ ., family = binomial, data = Mroz)</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; (Intercept)  3.18214    0.64438    4.94  7.9e-07 ***</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; k5          -1.46291    0.19700   -7.43  1.1e-13 ***</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; k618        -0.06457    0.06800   -0.95  0.34234    </span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; age         -0.06287    0.01278   -4.92  8.7e-07 ***</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; wcyes        0.80727    0.22998    3.51  0.00045 ***</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; hcyes        0.11173    0.20604    0.54  0.58762    </span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; lwg          0.60469    0.15082    4.01  6.1e-05 ***</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; inc         -0.03445    0.00821   -4.20  2.7e-05 ***</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 1029.75  on 752  degrees of freedom</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Residual deviance:  905.27  on 745  degrees of freedom</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; AIC: 921.3</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">cv</span>(m.mroz, <span class="co"># default method = &quot;exact&quot;</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>   <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, </span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>   <span class="at">criterion =</span> BayesRule))</span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt; method: exact</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">cv</span>(m.mroz,</span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>   <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>,</span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a>   <span class="at">criterion =</span> BayesRule,</span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a>   <span class="at">method =</span> <span class="st">&quot;Woodbury&quot;</span>))</span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; method: Woodbury</span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">cv</span>(m.mroz,</span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a>   <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>,</span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a>   <span class="at">criterion =</span> BayesRule,</span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a>   <span class="at">method =</span> <span class="st">&quot;hatvalues&quot;</span>))</span>
+<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a><span class="co">#&gt; n-Fold Cross Validation</span></span>
+<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a><span class="co">#&gt; method: hatvalues</span></span>
+<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a><span class="co">#&gt; criterion: BayesRule</span></span>
+<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 0.32005</span></span></code></pre></div>
 <p>As for linear models, we report some timings for the various
 <code>cv()</code> methods of computation in LOO CV as well as for the
 <code>cv.glm()</code> function from the <strong>boot</strong> package
 (which, recall, refits the model with each case removed, and thus is
 comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="at">hatvalues =</span> <span class="fu">cv</span>(</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>    m.mroz,</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>    <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>    <span class="at">criterion =</span> BayesRule,</span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;hatvalues&quot;</span></span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  ),</span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">Woodbury =</span> <span class="fu">cv</span>(</span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>    m.mroz,</span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>    <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>,</span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>    <span class="at">criterion =</span> BayesRule,</span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;Woodbury&quot;</span></span>
-<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>  ),</span>
-<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="at">exact =</span> <span class="fu">cv</span>(m.mroz, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">criterion =</span> BayesRule),</span>
-<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>  <span class="at">cv.glm =</span> boot<span class="sc">::</span><span class="fu">cv.glm</span>(Mroz, m.mroz,</span>
-<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>                        <span class="at">cost =</span> BayesRule),</span>
-<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
-<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>)</span>
-<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.0662    1.0898    1.2493    1.3424    1.3482    1.3814    10</span></span>
-<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a><span class="co">#&gt;   Woodbury   40.9706   41.6086   43.1168   43.4238   44.4415   44.9395    10</span></span>
-<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a><span class="co">#&gt;      exact 1738.8318 1764.3418 1785.2642 1774.3105 1818.1838 1834.7521    10</span></span>
-<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2010.3348 2027.7473 2114.2633 2113.6089 2174.4127 2303.9434    10</span></span>
-<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a><span class="co">#&gt;  cld</span></span>
-<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
-<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
-<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a><span class="co">#&gt;   b </span></span>
-<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="co">#&gt;    c</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>microbenchmark<span class="sc">::</span><span class="fu">microbenchmark</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">hatvalues =</span> <span class="fu">cv</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>    m.mroz,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    <span class="at">criterion =</span> BayesRule,</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;hatvalues&quot;</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  ),</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="at">Woodbury =</span> <span class="fu">cv</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    m.mroz,</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>    <span class="at">criterion =</span> BayesRule,</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;Woodbury&quot;</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  ),</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="at">exact =</span> <span class="fu">cv</span>(m.mroz, <span class="at">k =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">criterion =</span> BayesRule),</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="at">cv.glm =</span> boot<span class="sc">::</span><span class="fu">cv.glm</span>(Mroz, m.mroz,</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>                        <span class="at">cost =</span> BayesRule),</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>)</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.4388    1.6126    2.0269    1.6524    1.7319    5.273    10</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt;   Woodbury   47.5865   48.6913   49.6252   49.5880   50.1344   52.654    10</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;      exact 2066.3274 2090.2715 2136.2337 2119.0919 2178.5412 2262.585    10</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2452.5692 2477.5964 2527.5282 2540.4879 2543.2671 2644.205    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -744,64 +737,64 @@ are no consistent solutions in either case.</p>
 <p>The following R function computes AUC from <span class="math inline">\(\mathbf{\widehat{y}}_v\)</span> and <span class="math inline">\(\mathbf{y}_v\)</span>, accommodating the cases
 where <span class="math inline">\(\mathbf{y}_v\)</span> is all 0s or all
 1s:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>AUC <span class="ot">&lt;-</span> <span class="cf">function</span>(y, <span class="at">yhat =</span> <span class="fu">seq_along</span>(y)) {</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">sum</span>(y)</span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="cf">if</span> (s <span class="sc">==</span> <span class="dv">0</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>    <span class="fu">return</span>(<span class="dv">0</span>)</span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="cf">if</span> (s <span class="sc">==</span> <span class="fu">length</span>(y))</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>    <span class="fu">return</span>(<span class="dv">1</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  Metrics<span class="sc">::</span><span class="fu">auc</span>(y, yhat)</span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>AUC <span class="ot">&lt;-</span> <span class="cf">function</span>(y, <span class="at">yhat =</span> <span class="fu">seq_along</span>(y)) {</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">sum</span>(y)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="cf">if</span> (s <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    <span class="fu">return</span>(<span class="dv">0</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="cf">if</span> (s <span class="sc">==</span> <span class="fu">length</span>(y))</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>    <span class="fu">return</span>(<span class="dv">1</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  Metrics<span class="sc">::</span><span class="fu">auc</span>(y, yhat)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>}</span></code></pre></div>
 <p>We then define a function to generate all possible <span class="math inline">\(\mathbf{y}_v\)</span>s of length <span class="math inline">\(n_v\)</span> as rows of the matrix <span class="math inline">\(\mathbf{Y}_{(2^{n_v} \times n_v)}\)</span>:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>Ymat <span class="ot">&lt;-</span> <span class="cf">function</span>(n_v, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>) {</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="fu">stopifnot</span>(n_v <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>              <span class="fu">round</span>(n_v) <span class="sc">==</span> n_v)    <span class="co"># n_v must be a positive integer</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span>(<span class="dv">2</span> <span class="sc">^</span> n_v <span class="sc">-</span> <span class="dv">1</span>),</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>                <span class="cf">function</span>(x)</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>                  <span class="fu">as.integer</span>(<span class="fu">intToBits</span>(x)))[<span class="dv">1</span><span class="sc">:</span>n_v,]</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">is.matrix</span>(ret))</span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>    <span class="fu">t</span>(ret)</span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>  <span class="cf">else</span></span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>    <span class="fu">matrix</span>(ret)</span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="fu">colnames</span>(ret) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;y&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(ret))</span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  <span class="cf">if</span> (exclude_identical)</span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>    ret[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(ret)),]</span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>  <span class="cf">else</span></span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>    ret</span>
-<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>Ymat <span class="ot">&lt;-</span> <span class="cf">function</span>(n_v, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>) {</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">stopifnot</span>(n_v <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>              <span class="fu">round</span>(n_v) <span class="sc">==</span> n_v)    <span class="co"># n_v must be a positive integer</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">0</span><span class="sc">:</span>(<span class="dv">2</span> <span class="sc">^</span> n_v <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>                <span class="cf">function</span>(x)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>                  <span class="fu">as.integer</span>(<span class="fu">intToBits</span>(x)))[<span class="dv">1</span><span class="sc">:</span>n_v,]</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">is.matrix</span>(ret))</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>    <span class="fu">t</span>(ret)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="cf">else</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>    <span class="fu">matrix</span>(ret)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="fu">colnames</span>(ret) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;y&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(ret))</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  <span class="cf">if</span> (exclude_identical)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>    ret[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(ret)),]</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="cf">else</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>    ret</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>}</span></code></pre></div>
 <p>For <span class="math inline">\(n_v=3\)</span>,</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">Ymat</span>(<span class="dv">3</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3</span></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; [1,]  0  0  0</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; [2,]  1  0  0</span></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; [3,]  0  1  0</span></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; [4,]  1  1  0</span></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; [5,]  0  0  1</span></span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; [6,]  1  0  1</span></span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt; [7,]  0  1  1</span></span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; [8,]  1  1  1</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">Ymat</span>(<span class="dv">3</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; [1,]  0  0  0</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; [2,]  1  0  0</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; [3,]  0  1  0</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; [4,]  1  1  0</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; [5,]  0  0  1</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; [6,]  1  0  1</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; [7,]  0  1  1</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; [8,]  1  1  1</span></span></code></pre></div>
 <p>If we exclude <span class="math inline">\(\mathbf{y}_v\)</span>s with
 identical values, then</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">Ymat</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3</span></span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; [1,]  1  0  0</span></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; [2,]  0  1  0</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; [3,]  1  1  0</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; [4,]  0  0  1</span></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; [5,]  1  0  1</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; [6,]  0  1  1</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">Ymat</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; [1,]  1  0  0</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; [2,]  0  1  0</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; [3,]  1  1  0</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [4,]  0  0  1</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; [5,]  1  0  1</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; [6,]  0  1  1</span></span></code></pre></div>
 <p>Here is <span class="math inline">\(\mathbf{Y}\)</span> with
 corresponding values of AUC:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">cbind</span>(<span class="fu">Ymat</span>(<span class="dv">3</span>), <span class="at">AUC =</span> <span class="fu">apply</span>(<span class="fu">Ymat</span>(<span class="dv">3</span>), <span class="dv">1</span>, AUC))</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3 AUC</span></span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; [1,]  0  0  0 0.0</span></span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt; [2,]  1  0  0 0.0</span></span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt; [3,]  0  1  0 0.5</span></span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt; [4,]  1  1  0 0.0</span></span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co">#&gt; [5,]  0  0  1 1.0</span></span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt; [6,]  1  0  1 0.5</span></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt; [7,]  0  1  1 1.0</span></span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt; [8,]  1  1  1 1.0</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">cbind</span>(<span class="fu">Ymat</span>(<span class="dv">3</span>), <span class="at">AUC =</span> <span class="fu">apply</span>(<span class="fu">Ymat</span>(<span class="dv">3</span>), <span class="dv">1</span>, AUC))</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt;      y1 y2 y3 AUC</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; [1,]  0  0  0 0.0</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; [2,]  1  0  0 0.0</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; [3,]  0  1  0 0.5</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; [4,]  1  1  0 0.0</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; [5,]  0  0  1 1.0</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; [6,]  1  0  1 0.5</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt; [7,]  0  1  1 1.0</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt; [8,]  1  1  1 1.0</span></span></code></pre></div>
 <p>The values of <span class="math inline">\(\mathrm{cv}(\widehat{y}_i,
 y_i)\)</span> that express AUC as a sum of casewise values are solutions
 of equation (<span class="math inline">\(\ref{eq:cw}\)</span>), which
@@ -833,42 +826,42 @@ a least-squares problem, considering whether the residuals of the
 associated linear model are all 0, using the “design matrix” <span class="math inline">\([\mathbf{U} -\mathbf{Y}, \mathbf{Y}]\)</span> to
 predict the “outcome” <span class="math inline">\(\mathrm{AUC}(\mathbf{\widehat{Y}},\mathbf{Y})_{(2^{n_v}
 \times 1)}\)</span>:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>resids <span class="ot">&lt;-</span> <span class="cf">function</span>(n_v,</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>                   <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>                   <span class="at">tol =</span> <span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps)) {</span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  Y <span class="ot">&lt;-</span> <span class="fu">Ymat</span>(n_v, <span class="at">exclude_identical =</span> exclude_identical)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  AUC <span class="ot">&lt;-</span> <span class="fu">apply</span>(Y, <span class="dv">1</span>, AUC)</span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="dv">1</span> <span class="sc">-</span> Y, Y)</span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>  opts <span class="ot">&lt;-</span> <span class="fu">options</span>(<span class="at">warn =</span> <span class="sc">-</span><span class="dv">1</span>)</span>
-<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">options</span>(opts))</span>
-<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">lsfit</span>(X, AUC, <span class="at">intercept =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">abs</span>(<span class="fu">residuals</span>(fit)))</span>
-<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>  <span class="cf">if</span> (ret <span class="sc">&lt;</span> tol) {</span>
-<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>    ret <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a>    solution <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
-<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a>    <span class="fu">names</span>(solution) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;c(&quot;</span>, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>n_v, <span class="dv">1</span><span class="sc">:</span>n_v), <span class="st">&quot;,&quot;</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a>                              <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">each =</span> n_v), <span class="st">&quot;)&quot;</span>)</span>
-<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a>    <span class="fu">attr</span>(ret, <span class="st">&quot;solution&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">zapsmall</span>(solution)</span>
-<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a>  }</span>
-<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a>  ret</span>
-<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>resids <span class="ot">&lt;-</span> <span class="cf">function</span>(n_v,</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>                   <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                   <span class="at">tol =</span> <span class="fu">sqrt</span>(.Machine<span class="sc">$</span>double.eps)) {</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  Y <span class="ot">&lt;-</span> <span class="fu">Ymat</span>(n_v, <span class="at">exclude_identical =</span> exclude_identical)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  AUC <span class="ot">&lt;-</span> <span class="fu">apply</span>(Y, <span class="dv">1</span>, AUC)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="dv">1</span> <span class="sc">-</span> Y, Y)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  opts <span class="ot">&lt;-</span> <span class="fu">options</span>(<span class="at">warn =</span> <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">options</span>(opts))</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">lsfit</span>(X, AUC, <span class="at">intercept =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  ret <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">abs</span>(<span class="fu">residuals</span>(fit)))</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>  <span class="cf">if</span> (ret <span class="sc">&lt;</span> tol) {</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>    ret <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>    solution <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>    <span class="fu">names</span>(solution) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;c(&quot;</span>, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>n_v, <span class="dv">1</span><span class="sc">:</span>n_v), <span class="st">&quot;,&quot;</span>,</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>                              <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">each =</span> n_v), <span class="st">&quot;)&quot;</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>    <span class="fu">attr</span>(ret, <span class="st">&quot;solution&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">zapsmall</span>(solution)</span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>  }</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>  ret</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>}</span></code></pre></div>
 <p>The case <span class="math inline">\(n_v=3\)</span>, excluding
 identical <span class="math inline">\(y\)</span>s, has a solution:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;solution&quot;)</span></span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="co">#&gt; c(1,0) c(2,0) c(3,0) c(1,1) c(2,1) c(3,1) </span></span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co">#&gt;    1.0    0.0   -0.5    0.5    0.0    0.0</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;solution&quot;)</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt; c(1,0) c(2,0) c(3,0) c(1,1) c(2,1) c(3,1) </span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt;    1.0    0.0   -0.5    0.5    0.0    0.0</span></span></code></pre></div>
 <p>But, if identical <span class="math inline">\(y\)</span>s are
 included, the equation is not consistent:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.125</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">3</span>, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.125</span></span></code></pre></div>
 <p>For <span class="math inline">\(n_v=4\)</span>, there are no
 solutions in either case:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">4</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.083333</span></span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">4</span>, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.25</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">4</span>, <span class="at">exclude_identical =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.083333</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">resids</span>(<span class="dv">4</span>, <span class="at">exclude_identical =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; [1] 0.25</span></span></code></pre></div>
 <p>Consequently, the widely employed AUC measure of fit for binary
 regression cannot in general be used for a casewise cross-validation
 criterion.</p>

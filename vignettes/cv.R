@@ -112,13 +112,16 @@ summary(m.auto)
 
 cv(m.auto)
 
+## ----cv-summary---------------------------------------------------------------
+summary(cv(m.auto))
+
 ## ----cv.lm-2`-----------------------------------------------------------------
-cv(m.auto, k = "loo")
+summary(cv(m.auto, k = "loo"))
 
 ## ----cv.lm-3------------------------------------------------------------------
-cv(m.auto, k = "loo", method = "naive")
+summary(cv(m.auto, k = "loo", method = "naive"))
 
-cv(m.auto, k = "loo", method = "Woodbury")
+summary(cv(m.auto, k = "loo", method = "Woodbury"))
 
 ## ----polyomial-models---------------------------------------------------------
 for (p in 1:10) {
@@ -138,6 +141,7 @@ cv.auto.10 <- cv(
   seed = 2120
 )
 cv.auto.10[1:2] # for the linear and quadratic models
+summary(cv.auto.10)
 
 # LOO CV
 cv.auto.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
@@ -145,6 +149,7 @@ cv.auto.loo <- cv(models(m.1, m.2, m.3, m.4, m.5,
                   data = Auto,
                   k = "loo")
 cv.auto.loo[1:2] # linear and quadratic models
+summary(cv.auto.loo)
 
 ## ----polynomial-regression-CV-graph-------------------------------------------
 cv.mse.10 <- as.data.frame(cv.auto.10, 
@@ -209,34 +214,34 @@ BayesRule(ifelse(Mroz$lfp == "yes", 1, 0),
           fitted(m.mroz, type = "response"))
 
 ## ----cv-Mroz-10-fold----------------------------------------------------------
-cv(m.mroz, criterion = BayesRule, seed = 248)
+summary(cv(m.mroz, criterion = BayesRule, seed = 248))
 
-cv(m.mroz,
+summary(cv(m.mroz,
    criterion = BayesRule,
    seed = 248,
-   method = "Woodbury")
+   method = "Woodbury"))
 
 ## ----cv-Mroz-LOO--------------------------------------------------------------
-cv(m.mroz, k = "loo", criterion = BayesRule)
+summary(cv(m.mroz, k = "loo", criterion = BayesRule))
 
-cv(m.mroz,
+summary(cv(m.mroz,
    k = "loo",
    criterion = BayesRule,
-   method = "Woodbury")
+   method = "Woodbury"))
 
-cv(m.mroz,
+summary(cv(m.mroz,
    k = "loo",
    criterion = BayesRule,
-   method = "hatvalues")
+   method = "hatvalues"))
 
 ## ----mroz-reps----------------------------------------------------------------
-cv(
+summary(cv(
   m.mroz,
   criterion = BayesRule,
   seed = 248,
   reps = 5,
   method = "Woodbury"
-)
+))
 
 ## ----model-comparison-with-reps-----------------------------------------------
 cv.auto.reps <- cv(

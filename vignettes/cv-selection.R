@@ -58,7 +58,7 @@ mse(D$y, fitted(m.select))
 ## ----cv-selectedModel---------------------------------------------------------
 library("cv")
 
-cv(m.select, seed = 2529)
+summary(cv(m.select, seed = 2529))
 
 ## ----compare-selected-models--------------------------------------------------
 compareFolds(cv.select)
@@ -136,7 +136,7 @@ recursiveCV.auto <- cv(
   save.model = TRUE,
   seed = 2120
 )
-recursiveCV.auto
+summary(recursiveCV.auto)
 recursiveCV.auto$selected.model
 cv(m.7, seed = 2120) # same seed for same folds
 
@@ -164,7 +164,7 @@ BayesRule(Mroz$lfp == "yes",
           predict(m.mroz.sel, type = "response"))
 
 ## ----cv-mroz-regression-------------------------------------------------------
-cv(m.mroz.sel, criterion = BayesRule, seed = 345266)
+summary(cv(m.mroz.sel, criterion = BayesRule, seed = 345266))
 
 ## ----cv-mroz-selection--------------------------------------------------------
 m.mroz.sel.cv <- cv(
@@ -175,7 +175,7 @@ m.mroz.sel.cv <- cv(
   working.model = m.mroz,
   AIC = FALSE
 )
-m.mroz.sel.cv
+summary(m.mroz.sel.cv)
 
 ## ----compare-selected-models-mroz---------------------------------------------
 compareFolds(m.mroz.sel.cv)
@@ -248,7 +248,7 @@ cvs <- cv(
   response = "prestige",
   family = "yjPower"
 )
-cvs
+summary(cvs)
 
 cv(m.pres, seed = 1463) # untransformed model with same folds
 
@@ -346,7 +346,7 @@ cvs <- cv(
   AIC = FALSE,
   criterion = medAbsErr
 )
-cvs
+summary(cvs)
 
 compareFolds(cvs)
 

@@ -35,26 +35,26 @@ m.auto <- lm(mpg ~ poly(horsepower, 2), data = Auto)
 summary(m.auto)
 
 library("cv")
-cv(m.auto, k = "loo")  # default method = "hatvalues"
-cv(m.auto, k = "loo", method = "naive")
-cv(m.auto, k = "loo", method = "Woodbury")
+summary(cv(m.auto, k = "loo") ) # default method = "hatvalues"
+summary(cv(m.auto, k = "loo", method = "naive"))
+summary(cv(m.auto, k = "loo", method = "Woodbury"))
 
 ## ----Mroz-logistic-regression-------------------------------------------------
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data = Mroz, family = binomial)
 summary(m.mroz)
 
-cv(m.mroz, # default method = "exact"
+summary(cv(m.mroz, # default method = "exact"
    k = "loo", 
-   criterion = BayesRule)
-cv(m.mroz,
+   criterion = BayesRule))
+summary(cv(m.mroz,
    k = "loo",
    criterion = BayesRule,
-   method = "Woodbury")
-cv(m.mroz,
+   method = "Woodbury"))
+summary(cv(m.mroz,
    k = "loo",
    criterion = BayesRule,
-   method = "hatvalues")
+   method = "hatvalues"))
 
 ## -----------------------------------------------------------------------------
 AUC <- function(y, yhat = seq_along(y)) {

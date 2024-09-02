@@ -118,7 +118,7 @@ cv.multinom <-
   }
 
 ## ----BEPS-cv------------------------------------------------------------------
-cv(m.beps, seed=3465)
+summary(cv(m.beps, seed=3465))
 
 ## ----cv.multinom-alternative--------------------------------------------------
 cv.multinom <- function(model,
@@ -206,7 +206,7 @@ cv.multinom <- function(model,
 }
 
 ## ----BEPS-cv-alt-version------------------------------------------------------
-cv(m.beps, seed=3465)
+summary(cv(m.beps, seed=3465))
 
 ## ----cv.lme-------------------------------------------------------------------
 cv:::cv.lme
@@ -292,7 +292,7 @@ nrow(swiss)
 m.swiss <- lm(Fertility ~ ., data=swiss)
 summary(m.swiss)
 
-cv(m.swiss, seed=8433)
+summary(cv(m.swiss, seed=8433))
 
 ## ----subset-selection---------------------------------------------------------
 swiss.sub <- regsubsets(Fertility ~ ., data=swiss)
@@ -307,7 +307,7 @@ car::subsets(swiss.sub, legend="topright")
 m.best <- update(m.swiss, . ~ . - Examination)
 summary(m.best)
 
-cv(m.best, seed=8433) # use same folds as before
+summary(cv(m.best, seed=8433)) # use same folds as before
 
 ## ----selectSubsets------------------------------------------------------------
 selectSubsets <- function(data = insight::get_data(model),
@@ -383,12 +383,13 @@ selectSubsets(model=m.swiss)
 selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 
 ## ----cvSelect-selectSubsets---------------------------------------------------
-(cv.swiss <- cv(
+cv.swiss <- cv(
   selectSubsets,
   working.model = m.swiss,
   data = swiss,
   seed = 8433 # use same folds
-))
+)
+summary(cv.swiss)
 
 ## ----best-models-by-folds-----------------------------------------------------
 compareFolds(cv.swiss)

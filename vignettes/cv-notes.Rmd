@@ -95,9 +95,9 @@ m.auto <- lm(mpg ~ poly(horsepower, 2), data = Auto)
 summary(m.auto)
 
 library("cv")
-cv(m.auto, k = "loo")  # default method = "hatvalues"
-cv(m.auto, k = "loo", method = "naive")
-cv(m.auto, k = "loo", method = "Woodbury")
+summary(cv(m.auto, k = "loo") ) # default method = "hatvalues"
+summary(cv(m.auto, k = "loo", method = "naive"))
+summary(cv(m.auto, k = "loo", method = "Woodbury"))
 ```
 
 This is a small regression problem and all three computational approaches are essentially instantaneous, but it is still of interest to investigate their relative speed. In this comparison, we include the `cv.glm()` function from the **boot** package [@CantyRipley2022; @DavisonHinkley:1997], which takes the naive approach, and for which we have to fit the linear model as an equivalent Gaussian GLM. We use the `microbenchmark()` function from the package of the same name for the timings [@Mersmann:2023]:
@@ -123,17 +123,17 @@ data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data = Mroz, family = binomial)
 summary(m.mroz)
 
-cv(m.mroz, # default method = "exact"
+summary(cv(m.mroz, # default method = "exact"
    k = "loo", 
-   criterion = BayesRule)
-cv(m.mroz,
+   criterion = BayesRule))
+summary(cv(m.mroz,
    k = "loo",
    criterion = BayesRule,
-   method = "Woodbury")
-cv(m.mroz,
+   method = "Woodbury"))
+summary(cv(m.mroz,
    k = "loo",
    criterion = BayesRule,
-   method = "hatvalues")
+   method = "hatvalues"))
 ```
 
 As for linear models, we report some timings for the various `cv()` methods of computation in LOO CV as well as for the `cv.glm()` function from the **boot** package (which, recall, refits the model with each case removed, and thus is comparable to `cv()` with `method="exact"`):

@@ -188,7 +188,7 @@ That is, we simply call the default `cv()` method with the `type` argument prope
 
 Then:
 ```{r BEPS-cv}
-cv(m.beps, seed=3465)
+summary(cv(m.beps, seed=3465))
 ```
 The cross-validated polytomous Bayes-rule criterion confirms that the fitted model does substantially better than the marginal Bayes-rule prediction that everyone votes for Labour.
 
@@ -284,7 +284,7 @@ cv.multinom <- function(model,
 ```
 Notice that separate "helper" functions are defined for non-parallel and parallel computations.[^multinom-parallel] The new version of `cv.multinom()` produces the same results as the  version that calls `cv.default()`:[^multinom-scoping]
 ```{r BEPS-cv-alt-version}
-cv(m.beps, seed=3465)
+summary(cv(m.beps, seed=3465))
 ```
 
 
@@ -425,15 +425,15 @@ The two sets of estimates are similar, but not identical
 
 Finally, we try out our `cv.glmmPQL()` method, cross-validating both by clusters and by cases,
 ```{r cv-example-glmmPQL, cache=TRUE}
-cv(m.pql, clusterVariables="ID", criterion=BayesRule)
+summary(cv(m.pql, clusterVariables="ID", criterion=BayesRule))
 
-cv(m.pql, data=bacteria, criterion=BayesRule, seed=1490)
+summary(cv(m.pql, data=bacteria, criterion=BayesRule, seed=1490))
 ```
 and again compare to `glmer()`:
 ```{r cv-example-glmer, cache=TRUE}
-cv(m.glmer, clusterVariables="ID", criterion=BayesRule)
+summary(cv(m.glmer, clusterVariables="ID", criterion=BayesRule))
 
-cv(m.glmer, data=bacteria, criterion=BayesRule, seed=1490)
+summary(cv(m.glmer, data=bacteria, criterion=BayesRule, seed=1490))
 ```
 
 
@@ -466,7 +466,7 @@ Following @LumleyMiller:2020, we treat `Fertility` as the response and the other
 m.swiss <- lm(Fertility ~ ., data=swiss)
 summary(m.swiss)
 
-cv(m.swiss, seed=8433)
+summary(cv(m.swiss, seed=8433))
 ```
 Thus, the MSE for the model fit to the complete data is considerably smaller than the CV estimate of the MSE. Can we do better by selecting a subset of the predictors, taking account of the additional uncertainty induced by model selection?
 
@@ -486,7 +486,7 @@ The graph, produced by the `subsets()` function in the **car** package, shows th
 m.best <- update(m.swiss, . ~ . - Examination)
 summary(m.best)
 
-cv(m.best, seed=8433) # use same folds as before
+summary(cv(m.best, seed=8433)) # use same folds as before
 ```
 The MSE for the selected model is (of course) slightly higher than for the full model fit previously, but the cross-validated MSE is a bit lower; as we explain in the vignette on cross-validating model selection, however, it isn't kosher to select and cross-validate a model on the same data.
 
@@ -573,12 +573,13 @@ selectSubsets(model=m.swiss, indices=seq(5, 45, by=10))
 
 Then, using `selectSubsets()` in cross-validation, invoking the `cv.function()` method for `cv()`, we get:
 ```{r cvSelect-selectSubsets}
-(cv.swiss <- cv(
+cv.swiss <- cv(
   selectSubsets,
   working.model = m.swiss,
   data = swiss,
   seed = 8433 # use same folds
-))
+)
+summary(cv.swiss)
 ```
 Cross-validation shows that model selection exacts a penalty in MSE. Examining the models selected for the 10 folds reveals that there is some uncertainty in identifying the predictors in the "best" model, with `Agriculture` sometimes appearing and sometimes not:
 ```{r best-models-by-folds}

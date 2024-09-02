@@ -62,13 +62,13 @@ summary(hsb.lmer, correlation = FALSE)
 ## ----HSB-lmer-CV-cluster, cache=CACHE-----------------------------------------
 library("cv")
 
-cv(hsb.lmer,
+summary(cv(hsb.lmer,
    k = 10,
    clusterVariables = "school",
-   seed = 5240)
+   seed = 5240))
 
 ## ----HSB-lmer-CV-case, cache=CACHE--------------------------------------------
-cv(hsb.lmer, seed = 1575)
+summary(cv(hsb.lmer, seed = 1575))
 
 ## ----hsb-lme, cache=CACHE-----------------------------------------------------
 library("nlme")
@@ -80,12 +80,12 @@ hsb.lme <- lme(
 )
 summary(hsb.lme)
 
-cv(hsb.lme,
+summary(cv(hsb.lme,
    k = 10,
    clusterVariables = "school",
-   seed = 5240)
+   seed = 5240))
 
-cv(hsb.lme, seed = 1575)
+summary(cv(hsb.lme, seed = 1575))
 
 ## ----include=FALSE, echo=FALSE------------------------------------------------
 library("glmmTMB") # necessary for some reason to knit vignette in RStudio, harmless otherwise
@@ -317,19 +317,18 @@ m.p <- lmer(
 summary(m.p)
 
 ## ----pigs-cv------------------------------------------------------------------
-cv(m.p, clusterVariables = "id")
+summary(cv(m.p, clusterVariables = "id"))
 
-cv(m.p, clusterVariables = "week")
+summary(cv(m.p, clusterVariables = "week"))
 
-cv(
+summary(cv(
   m.p,
   clusterVariables = c("id", "week"),
   k = 10,
-  seed = 8469
-)
+  seed = 8469))
 
 ## ----pigs-cv-cases------------------------------------------------------------
-cv(m.p, k = 10, seed = 8469)
+summary(cv(m.p, k = 10, seed = 8469))
 
 ## ----coda, include = FALSE----------------------------------------------------
 options(.opts)

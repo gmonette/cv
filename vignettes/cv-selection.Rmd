@@ -89,7 +89,7 @@ If we cross-validate the selected model, we also obtain an optimistic estimate o
 ```{r cv-selectedModel}
 library("cv")
 
-cv(m.select, seed = 2529)
+summary(cv(m.select, seed = 2529))
 ```
 
 The `"function"` method of `cv()` allows us to cross-validate the whole model-selection procedure, where first argument to `cv()` is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion. The `selectStepAIC()` function, in the **cv** package and based on `stepAIC()`, is suitable for use with `cv()`:
@@ -102,7 +102,7 @@ cv.select <- cv(
   direction = "forward",
   scope = list(lower =  ~ 1, upper = formula(m.full))
 )
-cv.select
+summary(cv.select)
 ```
 
 The other arguments to `cv()` are:
@@ -202,7 +202,7 @@ recursiveCV.auto <- cv(
   save.model = TRUE,
   seed = 2120
 )
-recursiveCV.auto
+summary(recursiveCV.auto)
 recursiveCV.auto$selected.model
 cv(m.7, seed = 2120) # same seed for same folds
 ```
@@ -243,7 +243,7 @@ Bayes rule applied to the selected model misclassifies 32% of the cases in the `
 
 Cross-validating the selected model produces a similar, slightly larger, estimate of misclassification, about 33%:
 ```{r cv-mroz-regression}
-cv(m.mroz.sel, criterion = BayesRule, seed = 345266)
+summary(cv(m.mroz.sel, criterion = BayesRule, seed = 345266))
 ```
 Is this estimate of predictive performance optimistic?
 
@@ -257,7 +257,7 @@ m.mroz.sel.cv <- cv(
   working.model = m.mroz,
   AIC = FALSE
 )
-m.mroz.sel.cv
+summary(m.mroz.sel.cv)
 ```
 Setting `AIC=FALSE` in the call to `cv()` uses the BIC rather than the AIC as the model-selection criterion. As it turns out, exactly the same predictors are selected when each of the 10 folds are omitted, and the several coefficient estimates are very similar, as we show using `compareFolds()`:
 ```{r compare-selected-models-mroz}
@@ -371,7 +371,7 @@ cvs <- cv(
   response = "prestige",
   family = "yjPower"
 )
-cvs
+summary(cvs)
 
 cv(m.pres, seed = 1463) # untransformed model with same folds
 
@@ -514,7 +514,7 @@ cvs <- cv(
   AIC = FALSE,
   criterion = medAbsErr
 )
-cvs
+summary(cvs)
 
 compareFolds(cvs)
 ```
