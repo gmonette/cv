@@ -220,11 +220,11 @@ cv.glmmTMB <-
 
 # not exported (or registered):
 
-coef.merMod <- function(object, ...) lme4::fixef(object)
-
-coef.lme <- function(object, ...) nlme::fixef(object)
-
-coef.glmmTMB <- function(object, ...) flattenFixefGlmmTMB(object)
+# coef.merMod <- function(object, ...) lme4::fixef(object)
+#
+# coef.lme <- function(object, ...) nlme::fixef(object)
+#
+# coef.glmmTMB <- function(object, ...) flattenFixefGlmmTMB(object)
 
 flattenFixefGlmmTMB <- function(model, ...){
 
