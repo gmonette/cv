@@ -95,7 +95,6 @@ and can also be used for extensions (see the vignette "Extending the cv package,
 <span>  <span class="va">clusterVariables</span>,</span>
 <span>  predict.clusters.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model</span>, newdata <span class="op">=</span> <span class="va">data</span><span class="op">)</span>,</span>
 <span>  predict.cases.args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">model</span>, newdata <span class="op">=</span> <span class="va">data</span><span class="op">)</span>,</span>
-<span>  <span class="va">blups</span>,</span>
 <span>  <span class="va">fixed.effects</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -285,11 +284,6 @@ the whole data set from a mixed model when performing CV on cases;
 the first two elements should be
 <code>model</code> and <code>newdata</code>; see the "Extending the cv package" vignette
 (<code><a href="../articles/cv-extend.html">vignette("cv-extend", package="cv")</a></code>).</p></dd>
-
-
-<dt id="arg-blups">blups<a class="anchor" aria-label="anchor" href="#arg-blups"></a></dt>
-<dd><p>a function to be used to compute BLUPs for
-case-based CV when <code>details = TRUE</code>.</p></dd>
 
 
 <dt id="arg-fixed-effects">fixed.effects<a class="anchor" aria-label="anchor" href="#arg-fixed-effects"></a></dt>
