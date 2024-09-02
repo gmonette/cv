@@ -248,13 +248,7 @@ the bias-adjusted MSE includes 1):</p>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.select</span>, seed <span class="op">=</span> <span class="fl">2529</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2529</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.95937</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.95785</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.87661, 1.0391)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 0.95937</span></span></code></pre></div>
 <p>The <code>"function"</code> method of <code><a href="../reference/cv.html">cv()</a></code> allows us to
 cross-validate the whole model-selection procedure, where first argument
 to <code><a href="../reference/cv.html">cv()</a></code> is a model-selection function capable of refitting
@@ -273,12 +267,7 @@ package and based on <code><a href="https://rdrr.io/pkg/MASS/man/stepAIC.html" c
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 3791</span></span>
 <span><span class="va">cv.select</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 1.0687</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 1.0612</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.97172, 1.1506)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.93063</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 1.0687</span></span></code></pre></div>
 <p>The other arguments to <code><a href="../reference/cv.html">cv()</a></code> are:</p>
 <ul>
 <li>
@@ -404,11 +393,7 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
 <span><span class="va">recursiveCV.auto</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.105</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.68</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.746</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.105</span></span>
 <span><span class="va">recursiveCV.auto</span><span class="op">$</span><span class="va">selected.model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
@@ -423,12 +408,7 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span><span class="co">#&gt;                -8.55                  7.98</span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.7</span>, seed <span class="op">=</span> <span class="fl">2120</span><span class="op">)</span> <span class="co"># same seed for same folds</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 18.898</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 18.854</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.078</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 18.898</span></span></code></pre></div>
 <p>As expected, recursive CV produces a larger estimate of MSE for the
 selected 7th degree polynomial model than CV applied directly to this
 model.</p>
@@ -526,13 +506,7 @@ larger, estimate of misclassification, about 33%:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz.sel</span>, criterion <span class="op">=</span> <span class="va">BayesRule</span>, seed <span class="op">=</span> <span class="fl">345266</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 345266</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: exact</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.33068</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.33332</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.2997, 0.36695)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.31873</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.33068</span></span></code></pre></div>
 <p>Is this estimate of predictive performance optimistic?</p>
 <p>We proceed to apply the model-selection procedure by
 cross-validation, producing more or less the same result:</p>
@@ -547,12 +521,7 @@ cross-validation, producing more or less the same result:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 6681</span></span>
 <span><span class="va">m.mroz.sel.cv</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.33068</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.33452</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.3009, 0.36815)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.31873</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.33068</span></span></code></pre></div>
 <p>Setting <code>AIC=FALSE</code> in the call to <code><a href="../reference/cv.html">cv()</a></code> uses
 the BIC rather than the AIC as the model-selection criterion. As it
 turns out, exactly the same predictors are selected when each of the 10
@@ -836,20 +805,11 @@ on a subset of the data (i.e., a CV fold), and hence for use with
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1463</span></span>
 <span><span class="va">cvs</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 54.487</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 54.308</span></span>
-<span><span class="co">#&gt; full-sample criterion = 50.6</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 54.487</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.pres</span>, seed <span class="op">=</span> <span class="fl">1463</span><span class="op">)</span> <span class="co"># untransformed model with same folds</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1463</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 63.293</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 63.073</span></span>
-<span><span class="co">#&gt; full-sample criterion = 59.153</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 63.293</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">cvs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; CV criterion by folds:</span></span>
@@ -1307,10 +1267,7 @@ whole model-specification process:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 76692</span></span>
 <span><span class="va">cvs</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; criterion: medAbsErr</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 1.4951</span></span>
-<span><span class="co">#&gt; full-sample criterion = 1.3396</span></span>
+<span><span class="co">#&gt; cross-validation criterion (medAbsErr) = 1.4951</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">cvs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; CV criterion by folds:</span></span>

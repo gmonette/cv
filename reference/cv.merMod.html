@@ -230,21 +230,21 @@ models from the <span class="pkg">glmmTMB</span> package.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fixed Effects:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)         Days  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      251.41        10.47  </span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm1</span>, clusterVariables<span class="op">=</span><span class="st">"Subject"</span><span class="op">)</span> <span class="co"># LOO CV of clusters</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm1</span>, clusterVariables<span class="op">=</span><span class="st">"Subject"</span><span class="op">)</span><span class="op">)</span> <span class="co"># LOO CV of clusters</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation based on 18 {Subject} clusters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 2460.604</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 2454.627</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 2251.398</span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm1</span>, seed<span class="op">=</span><span class="fl">447</span><span class="op">)</span> <span class="co"># 10-fold CV of cases</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm1</span>, seed<span class="op">=</span><span class="fl">447</span><span class="op">)</span><span class="op">)</span> <span class="co"># 10-fold CV of cases</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 447</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 869.533</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 847.5586</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 549.342</span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm1</span>, clusterVariables<span class="op">=</span><span class="st">"Subject"</span>, k<span class="op">=</span><span class="fl">5</span>,</span></span>
-<span class="r-in"><span>   seed<span class="op">=</span><span class="fl">834</span>, reps<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="co"># 5-fold CV of clusters, repeated 3 times</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm1</span>, clusterVariables<span class="op">=</span><span class="st">"Subject"</span>, k<span class="op">=</span><span class="fl">5</span>,</span></span>
+<span class="r-in"><span>   seed<span class="op">=</span><span class="fl">834</span>, reps<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># 5-fold CV of clusters, repeated 3 times</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 834</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 448690</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 916534</span>
@@ -300,14 +300,15 @@ models from the <span class="pkg">glmmTMB</span> package.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of Observations: 108</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Number of Groups: 27 </span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm2</span><span class="op">)</span> <span class="co"># LOO CV of cases</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm2</span><span class="op">)</span><span class="op">)</span> <span class="co"># LOO CV of cases</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 765199</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 2.666103</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 2.589541</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 1.582435</span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm2</span>, clusterVariables<span class="op">=</span><span class="st">"Subject"</span>, k<span class="op">=</span><span class="fl">5</span>, seed<span class="op">=</span><span class="fl">321</span><span class="op">)</span> <span class="co"># 5-fold CV of clusters</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">fm2</span>, clusterVariables<span class="op">=</span><span class="st">"Subject"</span>,</span></span>
+<span class="r-in"><span>        k<span class="op">=</span><span class="fl">5</span>, seed<span class="op">=</span><span class="fl">321</span><span class="op">)</span><span class="op">)</span> <span class="co"># 5-fold CV of clusters</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 321</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation based on 27 {Subject} clusters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
@@ -342,7 +343,8 @@ models from the <span class="pkg">glmmTMB</span> package.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Zero-inflation model:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)      minedno  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       1.139       -1.736  </span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">m1</span>, seed<span class="op">=</span><span class="fl">97816</span>, k<span class="op">=</span><span class="fl">5</span>, clusterVariables<span class="op">=</span><span class="st">"site"</span><span class="op">)</span> <span class="co"># 5-fold CV of clusters</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">m1</span>, seed<span class="op">=</span><span class="fl">97816</span>, k<span class="op">=</span><span class="fl">5</span>,</span></span>
+<span class="r-in"><span>          clusterVariables<span class="op">=</span><span class="st">"site"</span><span class="op">)</span><span class="op">)</span> <span class="co"># 5-fold CV of clusters</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 97816</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation based on 23 {site} clusters</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
@@ -350,7 +352,7 @@ models from the <span class="pkg">glmmTMB</span> package.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 6.002191</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI for bias-adjusted CV criterion = (2.385452, 9.61893)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 5.970489</span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">m1</span>, seed<span class="op">=</span><span class="fl">34506</span>, k<span class="op">=</span><span class="fl">5</span><span class="op">)</span> <span class="co"># 5-fold CV of cases</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">m1</span>, seed<span class="op">=</span><span class="fl">34506</span>, k<span class="op">=</span><span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="co"># 5-fold CV of cases</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 34506</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>

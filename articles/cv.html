@@ -372,12 +372,7 @@ CV:</p>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 841111</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.25</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.236</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.25</span></span></code></pre></div>
 <p>The <code>"lm"</code> method by default uses <code><a href="../reference/cost-functions.html">mse()</a></code> as
 the CV criterion and the Woodbury matrix identity <span class="citation">(Hager, 1989)</span> to update the regression with each
 fold deleted without having literally to refit the model. (Computational
@@ -396,10 +391,7 @@ seed directly via the <code>seed</code> argument to
 <code>k="n"</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: hatvalues</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span></code></pre></div>
 <p>For LOO CV of a linear model, <code><a href="../reference/cv.html">cv()</a></code> by default uses the
 hatvalues from the model fit to the full data for the LOO updates, and
 reports only the CV estimate of MSE. Alternative methods are to use the
@@ -409,20 +401,10 @@ results for a linear model (within the precision of floating-point
 computations):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"naive"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: naive</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span></code></pre></div>
 <p>The <code>"naive"</code> and <code>"Woodbury"</code> methods also
 return the bias-adjusted estimate of MSE and the full-sample MSE, but
 bias isn’t an issue for LOO CV.</p>
@@ -491,20 +473,11 @@ model-selection process.</p>
 <span>  seed <span class="op">=</span> <span class="fl">2120</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">cv.auto.10</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span> <span class="co"># for the linear and quadratic models</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model model.1:</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 24.246</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 24.23</span></span>
-<span><span class="co">#&gt; full-sample criterion = 23.944</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 24.246 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model model.2:</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.346</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.327</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span>
 <span></span>
 <span><span class="co"># LOO CV</span></span>
 <span><span class="va">cv.auto.loo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="fu"><a href="../reference/cv.modList.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
@@ -512,15 +485,10 @@ model-selection process.</p>
 <span>                  data <span class="op">=</span> <span class="va">Auto</span>,</span>
 <span>                  k <span class="op">=</span> <span class="st">"loo"</span><span class="op">)</span></span>
 <span><span class="va">cv.auto.loo</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span> <span class="co"># linear and quadratic models</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model model.1:</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: hatvalues</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 24.232</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 24.232 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Model model.2:</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: hatvalues</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.248</span></span></code></pre></div>
 <p>Because we didn’t supply names for the models in the calls to the
 <code><a href="../reference/cv.modList.html">models()</a></code> function, the names <code>model.1</code>,
@@ -730,26 +698,14 @@ computational and technical vignette for details):</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, criterion <span class="op">=</span> <span class="va">BayesRule</span>, seed <span class="op">=</span> <span class="fl">248</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 248</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: exact</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31952</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28607, 0.35297)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32404</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
 <span>   seed <span class="op">=</span> <span class="fl">248</span>,</span>
 <span>   method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 248</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31926</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28581, 0.35271)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32404</span></span></code></pre></div>
 <p>To ensure that the two methods use the same 10 folds, we specify the
 seed for R’s random-number generator explicitly; here, and as is common
 in our experience, the <code>"exact"</code> and <code>"Woodbury"</code>
@@ -768,34 +724,19 @@ computation of confidence intervals for bias-adjusted CV criteria.</p>
 exact and the approximate methods:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, k <span class="op">=</span> <span class="st">"loo"</span>, criterion <span class="op">=</span> <span class="va">BayesRule</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: exact</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
 <span>   method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
 <span>   method <span class="op">=</span> <span class="st">"hatvalues"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: hatvalues</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span></code></pre></div>
 <p>To the number of decimal digits shown, the three methods produce
 identical results for this example.</p>
 </div>
@@ -851,59 +792,13 @@ repeated 5 times:</p>
 <span><span class="co">#&gt; R RNG seed set to 767359</span></span>
 <span><span class="co">#&gt; R RNG seed set to 556270</span></span>
 <span><span class="co">#&gt; R RNG seed set to 882966</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Replicate 1:</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31301</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.27967, 0.34635)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Replicate 2:</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.31607</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3117</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.27847, 0.34493)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Replicate 3:</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.31474</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.30862</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.27543, 0.34181)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Replicate 4:</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31807</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28462, 0.35152)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Replicate 5:</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32404</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31926</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28581, 0.35271)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Average:</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.31983 (0.003887)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.31394 (0.0040093)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule)</span></span>
+<span><span class="co">#&gt; Replicate 1: 0.32005 </span></span>
+<span><span class="co">#&gt; Replicate 2: 0.31607 </span></span>
+<span><span class="co">#&gt; Replicate 3: 0.31474 </span></span>
+<span><span class="co">#&gt; Replicate 4: 0.32404 </span></span>
+<span><span class="co">#&gt; Replicate 5: 0.32404 </span></span>
+<span><span class="co">#&gt; Average: 0.31983</span></span></code></pre></div>
 <p>When <code>reps</code> &gt; <code>1</code>, the result returned by
 <code><a href="../reference/cv.html">cv()</a></code> is an object of class <code>"cvList"</code>—literally
 a list of <code>"cv"</code> objects. The results are reported for each
@@ -968,76 +863,35 @@ information in the resulting data frames.</p>
 polynomial-regression models fit to the <code>Auto</code> data:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv.auto.reps</span></span>
+<span><span class="co">#&gt; Model model.1 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 24.185 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.1 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 24.185 (0.046346)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 24.172 (0.043909)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 23.944</span></span>
+<span><span class="co">#&gt; Model model.2 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.253 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.2 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.253 (0.035024)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.239 (0.033274)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span>
+<span><span class="co">#&gt; Model model.3 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.349 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.3 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.349 (0.078429)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.328 (0.074238)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.945</span></span>
+<span><span class="co">#&gt; Model model.4 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.449 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.4 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.449 (0.1074)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.418 (0.10153)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.876</span></span>
+<span><span class="co">#&gt; Model model.5 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.095 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.5 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.095 (0.17148)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.059 (0.16202)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.427</span></span>
+<span><span class="co">#&gt; Model model.6 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.034 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.6 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.034 (0.20617)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 18.99 (0.19465)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.241</span></span>
+<span><span class="co">#&gt; Model model.7 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 18.897 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.7 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 18.897 (0.20121)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 18.852 (0.19015)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.078</span></span>
+<span><span class="co">#&gt; Model model.8 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.026 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.8 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.026 (0.21574)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 18.973 (0.2035)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.066</span></span>
+<span><span class="co">#&gt; Model model.9 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.115 </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.9 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.115 (0.21158)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.054 (0.20041)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.027</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Model model.10 averaged across 5 replications (with SDs):</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.427 (0.24337)</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.339 (0.22818)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.01</span></span>
+<span><span class="co">#&gt; Model model.10 averaged across 5 replications:</span></span>
+<span><span class="co">#&gt; cross-validation criterion = 19.427</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "cvModList"</span></span></code></pre></div>
 <p>In this case, there are 5 replications of 10-fold CV.</p>
@@ -1301,7 +1155,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  20.175   0.440  20.620</span></span>
+<span><span class="co">#&gt;  20.046   0.430  20.479</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
@@ -1315,7 +1169,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.316   0.051  13.780</span></span>
+<span><span class="co">#&gt;   0.156   0.021  11.313</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>On our computer, the parallel computation with 2 cores is nearly

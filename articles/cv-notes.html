@@ -250,24 +250,11 @@ vignette, repeated here:</p>
 <span><span class="co">#&gt; Loading required package: iterators</span></span>
 <span><span class="co">#&gt; Loading required package: parallel</span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span><span class="op">)</span>  <span class="co"># default method = "hatvalues"</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: hatvalues</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"naive"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: naive</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.auto</span>, k <span class="op">=</span> <span class="st">"loo"</span>, method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.248</span></span>
-<span><span class="co">#&gt; full-sample criterion = 18.985</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.248</span></span></code></pre></div>
 <p>This is a small regression problem and all three computational
 approaches are essentially instantaneous, but it is still of interest to
 investigate their relative speed. In this comparison, we include the
@@ -293,10 +280,10 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   1.0384   1.2283   1.7494   1.2404   1.3177   4.4598    10</span></span>
-<span><span class="co">#&gt;   Woodbury  12.2057  12.5351  12.9879  12.6203  12.9144  16.2266    10</span></span>
-<span><span class="co">#&gt;      naive 216.2257 220.9324 228.3828 222.8859 225.4483 283.7737    10</span></span>
-<span><span class="co">#&gt;     cv.glm 371.3499 385.9726 404.0276 387.4045 447.1942 454.8360    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues   1.0489   1.1917   1.2079   1.2309   1.2597   1.3373    10</span></span>
+<span><span class="co">#&gt;   Woodbury  12.4051  12.5252  12.6659  12.6525  12.7824  13.0028    10</span></span>
+<span><span class="co">#&gt;      naive 218.6283 223.5441 229.6491 224.3107 225.3024 285.1751    10</span></span>
+<span><span class="co">#&gt;     cv.glm 379.4349 386.6174 409.9887 388.2875 445.9508 495.1006    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -344,32 +331,17 @@ example in the introductory vignette:</p>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>, <span class="co"># default method = "exact"</span></span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>, </span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: exact</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
 <span>   method <span class="op">=</span> <span class="st">"Woodbury"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: Woodbury</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 0.3183</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (0.28496, 0.35164)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 0.30677</span></span>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.mroz</span>,</span>
 <span>   k <span class="op">=</span> <span class="st">"loo"</span>,</span>
 <span>   criterion <span class="op">=</span> <span class="va">BayesRule</span>,</span>
 <span>   method <span class="op">=</span> <span class="st">"hatvalues"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; method: hatvalues</span></span>
-<span><span class="co">#&gt; criterion: BayesRule</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 0.32005</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (BayesRule) = 0.32005</span></span></code></pre></div>
 <p>As for linear models, we report some timings for the various
 <code><a href="../reference/cv.html">cv()</a></code> methods of computation in LOO CV as well as for the
 <code><a href="../reference/cv.html">cv.glm()</a></code> function from the <strong>boot</strong> package
@@ -395,11 +367,11 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span>  times <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    1.1647    1.3852    1.4099    1.4143    1.4833    1.739    10</span></span>
-<span><span class="co">#&gt;   Woodbury   41.8611   43.3503   43.8496   43.8203   44.7121   45.841    10</span></span>
-<span><span class="co">#&gt;      exact 1783.5535 1815.8081 1852.6943 1858.9388 1872.5714 1955.449    10</span></span>
-<span><span class="co">#&gt;     cv.glm 2016.5304 2081.2491 2114.6183 2122.3318 2150.3388 2173.004    10</span></span></code></pre></div>
+<span><span class="co">#&gt;       expr       min        lq      mean   median        uq       max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    1.1241    1.1473    1.3494    1.388    1.4348    1.6819    10</span></span>
+<span><span class="co">#&gt;   Woodbury   40.5150   41.8168   43.1560   43.371   44.0809   45.6914    10</span></span>
+<span><span class="co">#&gt;      exact 1743.8941 1764.7013 1819.7758 1824.343 1882.9810 1898.4467    10</span></span>
+<span><span class="co">#&gt;     cv.glm 2037.5415 2062.9709 2095.1069 2095.803 2119.6200 2162.0821    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>

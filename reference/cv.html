@@ -128,8 +128,14 @@ which are documented separately.</p>
 <span><span class="co"># S3 method for class 'cv'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, digits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"digits"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'cv'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, digits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"digits"</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'cvList'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'cvList'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'cv'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span></span>
@@ -255,12 +261,16 @@ of the available options.</p></dd>
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>a <code>"cv"</code>, <code>"cvList"</code>, or <code>"cvDataFrame"</code>
-object to be printed or coerced to a data frame.</p></dd>
+object to be summarized</p></dd>
 
 
 <dt id="arg-digits">digits<a class="anchor" aria-label="anchor" href="#arg-digits"></a></dt>
 <dd><p>significant digits for printing,
 default taken from the <code>"digits"</code> option.</p></dd>
+
+
+<dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
+<dd><p>an object to summarize.</p></dd>
 
 
 <dt id="arg-row-names">row.names<a class="anchor" aria-label="anchor" href="#arg-row-names"></a></dt>
@@ -291,10 +301,6 @@ to model coefficients (broadly construed); the default is
 <code>columns = c("criteria", "coefficients")</code>, which retains both;
 and the columns <code>"model"</code>, <code>"rep"</code>, and <code>"fold"</code>, if present,
 are always retained.</p></dd>
-
-
-<dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>an object inheriting from <code>"cvDataFrame"</code> to summarize.</p></dd>
 
 
 <dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
@@ -382,12 +388,14 @@ models; see the "Extending the cv package" vignette
     <h2 id="methods-by-generic-">Methods (by generic)<a class="anchor" aria-label="anchor" href="#methods-by-generic-"></a></h2>
 
 <ul><li><p><code>print(cv)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code>"cv"</code> objects.</p></li>
+<li><p><code>summary(cv)</code>: <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for <code>"cv"</code> objects.</p></li>
 <li><p><code>as.data.frame(cv)</code>: <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> method for <code>"cv"</code> objects.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
 
 <ul><li><p><code>print(cvList)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code>"cvList"</code> objects.</p></li>
+<li><p><code>summary(cvList)</code>: <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for <code>"cvList"</code> objects.</p></li>
 <li><p><code>as.data.frame(cvList)</code>: <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> method for <code>"cvList"</code> objects.</p></li>
 <li><p><code>print(cvDataFrame)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code>"cvDataFrame"</code> objects.</p></li>
 <li><p><code>summary(cvDataFrame)</code>: <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for <code>"cvDataFrame"</code> objects.</p></li>
@@ -405,9 +413,10 @@ models; see the "Extending the cv package" vignette
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Auto"</span>, package<span class="op">=</span><span class="st">"ISLR2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m.auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">horsepower</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>,  k<span class="op">=</span><span class="st">"loo"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">(</span><span class="va">cv.auto</span> <span class="op">&lt;-</span> <span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>,  k<span class="op">=</span><span class="st">"loo"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv.auto</span> <span class="op">&lt;-</span> <span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.auto</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">(</span><span class="va">cv.auto.reps</span> <span class="op">&lt;-</span> <span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span>, reps<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv.auto.reps</span> <span class="op">&lt;-</span> <span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span>, reps<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">D.auto.reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">D.auto.reps</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D.auto.reps</span>, <span class="va">mse</span> <span class="op">~</span> <span class="va">rep</span> <span class="op">+</span> <span class="va">fold</span>, include<span class="op">=</span><span class="st">"folds"</span><span class="op">)</span></span></span>
@@ -422,11 +431,13 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Auto", package="ISLR2")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.auto &lt;- lm(mpg ~ horsepower, data=Auto)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(m.auto,  k="loo")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (mse) = 24.23151 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.auto,  k="loo"))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: hatvalues</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 24.23151</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.auto &lt;- cv(m.auto, seed=1234))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.auto &lt;- cv(m.auto, seed=1234))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 1234</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
@@ -453,7 +464,7 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fold 8         40.1      -0.16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fold 9         39.6      -0.16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fold 10        39.9      -0.16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.auto.reps &lt;- cv(m.auto, seed=1234, reps=3))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.auto.reps &lt;- cv(m.auto, seed=1234, reps=3))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 1234</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 469908</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 267</span>
@@ -527,21 +538,21 @@ models; see the "Extending the cv package" vignette
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/source.html" class="external-link">withAutoprint</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Mroz"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m.mroz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">lfp</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">Mroz</span>, family<span class="op">=</span><span class="va">binomial</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">cv</span><span class="op">(</span><span class="va">m.mroz</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu">cv</span><span class="op">(</span><span class="va">m.mroz</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">123</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Duncan"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m.lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m.rlm</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/rlm.html" class="external-link">rlm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>,</span></span>
 <span class="r-in"><span>                   data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">cv</span><span class="op">(</span><span class="va">m.lm</span>, k<span class="op">=</span><span class="st">"loo"</span>, method<span class="op">=</span><span class="st">"Woodbury"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">cv</span><span class="op">(</span><span class="va">m.rlm</span>, k<span class="op">=</span><span class="st">"loo"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu">cv</span><span class="op">(</span><span class="va">m.lm</span>, k<span class="op">=</span><span class="st">"loo"</span>, method<span class="op">=</span><span class="st">"Woodbury"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu">cv</span><span class="op">(</span><span class="va">m.rlm</span>, k<span class="op">=</span><span class="st">"loo"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n install 'carData' package to run these examples\n"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Mroz", package="carData")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.mroz &lt;- glm(lfp ~ ., data=Mroz, family=binomial)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(m.mroz, criterion=BayesRule, seed=123)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.mroz, criterion=BayesRule, seed=123))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: exact</span>
@@ -554,14 +565,14 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.lm &lt;- lm(prestige ~ income + education, data=Duncan)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.rlm &lt;- MASS::rlm(prestige ~ income + education,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> +                    data=Duncan)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(m.lm, k="loo", method="Woodbury")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.lm, k="loo", method="Woodbury"))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 198.5274</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 198.1496</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(m.rlm, k="loo")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.rlm, k="loo"))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 193.3949</span>

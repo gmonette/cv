@@ -405,44 +405,17 @@ for the several folds and possibly average them.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.auto &lt;- lm(mpg ~ . - name - origin, data=Auto)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(selectStepAIC, Auto, seed=123, working.model=m.auto)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.87795</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.8753</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (mse) = 11.87795 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(selectStepAIC, Auto, seed=123, working.model=m.auto,</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> +          AIC=FALSE, k=5, reps=3) # via BIC</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 319729</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 889422</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 1:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.91891</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.8895</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 2:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.80601</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.78946</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 3:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.81343</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.79576</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Average:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 11.86432 (0.06311657)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 11.84105 (0.05600268)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 11.65549</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (mse)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 1: 11.91891 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 2: 11.80601 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 3: 11.81343 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Average: 11.86432 </span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"carData"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/source.html" class="external-link">withAutoprint</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Prestige"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
@@ -467,11 +440,7 @@ for the several folds and possibly average them.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> +           response="prestige", family="yjPower")</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 58.68193</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 58.26258</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 50.60016</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (mse) = 58.68193 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; compareFolds(cvt)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CV criterion by folds:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    fold.1    fold.2    fold.3    fold.4    fold.5    fold.6    fold.7    fold.8 </span>
@@ -496,12 +465,7 @@ for the several folds and possibly average them.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    1.00000000    0.33000000    0.07948918    1.00000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(m.pres, seed=123)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 66.91929</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 66.45514</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 59.15265</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (mse) = 66.91929 </span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ISLR2"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/source.html" class="external-link">withAutoprint</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">Auto</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">Auto</span><span class="op">$</span><span class="va">year</span><span class="op">)</span></span></span>
@@ -532,10 +496,7 @@ for the several folds and possibly average them.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> +           response="mpg", AIC=FALSE)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 76692</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvs</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: medAbsErr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 1.476272</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 1.339604</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (medAbsErr) = 1.476272 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; compareFolds(cvs)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CV criterion by folds:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   fold.1   fold.2   fold.3   fold.4   fold.5   fold.6   fold.7   fold.8 </span>
@@ -595,11 +556,7 @@ for the several folds and possibly average them.</p></li>
 <span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">selectModelList</span>, data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>,</span></span>
 <span class="r-in"><span>   working.model<span class="op">=</span><span class="fu"><a href="cv.modList.html">models</a></span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span>, <span class="va">m3</span><span class="op">)</span><span class="op">)</span> <span class="co"># recursive CV</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 5963</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 112.0172</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 139.8472</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 113.7905</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (mse) = 112.0172 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

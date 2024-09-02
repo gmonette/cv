@@ -235,12 +235,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <span>   clusterVariables <span class="op">=</span> <span class="st">"school"</span>,</span>
 <span>   seed <span class="op">=</span> <span class="fl">5240</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 5240</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation based on 160 {school} clusters</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 39.157</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.148</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (38.066, 40.231)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 39.006</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 39.157</span></span></code></pre></div>
 <p>or at the case (i.e., student) level,</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lmer</span>, seed <span class="op">=</span> <span class="fl">1575</span><span class="op">)</span></span>
@@ -248,12 +243,7 @@ fit a mixed model for math achievement to the HSB data:</p>
 <span><span class="co">#&gt; Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :</span></span>
 <span><span class="co">#&gt; Model failed to converge with max|grad| = 0.00587207 (tol = 0.002, component 1)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 37.445</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 37.338</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (36.288, 38.388)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 36.068</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 37.445</span></span></code></pre></div>
 <p>For cluster-level CV, the <code>clusterVariables</code> argument
 tells <code><a href="../reference/cv.html">cv()</a></code> how the clusters are defined. Were there more
 than one clustering variable, say classes within schools, these would be
@@ -337,21 +327,11 @@ illustrate with the mixed model fit to the HSB data:</p>
 <span>   clusterVariables <span class="op">=</span> <span class="st">"school"</span>,</span>
 <span>   seed <span class="op">=</span> <span class="fl">5240</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 5240</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation based on 160 {school} clusters</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 39.157</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 39.149</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (38.066, 40.232)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 39.006</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 39.157</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">hsb.lme</span>, seed <span class="op">=</span> <span class="fl">1575</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 1575</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 37.442</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 37.402</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (36.351, 38.453)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 36.147</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 37.442</span></span></code></pre></div>
 <p>We used the same random-number generator seeds as in the previous
 example cross-validating the model fit by <code><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer()</a></code>, and so
 the same folds are employed in both cases.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;The observant reader will notice that we set the
@@ -888,21 +868,11 @@ the <code>Pigs</code> data set correspond to individual cases, using
 only the fixed effects):</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.p</span>, clusterVariables <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation based on 48 {id} clusters</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.973</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.965</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (17.125, 22.805)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 19.201</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.973</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.p</span>, clusterVariables <span class="op">=</span> <span class="st">"week"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; boundary (singular) fit: see help('isSingular')</span></span>
-<span><span class="co">#&gt; n-Fold Cross Validation based on 9 {week} clusters</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.312</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.305</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (16.566, 22.044)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 19.201</span></span>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.312</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.p</span>,</span>
@@ -911,23 +881,13 @@ only the fixed effects):</p>
 <span>  seed <span class="op">=</span> <span class="fl">8469</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 8469</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation based on 432 {id, week} clusters</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 19.235</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.233</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (16.493, 21.973)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 19.201</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 19.235</span></span></code></pre></div>
 <p>We can also cross-validate the individual cases taking account of the
 random effects (employing the same 10 folds):</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.p</span>, k <span class="op">=</span> <span class="fl">10</span>, seed <span class="op">=</span> <span class="fl">8469</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 8469</span></span>
-<span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
-<span><span class="co">#&gt; criterion: mse</span></span>
-<span><span class="co">#&gt; cross-validation criterion = 5.1583</span></span>
-<span><span class="co">#&gt; bias-adjusted cross-validation criterion = 5.0729</span></span>
-<span><span class="co">#&gt; 95% CI for bias-adjusted CV criterion = (4.123, 6.0229)</span></span>
-<span><span class="co">#&gt; full-sample criterion = 3.796</span></span></code></pre></div>
+<span><span class="co">#&gt; cross-validation criterion (mse) = 5.1583</span></span></code></pre></div>
 <p>Because these predictions are based on BLUPs, they are more accurate
 than the predictions based only on fixed effects.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;Even though there is only one observation per
 combination of pigs and weeks, we can use the BLUP for the omitted case
