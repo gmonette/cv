@@ -52,25 +52,27 @@
 #' library("lme4")
 #' # from ?lmer:
 #' (fm1 <- lmer(Reaction ~ Days + (Days | Subject), sleepstudy))
-#' cv(fm1, clusterVariables="Subject") # LOO CV of clusters
-#' cv(fm1, seed=447) # 10-fold CV of cases
-#' cv(fm1, clusterVariables="Subject", k=5,
-#'    seed=834, reps=3) # 5-fold CV of clusters, repeated 3 times
+#' summary(cv(fm1, clusterVariables="Subject")) # LOO CV of clusters
+#' summary(cv(fm1, seed=447)) # 10-fold CV of cases
+#' summary(cv(fm1, clusterVariables="Subject", k=5,
+#'    seed=834, reps=3)) # 5-fold CV of clusters, repeated 3 times
 #'
 #' library("nlme")
 #' # from ?lme
 #' (fm2 <- lme(distance ~ age + Sex, data = Orthodont,
 #'             random = ~ 1))
-#' cv(fm2) # LOO CV of cases
-#' cv(fm2, clusterVariables="Subject", k=5, seed=321) # 5-fold CV of clusters
+#' summary(cv(fm2)) # LOO CV of cases
+#' summary(cv(fm2, clusterVariables="Subject",
+#'         k=5, seed=321)) # 5-fold CV of clusters
 #'
 #' library("glmmTMB")
 #' # from ?glmmTMB
 #' (m1 <- glmmTMB(count ~ mined + (1|site),
 #'                zi=~mined,
 #'                family=poisson, data=Salamanders))
-#' cv(m1, seed=97816, k=5, clusterVariables="site") # 5-fold CV of clusters
-#' cv(m1, seed=34506, k=5) # 5-fold CV of cases
+#' summary(cv(m1, seed=97816, k=5,
+#'           clusterVariables="site")) # 5-fold CV of clusters
+#' summary(cv(m1, seed=34506, k=5)) # 5-fold CV of cases
 
 #' @returns
 #' The methods \code{cv.merMod()}, \code{cv.lme()}, and \code{cv.glmmTMB()},

@@ -7,7 +7,9 @@
 \alias{cv.glm}
 \alias{cv.rlm}
 \alias{print.cv}
+\alias{summary.cv}
 \alias{print.cvList}
+\alias{summary.cvList}
 \alias{as.data.frame.cv}
 \alias{as.data.frame.cvList}
 \alias{print.cvDataFrame}
@@ -69,7 +71,11 @@ cv(model, data, criterion, k, reps = 1L, seed, ...)
 
 \method{print}{cv}(x, digits = getOption("digits"), ...)
 
+\method{summary}{cv}(object, digits = getOption("digits"), ...)
+
 \method{print}{cvList}(x, ...)
+
+\method{summary}{cvList}(object, ...)
 
 \method{as.data.frame}{cv}(
   x,
@@ -154,10 +160,12 @@ or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explan
 of the available options.}
 
 \item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"cvDataFrame"}
-object to be printed or coerced to a data frame.}
+object to be summarized}
 
 \item{digits}{significant digits for printing,
 default taken from the \code{"digits"} option.}
+
+\item{object}{an object to summarize.}
 
 \item{row.names}{optional row names for the result,
 defaults to \code{NULL}.}
@@ -180,8 +188,6 @@ to model coefficients (broadly construed); the default is
 \code{columns = c("criteria", "coefficients")}, which retains both;
 and the columns \code{"model"}, \code{"rep"}, and \code{"fold"}, if present,
 are always retained.}
-
-\item{object}{an object inheriting from \code{"cvDataFrame"} to summarize.}
 
 \item{formula}{of the form \code{some.criterion ~ classifying.variable(s)}
 (see examples).}
@@ -278,12 +284,16 @@ models; see the "Extending the cv package" vignette
 \itemize{
 \item \code{print(cv)}: \code{print()} method for \code{"cv"} objects.
 
+\item \code{summary(cv)}: \code{summary()} method for \code{"cv"} objects.
+
 \item \code{as.data.frame(cv)}: \code{as.data.frame()} method for \code{"cv"} objects.
 
 }}
 \section{Functions}{
 \itemize{
 \item \code{print(cvList)}: \code{print()} method for \code{"cvList"} objects.
+
+\item \code{summary(cvList)}: \code{summary()} method for \code{"cvList"} objects.
 
 \item \code{as.data.frame(cvList)}: \code{as.data.frame()} method for \code{"cvList"} objects.
 
@@ -298,9 +308,10 @@ withAutoprint({
 data("Auto", package="ISLR2")
 m.auto <- lm(mpg ~ horsepower, data=Auto)
 cv(m.auto,  k="loo")
-(cv.auto <- cv(m.auto, seed=1234))
+summary(cv(m.auto,  k="loo"))
+summary(cv.auto <- cv(m.auto, seed=1234))
 compareFolds(cv.auto)
-(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
+summary(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
 D.auto.reps <- as.data.frame(cv.auto.reps)
 head(D.auto.reps)
 summary(D.auto.reps, mse ~ rep + fold, include="folds")
@@ -317,14 +328,14 @@ if (requireNamespace("carData", quietly=TRUE)){
 withAutoprint({
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
-cv(m.mroz, criterion=BayesRule, seed=123)
+summary(cv(m.mroz, criterion=BayesRule, seed=123))
 
 data("Duncan", package="carData")
 m.lm <- lm(prestige ~ income + education, data=Duncan)
 m.rlm <- MASS::rlm(prestige ~ income + education,
                    data=Duncan)
-cv(m.lm, k="loo", method="Woodbury")
-cv(m.rlm, k="loo")
+summary(cv(m.lm, k="loo", method="Woodbury"))
+summary(cv(m.rlm, k="loo"))
 })
 } else {
 cat("\n install 'carData' package to run these examples\n")

@@ -118,9 +118,10 @@
 #' data("Auto", package="ISLR2")
 #' m.auto <- lm(mpg ~ horsepower, data=Auto)
 #' cv(m.auto,  k="loo")
-#' (cv.auto <- cv(m.auto, seed=1234))
+#' summary(cv(m.auto,  k="loo"))
+#' summary(cv.auto <- cv(m.auto, seed=1234))
 #' compareFolds(cv.auto)
-#' (cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
+#' summary(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
 #' D.auto.reps <- as.data.frame(cv.auto.reps)
 #' head(D.auto.reps)
 #' summary(D.auto.reps, mse ~ rep + fold, include="folds")
@@ -137,14 +138,14 @@
 #' withAutoprint({
 #' data("Mroz", package="carData")
 #' m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
-#' cv(m.mroz, criterion=BayesRule, seed=123)
+#' summary(cv(m.mroz, criterion=BayesRule, seed=123))
 #'
 #' data("Duncan", package="carData")
 #' m.lm <- lm(prestige ~ income + education, data=Duncan)
 #' m.rlm <- MASS::rlm(prestige ~ income + education,
 #'                    data=Duncan)
-#' cv(m.lm, k="loo", method="Woodbury")
-#' cv(m.rlm, k="loo")
+#' summary(cv(m.lm, k="loo", method="Woodbury"))
+#' summary(cv(m.rlm, k="loo"))
 #' })
 #' } else {
 #' cat("\n install 'carData' package to run these examples\n")
@@ -608,61 +609,113 @@ print.cv <- function(x, digits = getOption("digits"), ...) {
     else
       signif(x, digits)
   }
-  cat(x[["k"]], "-Fold Cross Validation", sep = "")
-  if (!is.null(x[["clusters"]])) {
-    cat(" based on", x[["n clusters"]],
-        paste0("{", paste(x[["clusters"]], collapse = ", "), "}"),
+  if (!is.null(x[["criterion"]]) &&
+      x[["criterion"]] != "criterion"){
+    cat(paste0("cross-validation criterion (",
+        x[["criterion"]],
+        ") = ",
+        rnd(x[["CV crit"]])),
+        "\n")
+  } else {
+    cat("cross-validation criterion =", rnd(x[["CV crit"]]), "\n")
+  }
+  invisible(x)
+}
+
+#' @exportS3Method base::summary
+#' @describeIn cv \code{summary()} method for \code{"cv"} objects.
+#' @param x a \code{"cv"}, \code{"cvList"}, or \code{"cvDataFrame"}
+#' object to be summarized
+summary.cv <- function(object, digits = getOption("digits"), ...) {
+  rnd <- function(object) {
+    if (round(log10(object)) >= digits)
+      round(object)
+    else
+      signif(object, digits)
+  }
+  cat(object[["k"]], "-Fold Cross Validation", sep = "")
+  if (!is.null(object[["clusters"]])) {
+    cat(" based on", object[["n clusters"]],
+        paste0("{", paste(object[["clusters"]], collapse = ", "), "}"),
         "clusters")
   }
-  if (!is.null(x[["method"]]))
-    cat("\nmethod:", x[["method"]])
-  if (!is.null(x[["criterion"]]) && x[["criterion"]] != "criterion")
-    cat("\ncriterion:", x[["criterion"]])
-  if (is.null(x[["SD CV crit"]])) {
-    cat("\ncross-validation criterion =", rnd(x[["CV crit"]]))
+  if (!is.null(object[["method"]]))
+    cat("\nmethod:", object[["method"]])
+  if (!is.null(object[["criterion"]]) && object[["criterion"]] != "criterion")
+    cat("\ncriterion:", object[["criterion"]])
+  if (is.null(object[["SD CV crit"]])) {
+    cat("\ncross-validation criterion =", rnd(object[["CV crit"]]))
   } else {
     cat("\ncross-validation criterion = ",
-        rnd(x[["CV crit"]]),
+        rnd(object[["CV crit"]]),
         " (",
-        rnd(x[["SD CV crit"]]),
+        rnd(object[["SD CV crit"]]),
         ")",
         sep = "")
   }
-  if (!is.null(x[["adj CV crit"]])) {
-    if (is.null(x[["SD adj CV crit"]])) {
-      cat("\nbias-adjusted cross-validation criterion =", rnd(x[["adj CV crit"]]))
+  if (!is.null(object[["adj CV crit"]])) {
+    if (is.null(object[["SD adj CV crit"]])) {
+      cat("\nbias-adjusted cross-validation criterion =", rnd(object[["adj CV crit"]]))
     } else {
       cat("\nbias-adjusted cross-validation criterion = ",
-          rnd(x[["adj CV crit"]]),
+          rnd(object[["adj CV crit"]]),
           " (",
-          rnd(x[["SD adj CV crit"]]),
+          rnd(object[["SD adj CV crit"]]),
           ")",
           sep = "")
     }
   }
-  if (!is.null(x$confint)) {
+  if (!is.null(object$confint)) {
     cat(
       paste0(
         "\n",
-        x$confint["level"],
+        object$confint["level"],
         "% CI for bias-adjusted CV criterion = (",
-        rnd(x$confint["lower"]),
+        rnd(object$confint["lower"]),
         ", ",
-        rnd(x$confint["upper"]),
+        rnd(object$confint["upper"]),
         ")"
       )
     )
   }
-  if (!is.null(x[["full crit"]]))
-    cat("\nfull-sample criterion =", rnd(x[["full crit"]]))
+  if (!is.null(object[["full crit"]]))
+    cat("\nfull-sample criterion =", rnd(object[["full crit"]]))
   cat("\n")
-  invisible(x)
+  invisible(object)
 }
+
+
 
 #' @describeIn cv \code{print()} method for \code{"cvList"} objects.
 #' @exportS3Method base::print
 print.cvList <- function(x, ...) {
   xx <- x
+  reps <- length(xx)
+  names(xx) <- paste("Replicate", 1L:reps)
+  xx$Average <- xx[[1L]]
+  sumry <-   summarizeReps(xx)
+  xx$Average[["CV crit"]] <- sumry[["CV crit"]]
+
+  if (!is.null(xx[[1]][["criterion"]]) &&
+      xx[[1]][["criterion"]] != "criterion"){
+    cat(paste0("cross-validation criterion (",
+               x[[1]][["criterion"]],
+               ")\n"))
+  } else {
+    cat("cross-validation criterion\n")
+  }
+
+  for (rep in seq_along(xx)) {
+    cat(names(xx)[rep], ": ", sep = "")
+    cat(xx[[rep]][["CV crit"]], "\n")
+  }
+  return(invisible(x))
+}
+
+#' @describeIn cv \code{summary()} method for \code{"cvList"} objects.
+#' @exportS3Method base::summary
+summary.cvList <- function(object, ...) {
+  xx <- object
   reps <- length(xx)
   names(xx) <- paste("Replicate", 1L:reps)
   xx$Average <- xx[[1L]]
@@ -674,9 +727,9 @@ print.cvList <- function(x, ...) {
   xx$Average$confint <- NULL
   for (rep in seq_along(xx)) {
     cat("\n", names(xx)[rep], ":\n", sep = "")
-    print(xx[[rep]])
+    summary(xx[[rep]])
   }
-  return(invisible(x))
+  return(invisible(object))
 }
 
 #' @describeIn cv \code{as.data.frame()} method for \code{"cv"} objects.
@@ -810,7 +863,7 @@ print.cvDataFrame <- function(x,
 }
 
 #' @describeIn cv \code{summary()} method for \code{"cvDataFrame"} objects.
-#' @param object an object inheriting from \code{"cvDataFrame"} to summarize.
+#' @param object an object to summarize.
 #' @param formula of the form \code{some.criterion ~ classifying.variable(s)}
 #' (see examples).
 #' @param subset a subsetting expression; the default (\code{NULL})

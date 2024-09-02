@@ -65,6 +65,7 @@
 #' @param col color for the line and points, defaults to the second
 #' element of the color palette; see \code{\link{palette}()}.
 #' @param lwd line width for the line (defaults to 2).
+#' @param object an object to summarize.
 #' @return \code{models()} returns a \code{"modList"} object, the
 #' \code{cv()} method for which returns a \code{"cvModList"} object,
 #' or, when \code{recursive=TRUE}, an object of class \code{c("cvSelect", "cv")}.
@@ -229,21 +230,47 @@ print.cvModList <- function(x, ...) {
   if (inherits(x[[1L]], "cvList")) {
     reps <- length(x[[1L]])
     nms <-
-      paste0(nms, " averaged across ", reps, " replications (with SDs)")
+      paste0(nms, " averaged across ", reps, " replications")
   }
   for (i in seq_along(x)) {
-    cat(paste0("\nModel ", nms[i], ":\n"))
+    cat(paste0("Model ", nms[i], ":\n"))
     if (inherits(x[[i]], "cvList")) {
       sumry <- summarizeReps(x[[i]])
       xi <- x[[i]][[1L]]
       nms.sumry <- names(sumry)
       xi[nms.sumry] <- sumry
       print(xi)
+      cat("\n")
     } else {
       print(x[[i]], ...)
+      cat("\n")
     }
   }
   return(invisible(x))
+}
+
+#' @describeIn cv.modList \code{summary()} method for \code{"cvModList"} objects.
+#' @exportS3Method
+summary.cvModList <- function(object, ...) {
+  nms <- names(object)
+  if (inherits(object[[1L]], "cvList")) {
+    reps <- length(object[[1L]])
+    nms <-
+      paste0(nms, " averaged across ", reps, " replications (with SDs)")
+  }
+  for (i in seq_along(object)) {
+    cat(paste0("\nModel ", nms[i], ":\n"))
+    if (inherits(object[[i]], "cvList")) {
+      sumry <- summarizeReps(object[[i]])
+      xi <- object[[i]][[1L]]
+      nms.sumry <- names(sumry)
+      xi[nms.sumry] <- sumry
+      summary(xi)
+    } else {
+      summary(object[[i]], ...)
+    }
+  }
+  return(invisible(object))
 }
 
 #' @describeIn cv.modList \code{plot()} method for \code{"cvModList"} objects.

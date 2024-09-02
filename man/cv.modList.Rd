@@ -4,6 +4,7 @@
 \alias{cv.modList}
 \alias{models}
 \alias{print.cvModList}
+\alias{summary.cvModList}
 \alias{plot.cvModList}
 \alias{as.data.frame.cvModList}
 \title{Cross-Validate Several Models Fit to the Same Data}
@@ -23,6 +24,8 @@
 models(...)
 
 \method{print}{cvModList}(x, ...)
+
+\method{summary}{cvModList}(object, ...)
 
 \method{plot}{cvModList}(
   x,
@@ -88,6 +91,8 @@ function.}
 
 \item{x}{an object of class \code{"cvModList"} to be printed or plotted.}
 
+\item{object}{an object to summarize.}
+
 \item{y}{the name of the element in each \code{"cv"} object to be
 plotted; defaults to \code{"adj CV crit"}, if it exists, or to
 \code{"CV crit"}.}
@@ -149,6 +154,8 @@ different response variables.
 \item \code{models()}: create a list of models.
 
 \item \code{print(cvModList)}: \code{print()} method for \code{"cvModList"} objects.
+
+\item \code{summary(cvModList)}: \code{summary()} method for \code{"cvModList"} objects.
 
 \item \code{plot(cvModList)}: \code{plot()} method for \code{"cvModList"} objects.
 
