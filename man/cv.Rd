@@ -10,6 +10,7 @@
 \alias{summary.cv}
 \alias{print.cvList}
 \alias{summary.cvList}
+\alias{plot.cvList}
 \alias{as.data.frame.cv}
 \alias{as.data.frame.cvList}
 \alias{print.cvDataFrame}
@@ -77,6 +78,14 @@ cv(model, data, criterion, k, reps = 1L, seed, ...)
 
 \method{summary}{cvList}(object, ...)
 
+\method{plot}{cvList}(
+  x,
+  y,
+  what = c("adjusted CV criterion", "CV criterion"),
+  confint = TRUE,
+  ...
+)
+
 \method{as.data.frame}{cv}(
   x,
   row.names = NULL,
@@ -121,7 +130,8 @@ for n-fold cross-validation.}
 
 \item{...}{to match generic; passed to \code{predict()} for the default \code{cv()} method;
 passed to the \code{\link[car]{Tapply}()} function in the \pkg{car} package for
-\code{summary.cvDataFrame()}.}
+\code{summary.cvDataFrame()}; passed to default \code{\link{plot}()} method for
+\code{plot.cvList()}.}
 
 \item{criterion.name}{a character string giving the name of the CV criterion function
 in the returned \code{"cv"} object (not usually needed).}
@@ -133,7 +143,10 @@ with that fold deleted.}
 
 \item{confint}{if \code{TRUE} (the default if the number of cases is 400
 or greater), compute a confidence interval for the bias-corrected CV
-criterion, if the criterion is the average of casewise components.}
+criterion, if the criterion is the average of casewise components;
+for \code{plot.cvList()}, whether to plot confidence intervals around the
+biased-adjusted CV criterion, defaulting to \code{TRUE} and applicable only
+if confidence intervals are included in the \code{"cv"} object.}
 
 \item{level}{confidence level (default \code{0.95}).}
 
@@ -166,6 +179,11 @@ object to be summarized}
 default taken from the \code{"digits"} option.}
 
 \item{object}{an object to summarize.}
+
+\item{y}{to match the \code{\link{plot}()} generic function, ignored.}
+
+\item{what}{what to plot, either \code{"adjusted CV criterion"} (the default if present
+in the \code{"cv"} object) or \code{"CV object"}.}
 
 \item{row.names}{optional row names for the result,
 defaults to \code{NULL}.}
@@ -295,6 +313,8 @@ models; see the "Extending the cv package" vignette
 
 \item \code{summary(cvList)}: \code{summary()} method for \code{"cvList"} objects.
 
+\item \code{plot(cvList)}: \code{plot()} method for \code{"cvList"} objects.
+
 \item \code{as.data.frame(cvList)}: \code{as.data.frame()} method for \code{"cvList"} objects.
 
 \item \code{print(cvDataFrame)}: \code{print()} method for \code{"cvDataFrame"} objects.
@@ -312,6 +332,8 @@ summary(cv(m.auto,  k="loo"))
 summary(cv.auto <- cv(m.auto, seed=1234))
 compareFolds(cv.auto)
 summary(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
+plot(cv.auto.reps)
+plot(cv(m.auto, seed=1234, reps=10, confint=TRUE))
 D.auto.reps <- as.data.frame(cv.auto.reps)
 head(D.auto.reps)
 summary(D.auto.reps, mse ~ rep + fold, include="folds")

@@ -23,7 +23,10 @@
 #' @param reps number of times to replicate k-fold CV (default is \code{1}).
 #' @param confint if \code{TRUE} (the default if the number of cases is 400
 #' or greater), compute a confidence interval for the bias-corrected CV
-#' criterion, if the criterion is the average of casewise components.
+#' criterion, if the criterion is the average of casewise components;
+#' for \code{plot.cvList()}, whether to plot confidence intervals around the
+#' biased-adjusted CV criterion, defaulting to \code{TRUE} and applicable only
+#' if confidence intervals are included in the \code{"cv"} object.
 #' @param level confidence level (default \code{0.95}).
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
@@ -46,7 +49,8 @@
 #' to the full data, possibly making the CV updates faster, e.g., for a GLM.
 #' @param ... to match generic; passed to \code{predict()} for the default \code{cv()} method;
 #' passed to the \code{\link[car]{Tapply}()} function in the \pkg{car} package for
-#' \code{summary.cvDataFrame()}.
+#' \code{summary.cvDataFrame()}; passed to default \code{\link{plot}()} method for
+#' \code{plot.cvList()}.
 #' @param model.function a regression function, typically for a new \code{cv()} method that
 #' that calls \code{cv.default()} via \code{NextMethod()},
 #' residing in a package that's not a declared dependency of the \pkg{cv} package,
@@ -122,6 +126,8 @@
 #' summary(cv.auto <- cv(m.auto, seed=1234))
 #' compareFolds(cv.auto)
 #' summary(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
+#' plot(cv.auto.reps)
+#' plot(cv(m.auto, seed=1234, reps=10, confint=TRUE))
 #' D.auto.reps <- as.data.frame(cv.auto.reps)
 #' head(D.auto.reps)
 #' summary(D.auto.reps, mse ~ rep + fold, include="folds")
@@ -730,6 +736,47 @@ summary.cvList <- function(object, ...) {
     summary(xx[[rep]])
   }
   return(invisible(object))
+}
+
+#' @param y to match the \code{\link{plot}()} generic function, ignored.
+#' @param what what to plot, either \code{"adjusted CV criterion"} (the default if present
+#' in the \code{"cv"} object) or \code{"CV object"}.
+#' @describeIn cv \code{plot()} method for \code{"cvList"} objects.
+#' @exportS3Method base::plot
+plot.cvList <- function(x, y,
+                        what=c("adjusted CV criterion", "CV criterion"),
+                        confint=TRUE, ...){
+  reps <- length(x)
+  what <- match.arg(what)
+  what <- if (what == "adjusted CV criterion") "adj CV crit" else "CV crit"
+  if (is.null(x[[1]]$"adj CV crit")) what <- "CV crit"
+  cv <- sapply(x, function(x) x[[what]])
+  ci <- if (confint && !is.null(x[[1]]$confint) && what == "adj CV crit") {
+    sapply(x, function(x) x[["confint"]])
+  } else {
+    NULL
+  }
+  ylim <- if (!is.null(ci)){
+    c(min(ci["lower", ]), max(ci["upper", ]))
+  } else {
+    range(cv)
+  }
+  criterion <- x[[1]]$criterion
+  if (criterion == "criterion") criterion <- NULL
+  ylab <- paste0(if(what == "CV crit") "CV criterion: "
+                 else "Adjusted CV criterion: ", criterion)
+  plot(1:reps, cv, xlab="Replication", ylab=ylab,
+       pch=16, col=2, xlim = c(0.75, length(x) + 0.25), ylim=ylim,
+       axes=FALSE, frame.plot=TRUE, ...)
+  axis(1, at=1:reps)
+  axis(2)
+  if (!is.null(ci)){
+    for (j in 1:reps){
+      arrows(x0=j, y0=ci["lower", j], y1=ci["upper", j],
+             angle=90, code=3, lwd=2, col=3, length=1/(2*reps))
+    }
+  }
+  invisible(NULL)
 }
 
 #' @describeIn cv \code{as.data.frame()} method for \code{"cv"} objects.
