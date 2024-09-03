@@ -137,6 +137,15 @@ which are documented separately.</p>
 <span><span class="co"># S3 method for class 'cvList'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S3 method for class 'cvList'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
+<span>  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"adjusted CV criterion"</span>, <span class="st">"CV criterion"</span><span class="op">)</span>,</span>
+<span>  confint <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'cv'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
@@ -202,7 +211,8 @@ for n-fold cross-validation.</p></dd>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>to match generic; passed to <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> for the default <code>cv()</code> method;
 passed to the <code><a href="https://rdrr.io/pkg/car/man/Tapply.html" class="external-link">Tapply</a>()</code> function in the <span class="pkg">car</span> package for
-<code>summary.cvDataFrame()</code>.</p></dd>
+<code>summary.cvDataFrame()</code>; passed to default <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a>()</code> method for
+<code>plot.cvList()</code>.</p></dd>
 
 
 <dt id="arg-criterion-name">criterion.name<a class="anchor" aria-label="anchor" href="#arg-criterion-name"></a></dt>
@@ -220,7 +230,10 @@ with that fold deleted.</p></dd>
 <dt id="arg-confint">confint<a class="anchor" aria-label="anchor" href="#arg-confint"></a></dt>
 <dd><p>if <code>TRUE</code> (the default if the number of cases is 400
 or greater), compute a confidence interval for the bias-corrected CV
-criterion, if the criterion is the average of casewise components.</p></dd>
+criterion, if the criterion is the average of casewise components;
+for <code>plot.cvList()</code>, whether to plot confidence intervals around the
+biased-adjusted CV criterion, defaulting to <code>TRUE</code> and applicable only
+if confidence intervals are included in the <code>"cv"</code> object.</p></dd>
 
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
@@ -271,6 +284,15 @@ default taken from the <code>"digits"</code> option.</p></dd>
 
 <dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>an object to summarize.</p></dd>
+
+
+<dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
+<dd><p>to match the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a>()</code> generic function, ignored.</p></dd>
+
+
+<dt id="arg-what">what<a class="anchor" aria-label="anchor" href="#arg-what"></a></dt>
+<dd><p>what to plot, either <code>"adjusted CV criterion"</code> (the default if present
+in the <code>"cv"</code> object) or <code>"CV object"</code>.</p></dd>
 
 
 <dt id="arg-row-names">row.names<a class="anchor" aria-label="anchor" href="#arg-row-names"></a></dt>
@@ -396,6 +418,7 @@ models; see the "Extending the cv package" vignette
 
 <ul><li><p><code>print(cvList)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code>"cvList"</code> objects.</p></li>
 <li><p><code>summary(cvList)</code>: <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for <code>"cvList"</code> objects.</p></li>
+<li><p><code>plot(cvList)</code>: <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method for <code>"cvList"</code> objects.</p></li>
 <li><p><code>as.data.frame(cvList)</code>: <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> method for <code>"cvList"</code> objects.</p></li>
 <li><p><code>print(cvDataFrame)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code>"cvDataFrame"</code> objects.</p></li>
 <li><p><code>summary(cvDataFrame)</code>: <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for <code>"cvDataFrame"</code> objects.</p></li>
@@ -417,6 +440,8 @@ models; see the "Extending the cv package" vignette
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv.auto</span> <span class="op">&lt;-</span> <span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="cv.function.html">compareFolds</a></span><span class="op">(</span><span class="va">cv.auto</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv.auto.reps</span> <span class="op">&lt;-</span> <span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span>, reps<span class="op">=</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">cv</span><span class="op">(</span><span class="va">m.auto</span>, seed<span class="op">=</span><span class="fl">1234</span>, reps<span class="op">=</span><span class="fl">10</span>, confint<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">D.auto.reps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">D.auto.reps</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D.auto.reps</span>, <span class="va">mse</span> <span class="op">~</span> <span class="va">rep</span> <span class="op">+</span> <span class="va">fold</span>, include<span class="op">=</span><span class="st">"folds"</span><span class="op">)</span></span></span>
@@ -500,6 +525,20 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 24.31271 (0.04496328)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 24.29331 (0.0425791)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 23.94366</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.auto.reps)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv(m.auto, seed=1234, reps=10, confint=TRUE))</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 1234</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 469908</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 267</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 714864</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 79919</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 970687</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 219008</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 967112</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 597697</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 217930</span>
+<span class="r-plt img"><img src="cv-1.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="cv-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; D.auto.reps &lt;- as.data.frame(cv.auto.reps)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; head(D.auto.reps)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   rep fold    mse adjusted.mse full.mse coef.Intercept coef.horsepower</span>
