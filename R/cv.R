@@ -50,7 +50,7 @@
 #' @param ... to match generic; passed to \code{predict()} for the default \code{cv()} method;
 #' passed to the \code{\link[car]{Tapply}()} function in the \pkg{car} package for
 #' \code{summary.cvDataFrame()}; passed to default \code{\link{plot}()} method for
-#' \code{plot.cvList()}.
+#' \code{plot.cvList()} or \code{plot.cv()}.
 #' @param model.function a regression function, typically for a new \code{cv()} method that
 #' that calls \code{cv.default()} via \code{NextMethod()},
 #' residing in a package that's not a declared dependency of the \pkg{cv} package,
@@ -125,6 +125,8 @@
 #' summary(cv(m.auto,  k="loo"))
 #' summary(cv.auto <- cv(m.auto, seed=1234))
 #' compareFolds(cv.auto)
+#' plot(cv.auto)
+#' plot(cv.auto, what="coefficients")
 #' summary(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
 #' plot(cv.auto.reps)
 #' plot(cv(m.auto, seed=1234, reps=10, confint=TRUE))
@@ -631,7 +633,7 @@ print.cv <- function(x, digits = getOption("digits"), ...) {
 #' @exportS3Method base::summary
 #' @describeIn cv \code{summary()} method for \code{"cv"} objects.
 #' @param x a \code{"cv"}, \code{"cvList"}, or \code{"cvDataFrame"}
-#' object to be summarized
+#' object to be plotted or summarized.
 summary.cv <- function(object, digits = getOption("digits"), ...) {
   rnd <- function(object) {
     if (round(log10(object)) >= digits)
@@ -690,8 +692,6 @@ summary.cv <- function(object, digits = getOption("digits"), ...) {
   invisible(object)
 }
 
-
-
 #' @describeIn cv \code{print()} method for \code{"cvList"} objects.
 #' @exportS3Method base::print
 print.cvList <- function(x, ...) {
@@ -739,8 +739,58 @@ summary.cvList <- function(object, ...) {
 }
 
 #' @param y to match the \code{\link{plot}()} generic function, ignored.
-#' @param what what to plot, either \code{"adjusted CV criterion"} (the default if present
-#' in the \code{"cv"} object) or \code{"CV object"}.
+#' @param what what to plot, for the \code{"cv"} method, either \code{"CV criterion"}
+#' (the default), or \code{"coefficients"};
+#' for the \code{"cvList"} method, either \code{"adjusted CV criterion"}
+#' (the default if present in the \code{"cv"} object) or \code{"CV object"}.
+#' @describeIn cv \code{plot()} method for \code{"cv"} objects.
+#' @exportS3Method base::plot
+plot.cv <- function(x, y, what=c("CV criterion", "coefficients"), ...){
+  if (is.null(x$details))
+    stop("no 'details' element in 'x', nothing to plot")
+  what <- match.arg(what)
+  if (what == "CV criterion"){
+    cv <- x[["CV crit"]]
+    cv.folds <- x$details$criterion
+    k <- x$k
+    ylim <- range(c(cv, cv.folds))
+    criterion <- x$criterion
+    if (criterion == "criterion") criterion <- NULL
+    plot(1:k, cv.folds, axes=FALSE, frame.plot=TRUE,
+         pch=16, col=3, xlab="Fold",
+         ylab=paste0("CV criterion: ", criterion),
+         ...)
+    axis(1, at = 1:k)
+    axis(2)
+    abline(h=cv, lty=2, lwd=2, col=2)
+    usr <- par("usr")
+    x <- mean(usr[1:2])
+    y <- usr[4] + 0.15*(usr[4] - usr[3])
+    graphics::legend(x, y, legend="Overall CV Criterion",
+           lwd=2, lty=2, col=2, xpd=TRUE, bty="n", xjust=0.5)
+    return(invisible(NULL))
+  } else {
+    coefs <- as.data.frame(x, columns="coefficients")
+    coefs.stacked <- utils::stack(coefs[, -1])
+    coefs.stacked <- cbind(coefs$fold, coefs.stacked)
+    names(coefs.stacked) <- c("Fold", "Coefficient", "coef.name")
+    coefs.stacked$coef.name <- sub("coef.", "", coefs.stacked$coef.name)
+    lattice::xyplot(Coefficient ~ Fold | coef.name, data=coefs.stacked,
+                    xlim=c(1, x$k),
+                    scales=list(relation= "free"),
+                    panel = function(x, y, ...){
+                      lattice::panel.points(x[x != 0], y[x != 0], ...)
+                      lattice::llines(x=range(x), y=rep(y[x == 0], 2),
+                             lty=2, lwd=2, col=palette()[2])
+                    },
+                    key=list(text=list(lab="Overall Coefficient:",
+                                       col=palette()[1]),
+                             lines=2,
+                             col=palette()[2], lty=2, lwd=2)
+    )
+  }
+}
+
 #' @describeIn cv \code{plot()} method for \code{"cvList"} objects.
 #' @exportS3Method base::plot
 plot.cvList <- function(x, y,

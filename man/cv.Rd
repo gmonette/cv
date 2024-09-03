@@ -10,6 +10,7 @@
 \alias{summary.cv}
 \alias{print.cvList}
 \alias{summary.cvList}
+\alias{plot.cv}
 \alias{plot.cvList}
 \alias{as.data.frame.cv}
 \alias{as.data.frame.cvList}
@@ -78,6 +79,8 @@ cv(model, data, criterion, k, reps = 1L, seed, ...)
 
 \method{summary}{cvList}(object, ...)
 
+\method{plot}{cv}(x, y, what = c("CV criterion", "coefficients"), ...)
+
 \method{plot}{cvList}(
   x,
   y,
@@ -131,7 +134,7 @@ for n-fold cross-validation.}
 \item{...}{to match generic; passed to \code{predict()} for the default \code{cv()} method;
 passed to the \code{\link[car]{Tapply}()} function in the \pkg{car} package for
 \code{summary.cvDataFrame()}; passed to default \code{\link{plot}()} method for
-\code{plot.cvList()}.}
+\code{plot.cvList()} or \code{plot.cv()}.}
 
 \item{criterion.name}{a character string giving the name of the CV criterion function
 in the returned \code{"cv"} object (not usually needed).}
@@ -173,7 +176,7 @@ or to a generalized linear (i.e., \code{"glm"}) model. See Details for an explan
 of the available options.}
 
 \item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"cvDataFrame"}
-object to be summarized}
+object to be plotted or summarized.}
 
 \item{digits}{significant digits for printing,
 default taken from the \code{"digits"} option.}
@@ -182,8 +185,10 @@ default taken from the \code{"digits"} option.}
 
 \item{y}{to match the \code{\link{plot}()} generic function, ignored.}
 
-\item{what}{what to plot, either \code{"adjusted CV criterion"} (the default if present
-in the \code{"cv"} object) or \code{"CV object"}.}
+\item{what}{what to plot, for the \code{"cv"} method, either \code{"CV criterion"}
+(the default), or \code{"coefficients"};
+for the \code{"cvList"} method, either \code{"adjusted CV criterion"}
+(the default if present in the \code{"cv"} object) or \code{"CV object"}.}
 
 \item{row.names}{optional row names for the result,
 defaults to \code{NULL}.}
@@ -304,6 +309,8 @@ models; see the "Extending the cv package" vignette
 
 \item \code{summary(cv)}: \code{summary()} method for \code{"cv"} objects.
 
+\item \code{plot(cv)}: \code{plot()} method for \code{"cv"} objects.
+
 \item \code{as.data.frame(cv)}: \code{as.data.frame()} method for \code{"cv"} objects.
 
 }}
@@ -331,6 +338,8 @@ cv(m.auto,  k="loo")
 summary(cv(m.auto,  k="loo"))
 summary(cv.auto <- cv(m.auto, seed=1234))
 compareFolds(cv.auto)
+plot(cv.auto)
+plot(cv.auto, what="coefficients")
 summary(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
 plot(cv.auto.reps)
 plot(cv(m.auto, seed=1234, reps=10, confint=TRUE))

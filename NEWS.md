@@ -1,5 +1,7 @@
 # cv 2.0.3
 
+- New plot.cv() and plot.cvList() methods.
+
 - Differentiate print() and summary() methods for "cv", "cvList", and "cvModlist" objects.
 
 - Fixes to computing per-fold details for mixed-models cv() methods.
