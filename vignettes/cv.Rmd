@@ -186,9 +186,23 @@ cv(m.auto)
 ```
 The `"lm"` method by default uses `mse()` as the CV criterion and the Woodbury matrix identity [@Hager:1989] to update the regression with each fold deleted without having literally to refit the model. (Computational details are discussed in a separate vignette.) The `print()` method for `"cv"` objects simply print the cross-validation criterion, here the MSE. We can use `summary()` to obtain more information (as we'll do routinely in the sequel):
 ```{r cv-summary}
-summary(cv(m.auto))
+summary(cv.m.auto <- cv(m.auto))
 ```
 The summary reports the CV estimate of MSE, a biased-adjusted estimate of the MSE (the bias adjustment is explained in the final section), and the MSE is also computed for the original, full-sample regression. Because the division of the data into 10 folds is random, `cv()` explicitly (randomly) generates and saves a seed for R's pseudo-random number generator, to make the results replicable. The user can also specify the seed directly via the `seed` argument to `cv()`.
+
+The `plot()` method for `"cv"` objects graphs the CV criterion (here MSE) by fold or the coefficients estimates with each fold deleted:
+```{r plot.cv.crit}
+#| out.width = "90%",
+#| fig.cap = "CV criterion (MSE) for cases in each fold."
+plot(cv.m.auto) # CV criterion
+```
+```{r plot.cv.coefs}
+#| out.width = "90%",
+#| fig.height = 8,
+#| fig.cap = "Regression coefficients with each fold omitted."
+plot(cv.m.auto, what="coefficients") # coefficient estimates
+```
+
 
 To perform LOO CV, we can set the `k` argument to `cv()` to the number of cases in the data, here `k=392`, or, more conveniently, to `k="loo"` or `k="n"`:
 
@@ -378,7 +392,7 @@ Because the partition into folds that's employed is selected randomly, the resul
 Here, for example, is 10-fold CV for the Mroz logistic regression, repeated 5 times:
 
 ```{r mroz-reps}
-summary(cv(
+summary(cv.mroz.reps <- cv(
   m.mroz,
   criterion = BayesRule,
   seed = 248,
@@ -388,9 +402,19 @@ summary(cv(
 ```
 When `reps` > `1`, the result returned by `cv()` is an object of class `"cvList"`---literally a list of `"cv"` objects. The results are reported for each repetition and then averaged across repetitions, with the standard deviations of the CV criterion and the biased-adjusted CV criterion given in parentheses. In this example, there is therefore little variation across repetitions, increasing our confidence in the reliability of the results. 
 
-Notice that the seed that's set in the `cv()` command pertains to the first repetition and the seeds for the remaining repetitions are then selected pseudo-randomly.[^replicates] Setting the first seed, however, makes the entire process easily replicable, and the seed for each repetition is stored in the corresponding element of the `"cvList"` object (which isn't, however, saved in the example).
+Notice that the seed that's set in the `cv()` command pertains to the first repetition and the seeds for the remaining repetitions are then selected pseudo-randomly.[^replicates] Setting the first seed, however, makes the entire process easily replicable, and the seed for each repetition is stored in the corresponding element of the `"cvList"` object.
 
 [^replicates]: Because of the manner in which the computation is performed, the order of the replicates in the `"cvList"` object returned by `cv()` isn't the same as the order in which the replicates are computed. Each element of the result, however, is a `"cv"` object with the correct random-number seed saved, and so this technical detail can be safely ignored. The individual `"cv"` objects are printed in the order in which they are stored rather than the order in which they are computed.
+
+The `plot()` method for `"cvList"` objects by default shows the adjusted CV criterion and confidence interval for each replication:
+
+```{r cv.mroz.reps}
+#| out.width = "90%",
+#| fig.height = 7,
+#| fig.cap = "Replicated cross-validated 10-fold CV for the logistic regression fit to the `Mroz` data."
+plot(cv.mroz.reps)
+```
+
 
 It's also possible to replicate CV when comparing competing models via the `cv()` method for `"modList"` objects. Recall our comparison of polynomial regressions of varying degree fit to the `Auto` data; we performed 10-fold CV for each of 10 models. Here, we replicate that process 5 times for each model and graph the results:
 ```{r model-comparison-with-reps}

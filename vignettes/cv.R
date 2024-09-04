@@ -113,7 +113,13 @@ summary(m.auto)
 cv(m.auto)
 
 ## ----cv-summary---------------------------------------------------------------
-summary(cv(m.auto))
+summary(cv.m.auto <- cv(m.auto))
+
+## ----plot.cv.crit-------------------------------------------------------------
+plot(cv.m.auto) # CV criterion
+
+## ----plot.cv.coefs------------------------------------------------------------
+plot(cv.m.auto, what="coefficients") # coefficient estimates
 
 ## ----cv.lm-2`-----------------------------------------------------------------
 summary(cv(m.auto, k = "loo"))
@@ -235,13 +241,16 @@ summary(cv(m.mroz,
    method = "hatvalues"))
 
 ## ----mroz-reps----------------------------------------------------------------
-summary(cv(
+summary(cv.mroz.reps <- cv(
   m.mroz,
   criterion = BayesRule,
   seed = 248,
   reps = 5,
   method = "Woodbury"
 ))
+
+## ----cv.mroz.reps-------------------------------------------------------------
+plot(cv.mroz.reps)
 
 ## ----model-comparison-with-reps-----------------------------------------------
 cv.auto.reps <- cv(
