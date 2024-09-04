@@ -5,3 +5,14 @@
 docs
 /doc/
 /Meta/
+*.log
+*.aux
+*.bbl
+*.blg
+*.out
+/vignettes/*_cache/
+/vignettes/fig/
+.gitignore
+*.synctex.*
+figure/
+scratch/*/*.md
