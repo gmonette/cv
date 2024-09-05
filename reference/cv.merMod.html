@@ -73,7 +73,6 @@ package; and for models of class <code>"glmmTMB"</code> fit by the
 <span>  details <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  <span class="va">clusterVariables</span>,</span>
-<span>  fixed.effects <span class="op">=</span> <span class="fu">lme4</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -88,7 +87,6 @@ package; and for models of class <code>"glmmTMB"</code> fit by the
 <span>  details <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  <span class="va">clusterVariables</span>,</span>
-<span>  fixed.effects <span class="op">=</span> <span class="fu">nlme</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nlme/man/fixed.effects.html" class="external-link">fixef</a></span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -103,7 +101,6 @@ package; and for models of class <code>"glmmTMB"</code> fit by the
 <span>  details <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ncores <span class="op">=</span> <span class="fl">1L</span>,</span>
 <span>  <span class="va">clusterVariables</span>,</span>
-<span>  fixed.effects <span class="op">=</span> <span class="va">flattenFixefGlmmTMB</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -117,7 +114,7 @@ package; and for models of class <code>"glmmTMB"</code> fit by the
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>data frame to which the model was fit (not usually necessary)</p></dd>
+<dd><p>data frame to which the model was fit (not usually necessary).</p></dd>
 
 
 <dt id="arg-criterion">criterion<a class="anchor" aria-label="anchor" href="#arg-criterion"></a></dt>
@@ -143,7 +140,7 @@ criterion, if the criterion is the average of casewise components.</p></dd>
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>for R's random number generator; optional, if not
 supplied a random seed will be selected and saved; not needed
-for n-fold cross-validation</p></dd>
+for n-fold cross-validation.</p></dd>
 
 
 <dt id="arg-details">details<a class="anchor" aria-label="anchor" href="#arg-details"></a></dt>
@@ -155,20 +152,14 @@ with that fold deleted.</p></dd>
 
 <dt id="arg-ncores">ncores<a class="anchor" aria-label="anchor" href="#arg-ncores"></a></dt>
 <dd><p>number of cores to use for parallel computations
-(default is <code>1</code>, i.e., computations aren't done in parallel)</p></dd>
+(default is <code>1</code>, i.e., computations aren't done in parallel).</p></dd>
 
 
 <dt id="arg-clustervariables">clusterVariables<a class="anchor" aria-label="anchor" href="#arg-clustervariables"></a></dt>
 <dd><p>a character vector of names of the variables
 defining clusters for a mixed model with nested or crossed random effects;
 if missing, cross-validation is performed for individual cases rather than
-for clusters
-case-based CV when <code>details = TRUE</code>.</p></dd>
-
-
-<dt id="arg-fixed-effects">fixed.effects<a class="anchor" aria-label="anchor" href="#arg-fixed-effects"></a></dt>
-<dd><p>a function to be used to compute fixed-effect
-coefficients for cluster-based CV when <code>details = TRUE</code>.</p></dd>
+for clusters.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
