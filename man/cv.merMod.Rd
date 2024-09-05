@@ -16,7 +16,6 @@
   details = NULL,
   ncores = 1L,
   clusterVariables,
-  fixed.effects = lme4::fixef,
   ...
 )
 
@@ -30,7 +29,6 @@
   details = NULL,
   ncores = 1L,
   clusterVariables,
-  fixed.effects = nlme::fixef,
   ...
 )
 
@@ -44,14 +42,13 @@
   details = NULL,
   ncores = 1L,
   clusterVariables,
-  fixed.effects = flattenFixefGlmmTMB,
   ...
 )
 }
 \arguments{
 \item{model}{a mixed-effects model object for which a \code{cv()} method is available.}
 
-\item{data}{data frame to which the model was fit (not usually necessary)}
+\item{data}{data frame to which the model was fit (not usually necessary).}
 
 \item{criterion}{cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 where \code{y} is the observed values of the response and
@@ -69,7 +66,7 @@ criterion, if the criterion is the average of casewise components.}
 
 \item{seed}{for R's random number generator; optional, if not
 supplied a random seed will be selected and saved; not needed
-for n-fold cross-validation}
+for n-fold cross-validation.}
 
 \item{details}{if \code{TRUE} (the default if the number of
 folds \code{k <= 10}), save detailed information about the value of the
@@ -77,16 +74,12 @@ CV criterion for the cases in each fold and the regression coefficients
 with that fold deleted.}
 
 \item{ncores}{number of cores to use for parallel computations
-(default is \code{1}, i.e., computations aren't done in parallel)}
+(default is \code{1}, i.e., computations aren't done in parallel).}
 
 \item{clusterVariables}{a character vector of names of the variables
 defining clusters for a mixed model with nested or crossed random effects;
 if missing, cross-validation is performed for individual cases rather than
-for clusters
-case-based CV when \code{details = TRUE}.}
-
-\item{fixed.effects}{a function to be used to compute fixed-effect
-coefficients for cluster-based CV when \code{details = TRUE}.}
+for clusters.}
 
 \item{...}{for \code{cv()} methods, to match generic,
 and for \code{cvMixed()}, arguments to be passed to \code{update()}.}

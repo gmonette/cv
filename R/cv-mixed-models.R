@@ -8,7 +8,7 @@
 #' \code{\link[glmmTMB]{glmmTMB}()} function in the \pkg{glmmTMB} package.
 #'
 #' @param model a mixed-effects model object for which a \code{cv()} method is available.
-#' @param data data frame to which the model was fit (not usually necessary)
+#' @param data data frame to which the model was fit (not usually necessary).
 #' @param criterion cross-validation ("cost" or lack-of-fit) criterion function of form \code{f(y, yhat)}
 #'        where \code{y} is the observed values of the response and
 #'        \code{yhat} the predicted values; the default is \code{\link{mse}}
@@ -22,21 +22,17 @@
 #' criterion, if the criterion is the average of casewise components.
 #' @param seed for R's random number generator; optional, if not
 #' supplied a random seed will be selected and saved; not needed
-#' for n-fold cross-validation
+#' for n-fold cross-validation.
 #' @param details if \code{TRUE} (the default if the number of
 #' folds \code{k <= 10}), save detailed information about the value of the
 #' CV criterion for the cases in each fold and the regression coefficients
 #' with that fold deleted.
 #' @param ncores number of cores to use for parallel computations
-#'        (default is \code{1}, i.e., computations aren't done in parallel)
+#'        (default is \code{1}, i.e., computations aren't done in parallel).
 #' @param clusterVariables a character vector of names of the variables
 #' defining clusters for a mixed model with nested or crossed random effects;
 #' if missing, cross-validation is performed for individual cases rather than
-#' for clusters
-# #' @param blups a function to be used to compute BLUPs for
-#' case-based CV when \code{details = TRUE}.
-#' @param fixed.effects a function to be used to compute fixed-effect
-#' coefficients for cluster-based CV when \code{details = TRUE}.
+#' for clusters.
 #' @param ... for \code{cv()} methods, to match generic,
 #' and for \code{cvMixed()}, arguments to be passed to \code{update()}.
 #'
@@ -92,8 +88,6 @@ cv.merMod <-
            details = NULL,
            ncores = 1L,
            clusterVariables,
-           # blups = coef,
-           fixed.effects = lme4::fixef,
            ...) {
     cvMixed(
       model,
@@ -120,8 +114,7 @@ cv.merMod <-
         re.form = NA,
         allow.new.levels = TRUE
       ),
-      # blups = blups,
-      fixed.effects = fixed.effects,
+      fixed.effects = lme4::fixef,
       ...
     )
   }
@@ -139,8 +132,6 @@ cv.lme <-
            details = NULL,
            ncores = 1L,
            clusterVariables,
-           # blups = coef,
-           fixed.effects = nlme::fixef,
            ...) {
     cvMixed(
       model,
@@ -164,8 +155,7 @@ cv.lme <-
         newdata = data,
         level = 1
       ),
-      # blups = blups,
-      fixed.effects = fixed.effects,
+      fixed.effects = nlme::fixef,
       ...
     )
   }
@@ -183,8 +173,6 @@ cv.glmmTMB <-
            details = NULL,
            ncores = 1L,
            clusterVariables,
-           # blups = coef,
-           fixed.effects = flattenFixefGlmmTMB,
            ...) {
     if(isFALSE(model$call$doFit)) model <- update(model, doFit = TRUE)
     cvMixed(
@@ -212,19 +200,10 @@ cv.glmmTMB <-
         re.form = NA,
         allow.new.levels = TRUE
       ),
-      # blups = blups,
-      fixed.effects = fixed.effects,
+      fixed.effects = flattenFixefGlmmTMB,
       ...
     )
   }
-
-# not exported (or registered):
-
-# coef.merMod <- function(object, ...) lme4::fixef(object)
-#
-# coef.lme <- function(object, ...) nlme::fixef(object)
-#
-# coef.glmmTMB <- function(object, ...) flattenFixefGlmmTMB(object)
 
 flattenFixefGlmmTMB <- function(model, ...){
 

@@ -325,13 +325,13 @@ Most of the arguments of `cvMixed()` are familiar:
 
 * `clusterVariables` is a character vector of the names of variables defining clusters; if missing, then CV is based on cases rather than clusters. 
 
-The remaining two arguments are unfamiliar:
+The remaining arguments are unfamiliar:
 
 * `predict.clusters.args` is a named list of arguments to be passed to the `predict()` function to obtain predictions for the full data set from a model fit to a subset of the data for cluster-based CV. The first two arguments should be `object` and `newdata`. It is typically necessary to tell `cvMixed()` how to base predictions only on fixed effects; in the case of `"lme"` models, this is done by setting `level = 0`.
 
 * Similarly, `predict.cases.args` is a named list of arguments to be passed to `predict()` for case-based CV. Setting `level = 1` includes random effects in the predictions.
 
-`fixed.effects` is used to compute detailed fold-based statistics.
+* `fixed.effects` is used to compute detailed fold-based statistics.
 
 Finally, any additional arguments, absorbed by `...`, are passed to `update()` when the model is refit with each fold omitted. `cvMixed()` returns an object of class `"cv"`.
 
@@ -368,7 +368,6 @@ cv.glmmPQL <- function(model,
                        seed,
                        ncores = 1,
                        clusterVariables,
-                       fixed.effects = nlme::fixef,
                        ...) {
   cvMixed(
     model,
@@ -392,7 +391,7 @@ cv.glmmPQL <- function(model,
       level = 1,
       type = "response"
     ),
-    fixed.effects = fixed.effects,
+    fixed.effects = nlme::fixef, 
     verbose = FALSE,
     ...
   )

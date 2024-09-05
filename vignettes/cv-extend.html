@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-09-02" />
+<meta name="date" content="2024-09-05" />
 
 <title>Extending the cv package</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Extending the cv package</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-09-02</h4>
+<h4 class="date">2024-09-05</h4>
 
 
 
@@ -473,7 +473,7 @@ casewise components of the criterion.</p>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;     (y - yhat)^2</span></span>
 <span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x12564f9a0&gt;</span></span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x1398b7900&gt;</span></span></code></pre></div>
 <p>For this scheme to work, the “casewise loss” attribute must be a
 character string (or vector of character strings), here
 <code>&quot;(y - yhat)^2&quot;</code>, that evaluates to an expression that is a
@@ -825,37 +825,34 @@ facilitate this process, and to see how that works, consider the
 <span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="co">#&gt;            details = NULL,</span></span>
 <span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a><span class="co">#&gt;            ncores = 1L,</span></span>
 <span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a><span class="co">#&gt;            clusterVariables,</span></span>
-<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a><span class="co">#&gt;            # blups = coef,</span></span>
-<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a><span class="co">#&gt;            fixed.effects = nlme::fixef,</span></span>
-<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a><span class="co">#&gt;            ...) {</span></span>
-<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a><span class="co">#&gt;     cvMixed(</span></span>
-<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a><span class="co">#&gt;       model,</span></span>
-<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="co">#&gt;       package = &quot;nlme&quot;,</span></span>
-<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a><span class="co">#&gt;       data = data,</span></span>
-<span id="cb18-18"><a href="#cb18-18" tabindex="-1"></a><span class="co">#&gt;       criterion = criterion,</span></span>
-<span id="cb18-19"><a href="#cb18-19" tabindex="-1"></a><span class="co">#&gt;       criterion.name = deparse(substitute(criterion)),</span></span>
-<span id="cb18-20"><a href="#cb18-20" tabindex="-1"></a><span class="co">#&gt;       k = k,</span></span>
-<span id="cb18-21"><a href="#cb18-21" tabindex="-1"></a><span class="co">#&gt;       reps = reps,</span></span>
-<span id="cb18-22"><a href="#cb18-22" tabindex="-1"></a><span class="co">#&gt;       seed = seed,</span></span>
-<span id="cb18-23"><a href="#cb18-23" tabindex="-1"></a><span class="co">#&gt;       details = details,</span></span>
-<span id="cb18-24"><a href="#cb18-24" tabindex="-1"></a><span class="co">#&gt;       ncores = ncores,</span></span>
-<span id="cb18-25"><a href="#cb18-25" tabindex="-1"></a><span class="co">#&gt;       clusterVariables = clusterVariables,</span></span>
-<span id="cb18-26"><a href="#cb18-26" tabindex="-1"></a><span class="co">#&gt;       predict.clusters.args = list(</span></span>
-<span id="cb18-27"><a href="#cb18-27" tabindex="-1"></a><span class="co">#&gt;         object = model,</span></span>
-<span id="cb18-28"><a href="#cb18-28" tabindex="-1"></a><span class="co">#&gt;         newdata = data,</span></span>
-<span id="cb18-29"><a href="#cb18-29" tabindex="-1"></a><span class="co">#&gt;         level = 0</span></span>
-<span id="cb18-30"><a href="#cb18-30" tabindex="-1"></a><span class="co">#&gt;       ),</span></span>
-<span id="cb18-31"><a href="#cb18-31" tabindex="-1"></a><span class="co">#&gt;       predict.cases.args = list(</span></span>
-<span id="cb18-32"><a href="#cb18-32" tabindex="-1"></a><span class="co">#&gt;         object = model,</span></span>
-<span id="cb18-33"><a href="#cb18-33" tabindex="-1"></a><span class="co">#&gt;         newdata = data,</span></span>
-<span id="cb18-34"><a href="#cb18-34" tabindex="-1"></a><span class="co">#&gt;         level = 1</span></span>
-<span id="cb18-35"><a href="#cb18-35" tabindex="-1"></a><span class="co">#&gt;       ),</span></span>
-<span id="cb18-36"><a href="#cb18-36" tabindex="-1"></a><span class="co">#&gt;       # blups = blups,</span></span>
-<span id="cb18-37"><a href="#cb18-37" tabindex="-1"></a><span class="co">#&gt;       fixed.effects = fixed.effects,</span></span>
-<span id="cb18-38"><a href="#cb18-38" tabindex="-1"></a><span class="co">#&gt;       ...</span></span>
-<span id="cb18-39"><a href="#cb18-39" tabindex="-1"></a><span class="co">#&gt;     )</span></span>
-<span id="cb18-40"><a href="#cb18-40" tabindex="-1"></a><span class="co">#&gt;   }</span></span>
-<span id="cb18-41"><a href="#cb18-41" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a><span class="co">#&gt;            ...) {</span></span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a><span class="co">#&gt;     cvMixed(</span></span>
+<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a><span class="co">#&gt;       model,</span></span>
+<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a><span class="co">#&gt;       package = &quot;nlme&quot;,</span></span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a><span class="co">#&gt;       data = data,</span></span>
+<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a><span class="co">#&gt;       criterion = criterion,</span></span>
+<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a><span class="co">#&gt;       criterion.name = deparse(substitute(criterion)),</span></span>
+<span id="cb18-18"><a href="#cb18-18" tabindex="-1"></a><span class="co">#&gt;       k = k,</span></span>
+<span id="cb18-19"><a href="#cb18-19" tabindex="-1"></a><span class="co">#&gt;       reps = reps,</span></span>
+<span id="cb18-20"><a href="#cb18-20" tabindex="-1"></a><span class="co">#&gt;       seed = seed,</span></span>
+<span id="cb18-21"><a href="#cb18-21" tabindex="-1"></a><span class="co">#&gt;       details = details,</span></span>
+<span id="cb18-22"><a href="#cb18-22" tabindex="-1"></a><span class="co">#&gt;       ncores = ncores,</span></span>
+<span id="cb18-23"><a href="#cb18-23" tabindex="-1"></a><span class="co">#&gt;       clusterVariables = clusterVariables,</span></span>
+<span id="cb18-24"><a href="#cb18-24" tabindex="-1"></a><span class="co">#&gt;       predict.clusters.args = list(</span></span>
+<span id="cb18-25"><a href="#cb18-25" tabindex="-1"></a><span class="co">#&gt;         object = model,</span></span>
+<span id="cb18-26"><a href="#cb18-26" tabindex="-1"></a><span class="co">#&gt;         newdata = data,</span></span>
+<span id="cb18-27"><a href="#cb18-27" tabindex="-1"></a><span class="co">#&gt;         level = 0</span></span>
+<span id="cb18-28"><a href="#cb18-28" tabindex="-1"></a><span class="co">#&gt;       ),</span></span>
+<span id="cb18-29"><a href="#cb18-29" tabindex="-1"></a><span class="co">#&gt;       predict.cases.args = list(</span></span>
+<span id="cb18-30"><a href="#cb18-30" tabindex="-1"></a><span class="co">#&gt;         object = model,</span></span>
+<span id="cb18-31"><a href="#cb18-31" tabindex="-1"></a><span class="co">#&gt;         newdata = data,</span></span>
+<span id="cb18-32"><a href="#cb18-32" tabindex="-1"></a><span class="co">#&gt;         level = 1</span></span>
+<span id="cb18-33"><a href="#cb18-33" tabindex="-1"></a><span class="co">#&gt;       ),</span></span>
+<span id="cb18-34"><a href="#cb18-34" tabindex="-1"></a><span class="co">#&gt;       fixed.effects = nlme::fixef,</span></span>
+<span id="cb18-35"><a href="#cb18-35" tabindex="-1"></a><span class="co">#&gt;       ...</span></span>
+<span id="cb18-36"><a href="#cb18-36" tabindex="-1"></a><span class="co">#&gt;     )</span></span>
+<span id="cb18-37"><a href="#cb18-37" tabindex="-1"></a><span class="co">#&gt;   }</span></span>
+<span id="cb18-38"><a href="#cb18-38" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:cv&gt;</span></span></code></pre></div>
 <p>Notice that <code>cv.lme()</code> sets up a call to
 <code>cvMixed()</code>, which does the computational work.</p>
 <p>Most of the arguments of <code>cvMixed()</code> are familiar:</p>
@@ -885,7 +882,7 @@ parallelized.</p></li>
 of variables defining clusters; if missing, then CV is based on cases
 rather than clusters.</p></li>
 </ul>
-<p>The remaining two arguments are unfamiliar:</p>
+<p>The remaining arguments are unfamiliar:</p>
 <ul>
 <li><p><code>predict.clusters.args</code> is a named list of arguments
 to be passed to the <code>predict()</code> function to obtain
@@ -899,9 +896,9 @@ setting <code>level = 0</code>.</p></li>
 arguments to be passed to <code>predict()</code> for case-based CV.
 Setting <code>level = 1</code> includes random effects in the
 predictions.</p></li>
+<li><p><code>fixed.effects</code> is used to compute detailed fold-based
+statistics.</p></li>
 </ul>
-<p><code>fixed.effects</code> is used to compute detailed fold-based
-statistics.</p>
 <p>Finally, any additional arguments, absorbed by <code>...</code>, are
 passed to <code>update()</code> when the model is refit with each fold
 omitted. <code>cvMixed()</code> returns an object of class
@@ -946,35 +943,34 @@ suppress warning messages about non-convergence:</p>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>                       seed,</span>
 <span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>                       <span class="at">ncores =</span> <span class="dv">1</span>,</span>
 <span id="cb20-8"><a href="#cb20-8" tabindex="-1"></a>                       clusterVariables,</span>
-<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>                       <span class="at">fixed.effects =</span> nlme<span class="sc">::</span>fixef,</span>
-<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>                       ...) {</span>
-<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>  <span class="fu">cvMixed</span>(</span>
-<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>    model,</span>
-<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>    <span class="at">package =</span> <span class="st">&quot;MASS&quot;</span>,</span>
-<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>    <span class="at">data =</span> data,</span>
-<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a>    <span class="at">criterion =</span> criterion,</span>
-<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>    <span class="at">k =</span> k,</span>
-<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a>    <span class="at">reps =</span> reps,</span>
-<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a>    <span class="at">seed =</span> seed,</span>
-<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a>    <span class="at">ncores =</span> ncores,</span>
-<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a>    <span class="at">clusterVariables =</span> clusterVariables,</span>
-<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a>    <span class="at">predict.clusters.args =</span> <span class="fu">list</span>(</span>
-<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a>      <span class="at">object =</span> model,</span>
-<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a>      <span class="at">newdata =</span> data,</span>
-<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a>      <span class="at">level =</span> <span class="dv">0</span>,</span>
-<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">&quot;response&quot;</span></span>
-<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a>    ),</span>
-<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a>    <span class="at">predict.cases.args =</span> <span class="fu">list</span>(</span>
-<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a>      <span class="at">object =</span> model,</span>
-<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a>      <span class="at">newdata =</span> data,</span>
-<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a>      <span class="at">level =</span> <span class="dv">1</span>,</span>
-<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">&quot;response&quot;</span></span>
-<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a>    ),</span>
-<span id="cb20-33"><a href="#cb20-33" tabindex="-1"></a>    <span class="at">fixed.effects =</span> fixed.effects,</span>
-<span id="cb20-34"><a href="#cb20-34" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb20-35"><a href="#cb20-35" tabindex="-1"></a>    ...</span>
-<span id="cb20-36"><a href="#cb20-36" tabindex="-1"></a>  )</span>
-<span id="cb20-37"><a href="#cb20-37" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb20-9"><a href="#cb20-9" tabindex="-1"></a>                       ...) {</span>
+<span id="cb20-10"><a href="#cb20-10" tabindex="-1"></a>  <span class="fu">cvMixed</span>(</span>
+<span id="cb20-11"><a href="#cb20-11" tabindex="-1"></a>    model,</span>
+<span id="cb20-12"><a href="#cb20-12" tabindex="-1"></a>    <span class="at">package =</span> <span class="st">&quot;MASS&quot;</span>,</span>
+<span id="cb20-13"><a href="#cb20-13" tabindex="-1"></a>    <span class="at">data =</span> data,</span>
+<span id="cb20-14"><a href="#cb20-14" tabindex="-1"></a>    <span class="at">criterion =</span> criterion,</span>
+<span id="cb20-15"><a href="#cb20-15" tabindex="-1"></a>    <span class="at">k =</span> k,</span>
+<span id="cb20-16"><a href="#cb20-16" tabindex="-1"></a>    <span class="at">reps =</span> reps,</span>
+<span id="cb20-17"><a href="#cb20-17" tabindex="-1"></a>    <span class="at">seed =</span> seed,</span>
+<span id="cb20-18"><a href="#cb20-18" tabindex="-1"></a>    <span class="at">ncores =</span> ncores,</span>
+<span id="cb20-19"><a href="#cb20-19" tabindex="-1"></a>    <span class="at">clusterVariables =</span> clusterVariables,</span>
+<span id="cb20-20"><a href="#cb20-20" tabindex="-1"></a>    <span class="at">predict.clusters.args =</span> <span class="fu">list</span>(</span>
+<span id="cb20-21"><a href="#cb20-21" tabindex="-1"></a>      <span class="at">object =</span> model,</span>
+<span id="cb20-22"><a href="#cb20-22" tabindex="-1"></a>      <span class="at">newdata =</span> data,</span>
+<span id="cb20-23"><a href="#cb20-23" tabindex="-1"></a>      <span class="at">level =</span> <span class="dv">0</span>,</span>
+<span id="cb20-24"><a href="#cb20-24" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">&quot;response&quot;</span></span>
+<span id="cb20-25"><a href="#cb20-25" tabindex="-1"></a>    ),</span>
+<span id="cb20-26"><a href="#cb20-26" tabindex="-1"></a>    <span class="at">predict.cases.args =</span> <span class="fu">list</span>(</span>
+<span id="cb20-27"><a href="#cb20-27" tabindex="-1"></a>      <span class="at">object =</span> model,</span>
+<span id="cb20-28"><a href="#cb20-28" tabindex="-1"></a>      <span class="at">newdata =</span> data,</span>
+<span id="cb20-29"><a href="#cb20-29" tabindex="-1"></a>      <span class="at">level =</span> <span class="dv">1</span>,</span>
+<span id="cb20-30"><a href="#cb20-30" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">&quot;response&quot;</span></span>
+<span id="cb20-31"><a href="#cb20-31" tabindex="-1"></a>    ),</span>
+<span id="cb20-32"><a href="#cb20-32" tabindex="-1"></a>    <span class="at">fixed.effects =</span> nlme<span class="sc">::</span>fixef, </span>
+<span id="cb20-33"><a href="#cb20-33" tabindex="-1"></a>    <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb20-34"><a href="#cb20-34" tabindex="-1"></a>    ...</span>
+<span id="cb20-35"><a href="#cb20-35" tabindex="-1"></a>  )</span>
+<span id="cb20-36"><a href="#cb20-36" tabindex="-1"></a>}</span></code></pre></div>
 <p>We set the argument <code>verbose=FALSE</code> to suppress
 <code>glmmPQL()</code>’s iteration counter when <code>cvMixed()</code>
 calls <code>update()</code>.</p>
