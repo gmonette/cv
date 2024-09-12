@@ -2,6 +2,8 @@
 
 - New plot.cv() and plot.cvList() methods.
 
+- New cvInfo() and selectedModel() accessor functions, with, repectively, "cv" and "cvSelect" methods.
+
 - Differentiate print() and summary() methods for "cv", "cvList", and "cvModlist" objects.
 
 - Fixes to computing per-fold details for mixed-models cv() methods.
