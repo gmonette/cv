@@ -107,3 +107,5 @@ multinom
 glmmTMB
 cvList
 cvModlist
+cvInfo
+selectedModel

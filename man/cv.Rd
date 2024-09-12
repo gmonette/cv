@@ -14,6 +14,8 @@
 \alias{plot.cvList}
 \alias{cvInfo}
 \alias{cvInfo.cv}
+\alias{cvInfo.cvModList}
+\alias{cvInfo.cvList}
 \alias{as.data.frame.cv}
 \alias{as.data.frame.cvList}
 \alias{print.cvDataFrame}
@@ -94,6 +96,20 @@ cv(model, data, criterion, k, reps = 1L, seed, ...)
 cvInfo(object, what, ...)
 
 \method{cvInfo}{cv}(
+  object,
+  what = c("CV criterion", "adjusted CV criterion", "full CV criterion", "confint", "SE",
+    "k", "seed", "method", "criterion name"),
+  ...
+)
+
+\method{cvInfo}{cvModList}(
+  object,
+  what = c("CV criterion", "adjusted CV criterion", "full CV criterion", "confint", "SE",
+    "k", "seed", "method", "criterion name"),
+  ...
+)
+
+\method{cvInfo}{cvList}(
   object,
   what = c("CV criterion", "adjusted CV criterion", "full CV criterion", "confint", "SE",
     "k", "seed", "method", "criterion name"),
@@ -192,8 +208,8 @@ object to be plotted or summarized.}
 \item{digits}{significant digits for printing,
 default taken from the \code{"digits"} option.}
 
-\item{object}{an object to summarize or a \code{"cv"} object from which
-to extract information via \code{criterion()}.}
+\item{object}{an object to summarize or a \code{"cv"}, \code{"cvModlist"},
+or \code{"cvList"} object from which to extract information via \code{cvInfo()}.}
 
 \item{y}{to match the \code{\link{plot}()} generic function, ignored.}
 
@@ -202,7 +218,8 @@ to extract information via \code{criterion()}.}
 for the \code{"cvList"} method, either \code{"adjusted CV criterion"}
 (the default if present in the \code{"cv"} object) or \code{"CV object"}.
 
-For \code{cvInfo()}, the information to extract from a \code{"cv"} object,
+For \code{cvInfo()}, the information to extract from a \code{"cv"},
+\code{"cvModList"}, or \code{"cvList"} object,
 one of: \code{"CV criterion"}, \code{"adjusted CV criterion"},
 \code{"full CV criterion"} (the CV criterion applied to the model fit to the
 full data set), \code{"SE"} (the standard error of the adjusted CV criterion),
@@ -369,6 +386,7 @@ compareFolds(cv.auto)
 plot(cv.auto)
 plot(cv.auto, what="coefficients")
 summary(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
+cvInfo(cv.auto.reps, what="adjusted CV criterion")
 plot(cv.auto.reps)
 plot(cv(m.auto, seed=1234, reps=10, confint=TRUE))
 D.auto.reps <- as.data.frame(cv.auto.reps)

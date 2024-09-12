@@ -128,6 +128,7 @@
 #' plot(cv.auto)
 #' plot(cv.auto, what="coefficients")
 #' summary(cv.auto.reps <- cv(m.auto, seed=1234, reps=3))
+#' cvInfo(cv.auto.reps, what="adjusted CV criterion")
 #' plot(cv.auto.reps)
 #' plot(cv(m.auto, seed=1234, reps=10, confint=TRUE))
 #' D.auto.reps <- as.data.frame(cv.auto.reps)
@@ -747,7 +748,8 @@ summary.cvList <- function(object, ...) {
 #' for the \code{"cvList"} method, either \code{"adjusted CV criterion"}
 #' (the default if present in the \code{"cv"} object) or \code{"CV object"}.
 #'
-#' For \code{cvInfo()}, the information to extract from a \code{"cv"} object,
+#' For \code{cvInfo()}, the information to extract from a \code{"cv"},
+#' \code{"cvModList"}, or \code{"cvList"} object,
 #' one of: \code{"CV criterion"}, \code{"adjusted CV criterion"},
 #' \code{"full CV criterion"} (the CV criterion applied to the model fit to the
 #' full data set), \code{"SE"} (the standard error of the adjusted CV criterion),
@@ -876,6 +878,33 @@ cvInfo.cv <- function(object,  what=c("CV criterion",
                           info
                          }
 
+#' @rdname cv
+#' @export
+cvInfo.cvModList <- function(object,  what=c("CV criterion",
+                                      "adjusted CV criterion",
+                                      "full CV criterion",
+                                      "confint", "SE", "k", "seed",
+                                      "method", "criterion name"),
+                      ...){
+  sapply(object, cvInfo, what=what, ...=...)
+}
+
+#' @rdname cv
+#' @export
+cvInfo.cvList <- function(object,  what=c("CV criterion",
+                                             "adjusted CV criterion",
+                                             "full CV criterion",
+                                             "confint", "SE", "k", "seed",
+                                             "method", "criterion name"),
+                             ...){
+  result <- sapply(object, cvInfo, what=what, ...=...)
+  if (is.matrix(result)) {
+    colnames(result) <- paste0("rep.", seq_along(object))
+  } else {
+    names(result) <- paste0("rep.", seq_along(object))
+  }
+  result
+}
 
 #' @describeIn cv \code{as.data.frame()} method for \code{"cv"} objects.
 #' @param row.names optional row names for the result,
@@ -1008,8 +1037,8 @@ print.cvDataFrame <- function(x,
 }
 
 #' @describeIn cv \code{summary()} method for \code{"cvDataFrame"} objects.
-#' @param object an object to summarize or a \code{"cv"} object from which
-#' to extract information via \code{criterion()}.
+#' @param object an object to summarize or a \code{"cv"}, \code{"cvModlist"},
+#' or \code{"cvList"} object from which to extract information via \code{cvInfo()}.
 #' @param formula of the form \code{some.criterion ~ classifying.variable(s)}
 #' (see examples).
 #' @param subset a subsetting expression; the default (\code{NULL})
