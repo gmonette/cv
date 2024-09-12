@@ -149,6 +149,16 @@ which are documented separately.</p>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">cvInfo</span><span class="op">(</span><span class="va">object</span>, <span class="va">what</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'cv'</span></span>
+<span><span class="fu">cvInfo</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CV criterion"</span>, <span class="st">"adjusted CV criterion"</span>, <span class="st">"full CV criterion"</span>, <span class="st">"confint"</span>, <span class="st">"SE"</span>,</span>
+<span>    <span class="st">"k"</span>, <span class="st">"seed"</span>, <span class="st">"method"</span>, <span class="st">"criterion name"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S3 method for class 'cv'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
@@ -286,7 +296,8 @@ default taken from the <code>"digits"</code> option.</p></dd>
 
 
 <dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>an object to summarize.</p></dd>
+<dd><p>an object to summarize or a <code>"cv"</code> object from which
+to extract information via <code>criterion()</code>.</p></dd>
 
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
@@ -294,10 +305,22 @@ default taken from the <code>"digits"</code> option.</p></dd>
 
 
 <dt id="arg-what">what<a class="anchor" aria-label="anchor" href="#arg-what"></a></dt>
-<dd><p>what to plot, for the <code>"cv"</code> method, either <code>"CV criterion"</code>
+<dd><p>for <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> methods, what to plot: for the <code>"cv"</code> method, either <code>"CV criterion"</code>
 (the default), or <code>"coefficients"</code>;
 for the <code>"cvList"</code> method, either <code>"adjusted CV criterion"</code>
-(the default if present in the <code>"cv"</code> object) or <code>"CV object"</code>.</p></dd>
+(the default if present in the <code>"cv"</code> object) or <code>"CV object"</code>.</p>
+<p>For <code>cvInfo()</code>, the information to extract from a <code>"cv"</code> object,
+one of: <code>"CV criterion"</code>, <code>"adjusted CV criterion"</code>,
+<code>"full CV criterion"</code> (the CV criterion applied to the model fit to the
+full data set), <code>"SE"</code> (the standard error of the adjusted CV criterion),
+<code>"confint"</code> (confidence interval for the adjusted CV criterion),
+<code>"k"</code>, (the number of folds), <code>"seed"</code> (the seed employed for
+R's random-number generator), <code>"method"</code> (the computational method
+employed, e.g., for a <code>"lm"</code> model object), or <code>"criterion name"</code>
+(the CV criterion employed); not all of these elements may be present, in
+which case <code>cvInfo()</code> would return <code>NULL</code>.</p>
+<p>Partial matching is supported, so, e.g., <code>cvInfo(cv-object, "adjusted")</code>
+is equivalent to <code>cvInfo(cv-object, "adjusted CV criterion")</code></p></dd>
 
 
 <dt id="arg-row-names">row.names<a class="anchor" aria-label="anchor" href="#arg-row-names"></a></dt>
@@ -425,6 +448,7 @@ models; see the "Extending the cv package" vignette
 <ul><li><p><code>print(cvList)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code>"cvList"</code> objects.</p></li>
 <li><p><code>summary(cvList)</code>: <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for <code>"cvList"</code> objects.</p></li>
 <li><p><code>plot(cvList)</code>: <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> method for <code>"cvList"</code> objects.</p></li>
+<li><p><code>cvInfo()</code>: extract information from a <code>"cv"</code> object.</p></li>
 <li><p><code>as.data.frame(cvList)</code>: <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> method for <code>"cvList"</code> objects.</p></li>
 <li><p><code>print(cvDataFrame)</code>: <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> method for <code>"cvDataFrame"</code> objects.</p></li>
 <li><p><code>summary(cvDataFrame)</code>: <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method for <code>"cvDataFrame"</code> objects.</p></li>
@@ -589,7 +613,10 @@ models; see the "Extending the cv package" vignette
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/source.html" class="external-link">withAutoprint</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Mroz"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m.mroz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">lfp</span> <span class="op">~</span> <span class="va">.</span>, data<span class="op">=</span><span class="va">Mroz</span>, family<span class="op">=</span><span class="va">binomial</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu">cv</span><span class="op">(</span><span class="va">m.mroz</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">123</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv.mroz</span> <span class="op">&lt;-</span> <span class="fu">cv</span><span class="op">(</span><span class="va">m.mroz</span>, criterion<span class="op">=</span><span class="va">BayesRule</span>, seed<span class="op">=</span><span class="fl">123</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">cvInfo</span><span class="op">(</span><span class="va">cv.mroz</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">cvInfo</span><span class="op">(</span><span class="va">cv.mroz</span>, <span class="st">"adjusted"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">cvInfo</span><span class="op">(</span><span class="va">cv.mroz</span>, <span class="st">"confint"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Duncan"</span>, package<span class="op">=</span><span class="st">"carData"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m.lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
@@ -603,7 +630,7 @@ models; see the "Extending the cv package" vignette
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Mroz", package="carData")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.mroz &lt;- glm(lfp ~ ., data=Mroz, family=binomial)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.mroz, criterion=BayesRule, seed=123))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.mroz &lt;- cv(m.mroz, criterion=BayesRule, seed=123))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: exact</span>
@@ -612,6 +639,13 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 0.3260248</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 95% CI for bias-adjusted CV criterion = (0.292366, 0.3596836)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 0.3067729</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvInfo(cv.mroz)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3320053</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvInfo(cv.mroz, "adjusted")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.3260248</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvInfo(cv.mroz, "confint")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      lower      upper      level </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  0.2923660  0.3596836 95.0000000 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Duncan", package="carData")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.lm &lt;- lm(prestige ~ income + education, data=Duncan)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.rlm &lt;- MASS::rlm(prestige ~ income + education,</span>

@@ -157,7 +157,12 @@ accuracy of this procedure.</p>
 <span><span class="fu">compareFolds</span><span class="op">(</span><span class="va">object</span>, digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'cvSelect'</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">average</span>, NAs <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">average</span>, NAs <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">selectedModel</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'cvSelect'</span></span>
+<span><span class="fu">selectedModel</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -381,6 +386,8 @@ and then select predictors.</p></li>
 for the several folds.</p></li>
 <li><p><code>coef(cvSelect)</code>: extract the coefficients from the selected models
 for the several folds and possibly average them.</p></li>
+<li><p><code>selectedModel()</code>: extract the selected model from a
+<code>selectModel</code> object.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -553,10 +560,24 @@ for the several folds and possibly average them.</p></li>
 <span class="r-in"><span><span class="va">m1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="va">income</span> <span class="op">+</span> <span class="va">education</span> <span class="op">+</span> <span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="op">(</span><span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span><span class="op">*</span><span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">selectModelList</span>, data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>,</span></span>
-<span class="r-in"><span>   working.model<span class="op">=</span><span class="fu"><a href="cv.modList.html">models</a></span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span>, <span class="va">m3</span><span class="op">)</span><span class="op">)</span> <span class="co"># recursive CV</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv.sel</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">selectModelList</span>, data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>,</span></span>
+<span class="r-in"><span>                     working.model<span class="op">=</span><span class="fu"><a href="cv.modList.html">models</a></span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span>, <span class="va">m3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                     save.model<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="co"># recursive CV</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 5963</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (mse) = 112.0172 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 112.0172</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 139.8472</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 113.7905</span>
+<span class="r-in"><span><span class="fu">selectedModel</span><span class="op">(</span><span class="va">cv.sel</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> lm(formula = prestige ~ income + education + type, data = Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)       income    education     typeprof       typewc  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     -0.1850       0.5975       0.3453      16.6575     -14.6611  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
