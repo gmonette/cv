@@ -8,6 +8,8 @@
 \alias{selectModelList}
 \alias{compareFolds}
 \alias{coef.cvSelect}
+\alias{selectedModel}
+\alias{selectedModel.cvSelect}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
 \method{cv}{`function`}(
@@ -86,6 +88,10 @@ selectModelList(
 compareFolds(object, digits = 3, ...)
 
 \method{coef}{cvSelect}(object, average, NAs = 0, ...)
+
+selectedModel(object, ...)
+
+\method{selectedModel}{cvSelect}(object, ...)
 }
 \arguments{
 \item{model}{a regression model object fit to data, or for the
@@ -268,6 +274,9 @@ for the several folds.
 \item \code{coef(cvSelect)}: extract the coefficients from the selected models
 for the several folds and possibly average them.
 
+\item \code{selectedModel()}: extract the selected model from a
+\code{selectModel} object.
+
 }}
 \examples{
 if (requireNamespace("ISLR2", quietly=TRUE)){
@@ -318,8 +327,10 @@ data("Duncan", package="carData")
 m1 <- lm(prestige ~ income + education, data=Duncan)
 m2 <- lm(prestige ~ income + education + type, data=Duncan)
 m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
-cv(selectModelList, data=Duncan, seed=5963,
-   working.model=models(m1, m2, m3)) # recursive CV
+summary(cv.sel <- cv(selectModelList, data=Duncan, seed=5963,
+                     working.model=models(m1, m2, m3),
+                     save.model=TRUE)) # recursive CV
+selectedModel(cv.sel)
 
 }
 \seealso{

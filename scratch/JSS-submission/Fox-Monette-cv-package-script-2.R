@@ -459,8 +459,9 @@ recursiveCV.auto <- cv(selectModelList, data = Auto,
                        working.model = mlist, save.model = TRUE,
                        seed = 2120)
 recursiveCV.auto
-brief(recursiveCV.auto$selected.model)
-cv(mlist[[7]], seed = 2120) # CV for selected model
+selectedModel(recursiveCV.auto)
+# CV for selected model
+summary(cv(selectedModel(recursiveCV.auto), seed = 2120))
 
   # equivalent, using recursive = TRUE
 
@@ -597,9 +598,7 @@ train(x = attrition[, c("JobSatisfaction", "Gender", "MonthlyIncome")],
     # LOO cv for the example using cv::cv()
 
 (cv.attrition <- cv(mod.attrition, k = "loo", criterion = BayesRule))
-all.equal(cv.attrition$`CV crit`, 1 - mean(rs_obj$accuracy),
-          check.attributes = FALSE)
-
+1 - mean(rs_obj$accuracy)
 
     # comparative timings for the various computations
 

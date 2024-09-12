@@ -12,6 +12,8 @@
 \alias{summary.cvList}
 \alias{plot.cv}
 \alias{plot.cvList}
+\alias{cvInfo}
+\alias{cvInfo.cv}
 \alias{as.data.frame.cv}
 \alias{as.data.frame.cvList}
 \alias{print.cvDataFrame}
@@ -86,6 +88,15 @@ cv(model, data, criterion, k, reps = 1L, seed, ...)
   y,
   what = c("adjusted CV criterion", "CV criterion"),
   confint = TRUE,
+  ...
+)
+
+cvInfo(object, what, ...)
+
+\method{cvInfo}{cv}(
+  object,
+  what = c("CV criterion", "adjusted CV criterion", "full CV criterion", "confint", "SE",
+    "k", "seed", "method", "criterion name"),
   ...
 )
 
@@ -181,14 +192,29 @@ object to be plotted or summarized.}
 \item{digits}{significant digits for printing,
 default taken from the \code{"digits"} option.}
 
-\item{object}{an object to summarize.}
+\item{object}{an object to summarize or a \code{"cv"} object from which
+to extract information via \code{criterion()}.}
 
 \item{y}{to match the \code{\link{plot}()} generic function, ignored.}
 
-\item{what}{what to plot, for the \code{"cv"} method, either \code{"CV criterion"}
+\item{what}{for \code{plot()} methods, what to plot: for the \code{"cv"} method, either \code{"CV criterion"}
 (the default), or \code{"coefficients"};
 for the \code{"cvList"} method, either \code{"adjusted CV criterion"}
-(the default if present in the \code{"cv"} object) or \code{"CV object"}.}
+(the default if present in the \code{"cv"} object) or \code{"CV object"}.
+
+For \code{cvInfo()}, the information to extract from a \code{"cv"} object,
+one of: \code{"CV criterion"}, \code{"adjusted CV criterion"},
+\code{"full CV criterion"} (the CV criterion applied to the model fit to the
+full data set), \code{"SE"} (the standard error of the adjusted CV criterion),
+\code{"confint"} (confidence interval for the adjusted CV criterion),
+\code{"k"}, (the number of folds), \code{"seed"} (the seed employed for
+R's random-number generator), \code{"method"} (the computational method
+employed, e.g., for a \code{"lm"} model object), or \code{"criterion name"}
+(the CV criterion employed); not all of these elements may be present, in
+which case \code{cvInfo()} would return \code{NULL}.
+
+Partial matching is supported, so, e.g., \code{cvInfo(cv-object, "adjusted")}
+is equivalent to \code{cvInfo(cv-object, "adjusted CV criterion")}}
 
 \item{row.names}{optional row names for the result,
 defaults to \code{NULL}.}
@@ -322,6 +348,8 @@ models; see the "Extending the cv package" vignette
 
 \item \code{plot(cvList)}: \code{plot()} method for \code{"cvList"} objects.
 
+\item \code{cvInfo()}: extract information from a \code{"cv"} object.
+
 \item \code{as.data.frame(cvList)}: \code{as.data.frame()} method for \code{"cvList"} objects.
 
 \item \code{print(cvDataFrame)}: \code{print()} method for \code{"cvDataFrame"} objects.
@@ -359,7 +387,10 @@ if (requireNamespace("carData", quietly=TRUE)){
 withAutoprint({
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
-summary(cv(m.mroz, criterion=BayesRule, seed=123))
+summary(cv.mroz <- cv(m.mroz, criterion=BayesRule, seed=123))
+cvInfo(cv.mroz)
+cvInfo(cv.mroz, "adjusted")
+cvInfo(cv.mroz, "confint")
 
 data("Duncan", package="carData")
 m.lm <- lm(prestige ~ income + education, data=Duncan)

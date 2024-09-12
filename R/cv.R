@@ -146,7 +146,10 @@
 #' withAutoprint({
 #' data("Mroz", package="carData")
 #' m.mroz <- glm(lfp ~ ., data=Mroz, family=binomial)
-#' summary(cv(m.mroz, criterion=BayesRule, seed=123))
+#' summary(cv.mroz <- cv(m.mroz, criterion=BayesRule, seed=123))
+#' cvInfo(cv.mroz)
+#' cvInfo(cv.mroz, "adjusted")
+#' cvInfo(cv.mroz, "confint")
 #'
 #' data("Duncan", package="carData")
 #' m.lm <- lm(prestige ~ income + education, data=Duncan)
@@ -739,10 +742,24 @@ summary.cvList <- function(object, ...) {
 }
 
 #' @param y to match the \code{\link{plot}()} generic function, ignored.
-#' @param what what to plot, for the \code{"cv"} method, either \code{"CV criterion"}
+#' @param what for \code{plot()} methods, what to plot: for the \code{"cv"} method, either \code{"CV criterion"}
 #' (the default), or \code{"coefficients"};
 #' for the \code{"cvList"} method, either \code{"adjusted CV criterion"}
 #' (the default if present in the \code{"cv"} object) or \code{"CV object"}.
+#'
+#' For \code{cvInfo()}, the information to extract from a \code{"cv"} object,
+#' one of: \code{"CV criterion"}, \code{"adjusted CV criterion"},
+#' \code{"full CV criterion"} (the CV criterion applied to the model fit to the
+#' full data set), \code{"SE"} (the standard error of the adjusted CV criterion),
+#' \code{"confint"} (confidence interval for the adjusted CV criterion),
+#' \code{"k"}, (the number of folds), \code{"seed"} (the seed employed for
+#' R's random-number generator), \code{"method"} (the computational method
+#' employed, e.g., for a \code{"lm"} model object), or \code{"criterion name"}
+#' (the CV criterion employed); not all of these elements may be present, in
+#' which case \code{cvInfo()} would return \code{NULL}.
+#'
+#' Partial matching is supported, so, e.g., \code{cvInfo(cv-object, "adjusted")}
+#' is equivalent to \code{cvInfo(cv-object, "adjusted CV criterion")}
 #' @describeIn cv \code{plot()} method for \code{"cv"} objects.
 #' @exportS3Method base::plot
 plot.cv <- function(x, y, what=c("CV criterion", "coefficients"), ...){
@@ -828,6 +845,37 @@ plot.cvList <- function(x, y,
   }
   invisible(NULL)
 }
+
+#' @describeIn cv extract information from a \code{"cv"} object.
+#' @export
+cvInfo <- function(object, what, ...){
+  UseMethod("cvInfo")
+}
+
+#' @rdname cv
+#' @export
+cvInfo.cv <- function(object,  what=c("CV criterion",
+                                      "adjusted CV criterion",
+                                      "full CV criterion",
+                                       "confint", "SE", "k", "seed",
+                                       "method", "criterion name"),
+                         ...){
+                          what <- match.arg(what)
+                          elements <- c("CV crit", "adj CV crit", "full crit",
+                                        "confint", "SE adj CV crit", "k",
+                                        "seed", "method", "criterion")
+                          names(elements) <- c("CV criterion",
+                                               "adjusted CV criterion",
+                                               "full CV criterion",
+                                               "confint", "SE", "k", "seed",
+                                               "method", "criterion name")
+                          info <- object[[elements[[what]]]]
+                          nms <- names(info)
+                          attributes(info) <- NULL
+                          names(info) <- nms
+                          info
+                         }
+
 
 #' @describeIn cv \code{as.data.frame()} method for \code{"cv"} objects.
 #' @param row.names optional row names for the result,
@@ -960,7 +1008,8 @@ print.cvDataFrame <- function(x,
 }
 
 #' @describeIn cv \code{summary()} method for \code{"cvDataFrame"} objects.
-#' @param object an object to summarize.
+#' @param object an object to summarize or a \code{"cv"} object from which
+#' to extract information via \code{criterion()}.
 #' @param formula of the form \code{some.criterion ~ classifying.variable(s)}
 #' (see examples).
 #' @param subset a subsetting expression; the default (\code{NULL})
