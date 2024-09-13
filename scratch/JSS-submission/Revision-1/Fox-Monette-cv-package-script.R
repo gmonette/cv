@@ -75,10 +75,11 @@ library("car") # for brief() and other functions
 m.auto <- lm(mpg ~ poly(horsepower, 2), data = Auto)
 brief(m.auto)
 
-cv(m.auto, confint = TRUE)
+(cv.auto <- cv(m.auto, confint = TRUE))
+summary(cv.auto)
 
-cv(m.auto, k = "loo")
-cv(m.auto, k = "loo", method = "naive", confint = TRUE)
+summary(cv(m.auto, k = "loo"))
+summary(cv(m.auto, k = "loo", method = "naive", confint = TRUE))
 
   # some relative timings
 
@@ -157,11 +158,11 @@ S(hsb.lmer, brief = TRUE)
 
     # cluster-based CV
 
-cv(hsb.lmer, k = 10, clusterVariables = "school", seed = 5240)
+summary(cv(hsb.lmer, k = 10, clusterVariables = "school", seed = 5240))
 
     # case-based CV
 
-cv(hsb.lmer, seed = 1575) # note one convergence failure
+summary(cv(hsb.lmer, seed = 1575)) # note one convergence failure
 
 
   # Sec. 3.2. Example: Contrasting cluster-based and case-based CV
@@ -449,7 +450,7 @@ num.predictors
 cvs <- cv(selectTransStepAIC, data = Auto, seed = 76692,
           working.model = m.auto, predictors = num.predictors,
           response = "mpg", AIC = FALSE)
-cvs
+summary(cvs)
 
 compareFolds(cvs)
 
@@ -465,7 +466,8 @@ cv(m.sel, seed = 2120)
 
   # equivalent, using recursive = TRUE
 
-cv(mlist, data = Auto, seed = 2120, recursive = TRUE, save.model = TRUE)
+summary(cv(mlist, data = Auto, seed = 2120, recursive = TRUE,
+           save.model = TRUE))
 
 # Sec. 5: Extending the cv package
 
@@ -540,7 +542,7 @@ cv.multinom <- function (model, data, criterion = BayesRuleMulti,
   }
 
     # works
-cv(m.beps, seed = 3465)
+summary(cv(m.beps, seed = 3465))
 
 # Sec. 6: Comparing cv to other R software for cross-validation
 
