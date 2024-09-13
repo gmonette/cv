@@ -137,8 +137,8 @@ recursiveCV.auto <- cv(
   seed = 2120
 )
 summary(recursiveCV.auto)
-recursiveCV.auto$selected.model
-cv(m.7, seed = 2120) # same seed for same folds
+(m.sel <- cvInfo(recursiveCV.auto, "selected model"))
+cv(m.sel, seed = 2120) # same seed for same folds
 
 ## ----recursive-cv-alt---------------------------------------------------------
 recursiveCV.auto.alt <- cv(

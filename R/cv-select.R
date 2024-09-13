@@ -733,7 +733,7 @@ selectModelList <-
 #' summary(cv.sel <- cv(selectModelList, data=Duncan, seed=5963,
 #'                      working.model=models(m1, m2, m3),
 #'                      save.model=TRUE)) # recursive CV
-#' selectedModel(cv.sel)
+#' cvInfo(cv.sel, "selected model")
 #'
 #' @describeIn cv.function print the coefficients from the selected models
 #' for the several folds.
@@ -785,16 +785,32 @@ coef.cvSelect <- function(object, average, NAs = 0, ...) {
   apply(coef, 2, average)
 }
 
-#' @describeIn cv.function extract the selected model from a
-#' \code{selectModel} object.
-#' @export
-selectedModel <- function(object, ...){
-  UseMethod("selectedModel")
-}
-
+#' @param what the information to extract from a \code{"cvSelect"} object,
+#' one of: \code{"CV criterion"}, \code{"adjusted CV criterion"},
+#' \code{"full CV criterion"} (the CV criterion applied to the model fit to the
+#' full data set), \code{"SE"} (the standard error of the adjusted CV criterion),
+#' \code{"confint"} (confidence interval for the adjusted CV criterion),
+#' \code{"k"}, (the number of folds), \code{"seed"} (the seed employed for
+#' R's random-number generator), \code{"method"} (the computational method
+#' employed, e.g., for a \code{"lm"} model object), \code{"criterion name"}
+#' (the CV criterion employed), or \code{"selected model"} (the model object
+#' for the model that was selected); not all of these elements may be present, in
+#' which case \code{cvInfo()} would return \code{NULL}.
 #' @rdname cv.function
 #' @export
-selectedModel.cvSelect <- function(object, ...){
-  object$selected
+cvInfo.cvSelect <- function(object,
+                            what=c("CV criterion",
+                                   "adjusted CV criterion",
+                                   "full CV criterion",
+                                   "confint", "SE", "k", "seed",
+                                   "method", "criterion name",
+                                   "selected model"),
+                            ...){
+  what <- match.arg(what)
+  if (what == "selected model"){
+    object$selected
+  } else {
+    NextMethod()
+  }
 }
 

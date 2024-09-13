@@ -458,10 +458,10 @@ compareFolds(cvs)
 recursiveCV.auto <- cv(selectModelList, data = Auto,
                        working.model = mlist, save.model = TRUE,
                        seed = 2120)
-recursiveCV.auto
-selectedModel(recursiveCV.auto)
+summary(recursiveCV.auto)
+brief(m.sel <- cvInfo(recursiveCV.auto, "selected model"))
 # CV for selected model
-summary(cv(selectedModel(recursiveCV.auto), seed = 2120))
+cv(m.sel, seed = 2120)
 
   # equivalent, using recursive = TRUE
 

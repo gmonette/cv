@@ -720,7 +720,7 @@ recursiveCV.auto <- cv(selectModelList, data = Auto,
                        working.model = mlist, save.model = TRUE, 
                        seed = 2120)
 summary(recursiveCV.auto)
-brief(m.sel <- selectedModel(recursiveCV.auto))
+brief(m.sel <- cvInfo(recursiveCV.auto, "selected model"))
 cv(m.sel, seed = 2120)
 ```
 As expected, recursive CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model (using the same seed for \proglang{R}'s random-number generator to obtain the same folds).

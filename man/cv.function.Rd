@@ -8,8 +8,7 @@
 \alias{selectModelList}
 \alias{compareFolds}
 \alias{coef.cvSelect}
-\alias{selectedModel}
-\alias{selectedModel.cvSelect}
+\alias{cvInfo.cvSelect}
 \title{Cross-Validate a Model-Selection Procedure}
 \usage{
 \method{cv}{`function`}(
@@ -89,9 +88,12 @@ compareFolds(object, digits = 3, ...)
 
 \method{coef}{cvSelect}(object, average, NAs = 0, ...)
 
-selectedModel(object, ...)
-
-\method{selectedModel}{cvSelect}(object, ...)
+\method{cvInfo}{cvSelect}(
+  object,
+  what = c("CV criterion", "adjusted CV criterion", "full CV criterion", "confint", "SE",
+    "k", "seed", "method", "criterion name", "selected model"),
+  ...
+)
 }
 \arguments{
 \item{model}{a regression model object fit to data, or for the
@@ -192,6 +194,18 @@ estimates for each fold are returned.}
 averaged estimates; the default, \code{0}, is appropriate, e.g.,
 for regression coefficients; the value \code{1} might be appropriate
 for power-transformation estimates.}
+
+\item{what}{the information to extract from a \code{"cvSelect"} object,
+one of: \code{"CV criterion"}, \code{"adjusted CV criterion"},
+\code{"full CV criterion"} (the CV criterion applied to the model fit to the
+full data set), \code{"SE"} (the standard error of the adjusted CV criterion),
+\code{"confint"} (confidence interval for the adjusted CV criterion),
+\code{"k"}, (the number of folds), \code{"seed"} (the seed employed for
+R's random-number generator), \code{"method"} (the computational method
+employed, e.g., for a \code{"lm"} model object), \code{"criterion name"}
+(the CV criterion employed), or \code{"selected model"} (the model object
+for the model that was selected); not all of these elements may be present, in
+which case \code{cvInfo()} would return \code{NULL}.}
 }
 \value{
 An object of class \code{"cvSelect"},
@@ -274,9 +288,6 @@ for the several folds.
 \item \code{coef(cvSelect)}: extract the coefficients from the selected models
 for the several folds and possibly average them.
 
-\item \code{selectedModel()}: extract the selected model from a
-\code{selectModel} object.
-
 }}
 \examples{
 if (requireNamespace("ISLR2", quietly=TRUE)){
@@ -330,7 +341,7 @@ m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
 summary(cv.sel <- cv(selectModelList, data=Duncan, seed=5963,
                      working.model=models(m1, m2, m3),
                      save.model=TRUE)) # recursive CV
-selectedModel(cv.sel)
+cvInfo(cv.sel, "selected model")
 
 }
 \seealso{
