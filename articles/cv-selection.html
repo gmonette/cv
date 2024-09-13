@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-09-12</h4>
+            <h4 data-toc-skip class="date">2024-09-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv-selection.Rmd" class="external-link"><code>vignettes/cv-selection.Rmd</code></a></small>
       <div class="d-none name"><code>cv-selection.Rmd</code></div>
@@ -409,7 +409,7 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span><span class="co">#&gt; cross-validation criterion = 19.105</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.68</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.746</span></span>
-<span><span class="va">recursiveCV.auto</span><span class="op">$</span><span class="va">selected.model</span></span>
+<span><span class="op">(</span><span class="va">m.sel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cvInfo</a></span><span class="op">(</span><span class="va">recursiveCV.auto</span>, <span class="st">"selected model"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; lm(formula = mpg ~ poly(horsepower, 7), data = Auto)</span></span>
@@ -421,7 +421,7 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span><span class="co">#&gt;                -3.95                 -5.19                 13.27  </span></span>
 <span><span class="co">#&gt; poly(horsepower, 7)6  poly(horsepower, 7)7  </span></span>
 <span><span class="co">#&gt;                -8.55                  7.98</span></span>
-<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.7</span>, seed <span class="op">=</span> <span class="fl">2120</span><span class="op">)</span> <span class="co"># same seed for same folds</span></span>
+<span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.sel</span>, seed <span class="op">=</span> <span class="fl">2120</span><span class="op">)</span> <span class="co"># same seed for same folds</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
 <span><span class="co">#&gt; cross-validation criterion (mse) = 18.898</span></span></code></pre></div>
 <p>As expected, recursive CV produces a larger estimate of MSE for the

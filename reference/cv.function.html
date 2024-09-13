@@ -159,10 +159,13 @@ accuracy of this procedure.</p>
 <span><span class="co"># S3 method for class 'cvSelect'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">average</span>, NAs <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">selectedModel</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># S3 method for class 'cvSelect'</span></span>
-<span><span class="fu">selectedModel</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="cv.html">cvInfo</a></span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CV criterion"</span>, <span class="st">"adjusted CV criterion"</span>, <span class="st">"full CV criterion"</span>, <span class="st">"confint"</span>, <span class="st">"SE"</span>,</span>
+<span>    <span class="st">"k"</span>, <span class="st">"seed"</span>, <span class="st">"method"</span>, <span class="st">"criterion name"</span>, <span class="st">"selected model"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -321,6 +324,20 @@ averaged estimates; the default, <code>0</code>, is appropriate, e.g.,
 for regression coefficients; the value <code>1</code> might be appropriate
 for power-transformation estimates.</p></dd>
 
+
+<dt id="arg-what">what<a class="anchor" aria-label="anchor" href="#arg-what"></a></dt>
+<dd><p>the information to extract from a <code>"cvSelect"</code> object,
+one of: <code>"CV criterion"</code>, <code>"adjusted CV criterion"</code>,
+<code>"full CV criterion"</code> (the CV criterion applied to the model fit to the
+full data set), <code>"SE"</code> (the standard error of the adjusted CV criterion),
+<code>"confint"</code> (confidence interval for the adjusted CV criterion),
+<code>"k"</code>, (the number of folds), <code>"seed"</code> (the seed employed for
+R's random-number generator), <code>"method"</code> (the computational method
+employed, e.g., for a <code>"lm"</code> model object), <code>"criterion name"</code>
+(the CV criterion employed), or <code>"selected model"</code> (the model object
+for the model that was selected); not all of these elements may be present, in
+which case <code><a href="cv.html">cvInfo()</a></code> would return <code>NULL</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -386,8 +403,6 @@ and then select predictors.</p></li>
 for the several folds.</p></li>
 <li><p><code>coef(cvSelect)</code>: extract the coefficients from the selected models
 for the several folds and possibly average them.</p></li>
-<li><p><code>selectedModel()</code>: extract the selected model from a
-<code>selectModel</code> object.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -569,7 +584,7 @@ for the several folds and possibly average them.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 112.0172</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 139.8472</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 113.7905</span>
-<span class="r-in"><span><span class="fu">selectedModel</span><span class="op">(</span><span class="va">cv.sel</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="cv.html">cvInfo</a></span><span class="op">(</span><span class="va">cv.sel</span>, <span class="st">"selected model"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> lm(formula = prestige ~ income + education + type, data = Duncan)</span>
