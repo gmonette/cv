@@ -173,7 +173,7 @@ brief(m.auto)
 (cv.auto <- cv(m.auto, confint = TRUE))
 summary(cv.auto)
 ```
-The `print()` method for `"cv"` objects reports the CV estimate of MSE; the `summary()` method, which we'll use extensively in the sequel, in additions reports a bias-adjusted estimate of the MSE (the bias adjustment is explained in Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}), and the MSE is also computed for the original, full-sample regression. Because the number of cases $n = 392 < 400$ for the \code{Auto} data, we set the argument \code{confint = TRUE} to obtain a confidence interval for the MSE, which proves to be quite wide.
+The `print()` method for `"cv"` objects reports the CV estimate of MSE; the `summary()` method, which we'll use extensively in the sequel, in addition reports a bias-adjusted estimate of the MSE (the bias adjustment is explained in Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}), and the MSE is also computed for the original, full-sample regression. Because the number of cases $n = 392 < 400$ for the \code{Auto} data, we set the argument \code{confint = TRUE} to obtain a confidence interval for the MSE, which proves to be quite wide.
 
 To perform LOO CV:
 
