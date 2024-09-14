@@ -73,7 +73,7 @@ methods("cv")
 
 * The \code{"default"} \code{cv()} method works (perhaps with a bit of coaxing) with many other existing regression-model classes for which there is an \code{update()} method that accepts a \code{data} argument. More generally, the \pkg{cv} package is designed to be extensible, as discussed in Section \ref{extending-the-cv-package}.
 
-A number of existing \proglang{R} packages include functions for cross-validating regression models. We briefly situate the \pkg{cv} package relative to other \proglang{R} software for cross-validation in Section \ref{comparing-cv-to-other-r-software-for-cross-validation}.
+A number of existing \proglang{R} packages include functions for cross-validating regression models. We briefly situate the \pkg{cv} package relative to other \proglang{R} software for cross-validation, and to other statistical software (in particular, \proglang{SAS}, \proglang{Stata}, and \proglang{Python}), in Section \ref{comparing-cv-to-other-software-for-cross-validation}.
 
 The final section of the paper (Section \ref{computational-notes}) describes some computational details, including efficient CV computations for linear and generalized-linear models, and computation of bias-corrected CV criteria.
 
@@ -834,7 +834,7 @@ summary(cv(m.beps, seed = 3465))
 ```
 The cross-validated polytomous Bayes's rule criterion confirms that the fitted model does substantially better than the marginal Bayes's rule prediction that everyone votes for Labour.
 
-# Comparing cv to other R software for cross-validation
+# Comparing cv to other software for cross-validation
 
 In this section with briefly compare the \code{cv} package to other packages in \proglang{R} that support cross-validation, and then even more briefly consider facilities for cross-validation in other commonly used statistical software, \proglang{SAS}, \proglang{Stata}, and \proglang{Python}.
 
