@@ -16,3 +16,4 @@ docs
 *.synctex.*
 figure/
 scratch/*/*.md
+Rplots.pdf
