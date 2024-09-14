@@ -28,64 +28,15 @@ sessionInfo()
 ## tzcode source: internal
 ## 
 ## attached base packages:
-## [1] parallel  stats     graphics  grDevices utils     datasets 
-## [7] methods   base     
+## [1] stats     graphics  grDevices utils     datasets  methods  
+## [7] base     
 ## 
 ## other attached packages:
-##  [1] knitr_1.48          caret_6.0-94        ggplot2_3.5.1      
-##  [4] purrr_1.0.2         rsample_1.2.1       nnet_7.3-19        
-##  [7] MASS_7.3-61         latticeExtra_0.6-30 lattice_0.22-6     
-## [10] glmmTMB_1.1.9       lme4_1.1-35.5       Matrix_1.7-0       
-## [13] car_3.1-3           carData_3.0-5       cv_2.0.3           
-## [16] doParallel_1.0.17   iterators_1.0.14    foreach_1.5.2      
+## [1] knitr_1.48
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] DBI_1.2.3             pROC_1.18.5          
-##  [3] deldir_2.0-4          sandwich_3.1-0       
-##  [5] rlang_1.1.4           magrittr_2.0.3       
-##  [7] multcomp_1.4-26       furrr_0.3.1          
-##  [9] e1071_1.7-14          compiler_4.4.1       
-## [11] mgcv_1.9-1            png_0.1-8            
-## [13] vctrs_0.6.5           reshape2_1.4.4       
-## [15] stringr_1.5.1         pkgconfig_2.0.3      
-## [17] fastmap_1.2.0         backports_1.5.0      
-## [19] utf8_1.2.4            rmarkdown_2.27       
-## [21] prodlim_2024.06.25    nloptr_2.1.1         
-## [23] xfun_0.46             recipes_1.1.0        
-## [25] highr_0.11            jpeg_0.1-10          
-## [27] broom_1.0.6           R6_2.5.1             
-## [29] stringi_1.8.4         RColorBrewer_1.1-3   
-## [31] pkgload_1.4.0         parallelly_1.38.0    
-## [33] boot_1.3-30           rpart_4.1.23         
-## [35] lubridate_1.9.3       numDeriv_2016.8-1.1  
-## [37] Rcpp_1.0.13           future.apply_1.11.2  
-## [39] zoo_1.8-12            splines_4.4.1        
-## [41] timechange_0.3.0      tidyselect_1.2.1     
-## [43] rstudioapi_0.16.0     effects_4.2-3        
-## [45] abind_1.4-5           yaml_2.3.10          
-## [47] timeDate_4032.109     TMB_1.9.14           
-## [49] codetools_0.2-20      listenv_0.9.1        
-## [51] tibble_3.2.1          plyr_1.8.9           
-## [53] withr_3.0.1           evaluate_0.24.0      
-## [55] future_1.34.0         survival_3.7-0       
-## [57] proxy_0.4-27          survey_4.4-2         
-## [59] pillar_1.9.0          stats4_4.4.1         
-## [61] insight_0.20.2        generics_0.1.3       
-## [63] munsell_0.5.1         scales_1.3.0         
-## [65] minqa_1.2.8           globals_0.16.3       
-## [67] class_7.3-22          glue_1.7.0           
-## [69] tools_4.4.1           interp_1.1-6         
-## [71] data.table_1.15.4     ModelMetrics_1.2.2.2 
-## [73] gower_1.0.1           mvtnorm_1.2-5        
-## [75] grid_4.4.1            tidyr_1.3.1          
-## [77] mitools_2.4           ipred_0.9-15         
-## [79] colorspace_2.1-1      nlme_3.1-165         
-## [81] Formula_1.2-5         cli_3.6.3            
-## [83] fansi_1.0.6           lava_1.8.0           
-## [85] dplyr_1.1.4           gtable_0.3.5         
-## [87] digest_0.6.36         TH.data_1.1-2        
-## [89] htmltools_0.5.8.1     lifecycle_1.0.4      
-## [91] hardhat_1.4.0         microbenchmark_1.4.10
+## [1] compiler_4.4.1    tools_4.4.1       rstudioapi_0.16.0
+## [4] xfun_0.46         evaluate_0.24.0
 ```
 
 ``` r
@@ -96,13 +47,32 @@ palette(car::carPalette())
 # code for Sec. 1: Introduction
 
 library("cv")
+```
+
+```
+## Loading required package: doParallel
+```
+
+```
+## Loading required package: foreach
+```
+
+```
+## Loading required package: iterators
+```
+
+```
+## Loading required package: parallel
+```
+
+``` r
 methods("cv")
 ```
 
 ```
-##  [1] cv.default*  cv.function* cv.glm*      cv.glmmTMB* 
-##  [5] cv.lm*       cv.lme*      cv.merMod*   cv.modList* 
-##  [9] cv.multinom  cv.rlm*     
+## [1] cv.default*  cv.function* cv.glm*      cv.glmmTMB* 
+## [5] cv.lm*       cv.lme*      cv.merMod*   cv.modList* 
+## [9] cv.rlm*     
 ## see '?methods' for accessing help and source code
 ```
 
@@ -209,7 +179,13 @@ args(cv:::cv.lm)
 
 ``` r
 library("car") # for brief() and other functions
+```
 
+```
+## Loading required package: carData
+```
+
+``` r
   # CV for second-degree polynomial
 
 m.auto <- lm(mpg ~ poly(horsepower, 2), data = Auto)
@@ -229,11 +205,11 @@ brief(m.auto)
 ```
 
 ```
-## R RNG seed set to 694354
+## R RNG seed set to 548422
 ```
 
 ```
-## cross-validation criterion (mse) = 19.188
+## cross-validation criterion (mse) = 19.348
 ```
 
 ``` r
@@ -244,9 +220,9 @@ summary(cv.auto)
 ## 10-Fold Cross Validation
 ## method: Woodbury
 ## criterion: mse
-## cross-validation criterion = 19.188
-## bias-adjusted cross-validation criterion = 19.177
-## 95% CI for bias-adjusted CV criterion = (15.712, 22.642)
+## cross-validation criterion = 19.348
+## bias-adjusted cross-validation criterion = 19.329
+## 95% CI for bias-adjusted CV criterion = (15.838, 22.821)
 ## full-sample criterion = 18.985
 ```
 
@@ -298,12 +274,18 @@ print(microbenchmark::microbenchmark(
 ```
 
 ```
+## Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto,
+## k = "loo"), : less accurate nanosecond times to avoid potential
+## integer overflows
+```
+
+```
 ## Unit: relative
-##       expr   min    lq  mean median     uq    max neval cld
-##  hatvalues   1.0   1.0   1.0   1.00   1.00   1.00    10 a  
-##   Woodbury  10.7  10.2   9.3   8.87   8.58   8.96    10 a  
-##      naive 185.0 172.0 162.0 154.00 150.00 166.00    10  b 
-##     cv.glm 318.0 300.0 285.0 265.00 254.00 333.00    10   c
+##       expr   min    lq  mean median     uq max neval cld
+##  hatvalues   1.0   1.0   1.0   1.00   1.00   1    10 a  
+##   Woodbury  11.3  11.3  10.5   9.97   9.34  12    10 a  
+##      naive 192.0 192.0 181.0 169.00 163.00 188    10  b 
+##     cv.glm 333.0 328.0 307.0 291.00 289.00 303    10   c
 ```
 
 ``` r
@@ -451,6 +433,13 @@ HSB <- within(HSB, {
     # fit mixed model
 
 library("lme4")
+```
+
+```
+## Loading required package: Matrix
+```
+
+``` r
 hsb.lmer <- lmer(mathach ~ mean.ses*cses + sector*cses
                    + (cses | school), data = HSB)
 S(hsb.lmer, brief = TRUE)
@@ -1222,7 +1211,7 @@ BayesRule
 ##     attr(result, "casewise loss") <- "y != round(yhat)"
 ##     result
 ## }
-## <bytecode: 0x12c2e4e48>
+## <bytecode: 0x12621a928>
 ## <environment: namespace:cv>
 ```
 
@@ -1282,11 +1271,7 @@ try(cv(m.beps, seed = 3465, criterion = BayesRuleMulti))
 ```
 
 ```
-## R RNG seed set to 3465
-```
-
-```
-## cross-validation criterion (BayesRuleMulti) = 0.32459
+## Error in GetResponse.default(model) : non-vector response
 ```
 
 ``` r
@@ -1316,7 +1301,7 @@ try(cv(m.beps, seed = 3465, criterion = BayesRuleMulti))
 ```
 
 ```
-## cross-validation criterion (BayesRuleMulti) = 0.32459
+## Error in match.arg(type) : 'arg' should be one of "class", "probs"
 ```
 
 ``` r
@@ -1384,7 +1369,26 @@ holdout_results <- function(splits, ...) {
 }
 
 library("purrr")
+```
 
+```
+## 
+## Attaching package: 'purrr'
+```
+
+```
+## The following object is masked from 'package:car':
+## 
+##     some
+```
+
+```
+## The following objects are masked from 'package:foreach':
+## 
+##     accumulate, when
+```
+
+``` r
 rs_obj$results <- map(rs_obj$splits, holdout_results, mod_form)
 rs_obj$accuracy <- map_dbl(rs_obj$results, function(x) mean(x$correct))
 1 - summary(rs_obj$accuracy) # error rate is complement of accuracy
@@ -1416,7 +1420,41 @@ mean(((attrition$Attrition == "Yes") - round(yhat)) ^ 2)
     # LOO CV for the example using the caret package
 
 library("ggplot2")
+```
+
+```
+## 
+## Attaching package: 'ggplot2'
+```
+
+```
+## The following objects are masked _by_ '.GlobalEnv':
+## 
+##     layer, mpg
+```
+
+```
+## The following object is masked from 'package:latticeExtra':
+## 
+##     layer
+```
+
+``` r
 library("caret")
+```
+
+```
+## 
+## Attaching package: 'caret'
+```
+
+```
+## The following object is masked from 'package:purrr':
+## 
+##     lift
+```
+
+``` r
 train(x = attrition[, c("JobSatisfaction", "Gender", "MonthlyIncome")],
       y = attrition$Attrition, method = "glm",
       trControl = trainControl(method = "LOOCV"))
@@ -1491,20 +1529,13 @@ print(microbenchmark::microbenchmark(
 
 ```
 ## Unit: relative
-##          expr    min     lq   mean median     uq    max neval
-##  cv.hatvalues    1.0    1.0    1.0    1.0    1.0    1.0    10
-##       cv.wood   80.8   67.4   66.6   67.3   61.3   57.9    10
-##      cv.exact 3670.0 3060.0 3020.0 3040.0 2790.0 2630.0    10
-##        direct 4180.0 3480.0 3360.0 3360.0 3050.0 2890.0    10
-##       rsample 4470.0 3790.0 3660.0 3650.0 3370.0 3170.0    10
-##         caret 5220.0 4360.0 4200.0 4210.0 3830.0 3590.0    10
-##    cld
-##  a    
-##  a    
-##   b   
-##    c  
-##     d 
-##      e
+##          expr    min     lq   mean median     uq  max neval  cld
+##  cv.hatvalues    1.0    1.0    1.0    1.0    1.0    1    10 a   
+##       cv.wood   78.4   69.6   73.5   67.2   59.7  125    10 a   
+##      cv.exact 3390.0 3100.0 2950.0 3040.0 2710.0 2640    10  b  
+##        direct 3960.0 3530.0 3380.0 3460.0 3030.0 3080    10  bc 
+##       rsample 4380.0 3890.0 3730.0 3800.0 3420.0 3470    10   c 
+##         caret 5040.0 4520.0 4570.0 4370.0 3840.0 6090    10    d
 ```
 
 ``` r
@@ -1533,59 +1564,56 @@ sessionInfo()
 ## [7] methods   base     
 ## 
 ## other attached packages:
-##  [1] knitr_1.48          caret_6.0-94        ggplot2_3.5.1      
-##  [4] purrr_1.0.2         rsample_1.2.1       nnet_7.3-19        
-##  [7] MASS_7.3-61         latticeExtra_0.6-30 lattice_0.22-6     
-## [10] glmmTMB_1.1.9       lme4_1.1-35.5       Matrix_1.7-0       
-## [13] car_3.1-3           carData_3.0-5       cv_2.0.3           
-## [16] doParallel_1.0.17   iterators_1.0.14    foreach_1.5.2      
+##  [1] caret_6.0-94        ggplot2_3.5.1       purrr_1.0.2        
+##  [4] rsample_1.2.1       nnet_7.3-19         MASS_7.3-61        
+##  [7] latticeExtra_0.6-30 lattice_0.22-6      glmmTMB_1.1.9      
+## [10] lme4_1.1-35.5       Matrix_1.7-0        car_3.1-3          
+## [13] carData_3.0-5       cv_2.0.3            doParallel_1.0.17  
+## [16] iterators_1.0.14    foreach_1.5.2       knitr_1.48         
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] DBI_1.2.3             pROC_1.18.5          
-##  [3] deldir_2.0-4          sandwich_3.1-0       
-##  [5] rlang_1.1.4           magrittr_2.0.3       
-##  [7] multcomp_1.4-26       furrr_0.3.1          
-##  [9] e1071_1.7-14          compiler_4.4.1       
-## [11] mgcv_1.9-1            png_0.1-8            
-## [13] vctrs_0.6.5           reshape2_1.4.4       
-## [15] stringr_1.5.1         pkgconfig_2.0.3      
-## [17] fastmap_1.2.0         backports_1.5.0      
-## [19] utf8_1.2.4            rmarkdown_2.27       
-## [21] prodlim_2024.06.25    nloptr_2.1.1         
-## [23] xfun_0.46             recipes_1.1.0        
-## [25] highr_0.11            jpeg_0.1-10          
-## [27] broom_1.0.6           R6_2.5.1             
-## [29] stringi_1.8.4         RColorBrewer_1.1-3   
-## [31] pkgload_1.4.0         parallelly_1.38.0    
-## [33] boot_1.3-30           rpart_4.1.23         
-## [35] lubridate_1.9.3       numDeriv_2016.8-1.1  
-## [37] Rcpp_1.0.13           future.apply_1.11.2  
-## [39] zoo_1.8-12            splines_4.4.1        
-## [41] timechange_0.3.0      tidyselect_1.2.1     
-## [43] rstudioapi_0.16.0     effects_4.2-3        
-## [45] abind_1.4-5           yaml_2.3.10          
-## [47] timeDate_4032.109     TMB_1.9.14           
-## [49] codetools_0.2-20      listenv_0.9.1        
-## [51] tibble_3.2.1          plyr_1.8.9           
-## [53] withr_3.0.1           evaluate_0.24.0      
-## [55] future_1.34.0         survival_3.7-0       
-## [57] proxy_0.4-27          survey_4.4-2         
-## [59] pillar_1.9.0          stats4_4.4.1         
-## [61] insight_0.20.2        generics_0.1.3       
-## [63] munsell_0.5.1         scales_1.3.0         
-## [65] minqa_1.2.8           globals_0.16.3       
-## [67] class_7.3-22          glue_1.7.0           
-## [69] tools_4.4.1           interp_1.1-6         
-## [71] data.table_1.15.4     ModelMetrics_1.2.2.2 
-## [73] gower_1.0.1           mvtnorm_1.2-5        
-## [75] grid_4.4.1            tidyr_1.3.1          
-## [77] mitools_2.4           ipred_0.9-15         
-## [79] colorspace_2.1-1      nlme_3.1-165         
-## [81] Formula_1.2-5         cli_3.6.3            
-## [83] fansi_1.0.6           lava_1.8.0           
-## [85] dplyr_1.1.4           gtable_0.3.5         
-## [87] digest_0.6.36         TH.data_1.1-2        
-## [89] htmltools_0.5.8.1     lifecycle_1.0.4      
-## [91] hardhat_1.4.0         microbenchmark_1.4.10
+##  [1] tidyselect_1.2.1      timeDate_4032.109    
+##  [3] dplyr_1.1.4           TH.data_1.1-2        
+##  [5] pROC_1.18.5           rpart_4.1.23         
+##  [7] digest_0.6.36         timechange_0.3.0     
+##  [9] lifecycle_1.0.4       survival_3.7-0       
+## [11] magrittr_2.0.3        compiler_4.4.1       
+## [13] rlang_1.1.4           tools_4.4.1          
+## [15] utf8_1.2.4            data.table_1.15.4    
+## [17] interp_1.1-6          plyr_1.8.9           
+## [19] RColorBrewer_1.1-3    multcomp_1.4-26      
+## [21] abind_1.4-5           withr_3.0.1          
+## [23] numDeriv_2016.8-1.1   effects_4.2-3        
+## [25] stats4_4.4.1          grid_4.4.1           
+## [27] fansi_1.0.6           e1071_1.7-14         
+## [29] colorspace_2.1-1      future_1.34.0        
+## [31] globals_0.16.3        scales_1.3.0         
+## [33] insight_0.20.2        cli_3.6.3            
+## [35] mvtnorm_1.2-5         survey_4.4-2         
+## [37] generics_0.1.3        future.apply_1.11.2  
+## [39] rstudioapi_0.16.0     reshape2_1.4.4       
+## [41] proxy_0.4-27          minqa_1.2.8          
+## [43] DBI_1.2.3             stringr_1.5.1        
+## [45] splines_4.4.1         mitools_2.4          
+## [47] vctrs_0.6.5           hardhat_1.4.0        
+## [49] boot_1.3-30           sandwich_3.1-0       
+## [51] Formula_1.2-5         listenv_0.9.1        
+## [53] jpeg_0.1-10           gower_1.0.1          
+## [55] tidyr_1.3.1           recipes_1.1.0        
+## [57] glue_1.7.0            parallelly_1.38.0    
+## [59] nloptr_2.1.1          codetools_0.2-20     
+## [61] stringi_1.8.4         lubridate_1.9.3      
+## [63] gtable_0.3.5          deldir_2.0-4         
+## [65] munsell_0.5.1         tibble_3.2.1         
+## [67] furrr_0.3.1           pillar_1.9.0         
+## [69] ipred_0.9-15          lava_1.8.0           
+## [71] R6_2.5.1              TMB_1.9.14           
+## [73] microbenchmark_1.4.10 evaluate_0.24.0      
+## [75] png_0.1-8             backports_1.5.0      
+## [77] broom_1.0.6           class_7.3-22         
+## [79] Rcpp_1.0.13           prodlim_2024.06.25   
+## [81] nlme_3.1-165          mgcv_1.9-1           
+## [83] xfun_0.46             ModelMetrics_1.2.2.2 
+## [85] zoo_1.8-12            pkgconfig_2.0.3
 ```
 
