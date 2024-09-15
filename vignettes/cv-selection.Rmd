@@ -119,7 +119,7 @@ Also by default, when the number of folds is 10 or fewer, `cv()` saves details d
 compareFolds(cv.select)
 ```
 
-## Polynomial regression for the Auto data revisited: recursive cross-validation
+## Polynomial regression for the Auto data revisited: meta cross-validation
 
 In the introductory vignette on cross-validating regression models, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of `mpg` to `horsepower` for the `Auto` data, saving the results in `m.1` through `m.10`. We then used `cv()` to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin); repeating the relevant graph: 
 ```{r polynomial-regression-CV-graph-duplicated, echo=FALSE}
@@ -190,11 +190,11 @@ legend(
 )
 ```
 
-If we then select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
+If we then select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively, a process that we term "meta cross-validation." The function `selectModelList()`, which is suitable for use with `cv()`, implements this idea.
 
 Applying `selectModelList()` to the `Auto` polynomial-regression models, and using 10-fold CV, we obtain:
-```{r recursive-CV-polynomials}
-recursiveCV.auto <- cv(
+```{r meta-CV-polynomials}
+metaCV.auto <- cv(
   selectModelList,
   Auto,
   working.model = models(m.1, m.2, m.3, m.4, m.5,
@@ -202,23 +202,23 @@ recursiveCV.auto <- cv(
   save.model = TRUE,
   seed = 2120
 )
-summary(recursiveCV.auto)
-(m.sel <- cvInfo(recursiveCV.auto, "selected model"))
+summary(metaCV.auto)
+(m.sel <- cvInfo(metaCV.auto, "selected model"))
 cv(m.sel, seed = 2120) # same seed for same folds
 ```
-As expected, recursive CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model.
+As expected, meta CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model.
 
-We can equivalently call `cv()` with the list of models as the first argument and set `recursive=TRUE`:
-```{r recursive-cv-alt}
-recursiveCV.auto.alt <- cv(
+We can equivalently call `cv()` with the list of models as the first argument and set `meta=TRUE`:
+```{r meta-cv-alt}
+metaCV.auto.alt <- cv(
   models(m.1, m.2, m.3, m.4, m.5,
          m.6, m.7, m.8, m.9, m.10),
   data = Auto,
   seed = 2120,
-  recursive = TRUE,
+  meta = TRUE,
   save.model = TRUE
 )
-all.equal(recursiveCV.auto, recursiveCV.auto.alt)
+all.equal(metaCV.auto, metaCV.auto.alt)
 ```
 
 

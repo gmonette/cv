@@ -205,11 +205,11 @@ brief(m.auto)
 ```
 
 ```
-## R RNG seed set to 548422
+## R RNG seed set to 707059
 ```
 
 ```
-## cross-validation criterion (mse) = 19.348
+## cross-validation criterion (mse) = 19.385
 ```
 
 ``` r
@@ -220,9 +220,9 @@ summary(cv.auto)
 ## 10-Fold Cross Validation
 ## method: Woodbury
 ## criterion: mse
-## cross-validation criterion = 19.348
-## bias-adjusted cross-validation criterion = 19.329
-## 95% CI for bias-adjusted CV criterion = (15.838, 22.821)
+## cross-validation criterion = 19.385
+## bias-adjusted cross-validation criterion = 19.364
+## 95% CI for bias-adjusted CV criterion = (15.876, 22.852)
 ## full-sample criterion = 18.985
 ```
 
@@ -274,18 +274,18 @@ print(microbenchmark::microbenchmark(
 ```
 
 ```
-## Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto,
-## k = "loo"), : less accurate nanosecond times to avoid potential
+## Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k
+## = "loo"), : less accurate nanosecond times to avoid potential
 ## integer overflows
 ```
 
 ```
 ## Unit: relative
-##       expr   min    lq  mean median     uq max neval cld
-##  hatvalues   1.0   1.0   1.0   1.00   1.00   1    10 a  
-##   Woodbury  11.3  11.3  10.5   9.97   9.34  12    10 a  
-##      naive 192.0 192.0 181.0 169.00 163.00 188    10  b 
-##     cv.glm 333.0 328.0 307.0 291.00 289.00 303    10   c
+##       expr   min    lq  mean median     uq    max neval cld
+##  hatvalues   1.0   1.0   1.0      1   1.00   1.00    10 a  
+##   Woodbury  11.4  11.3  10.4     10   9.49   9.73    10 a  
+##      naive 190.0 189.0 165.0    167 153.00 130.00    10  b 
+##     cv.glm 330.0 329.0 300.0    297 281.00 258.00    10   c
 ```
 
 ``` r
@@ -1065,11 +1065,11 @@ compareFolds(cvs)
 ```
 
 ``` r
-  # Sec. 4.2: Example: Applying recursive CV to polynomial regression for the Auto data
+  # Sec. 4.2: Example: Applying meta CV to polynomial regression for the Auto data
 
-recursiveCV.auto <- cv(selectModelList, data = Auto,
-                       working.model = mlist, save.model = TRUE,
-                       seed = 2120)
+metaCV.auto <- cv(selectModelList, data = Auto,
+                  working.model = mlist, save.model = TRUE,
+                  seed = 2120)
 ```
 
 ```
@@ -1077,7 +1077,7 @@ recursiveCV.auto <- cv(selectModelList, data = Auto,
 ```
 
 ``` r
-summary(recursiveCV.auto)
+summary(metaCV.auto)
 ```
 
 ```
@@ -1089,7 +1089,7 @@ summary(recursiveCV.auto)
 ```
 
 ``` r
-brief(m.sel <- cvInfo(recursiveCV.auto, "selected model"))
+brief(m.sel <- cvInfo(metaCV.auto, "selected model"))
 ```
 
 ```
@@ -1123,9 +1123,9 @@ cv(m.sel, seed = 2120)
 ```
 
 ``` r
-  # equivalent, using recursive = TRUE
+  # equivalent, using meta = TRUE
 
-summary(cv(mlist, data = Auto, seed = 2120, recursive = TRUE,
+summary(cv(mlist, data = Auto, seed = 2120, meta = TRUE,
            save.model = TRUE))
 ```
 
@@ -1200,18 +1200,18 @@ BayesRule
 ```
 
 ```
-## function (y, yhat) 
-## {
-##     if (!all(y %in% c(0, 1))) 
-##         stop("response values not all 0 or 1")
-##     if (any(yhat < 0) || any(yhat > 1)) 
-##         stop("fitted values outside of interval [0, 1]")
-##     yhat <- round(yhat)
-##     result <- mean(y != yhat)
-##     attr(result, "casewise loss") <- "y != round(yhat)"
-##     result
+## function(y, yhat) {
+##   if (!all(y %in% c(0, 1)))
+##     stop("response values not all 0 or 1")
+##   if (any(yhat < 0) ||
+##       any(yhat > 1))
+##     stop("fitted values outside of interval [0, 1]")
+##   yhat <- round(yhat)
+##   result <- mean(y != yhat) # proportion in error
+##   attr(result, "casewise loss") <- "y != round(yhat)"
+##   result
 ## }
-## <bytecode: 0x12621a928>
+## <bytecode: 0x135f47008>
 ## <environment: namespace:cv>
 ```
 
@@ -1529,13 +1529,13 @@ print(microbenchmark::microbenchmark(
 
 ```
 ## Unit: relative
-##          expr    min     lq   mean median     uq  max neval  cld
-##  cv.hatvalues    1.0    1.0    1.0    1.0    1.0    1    10 a   
-##       cv.wood   78.4   69.6   73.5   67.2   59.7  125    10 a   
-##      cv.exact 3390.0 3100.0 2950.0 3040.0 2710.0 2640    10  b  
-##        direct 3960.0 3530.0 3380.0 3460.0 3030.0 3080    10  bc 
-##       rsample 4380.0 3890.0 3730.0 3800.0 3420.0 3470    10   c 
-##         caret 5040.0 4520.0 4570.0 4370.0 3840.0 6090    10    d
+##          expr    min     lq   mean median     uq  max neval   cld
+##  cv.hatvalues    1.0    1.0    1.0    1.0    1.0    1    10 a    
+##       cv.wood   79.5   66.8   66.7   64.4   61.9   63    10 a    
+##      cv.exact 3540.0 3050.0 3060.0 3010.0 2840.0 2900    10  b   
+##        direct 4150.0 3500.0 3450.0 3340.0 3170.0 3220    10   c  
+##       rsample 4520.0 3820.0 3800.0 3600.0 3550.0 3870    10    d 
+##         caret 5120.0 4440.0 4310.0 4230.0 3960.0 3970    10     e
 ```
 
 ``` r

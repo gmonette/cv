@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-09-13" />
+<meta name="date" content="2024-09-15" />
 
 <title>Cross-validating model selection</title>
 
@@ -363,7 +363,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Cross-validating model selection</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-09-13</h4>
+<h4 class="date">2024-09-15</h4>
 
 
 
@@ -620,8 +620,8 @@ different:</p>
 <span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a><span class="co">#&gt; Fold 9                                              </span></span>
 <span id="cb6-61"><a href="#cb6-61" tabindex="-1"></a><span class="co">#&gt; Fold 10</span></span></code></pre></div>
 </div>
-<div id="polynomial-regression-for-the-auto-data-revisited-recursive-cross-validation" class="section level2">
-<h2>Polynomial regression for the Auto data revisited: recursive
+<div id="polynomial-regression-for-the-auto-data-revisited-meta-cross-validation" class="section level2">
+<h2>Polynomial regression for the Auto data revisited: meta
 cross-validation</h2>
 In the introductory vignette on cross-validating regression models,
 following <span class="citation">James, Witten, Hastie, &amp; Tibshirani
@@ -642,12 +642,13 @@ Cross-validated 10-fold and LOO MSE as a function of polynomial degree,
 <p>If we then select the 7th degree polynomial model, intending to use
 it for prediction, the CV estimate of the MSE for this model will be
 optimistic. One solution is to cross-validate the process of using CV to
-select the “best” model—that is, to apply CV to CV recursively. The
-function <code>selectModelList()</code>, which is suitable for use with
+select the “best” model—that is, to apply CV to CV recursively, a
+process that we term “meta cross-validation.” The function
+<code>selectModelList()</code>, which is suitable for use with
 <code>cv()</code>, implements this idea.</p>
 <p>Applying <code>selectModelList()</code> to the <code>Auto</code>
 polynomial-regression models, and using 10-fold CV, we obtain:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>recursiveCV.auto <span class="ot">&lt;-</span> <span class="fu">cv</span>(</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>metaCV.auto <span class="ot">&lt;-</span> <span class="fu">cv</span>(</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  selectModelList,</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  Auto,</span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">working.model =</span> <span class="fu">models</span>(m<span class="fl">.1</span>, m<span class="fl">.2</span>, m<span class="fl">.3</span>, m<span class="fl">.4</span>, m<span class="fl">.5</span>,</span>
@@ -656,13 +657,13 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">2120</span></span>
 <span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>)</span>
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 2120</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="fu">summary</span>(recursiveCV.auto)</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="fu">summary</span>(metaCV.auto)</span>
 <span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; criterion: mse</span></span>
 <span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion = 19.105</span></span>
 <span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.68</span></span>
 <span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; full-sample criterion = 18.746</span></span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>(m.sel <span class="ot">&lt;-</span> <span class="fu">cvInfo</span>(recursiveCV.auto, <span class="st">&quot;selected model&quot;</span>))</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>(m.sel <span class="ot">&lt;-</span> <span class="fu">cvInfo</span>(metaCV.auto, <span class="st">&quot;selected model&quot;</span>))</span>
 <span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
 <span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; lm(formula = mpg ~ poly(horsepower, 7), data = Auto)</span></span>
@@ -677,21 +678,21 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="fu">cv</span>(m.sel, <span class="at">seed =</span> <span class="dv">2120</span>) <span class="co"># same seed for same folds</span></span>
 <span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 2120</span></span>
 <span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt; cross-validation criterion (mse) = 18.898</span></span></code></pre></div>
-<p>As expected, recursive CV produces a larger estimate of MSE for the
+<p>As expected, meta CV produces a larger estimate of MSE for the
 selected 7th degree polynomial model than CV applied directly to this
 model.</p>
 <p>We can equivalently call <code>cv()</code> with the list of models as
-the first argument and set <code>recursive=TRUE</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>recursiveCV.auto.alt <span class="ot">&lt;-</span> <span class="fu">cv</span>(</span>
+the first argument and set <code>meta=TRUE</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>metaCV.auto.alt <span class="ot">&lt;-</span> <span class="fu">cv</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="fu">models</span>(m<span class="fl">.1</span>, m<span class="fl">.2</span>, m<span class="fl">.3</span>, m<span class="fl">.4</span>, m<span class="fl">.5</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>         m<span class="fl">.6</span>, m<span class="fl">.7</span>, m<span class="fl">.8</span>, m<span class="fl">.9</span>, m<span class="fl">.10</span>),</span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">data =</span> Auto,</span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">2120</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">recursive =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">meta =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">save.model =</span> <span class="cn">TRUE</span></span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>)</span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; R RNG seed set to 2120</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="fu">all.equal</span>(recursiveCV.auto, recursiveCV.auto.alt)</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="fu">all.equal</span>(metaCV.auto, metaCV.auto.alt)</span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Component \&quot;criterion\&quot;: 1 string mismatch&quot;</span></span></code></pre></div>
 </div>
 <div id="mrozs-logistic-regression-revisited" class="section level2">

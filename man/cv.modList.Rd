@@ -17,7 +17,7 @@
   reps = 1L,
   seed,
   quietly = TRUE,
-  recursive = FALSE,
+  meta = FALSE,
   ...
 )
 
@@ -68,7 +68,7 @@ leave-one-out CV.}
 value to which the random-number generator seed is set), but not warnings or
 errors, are suppressed.}
 
-\item{recursive}{if \code{TRUE} (the default is \code{FALSE}), cross-validation
+\item{meta}{if \code{TRUE} (the default is \code{FALSE}), cross-validation
 is performed recursively to select a "best" model deleting each fold in turn
 by calculating the CV estimate of the criterion for the remaining folds;
 this is equivalent to employing the \code{\link{selectModelList}()} model-selection
@@ -135,13 +135,13 @@ are coerced to syntactically correct names.}
 \value{
 \code{models()} returns a \code{"modList"} object, the
 \code{cv()} method for which returns a \code{"cvModList"} object,
-or, when \code{recursive=TRUE}, an object of class \code{c("cvSelect", "cv")}.
+or, when \code{meta=TRUE}, an object of class \code{c("cvSelect", "cv")}.
 }
 \description{
 A \code{\link{cv}()} method for an object of class  \code{"modlist"},
 created by the \code{models()} function. This \code{cv()} method simplifies
 the process of cross-validating several models on the same set of CV folds
-and may also be used for recursive CV, where CV is used to select one from among
+and may also be used for meta CV, where CV is used to select one from among
 several models. \code{models()} performs some
 "sanity" checks, warning if the models are of different classes, and
 reporting an error if they are fit to apparently different data sets or
@@ -180,10 +180,10 @@ plot(cv.models)
                     data=Duncan, seed=5963, confint=TRUE, level=0.50))
                  # nb: n too small for accurate CIs
 plot(cv.models.ci)
-(cv.models.recursive <- cv(models(m1=m1, m2=m2, m3=m3),
-                           data=Duncan, seed=5963,
-                           recursive=TRUE, save.model=TRUE))
-cv.models.recursive$selected.model
+(cv.models.meta <- cv(models(m1=m1, m2=m2, m3=m3),
+                      data=Duncan, seed=5963,
+                      meta=TRUE, save.model=TRUE))
+cvInfo(cv.models.meta, "selected model")
 })
 } else {
 cat("install the 'carData' package to run these examples\n")

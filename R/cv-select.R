@@ -10,7 +10,7 @@
 #' \pkg{car} package; \code{selectTransAndStepAIC()} combines predictor and response
 #' transformations with predictor selection; and \code{selectModelList()}
 #' uses cross-validation to select a model from a list of models created by
-#' \code{\link{models}()} and employs (recursive) cross-validation to assess the predictive
+#' \code{\link{models}()} and employs (meta) cross-validation to assess the predictive
 #' accuracy of this procedure.
 #'
 #' @param data full data frame for model selection.
@@ -648,11 +648,11 @@ selectTransStepAIC <- function(data,
   )
 }
 
-#' @describeIn cv.function select a model using (recursive) CV.
+#' @describeIn cv.function select a model using (meta) CV.
 #' @param quietly if \code{TRUE} (the default), simple messages (for example about the
 #' value to which the random-number generator seed is set), but not warnings or
 #' errors, are suppressed.
-#' @param k.recurse the number of folds for recursive CV; defaults
+#' @param k.meta the number of folds for meta CV; defaults
 #' to the value of \code{k}; may be specified as \code{"loo"} or
 #' \code{"n"} as well as an integer.
 #' @export
@@ -662,7 +662,7 @@ selectModelList <-
            model,
            criterion = mse,
            k = 10L,
-           k.recurse = k,
+           k.meta = k,
            details =  k <= 10L,
            save.model = FALSE,
            seed = FALSE,
@@ -679,7 +679,7 @@ selectModelList <-
           model,
           data,
           criterion = criterion,
-          k = k.recurse,
+          k = k.meta,
           details = FALSE,
           quietly = quietly,
           seed = FALSE,
@@ -703,7 +703,7 @@ selectModelList <-
         model,
         data[-indices,],
         criterion = criterion,
-        k = k.recurse,
+        k = k.meta,
         details = details,
         quietly = quietly,
         seed = FALSE,
@@ -732,7 +732,7 @@ selectModelList <-
 #' m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
 #' summary(cv.sel <- cv(selectModelList, data=Duncan, seed=5963,
 #'                      working.model=models(m1, m2, m3),
-#'                      save.model=TRUE)) # recursive CV
+#'                      save.model=TRUE)) # meta CV
 #' cvInfo(cv.sel, "selected model")
 #'
 #' @describeIn cv.function print the coefficients from the selected models

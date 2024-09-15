@@ -560,7 +560,7 @@ In summary, when between-cluster variation is relatively large, the model \code{
 
 As @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"] explain, if the whole data are used to specify or fine-tune a statistical model, then subsequent cross-validation of the model is intrinsically misleading, because the model is selected to fit the whole data, including the part of the data that remains when each fold is removed.  Statistical modeling is partly a craft, and one could imagine applying that craft independently to successive partial data sets, each with a fold removed. The resulting procedure would be tedious, though possibly worth the effort, but it would also be difficult to realize in practice: After all, we can hardly erase our memory of statistical modeling choices between analyzing partial data sets. Alternatively, if we're able to automate the process of model specification, then we can more realistically apply CV mechanically. 
 
-The \code{"function"} method for \code{cv()} cross-validates a model-specification process in a general manner. Functions for four such model-specification processes are included in the package: \code{selectStepAIC()}, based on the \code{stepAIC()} function in the \pkg{MASS} package [@VenablesRipley:2002], performs stepwise predictor selection for regression models; \code{selectTrans()}, based on the \code{powerTransform()} function in the \pkg{car} package, transforms predictors and the response in a regression model towards normality; \code{selectTransAndStepAIC()}---the use of which we illustrate in the current section---performs both of these procedures sequentially; and \code{selectModelList()}---also illustrated in the current section---uses CV both to select one of several competing models, and then, recursively, to estimate prediction error for the selected model.[^adding-model-selection]
+The \code{"function"} method for \code{cv()} cross-validates a model-specification process in a general manner. Functions for four such model-specification processes are included in the package: \code{selectStepAIC()}, based on the \code{stepAIC()} function in the \pkg{MASS} package [@VenablesRipley:2002], performs stepwise predictor selection for regression models; \code{selectTrans()}, based on the \code{powerTransform()} function in the \pkg{car} package, transforms predictors and the response in a regression model towards normality; \code{selectTransAndStepAIC()}---the use of which we illustrate in the current section---performs both of these procedures sequentially; and \code{selectModelList()}---also illustrated in the current section---uses CV both to select one of several competing models, and then, recursively, to estimate prediction error for the selected model, a process that we term "meta cross-validation."[^adding-model-selection]
 
 [^adding-model-selection]: In a vignette on extending the \pkg{cv} package, we explain how to specify additional model-selection procedures.
 
@@ -706,28 +706,28 @@ Some noteworthy points:
 * As we anticipated, the estimate of the MSE that we obtain by cross-validating the whole model-specification process is larger than the MSE computed for the model we fit to the \code{Auto} data separately selecting transformations of the predictors and the response and then selecting predictors for the whole data set.
 * When we look at the transformations and predictors selected with each of the 10 folds omitted (i.e., the output of \code{compareFolds(cvs)}, which isn't shown), we see that there is little uncertainty in choosing variable transformations, but considerably more uncertainty in subsequently selecting predictors: \code{horsepower}, \code{weight}, and \code{year} are always included among the selected predictors; \code{acceleration} and \code{displacement} are included respectively in 4 and 3 of 10 selected models; and \code{cylinders} and \code{origin} are each included in only 1 of 10 models. Recall that when we selected predictors for the full data, we obtained a model with \code{horsepower}, \code{weight}, \code{acceleration}, \code{year}, and \code{origin}.
 
-## Example: Applying recursive CV to polynomial regression for the Auto data[^recursive-cv]
+## Example: Applying meta CV to polynomial regression for the Auto data[^meta-cv]
 
-[^recursive-cv]: What we call here "recursive CV" has also been termed "nested CV" [e.g., in the \pkg{cvms} package by @OlsenZachariae:2024]. We prefer, however, to reserve the term "nested CV" for the procedure described by @BatesHastieTibshirani:2023.
+[^meta-cv]: What we call here "meta CV" has also been termed "nested CV" [e.g., in the \pkg{cvms} package by @OlsenZachariae:2024]. We prefer, however, to reserve the term "nested CV" for the procedure described by @BatesHastieTibshirani:2023.
 
 In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of \code{mpg} to \code{horsepower} for the \code{Auto} data, saving the 10 models, named \code{m.1} through \code{m.10}, in the list \code{mlist}. We then used \code{cv()} to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
 
-If we select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply CV to CV recursively. The function \code{selectModelList()}, which is suitable for use with \code{cv()}, implements this idea.
+If we select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply meta-CV. The function \code{selectModelList()}, which is suitable for use with \code{cv()}, implements this idea.
 
 Applying \code{selectModelList()} to the \code{Auto} polynomial-regression models, and using 10-fold CV, we obtain:
-```{r recursive-CV-polynomials}
-recursiveCV.auto <- cv(selectModelList, data = Auto, 
-                       working.model = mlist, save.model = TRUE, 
+```{r meta-CV-polynomials}
+metaCV.auto <- cv(selectModelList, data = Auto, 
+                  working.model = mlist, save.model = TRUE, 
                        seed = 2120)
-summary(recursiveCV.auto)
-brief(m.sel <- cvInfo(recursiveCV.auto, "selected model"))
+summary(metaCV.auto)
+brief(m.sel <- cvInfo(metaCV.auto, "selected model"))
 cv(m.sel, seed = 2120)
 ```
-As expected, recursive CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model (using the same seed for \proglang{R}'s random-number generator to obtain the same folds).
+As expected, meta CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model (using the same seed for \proglang{R}'s random-number generator to obtain the same folds).
 
-We can equivalently call \code{cv()} with the list of models as its first argument and set the argument \code{recursive = TRUE} (identical output not shown):
-```{r recursive-cv-alt, eval=FALSE}
-summary(cv(mlist, data = Auto, seed = 2120, recursive = TRUE, 
+We can equivalently call \code{cv()} with the list of models as its first argument and set the argument \code{meta = TRUE} (identical output not shown):
+```{r meta-cv-alt, eval=FALSE}
+summary(cv(mlist, data = Auto, seed = 2120, meta = TRUE, 
            save.model = TRUE))
 ```
 

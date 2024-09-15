@@ -127,8 +127,8 @@ legend(
   pch = 17:16
 )
 
-## ----recursive-CV-polynomials-------------------------------------------------
-recursiveCV.auto <- cv(
+## ----meta-CV-polynomials------------------------------------------------------
+metaCV.auto <- cv(
   selectModelList,
   Auto,
   working.model = models(m.1, m.2, m.3, m.4, m.5,
@@ -136,20 +136,20 @@ recursiveCV.auto <- cv(
   save.model = TRUE,
   seed = 2120
 )
-summary(recursiveCV.auto)
-(m.sel <- cvInfo(recursiveCV.auto, "selected model"))
+summary(metaCV.auto)
+(m.sel <- cvInfo(metaCV.auto, "selected model"))
 cv(m.sel, seed = 2120) # same seed for same folds
 
-## ----recursive-cv-alt---------------------------------------------------------
-recursiveCV.auto.alt <- cv(
+## ----meta-cv-alt--------------------------------------------------------------
+metaCV.auto.alt <- cv(
   models(m.1, m.2, m.3, m.4, m.5,
          m.6, m.7, m.8, m.9, m.10),
   data = Auto,
   seed = 2120,
-  recursive = TRUE,
+  meta = TRUE,
   save.model = TRUE
 )
-all.equal(recursiveCV.auto, recursiveCV.auto.alt)
+all.equal(metaCV.auto, metaCV.auto.alt)
 
 ## ----recall-Mroz-regression---------------------------------------------------
 data("Mroz", package = "carData")

@@ -8,6 +8,8 @@
 
 - Fixes to computing per-fold details for mixed-models cv() methods.
 
+- Rename "recursive CV" as "meta CV" and edit functions, arguments, examples, etc., to reflect this change.
+
 - Small fixes.
 
 # cv 2.0.2

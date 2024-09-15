@@ -76,7 +76,7 @@ selectModelList(
   model,
   criterion = mse,
   k = 10L,
-  k.recurse = k,
+  k.meta = k,
   details = k <= 10L,
   save.model = FALSE,
   seed = FALSE,
@@ -173,7 +173,7 @@ with \code{"bcPower"} as the default.}
 \item{rounded}{if \code{TRUE} (the default) use nicely rounded versions
 of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).}
 
-\item{k.recurse}{the number of folds for recursive CV; defaults
+\item{k.meta}{the number of folds for meta CV; defaults
 to the value of \code{k}; may be specified as \code{"loo"} or
 \code{"n"} as well as an integer.}
 
@@ -233,7 +233,7 @@ uses the \code{\link[car]{powerTransform}()} function in the
 \pkg{car} package; \code{selectTransAndStepAIC()} combines predictor and response
 transformations with predictor selection; and \code{selectModelList()}
 uses cross-validation to select a model from a list of models created by
-\code{\link{models}()} and employs (recursive) cross-validation to assess the predictive
+\code{\link{models}()} and employs (meta) cross-validation to assess the predictive
 accuracy of this procedure.
 }
 \details{
@@ -280,7 +280,7 @@ using \code{\link[car]{powerTransform}()} in the \pkg{car} package.
 \item \code{selectTransStepAIC()}: select transformations of the predictors and response,
 and then select predictors.
 
-\item \code{selectModelList()}: select a model using (recursive) CV.
+\item \code{selectModelList()}: select a model using (meta) CV.
 
 \item \code{compareFolds()}: print the coefficients from the selected models
 for the several folds.
@@ -340,7 +340,7 @@ m2 <- lm(prestige ~ income + education + type, data=Duncan)
 m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
 summary(cv.sel <- cv(selectModelList, data=Duncan, seed=5963,
                      working.model=models(m1, m2, m3),
-                     save.model=TRUE)) # recursive CV
+                     save.model=TRUE)) # meta CV
 cvInfo(cv.sel, "selected model")
 
 }

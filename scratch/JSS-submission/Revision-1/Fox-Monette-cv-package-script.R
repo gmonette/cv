@@ -454,19 +454,19 @@ summary(cvs)
 
 compareFolds(cvs)
 
-  # Sec. 4.2: Example: Applying recursive CV to polynomial regression for the Auto data
+  # Sec. 4.2: Example: Applying meta CV to polynomial regression for the Auto data
 
-recursiveCV.auto <- cv(selectModelList, data = Auto,
-                       working.model = mlist, save.model = TRUE,
-                       seed = 2120)
-summary(recursiveCV.auto)
-brief(m.sel <- cvInfo(recursiveCV.auto, "selected model"))
+metaCV.auto <- cv(selectModelList, data = Auto,
+                  working.model = mlist, save.model = TRUE,
+                  seed = 2120)
+summary(metaCV.auto)
+brief(m.sel <- cvInfo(metaCV.auto, "selected model"))
 # CV for selected model
 cv(m.sel, seed = 2120)
 
-  # equivalent, using recursive = TRUE
+  # equivalent, using meta = TRUE
 
-summary(cv(mlist, data = Auto, seed = 2120, recursive = TRUE,
+summary(cv(mlist, data = Auto, seed = 2120, meta = TRUE,
            save.model = TRUE))
 
 # Sec. 5: Extending the cv package
