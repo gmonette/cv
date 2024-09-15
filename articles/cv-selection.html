@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-09-14</h4>
+            <h4 data-toc-skip class="date">2024-09-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv-selection.Rmd" class="external-link"><code>vignettes/cv-selection.Rmd</code></a></small>
       <div class="d-none name"><code>cv-selection.Rmd</code></div>
@@ -366,8 +366,8 @@ different:</p>
 <span><span class="co">#&gt; Fold 10</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="polynomial-regression-for-the-auto-data-revisited-recursive-cross-validation">Polynomial regression for the Auto data revisited: recursive
-cross-validation<a class="anchor" aria-label="anchor" href="#polynomial-regression-for-the-auto-data-revisited-recursive-cross-validation"></a>
+<h2 id="polynomial-regression-for-the-auto-data-revisited-meta-cross-validation">Polynomial regression for the Auto data revisited: meta
+cross-validation<a class="anchor" aria-label="anchor" href="#polynomial-regression-for-the-auto-data-revisited-meta-cross-validation"></a>
 </h2>
 In the introductory vignette on cross-validating regression models,
 following <span class="citation">James, Witten, Hastie, &amp; Tibshirani
@@ -388,13 +388,14 @@ Cross-validated 10-fold and LOO MSE as a function of polynomial degree,
 <p>If we then select the 7th degree polynomial model, intending to use
 it for prediction, the CV estimate of the MSE for this model will be
 optimistic. One solution is to cross-validate the process of using CV to
-select the “best” model—that is, to apply CV to CV recursively. The
-function <code><a href="../reference/cv.function.html">selectModelList()</a></code>, which is suitable for use with
+select the “best” model—that is, to apply CV to CV recursively, a
+process that we term “meta cross-validation.” The function
+<code><a href="../reference/cv.function.html">selectModelList()</a></code>, which is suitable for use with
 <code><a href="../reference/cv.html">cv()</a></code>, implements this idea.</p>
 <p>Applying <code><a href="../reference/cv.function.html">selectModelList()</a></code> to the <code>Auto</code>
 polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">recursiveCV.auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">metaCV.auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="va">selectModelList</span>,</span>
 <span>  <span class="va">Auto</span>,</span>
 <span>  working.model <span class="op">=</span> <span class="fu"><a href="../reference/cv.modList.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
@@ -403,13 +404,13 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span>  seed <span class="op">=</span> <span class="fl">2120</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">recursiveCV.auto</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">metaCV.auto</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 10-Fold Cross Validation</span></span>
 <span><span class="co">#&gt; criterion: mse</span></span>
 <span><span class="co">#&gt; cross-validation criterion = 19.105</span></span>
 <span><span class="co">#&gt; bias-adjusted cross-validation criterion = 19.68</span></span>
 <span><span class="co">#&gt; full-sample criterion = 18.746</span></span>
-<span><span class="op">(</span><span class="va">m.sel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cvInfo</a></span><span class="op">(</span><span class="va">recursiveCV.auto</span>, <span class="st">"selected model"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">m.sel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cvInfo</a></span><span class="op">(</span><span class="va">metaCV.auto</span>, <span class="st">"selected model"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; lm(formula = mpg ~ poly(horsepower, 7), data = Auto)</span></span>
@@ -424,22 +425,22 @@ polynomial-regression models, and using 10-fold CV, we obtain:</p>
 <span><span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span><span class="va">m.sel</span>, seed <span class="op">=</span> <span class="fl">2120</span><span class="op">)</span> <span class="co"># same seed for same folds</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
 <span><span class="co">#&gt; cross-validation criterion (mse) = 18.898</span></span></code></pre></div>
-<p>As expected, recursive CV produces a larger estimate of MSE for the
+<p>As expected, meta CV produces a larger estimate of MSE for the
 selected 7th degree polynomial model than CV applied directly to this
 model.</p>
 <p>We can equivalently call <code><a href="../reference/cv.html">cv()</a></code> with the list of models as
-the first argument and set <code>recursive=TRUE</code>:</p>
+the first argument and set <code>meta=TRUE</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">recursiveCV.auto.alt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">metaCV.auto.alt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/cv.modList.html">models</a></span><span class="op">(</span><span class="va">m.1</span>, <span class="va">m.2</span>, <span class="va">m.3</span>, <span class="va">m.4</span>, <span class="va">m.5</span>,</span>
 <span>         <span class="va">m.6</span>, <span class="va">m.7</span>, <span class="va">m.8</span>, <span class="va">m.9</span>, <span class="va">m.10</span><span class="op">)</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">Auto</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">2120</span>,</span>
-<span>  recursive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  meta <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  save.model <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; R RNG seed set to 2120</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">recursiveCV.auto</span>, <span class="va">recursiveCV.auto.alt</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">metaCV.auto</span>, <span class="va">metaCV.auto.alt</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Component \"criterion\": 1 string mismatch"</span></span></code></pre></div>
 </div>
 <div class="section level2">

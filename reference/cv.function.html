@@ -9,7 +9,7 @@ uses the powerTransform() function in the
 car package; selectTransAndStepAIC() combines predictor and response
 transformations with predictor selection; and selectModelList()
 uses cross-validation to select a model from a list of models created by
-models() and employs (recursive) cross-validation to assess the predictive
+models() and employs (meta) cross-validation to assess the predictive
 accuracy of this procedure.'><meta property="og:description" content='The cv() "function" method
 is a general function to cross-validate a model-selection procedure,
 such as the following:
@@ -20,7 +20,7 @@ uses the powerTransform() function in the
 car package; selectTransAndStepAIC() combines predictor and response
 transformations with predictor selection; and selectModelList()
 uses cross-validation to select a model from a list of models created by
-models() and employs (recursive) cross-validation to assess the predictive
+models() and employs (meta) cross-validation to assess the predictive
 accuracy of this procedure.'></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
@@ -74,7 +74,7 @@ uses the <code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="
 <span class="pkg">car</span> package; <code>selectTransAndStepAIC()</code> combines predictor and response
 transformations with predictor selection; and <code>selectModelList()</code>
 uses cross-validation to select a model from a list of models created by
-<code><a href="cv.modList.html">models</a>()</code> and employs (recursive) cross-validation to assess the predictive
+<code><a href="cv.modList.html">models</a>()</code> and employs (meta) cross-validation to assess the predictive
 accuracy of this procedure.</p>
     </div>
 
@@ -146,7 +146,7 @@ accuracy of this procedure.</p>
 <span>  <span class="va">model</span>,</span>
 <span>  criterion <span class="op">=</span> <span class="va">mse</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">10L</span>,</span>
-<span>  k.recurse <span class="op">=</span> <span class="va">k</span>,</span>
+<span>  k.meta <span class="op">=</span> <span class="va">k</span>,</span>
 <span>  details <span class="op">=</span> <span class="va">k</span> <span class="op">&lt;=</span> <span class="fl">10L</span>,</span>
 <span>  save.model <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -291,8 +291,8 @@ with <code>"bcPower"</code> as the default.</p></dd>
 of the estimated transformation parameters (see <code><a href="https://rdrr.io/pkg/car/man/bcPower.html" class="external-link">bcPower</a>()</code>).</p></dd>
 
 
-<dt id="arg-k-recurse">k.recurse<a class="anchor" aria-label="anchor" href="#arg-k-recurse"></a></dt>
-<dd><p>the number of folds for recursive CV; defaults
+<dt id="arg-k-meta">k.meta<a class="anchor" aria-label="anchor" href="#arg-k-meta"></a></dt>
+<dd><p>the number of folds for meta CV; defaults
 to the value of <code>k</code>; may be specified as <code>"loo"</code> or
 <code>"n"</code> as well as an integer.</p></dd>
 
@@ -398,7 +398,7 @@ model-selection (or specification) procedure.</p></li>
 using <code><a href="https://rdrr.io/pkg/car/man/powerTransform.html" class="external-link">powerTransform</a>()</code> in the <span class="pkg">car</span> package.</p></li>
 <li><p><code>selectTransStepAIC()</code>: select transformations of the predictors and response,
 and then select predictors.</p></li>
-<li><p><code>selectModelList()</code>: select a model using (recursive) CV.</p></li>
+<li><p><code>selectModelList()</code>: select a model using (meta) CV.</p></li>
 <li><p><code>compareFolds()</code>: print the coefficients from the selected models
 for the several folds.</p></li>
 <li><p><code>coef(cvSelect)</code>: extract the coefficients from the selected models
@@ -577,7 +577,7 @@ for the several folds and possibly average them.</p></li>
 <span class="r-in"><span><span class="va">m3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">prestige</span> <span class="op">~</span> <span class="op">(</span><span class="va">income</span> <span class="op">+</span> <span class="va">education</span><span class="op">)</span><span class="op">*</span><span class="va">type</span>, data<span class="op">=</span><span class="va">Duncan</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv.sel</span> <span class="op">&lt;-</span> <span class="fu"><a href="cv.html">cv</a></span><span class="op">(</span><span class="va">selectModelList</span>, data<span class="op">=</span><span class="va">Duncan</span>, seed<span class="op">=</span><span class="fl">5963</span>,</span></span>
 <span class="r-in"><span>                     working.model<span class="op">=</span><span class="fu"><a href="cv.modList.html">models</a></span><span class="op">(</span><span class="va">m1</span>, <span class="va">m2</span>, <span class="va">m3</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                     save.model<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="co"># recursive CV</span></span></span>
+<span class="r-in"><span>                     save.model<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="co"># meta CV</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 5963</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
