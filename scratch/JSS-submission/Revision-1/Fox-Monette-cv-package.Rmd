@@ -714,7 +714,7 @@ In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1
 
 If we select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply meta-CV. The function \code{selectModelList()}, which is suitable for use with \code{cv()}, implements this idea.
 
-Applying \code{selectModelList()} to the \code{Auto} polynomial-regression models, and using 10-fold CV, we obtain:
+Applying \code{selectModelList()} to the \code{Auto} polynomial-regression models, and using 10-fold CV, we obtain:[^cvInfo]
 ```{r meta-CV-polynomials}
 metaCV.auto <- cv(selectModelList, data = Auto, 
                   working.model = mlist, save.model = TRUE, 
@@ -723,6 +723,9 @@ summary(metaCV.auto)
 brief(m.sel <- cvInfo(metaCV.auto, "selected model"))
 cv(m.sel, seed = 2120)
 ```
+
+[^cvInfo]: Two functions are employed to access information in objects produced by functions in the \pkg{cv} package: \code{cvInfo()} and \code{as.data.frame()} are generic functions (the latter a standard-\proglang{R} generic) with methods for classes \code{"cv"}, \code{"cvList"}, \code{"cvModlist"}, and \code{"cvSelect"} (in the case of \code{cvInfo()}) , and \code{"cv"}, \code{"cvList"}, and \code{"cvModlist"} (in the case of \code{as.data.frame()}). Here we use \code{cvInfo(metaCV.auto, "selected model")} to retrieve the model selected by \code{cv()} via \code{selectModelList()}. See \code{?cv} and \code{?cvInfo.cvSelect} for details.
+
 As expected, meta CV produces a larger estimate of MSE for the selected 7th degree polynomial model than CV applied directly to this model (using the same seed for \proglang{R}'s random-number generator to obtain the same folds).
 
 We can equivalently call \code{cv()} with the list of models as its first argument and set the argument \code{meta = TRUE} (identical output not shown):
