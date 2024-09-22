@@ -503,16 +503,16 @@ models; see the "Extending the cv package" vignette
 <span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n install 'ISLR2' package to run these examples\n"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Auto", package="ISLR2")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.auto &lt;- lm(mpg ~ horsepower, data=Auto)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(m.auto,  k="loo")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Auto", package = "ISLR2")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.auto &lt;- lm(mpg ~ horsepower, data = Auto)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cv(m.auto, k = "loo")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion (mse) = 24.23151 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.auto,  k="loo"))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.auto, k = "loo"))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: hatvalues</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 24.23151</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.auto &lt;- cv(m.auto, seed=1234))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.auto &lt;- cv(m.auto, seed = 1234))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 1234</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
@@ -541,12 +541,12 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> Fold 10        39.9      -0.16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.auto)</span>
 <span class="r-plt img"><img src="cv-1.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.auto, what="coefficients")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.auto.reps &lt;- cv(m.auto, seed=1234, reps=3))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.auto, what = "coefficients")</span>
+<span class="r-plt img"><img src="cv-2.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.auto.reps &lt;- cv(m.auto, seed = 1234, reps = 3))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 1234</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 469908</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 267</span>
-<span class="r-plt img"><img src="cv-2.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Replicate 1:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
@@ -579,11 +579,12 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 24.31271 (0.04496328)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 24.29331 (0.0425791)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 23.94366</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvInfo(cv.auto.reps, what="adjusted CV criterion")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvInfo(cv.auto.reps, what = "adjusted CV criterion")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    rep.1    rep.2    rep.3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 24.26775 24.28129 24.35646 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.auto.reps)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv(m.auto, seed=1234, reps=10, confint=TRUE))</span>
+<span class="r-plt img"><img src="cv-3.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv(m.auto, seed = 1234, reps = 10, confint = TRUE))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 1234</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 469908</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 267</span>
@@ -594,7 +595,6 @@ models; see the "Extending the cv package" vignette
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 967112</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 597697</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 217930</span>
-<span class="r-plt img"><img src="cv-3.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="cv-4.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; D.auto.reps &lt;- as.data.frame(cv.auto.reps)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; head(D.auto.reps)</span>
@@ -605,7 +605,7 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4   1    3 25.502           NA       NA         39.694        -0.15634</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5   1    4 24.518           NA       NA         40.507        -0.16337</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6   1    5 24.540           NA       NA         39.997        -0.15796</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.auto.reps, mse ~ rep + fold, include="folds")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.auto.reps, mse ~ rep + fold, include = "folds")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    fold</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rep        1        2        3        4        5        6        7        8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1 23.06906 15.67122 25.50203 24.51830 24.54048 27.90666 19.74447 36.27542</span>
@@ -616,17 +616,17 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1 19.43045 26.45118</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   2 20.69013 27.64165</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   3 19.62079 35.28078</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.auto.reps, mse ~ rep + fold, include = "folds",</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +         subset = fold &lt;= 5) # first 5 folds</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.auto.reps, mse ~ rep + fold, include = "folds", subset = fold &lt;= </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +     5)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    fold</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> rep        1        2        3        4        5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1 23.06906 15.67122 25.50203 24.51830 24.54048</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   2 28.73251 21.92554 22.25392 23.22799 33.15260</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   3 24.31128 18.54939 33.52760 22.09623 25.09248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.auto.reps, mse ~ rep, include="folds")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.auto.reps, mse ~ rep, include = "folds")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        1        2        3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 24.31093 24.29475 24.39452 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.auto.reps, mse ~ rep, fun=sd, include="folds")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.auto.reps, mse ~ rep, fun = sd, include = "folds")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        1        2        3 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5.607849 4.707138 6.383539 </span>
 <span class="r-in"><span></span></span>
@@ -649,9 +649,9 @@ models; see the "Extending the cv package" vignette
 <span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n install 'carData' package to run these examples\n"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Mroz", package="carData")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.mroz &lt;- glm(lfp ~ ., data=Mroz, family=binomial)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.mroz &lt;- cv(m.mroz, criterion=BayesRule, seed=123))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Mroz", package = "carData")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.mroz &lt;- glm(lfp ~ ., data = Mroz, family = binomial)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv.mroz &lt;- cv(m.mroz, criterion = BayesRule, seed = 123))</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 123</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: exact</span>
@@ -667,18 +667,17 @@ models; see the "Extending the cv package" vignette
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvInfo(cv.mroz, "confint")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      lower      upper      level </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0.2923660  0.3596836 95.0000000 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Duncan", package="carData")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.lm &lt;- lm(prestige ~ income + education, data=Duncan)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.rlm &lt;- MASS::rlm(prestige ~ income + education,</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +                    data=Duncan)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.lm, k="loo", method="Woodbury"))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Duncan", package = "carData")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.lm &lt;- lm(prestige ~ income + education, data = Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m.rlm &lt;- MASS::rlm(prestige ~ income + education, data = Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.lm, k = "loo", method = "Woodbury"))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> method: Woodbury</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 198.5274</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> bias-adjusted cross-validation criterion = 198.1496</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> full-sample criterion = 166.8155</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.rlm, k="loo"))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(cv(m.rlm, k = "loo"))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> n-Fold Cross Validation</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> criterion: mse</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 193.3949</span>
@@ -696,7 +695,7 @@ models; see the "Extending the cv package" vignette
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

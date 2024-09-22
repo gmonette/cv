@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-09-16</h4>
+            <h4 data-toc-skip class="date">2024-09-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv-notes.Rmd" class="external-link"><code>vignettes/cv-notes.Rmd</code></a></small>
       <div class="d-none name"><code>cv-notes.Rmd</code></div>
@@ -291,12 +291,12 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :</span></span>
 <span><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
-<span><span class="co">#&gt; Unit: milliseconds</span></span>
-<span><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">#&gt;  hatvalues   1.0414   1.1469   1.3337   1.2954   1.3785   2.0808    10</span></span>
-<span><span class="co">#&gt;   Woodbury  12.7966  13.3724  15.5525  16.1881  17.7647  18.0120    10</span></span>
-<span><span class="co">#&gt;      naive 227.3813 232.2123 238.1265 234.5149 235.9692 272.9634    10</span></span>
-<span><span class="co">#&gt;     cv.glm 403.7387 407.4976 427.0974 412.9294 443.5542 478.9376    10</span></span></code></pre></div>
+<span><span class="co">#&gt; Unit: microseconds</span></span>
+<span><span class="co">#&gt;       expr       min     lq     mean   median     uq      max neval</span></span>
+<span><span class="co">#&gt;  hatvalues    995.07   1018   1194.5   1218.5   1246   1454.1    10</span></span>
+<span><span class="co">#&gt;   Woodbury  12522.88  12692  13471.1  12719.2  13005  16554.4    10</span></span>
+<span><span class="co">#&gt;      naive 223016.18 223975 229118.8 226657.1 235358 239642.5    10</span></span>
+<span><span class="co">#&gt;     cv.glm 381133.46 388052 400412.0 394251.0 409309 444399.1    10</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Out of impatience, we asked
@@ -396,10 +396,10 @@ comparable to <code><a href="../reference/cv.html">cv()</a></code> with <code>me
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Unit: milliseconds</span></span>
 <span><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
-<span><span class="co">#&gt;  hatvalues    1.1479    1.1922    1.3759    1.4217    1.4536    1.5478    10</span></span>
-<span><span class="co">#&gt;   Woodbury   42.6960   43.7782   47.5582   45.1223   48.0050   62.0776    10</span></span>
-<span><span class="co">#&gt;      exact 1818.9005 1859.6393 2110.0050 1967.3170 2564.1718 2596.6855    10</span></span>
-<span><span class="co">#&gt;     cv.glm 2069.0473 2232.4480 2481.4417 2272.5129 2669.9130 3341.8540    10</span></span></code></pre></div>
+<span><span class="co">#&gt;  hatvalues    1.1203    1.1486    1.3535    1.4212    1.4402    1.5128    10</span></span>
+<span><span class="co">#&gt;   Woodbury   42.1699   42.2593   43.8565   43.3677   43.8647   49.3639    10</span></span>
+<span><span class="co">#&gt;      exact 1752.0450 1784.1110 1846.6760 1844.3065 1902.0752 1980.2256    10</span></span>
+<span><span class="co">#&gt;     cv.glm 2036.7595 2068.1214 2091.4725 2092.9802 2112.6757 2150.3881    10</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>
@@ -789,7 +789,7 @@ Retrieved from <a href="https://CRAN.R-project.org/package=microbenchmark" class
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

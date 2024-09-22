@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2024-09-16</h4>
+            <h4 data-toc-skip class="date">2024-09-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv-selection.Rmd" class="external-link"><code>vignettes/cv-selection.Rmd</code></a></small>
       <div class="d-none name"><code>cv-selection.Rmd</code></div>
@@ -379,7 +379,7 @@ results in <code>m.1</code> through <code>m.10</code>. We then used
 discovering that the 7th degree polynomial had the smallest MSE (by a
 small margin); repeating the relevant graph:
 <div class="figure" style="text-align: center">
-<img src="fig/polynomial-regression-CV-graph-duplicated-1.png" alt="Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$ (repeated)" width="100%"><p class="caption">
+<img src="fig%2Fpolynomial-regression-CV-graph-duplicated-1.png" alt="Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$ (repeated)" width="100%"><p class="caption">
 Cross-validated 10-fold and LOO MSE as a function of polynomial degree,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
 (repeated)
@@ -665,7 +665,7 @@ the response (i.e., <code>prestige</code>), are nonlinear:</p>
 <span>  smooth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spread <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/scatterplot-matrix-1.png" alt="Scatterplot matrix for the `Prestige` data." width="100%"><p class="caption">
+<img src="fig%2Fscatterplot-matrix-1.png" alt="Scatterplot matrix for the `Prestige` data." width="100%"><p class="caption">
 Scatterplot matrix for the <code>Prestige</code> data.
 </p>
 </div>
@@ -725,7 +725,7 @@ transformations makes the predictors better-behaved:</p>
 <span>  smooth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spread <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/transformed-predictors-1.png" alt="Scatterplot matrix for the `Prestige` data with the predictors transformed." width="100%"><p class="caption">
+<img src="fig%2Ftransformed-predictors-1.png" alt="Scatterplot matrix for the `Prestige` data with the predictors transformed." width="100%"><p class="caption">
 Scatterplot matrix for the <code>Prestige</code> data with the
 predictors transformed.
 </p>
@@ -754,7 +754,7 @@ to linear in both regressions:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/CR-plots-untransformed-1.png" alt="Component+residual plots for the `Prestige` regression with the original predictors." width="672"><p class="caption">
+<img src="fig%2FCR-plots-untransformed-1.png" alt="Component+residual plots for the `Prestige` regression with the original predictors." width="672"><p class="caption">
 Component+residual plots for the <code>Prestige</code> regression with
 the original predictors.
 </p>
@@ -762,7 +762,7 @@ the original predictors.
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.pres.trans</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/CR-plots-transformed-1.png" alt="Component+residual plots for the `Prestige` regression with transformed predictors." width="672"><p class="caption">
+<img src="fig%2FCR-plots-transformed-1.png" alt="Component+residual plots for the `Prestige` regression with transformed predictors." width="672"><p class="caption">
 Component+residual plots for the <code>Prestige</code> regression with
 transformed predictors.
 </p>
@@ -955,7 +955,7 @@ relationships among the numeric variables in the data set:</p>
 <span>  data <span class="op">=</span> <span class="va">Auto</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/Auto-explore-1.png" alt="Scatterplot matrix for the numeric variables in the `Auto` data" width="100%"><p class="caption">
+<img src="fig%2FAuto-explore-1.png" alt="Scatterplot matrix for the numeric variables in the `Auto` data" width="100%"><p class="caption">
 Scatterplot matrix for the numeric variables in the <code>Auto</code>
 data
 </p>
@@ -1039,7 +1039,7 @@ relationships of the response to the numeric predictors:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m.auto</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/Auto-working-model-1.png" alt="Component+residual plots for the working model fit to the `Auto` data" width="100%"><p class="caption">
+<img src="fig%2FAuto-working-model-1.png" alt="Component+residual plots for the working model fit to the `Auto` data" width="100%"><p class="caption">
 Component+residual plots for the working model fit to the
 <code>Auto</code> data
 </p>
@@ -1176,7 +1176,7 @@ logs—to the data and re-estimate the model:</p>
 <span>  data <span class="op">=</span> <span class="va">A</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/Auto-transformed-scatterplot-matrix-1.png" alt="Scatterplot matrix for the transformed numeric variables in the `Auto` data" width="100%"><p class="caption">
+<img src="fig%2FAuto-transformed-scatterplot-matrix-1.png" alt="Scatterplot matrix for the transformed numeric variables in the `Auto` data" width="100%"><p class="caption">
 Scatterplot matrix for the transformed numeric variables in the
 <code>Auto</code> data
 </p>
@@ -1186,7 +1186,7 @@ data are much more nearly linear:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/car/man/crPlots.html" class="external-link">crPlots</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/Auto-CR-plots-transformed-1.png" alt="Component+residual plots for the model fit to the transformed `Auto` data" width="100%"><p class="caption">
+<img src="fig%2FAuto-CR-plots-transformed-1.png" alt="Component+residual plots for the model fit to the transformed `Auto` data" width="100%"><p class="caption">
 Component+residual plots for the model fit to the transformed
 <code>Auto</code> data
 </p>
@@ -1449,7 +1449,7 @@ edition). Hoboken <span>NJ</span>: Wiley.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>

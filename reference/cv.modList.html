@@ -292,12 +292,12 @@ or, when <code>meta=TRUE</code>, an object of class <code>c("cvSelect", "cv")</c
 <span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"install the 'carData' package to run these examples\n"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Duncan", package="carData")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m1 &lt;- lm(prestige ~ income + education, data=Duncan)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m2 &lt;- lm(prestige ~ income + education + type, data=Duncan)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m3 &lt;- lm(prestige ~ (income + education)*type, data=Duncan)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models &lt;- cv(models(m1=m1, m2=m2, m3=m3),</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +                  data=Duncan, seed=7949, reps=5))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; data("Duncan", package = "carData")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m1 &lt;- lm(prestige ~ income + education, data = Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m2 &lt;- lm(prestige ~ income + education + type, data = Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; m3 &lt;- lm(prestige ~ (income + education) * type, data = Duncan)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models &lt;- cv(models(m1 = m1, m2 = m2, m3 = m3), data = Duncan, seed = 7949, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +     reps = 5))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m1 averaged across 5 replications:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 195.0866 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -330,7 +330,7 @@ or, when <code>meta=TRUE</code>, an object of class <code>c("cvSelect", "cv")</c
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4                 NA                      NA                    NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5                 NA                      NA                    NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6                 NA                      NA                    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.cv.models, criterion ~ model + rep, include="folds")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; summary(D.cv.models, criterion ~ model + rep, include = "folds")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      rep</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> model        1        2        3        4        5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    m1 204.7489 197.8415 192.9138 199.5759 200.2259</span>
@@ -338,8 +338,8 @@ or, when <code>meta=TRUE</code>, an object of class <code>c("cvSelect", "cv")</c
 <span class="r-out co"><span class="r-pr">#&gt;</span>    m3 141.9428 145.7092 143.0177 143.1847 155.0245</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.models)</span>
 <span class="r-plt img"><img src="cv.modList-1.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models.ci &lt;- cv(models(m1=m1, m2=m2, m3=m3),</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +                     data=Duncan, seed=5963, confint=TRUE, level=0.50))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models.ci &lt;- cv(models(m1 = m1, m2 = m2, m3 = m3), data = Duncan, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +     seed = 5963, confint = TRUE, level = 0.5))</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m1:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 196.8033 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -349,13 +349,11 @@ or, when <code>meta=TRUE</code>, an object of class <code>c("cvSelect", "cv")</c
 <span class="r-out co"><span class="r-pr">#&gt;</span> Model m3:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 145.4901 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt;                  # nb: n too small for accurate CIs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; plot(cv.models.ci)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models.meta &lt;- cv(models(m1=m1, m2=m2, m3=m3),</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +                       data=Duncan, seed=5963,</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> +                       meta=TRUE, save.model=TRUE))</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 5963</span>
 <span class="r-plt img"><img src="cv.modList-2.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &gt; (cv.models.meta &lt;- cv(models(m1 = m1, m2 = m2, m3 = m3), data = Duncan, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> +     seed = 5963, meta = TRUE, save.model = TRUE))</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> R RNG seed set to 5963</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> cross-validation criterion = 112.0172 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &gt; cvInfo(cv.models.meta, "selected model")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -377,7 +375,7 @@ or, when <code>meta=TRUE</code>, an object of class <code>c("cvSelect", "cv")</c
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
