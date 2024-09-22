@@ -1,0 +1,45 @@
+---
+documentclass: jss
+author:
+  - name: John Fox
+    orcid: 0000-0002-1196-8012
+    affiliation: 'McMaster University'
+    address: |
+      | Hamilton, Ontario, Canada
+    email: \email{jfox@mcmaster.ca}
+    url: https://www.john-fox.ca/
+  - name: Georges Monette
+    orcid: 0000-0003-0076-5532
+    affiliation: 'York University'
+    address: |
+      | Toronto, Ontario, Canada
+    email: \email
+    url: http://blackwell.math.yorku.ca/gmonette
+title: DRAFT Addition re Other Packages
+preamble: >
+  \usepackage{amsmath}
+output: 
+  rticles::jss_article:
+    extra_dependencies: "subfig"
+bibliography: ["cv-add.bib"]
+---
+
+# Comparing cv to other software for cross-validation
+
+We have examined provisions for cross-validation
+in \proglang{SAS}, \proglang{Stata}, and \proglang{Python} although
+we do not have recent experience with languages other than \proglang{R}.
+
+In \proglang{Python} [@pedregosaScikitlearnMachineLearning:2011], 
+statistical modelling is supported through extensive libraries
+such as \pkg{scikit-learn} [@ScikitLearnDevelopers:2024]
+and \pkg{Tensorflow} [@tensorflow:2024].  
+Functions for cross-validation are provided in the \pkg{Scikit-learn}
+library that includes functions
+for k-fold, repeated k-fold, leave-one-out, leave-p-out cross-validation.
+These functions can be applied to data sets consisting of independent observations,
+hierarchical groups, or time series data. Documentation
+for the \pkg{scikit-learn} provides
+a sample program [@ScikitLearnDevelopers:2024] to show
+users how to implement nested cross-validation.
+
