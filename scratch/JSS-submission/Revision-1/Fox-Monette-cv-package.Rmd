@@ -29,6 +29,7 @@ keywords:
   plain:     [cross-validation, regression analysis, model selection, R]
 preamble: >
   \usepackage{amsmath}
+  \usepackage{amssymb}
 output: 
   rticles::jss_article:
     extra_dependencies: "subfig"
@@ -950,7 +951,31 @@ print(microbenchmark::microbenchmark(
 ```
 Computing time for \pkg{rsample} and \pkg{caret} for this problem is similar to direct computation of LOO CV and to \code{cv()} with \code{method="exact"}, but almost two orders of magnitude slower than \code{cv()} with \code{method="Woodbury"}, and more than three orders of magnitude slower then \code{cv()} with \code{method="hatvalues"}.
 
-## Other statistical software: SAS, Stata, and Python
+## Comparing cv to other software for cross-validation: SAS, Stata, and Python
+
+Although we do not have recent experience with statistical software for cross-validation other than in \proglang{R},[^other-software] we have examined provisions for CV in \proglang{SAS}, \proglang{Stata}, and \proglang{Python}, primarily by locating and reading documentation.
+
+[^other-software]: It is our impression that these three statistical systems, in addition to \proglang{R}, are most likely to be used for applications of cross-validation. We were once frequent users of \proglang{SAS}, though not recently, and have only cursory experience with \proglang{Stata} and \proglang{Python}, so we are not ideally situated to evaluate CV software for any of the three.
+
+### SAS
+
+Cross-validation in \proglang{SAS} is associated with particular procedures ("\code{PROC}s"), and is distributed across several products, including, for example, \code{PROC LOGISTIC} and \code{PROC PLS} in \proglang{SAS/STAT} [@SAS-Stat:2020], in \proglang{SAS Enterprise Miner} [@SAS-Enterprise-Miner:2018], and in \proglang{SAS Visual Data Mining and Machine Learning} [@SAS-Visual-Data-Mining:2020]. These appear to be straightforward implementations of $k$-fold CV.
+
+In addition, \proglang{SAS} has programming capabilities, including via its macro language, and we're aware of several independent implementations of CV in \proglang{SAS} macros. These tend to be limited in scope. For example @Slaets-et-al:2014 employ and provide access to a \proglang{SAS} macro for $k$-fold CV of mixed-effects models, which repeatedly calls \code{PROC MIXED} in \proglang{SAS/STAT}, and which performs cluster-based resampling (one of the options that we provide for mixed-effects models in the \pkg{cv} package).
+
+### Stata
+
+As far as we can tell, \proglang{Stata} has no standard implementation of cross-validation. Like \proglang{R}, however, \proglang{Stata} is extensible through a programming language that allows users to define new commands in so-called "\code{ado}" files. 
+
+Several such contributed \proglang{Stata} CV commands, varying in generality, are shared in an archive maintained at the Boston College Department of Economics. For example, the \code{CV\_REGRESS} command [@Rios-Avila:2018] computes leave-one-out CV for least-squares regression using the hatvalues, and thus is comparable to \code{cv()} for linear models with \code{method = "hatvalues"}. In contrast, the \code{CROSSVALIDATE} command [@Schonlau:2020] performs $k$-fold CV for a wide range of regression models fit in \proglang{Stata}, and is roughly comparable to the default method of \code{cv()}, although \code{CROSSVALIDATE} returns cross-validated fitted values, from which cost criteria can be computed, rather than (as \code{cv()}) cost-criteria directly.
+
+### Python
+
+The programming language \proglang{Python} is often the software of choice for "machine learning," in which cross-validation can play a prominent role. Machine learning and statistical modeling more generally are supported through extensive \proglang{Python} libraries, such as \pkg{scikit-learn} [@Pedregosa-et-al:2011; @ScikitLearnDevelopers:2024] and \pkg{TensorFlow} [@TensorFlow:2015, which isn't limited to use within \proglang{Python}]. 
+
+Functions for cross-validation are provided in \pkg{scikit-learn}, which supports $k$-fold, repeated $k$-fold, and leave-one-out CV. These functions can be applied to data sets consisting of independent observations, hierarchical groups, or time-series data.  A sample program in the \pkg{scikit-learn} documentation [@ScikitLearnDevelopers:2024] demonstrates how to implement meta cross-validation (termed "nested cross-validation" in the documentation).
+
+The approach taken by \pkg{scikit-Learn} for independent observations is similar to that in the default \code{cv()} function in the \pkg{cv} package. The approach for hierarchical data is similar, but not identical, to that in \pkg{cv} (as described in Section \ref{cross-validating-mixed-effects-models}). Our \code{cv()} package doesn't currently provide for cross-validating time-series models.
 
 
 # Computational notes
