@@ -13,8 +13,7 @@
 #' frame with data to which the model is to be fit.
 #' @param criterion function to compute the CV cost criterion
 #' (default \code{\link{mse}}).
-#' @param k number of folds, an integer or "n" or "loo" for
-#' leave-one-out CV; the default is \code{10}.
+#' @param k number of folds, an integer \eqn{\gt 2}; the default is \code{10}.
 #' @param reps ignored (to match \code{\link{cv}()} generic function.)
 #' @param seed ignored (to match \code{\link{cv}()} generic function.)
 #' @param i.only if \code{TRUE} (the default is \code{FALSE}), predict
@@ -238,6 +237,7 @@ cv.ARIMA <- function(model,
                    i.only = FALSE,
                    criterion.name = deparse(substitute(criterion)),
                    details = k <= 10L,
+                   ncores = 1L,
                    ...) {
 
   f <- function(i, ...) {
@@ -253,20 +253,54 @@ cv.ARIMA <- function(model,
     )
   }
 
+  fPara <- function(i,
+                    model.function = model.function,
+                    model.function.name,
+                    ...) {
+    # helper function to compute cv criterion for each fold
+    #  with parallel computations
+    indices.i <- fold(folds, i, i.only = i.only)
+    indices.j <- fold(folds, i, predict=TRUE)
+    assign(model.function.name, model.function)
+    # the following deals with a scoping issue that can
+    #   occur with args passed via ... (which is saved in dots)
+    predict.args <- c(list(
+      object = update(model, data = data[indices.i, , drop=FALSE]),
+      newdata = data[indices.j, x.names, drop=FALSE],
+      n.ahead = length(indices.j)
+    ), dots)
+
+    fit.i <- do.call(predict, predict.args)
+    list(
+      fit.i = fit.i,
+      coef.i = coef(predict.args$object)
+    )
+  }
+
   x.names <- colnames(model$model.matrix)
 
-  cvOrdered(
+  call <- getCall(model)
+  model.function <- call[[1L]]
+  model.function.name <- as.character(model.function)
+  model.function <- eval(model.function)
+
+  result <- cvOrdered(
     model = model,
     data = data,
     criterion = criterion,
     criterion.name = criterion.name,
     k = k,
     i.only = i.only,
+    confint=FALSE,
     details = details,
+    ncores = ncores,
     f = f,
+    fPara = fPara,
+    model.function = model.function,
+    model.function.name = model.function.name,
     locals = list(x.names = x.names),
-    n.ahead=0, # passed to predict() for the full sample
-               # to produce na for CV criterion
     ...
   )
+  result[["full crit"]] <- NULL
+  result
 }

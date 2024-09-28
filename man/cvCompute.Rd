@@ -149,7 +149,7 @@ in the returned \code{"cv"} object).}
 
 \item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
-cross-validation; for \code{folds()}, \code{k} must be a number.}
+cross-validation; for \code{folds()} and \code{cvOrdered()}, \code{k} must be a number.}
 
 \item{reps}{number of times to replicate k-fold CV (default is \code{1}).}
 

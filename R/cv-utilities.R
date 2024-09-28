@@ -14,7 +14,7 @@
 #'        (the mean-squared error).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
-#' cross-validation; for \code{folds()}, \code{k} must be a number.
+#' cross-validation; for \code{folds()} and \code{cvOrdered()}, \code{k} must be a number.
 #' @param reps number of times to replicate k-fold CV (default is \code{1}).
 #' @param confint if \code{TRUE} (the default if the number of cases is 400
 #' or greater), compute a confidence interval for the bias-corrected CV
@@ -912,20 +912,11 @@ cvOrdered <- function(model,
   y <- GetResponse(model)
   b <- coef(model)
   n <- nrow(data)
-  if (is.character(k)) {
-    if (k == "n" || k == "loo") {
-      k <- n
-    }
-  }
   if (!is.numeric(k) ||
-      length(k) > 1L || k > n || k < 2L || k != round(k)) {
-    stop('k must be an integer between 2 and n or "n" or "loo"')
+      length(k) > 1L || k < 2L || k != round(k)) {
+    stop('k must be an integer > 2')
   }
-  if (k == n) {
-    message("Note: for ordered data, LOO CV entails n - 1 fits")
-  } else {
-    message("Note: for ordered data, k-fold CV entails k - 1 fits")
-  }
+  message("Note: for ordered data, k-fold CV entails k - 1 fits")
   folds <- folds(n, k, ordered = TRUE)
   yhat <- if (is.factor(y)) {
     factor(rep(NA, n), levels = levels(y))

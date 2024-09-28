@@ -53,6 +53,7 @@ Arima(
   i.only = FALSE,
   criterion.name = deparse(substitute(criterion)),
   details = k <= 10L,
+  ncores = 1L,
   ...
 )
 }
@@ -68,8 +69,7 @@ frame with data to which the model is to be fit.}
 \item{criterion}{function to compute the CV cost criterion
 (default \code{\link{mse}}).}
 
-\item{k}{number of folds, an integer or "n" or "loo" for
-leave-one-out CV; the default is \code{10}.}
+\item{k}{number of folds, an integer \eqn{\gt 2}; the default is \code{10}.}
 
 \item{reps}{ignored (to match \code{\link{cv}()} generic function.)}
 

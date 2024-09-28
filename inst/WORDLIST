@@ -110,3 +110,6 @@ cvModlist
 cvInfo
 selectedModel
 timeseries
+arima
+cvOrdered
+gls
