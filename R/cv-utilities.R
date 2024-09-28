@@ -863,20 +863,200 @@ cvSelect <- function(procedure,
     return(res)
   }
 }
+#' @param i.only if \code{TRUE} (the default is \code{FALSE}), predict
+#' the response for cases in the i-th fold from the model fit to data
+#' in the preceding fold only rather than fit to data from \emph{all}
+#' preceding folds.
+#' @param ordered if \code{TRUE} (the default is \code{FALSE}), create
+#' ordered folds for cross-validating a timeseries model.
+#' @describeIn cvCompute used internally by \code{cv()} methods for
+#' cross-validating time-series models.
+#' @export
+cvOrdered <- function(model,
+                      i.only = FALSE,
+                      data = insight::get_data(model),
+                      criterion = mse,
+                      criterion.name,
+                      k = 10L,
+                      details = k <= 10L,
+                      confint,
+                      level = 0.95,
+                      method = NULL,
+                      ncores = 1L,
+                      type = "response",
+                      start = FALSE,
+                      f,
+                      fPara,
+                      locals = list(fold = fold),
+                      model.function = NULL,
+                      model.function.name = NULL,
+                      ...) {
+  if (missing(fPara) && ncores > 1)
+    stop("parallel processing not available for models of class '",
+         class(model), "'")
+  # put function and variable args in the local environment
+  env <- environment()
+  environment(f) <- env
+  if (!missing(fPara)) environment(fPara) <- env
+  localsNames <- names(locals)
+  for (i in seq_along(locals)) {
+    assign(localsNames[i], locals[[i]])
+  }
+
+  se.cv <- NA
+
+  if (missing(criterion.name) ||
+      is.null(criterion.name))
+    criterion.name <- deparse(substitute(criterion))
+
+  y <- GetResponse(model)
+  b <- coef(model)
+  n <- nrow(data)
+  if (is.character(k)) {
+    if (k == "n" || k == "loo") {
+      k <- n
+    }
+  }
+  if (!is.numeric(k) ||
+      length(k) > 1L || k > n || k < 2L || k != round(k)) {
+    stop('k must be an integer between 2 and n or "n" or "loo"')
+  }
+  if (k == n) {
+    message("Note: for ordered data, LOO CV entails n - 1 fits")
+  } else {
+    message("Note: for ordered data, k-fold CV entails k - 1 fits")
+  }
+  folds <- folds(n, k, ordered = TRUE)
+  yhat <- if (is.factor(y)) {
+    factor(rep(NA, n), levels = levels(y))
+  } else if (is.character(y)) {
+    character(n)
+  } else {
+    numeric(n)
+  }
+  yhat[fold(folds, 1)] <- NA
+
+  if (details) {
+    crit.i <- numeric(k - 1)
+    coef.i <- vector(k - 1, mode = "list")
+    names(crit.i) <- names(coef.i) <- paste("fold", 1L:(k - 1), sep = ".")
+  } else {
+    crit.i <- NULL
+    coef.i <- NULL
+  }
+
+  if (ncores > 1L) {
+    dots <- list(...)
+    cl <- makeCluster(ncores)
+    registerDoParallel(cl)
+    result <- foreach(i = 1L:(k - 1)) %dopar% {
+      fPara(i,
+            model.function = model.function,
+            model.function.name = model.function.name,
+            ...)
+    }
+    stopCluster(cl)
+    for (i in 1L:(k - 1)) {
+      yhat[fold(folds, i, predict = TRUE)] <- result[[i]]$fit.i
+      if (details) {
+        crit.i[i] <- criterion(y[fold(folds, i, predict = TRUE)], yhat[fold(folds, i, predict =
+                                                                              TRUE)])
+        coef.i[[i]] <- result[[i]]$coef.i
+      }
+    }
+  } else {
+    result <- vector(k - 1, mode = "list")
+    for (i in 1L:(k - 1)) {
+      result[[i]] <- f(i)
+      yhat[fold(folds, i, predict = TRUE)] <- result[[i]]$fit.i
+      if (details) {
+        crit.i[i] <- criterion(as.vector(y[fold(folds, i, predict = TRUE)]),
+                               as.vector(yhat[fold(folds, i, predict =TRUE)]))
+        coef.i[[i]] <- result[[i]]$coef.i
+      }
+    }
+  }
+  cv <- criterion(as.vector(y)[-fold(folds, 1)], as.vector(yhat)[-fold(folds, 1)])
+  cv.full <- criterion(as.vector(y), as.vector(predict(model, type = type, ...)))
+  if (is.na(cv.full)) cv.full <- NULL
+  loss <- getLossFn(cv) # casewise loss function
+  if (!is.null(loss) && !is.null(result[[1]]$crit.all.i)) {
+    adj.cv <- cv + cv.full -
+      weighted.mean(sapply(result, function(x)
+        x$crit.all.i), folds$folds[-1])
+    se.cv <- sd(loss(y, yhat), na.rm = TRUE) / sqrt(n)
+    halfwidth <- qnorm(1 - (1 - level) / 2) * se.cv
+    ci <-
+      if (confint)
+        c(
+          lower = adj.cv - halfwidth,
+          upper = adj.cv + halfwidth,
+          level = round(level * 100)
+        )
+    else
+      NULL
+  } else {
+    adj.cv <- NULL
+    ci <- NULL
+  }
+  result <- list(
+    "CV crit" = cv,
+    "adj CV crit" = adj.cv,
+    "full crit" = cv.full,
+    "confint" = ci,
+    "SE adj CV crit" = se.cv,
+    "k" = if (k == n)
+      "n"
+    else
+      k,
+    "method" = method,
+    "criterion" = criterion.name,
+    "coefficients" = if (details)
+      coef(model)
+    else
+      NULL,
+    "details" = list(criterion = crit.i, coefficients = coef.i)
+  )
+  if (missing(method) || is.null(method))
+    result$method <- NULL
+  class(result) <- "cv"
+  return(result)
+}
 
 #' @describeIn cvCompute used internally by \code{cv()} methods (not for direct use).
 #' @export
-folds <- function(n, k) {
+# folds <- function(n, k) {
+#   nk <-  n %/% k # number of cases in each fold
+#   rem <- n %% k  # remainder
+#   folds <-
+#     rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
+#   ends <- cumsum(folds) # end of each fold
+#   starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
+#   indices <- if (n > k)
+#     sample(n, n)
+#   else
+#     1L:n # permute cases
+#   result <- list(
+#     n = n,
+#     k = k,
+#     folds = folds,
+#     starts = starts,
+#     ends = ends,
+#     indices = indices
+#   )
+#   class(result) <- "folds"
+#   result
+# }
+folds <- function(n, k, ordered=FALSE) {
   nk <-  n %/% k # number of cases in each fold
   rem <- n %% k  # remainder
-  folds <-
-    rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
+  folds <- rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
   ends <- cumsum(folds) # end of each fold
   starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
-  indices <- if (n > k)
-    sample(n, n)
+  indices <- if (n > k && !ordered)
+    sample(n, n) # permute cases
   else
-    1L:n # permute cases
+    1L:n
   result <- list(
     n = n,
     k = k,
@@ -885,9 +1065,10 @@ folds <- function(n, k) {
     ends = ends,
     indices = indices
   )
-  class(result) <- "folds"
+  class(result) <- if (ordered) "orderedfolds" else  "folds"
   result
 }
+
 
 #' @describeIn cvCompute to extract a fold from a \code{"folds"} object.
 #' @export
@@ -896,9 +1077,25 @@ fold <- function(folds, i, ...)
 
 #' @describeIn cvCompute \code{fold()} method for \code{"folds"} objects.
 #' @export
-fold.folds <-
-  function(folds, i, ...)
+fold.folds <- function(folds, i, ...)
     folds$indices[folds$starts[i]:folds$ends[i]]
+
+#' @param predicted if \code{TRUE} (the default is \code{FALSE}), return
+#' the indices to the cases to be predicted; otherwise, return the indices
+#' of the cases used to fit the predictive model.
+#' @describeIn cvCompute to extract a fold from an \code{"orderedfolds"} object.
+#' @export
+fold.orderedfolds <- function(folds, i, predicted=FALSE,
+                              i.only=FALSE, ...){
+  if (i > (kk <- folds$k - 1)) stop("fold ", i, "out of range 1 to ", kk - 1 )
+  if (predicted) {
+    folds$starts[i + 1]:folds$ends[i + 1]
+  } else if (i.only) {
+    folds$starts[i]:folds$ends[i]
+  } else {
+    1:folds$ends[i]
+  }
+}
 
 #' @describeIn cvCompute \code{print()} method for \code{"folds"} objects.
 #' @export
@@ -920,6 +1117,18 @@ print.folds <- function(x, ...) {
   if (x$k > 10L)
     cat("\n ...")
   cat("\n")
+  invisible(x)
+}
+
+#' @describeIn cvCompute \code{print()} method for \code{"otderedfolds"} objects.
+#' @export
+print.orderedfolds <- function(x, ...) {
+  if (x$k == x$n) {
+    cat("LOO:", x$k, "folds for", x$n, "cases")
+    return(invisible(x))
+  }
+  cat(x$k, "ordered folds of approximately", floor(x$n / x$k),
+      "cases each\n")
   invisible(x)
 }
 
@@ -993,6 +1202,17 @@ GetResponse.glmmTMB <- function (model, ...){
 GetResponse.modList <- function(model, ...)
   GetResponse(model[[1L]])
 
+#' @describeIn cvCompute \code{"gls"} method.
+#' @export
+GetResponse.gls <- function(model, ...) {
+  insight::get_response(model)
+}
+
+#' @describeIn cvCompute \code{"ARIMA"} method.
+#' @export
+GetResponse.ARIMA <- function(model, ...) {
+  model$response
+}
 
 # not exported
 

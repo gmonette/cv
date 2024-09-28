@@ -4,16 +4,21 @@
 \alias{cvCompute}
 \alias{cvMixed}
 \alias{cvSelect}
+\alias{cvOrdered}
 \alias{folds}
 \alias{fold}
 \alias{fold.folds}
+\alias{fold.orderedfolds}
 \alias{print.folds}
+\alias{print.orderedfolds}
 \alias{GetResponse}
 \alias{GetResponse.default}
 \alias{GetResponse.merMod}
 \alias{GetResponse.lme}
 \alias{GetResponse.glmmTMB}
 \alias{GetResponse.modList}
+\alias{GetResponse.gls}
+\alias{GetResponse.ARIMA}
 \title{Utility Functions for the cv Package}
 \usage{
 cvCompute(
@@ -78,13 +83,39 @@ cvSelect(
   ...
 )
 
-folds(n, k)
+cvOrdered(
+  model,
+  i.only = FALSE,
+  data = insight::get_data(model),
+  criterion = mse,
+  criterion.name,
+  k = 10L,
+  details = k <= 10L,
+  confint,
+  level = 0.95,
+  method = NULL,
+  ncores = 1L,
+  type = "response",
+  start = FALSE,
+  f,
+  fPara,
+  locals = list(fold = fold),
+  model.function = NULL,
+  model.function.name = NULL,
+  ...
+)
+
+folds(n, k, ordered = FALSE)
 
 fold(folds, i, ...)
 
 \method{fold}{folds}(folds, i, ...)
 
+\method{fold}{orderedfolds}(folds, i, predicted = FALSE, i.only = FALSE, ...)
+
 \method{print}{folds}(x, ...)
+
+\method{print}{orderedfolds}(x, ...)
 
 GetResponse(model, ...)
 
@@ -97,6 +128,10 @@ GetResponse(model, ...)
 \method{GetResponse}{glmmTMB}(model, ...)
 
 \method{GetResponse}{modList}(model, ...)
+
+\method{GetResponse}{gls}(model, ...)
+
+\method{GetResponse}{ARIMA}(model, ...)
 }
 \arguments{
 \item{model}{a regression model object.}
@@ -204,11 +239,23 @@ is set to the value of \code{save.coef}.}
 
 \item{save.model}{save the model that's selected using the \emph{full} data set.}
 
+\item{i.only}{if \code{TRUE} (the default is \code{FALSE}), predict
+the response for cases in the i-th fold from the model fit to data
+in the preceding fold only rather than fit to data from \emph{all}
+preceding folds.}
+
 \item{n}{number of cases, for constructed folds.}
+
+\item{ordered}{if \code{TRUE} (the default is \code{FALSE}), create
+ordered folds for cross-validating a timeseries model.}
 
 \item{folds}{an object of class \code{"folds"}.}
 
 \item{i}{a fold number for an object of class \code{"folds"}.}
+
+\item{predicted}{if \code{TRUE} (the default is \code{FALSE}), return
+the indices to the cases to be predicted; otherwise, return the indices
+of the cases used to fit the predictive model.}
 
 \item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed}
 }
@@ -275,13 +322,20 @@ cross-validating a model-selection procedure; may also be called
 directly for this purpose, but use via \code{cv()} is preferred.
 \code{cvSelect()} is exported primarily to support new model-selection procedures.
 
+\item \code{cvOrdered()}: used internally by \code{cv()} methods for
+cross-validating time-series models.
+
 \item \code{folds()}: used internally by \code{cv()} methods (not for direct use).
 
 \item \code{fold()}: to extract a fold from a \code{"folds"} object.
 
 \item \code{fold(folds)}: \code{fold()} method for \code{"folds"} objects.
 
+\item \code{fold(orderedfolds)}: to extract a fold from an \code{"orderedfolds"} object.
+
 \item \code{print(folds)}: \code{print()} method for \code{"folds"} objects.
+
+\item \code{print(orderedfolds)}: \code{print()} method for \code{"otderedfolds"} objects.
 
 \item \code{GetResponse()}: function to return the response variable
 from a regression model.
@@ -295,6 +349,10 @@ from a regression model.
 \item \code{GetResponse(glmmTMB)}: \code{"glmmTMB"} method.
 
 \item \code{GetResponse(modList)}: \code{"modList"} method.
+
+\item \code{GetResponse(gls)}: \code{"gls"} method.
+
+\item \code{GetResponse(ARIMA)}: \code{"ARIMA"} method.
 
 }}
 \examples{
