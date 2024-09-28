@@ -1,3 +1,7 @@
+# cv 2.1.0
+
+- New cvOrdered() to support timeseries models, used by new cv.gls() and cv.arima() methods.
+
 # cv 2.0.3
 
 - New plot.cv() and plot.cvList() methods.
