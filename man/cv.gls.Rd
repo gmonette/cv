@@ -6,6 +6,7 @@
 \alias{print.ARIMA}
 \alias{update.ARIMA}
 \alias{coef.ARIMA}
+\alias{model.matrix.ARIMA}
 \alias{predict.ARIMA}
 \alias{cv.ARIMA}
 \title{Cross-Validate Mixed-Effects Model}
@@ -41,7 +42,9 @@ Arima(
 
 \method{coef}{ARIMA}(object, ...)
 
-\method{predict}{ARIMA}(object, n.ahead = 1L, newdata = NULL, se.fit = FALSE, ...)
+\method{model.matrix}{ARIMA}(object, ...)
+
+\method{predict}{ARIMA}(object, n.ahead, newdata = NULL, se.fit = FALSE, ...)
 
 \method{cv}{ARIMA}(
   model,
@@ -144,6 +147,9 @@ created by the \code{\link{Arima}()} function.
 \item \code{coef(ARIMA)}: \code{coef()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
+\item \code{model.matrix(ARIMA)}: \code{model.matrix()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
 \item \code{predict(ARIMA)}: \code{predict()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
@@ -151,3 +157,36 @@ created by the \code{\link{Arima}()} function.
 created by the \code{\link{Arima}()} function.
 
 }}
+\examples{
+
+# model from help("gls", package="nlme")
+if (require("nlme", quietly=TRUE)){
+withAutoprint({
+fm1 <- gls(follicles ~ sin(2*pi*Time) + cos(2*pi*Time), Ovary,
+           correlation = corAR1(form = ~ 1 | Mare))
+fm1
+summary(cv(fm1, k=5, confint = TRUE))
+summary(cv(fm1, k=5, confint = TRUE, i.only = TRUE))
+})
+}
+
+if (require("stats", quietly=TRUE) &&
+    require("datasets", quietly=TRUE)){
+withAutoprint({
+# model adapted from help("arima")
+LH <- data.frame(lh = lh)
+lh.arima <- Arima(~lh, data=LH)
+lh.arima
+summary(cv(lh.arima, k=5))
+summary(cv(lh.arima, k=5, i.only=TRUE))
+
+# model adapted from help("arima")
+Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
+lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
+                  order=c(2, 0, 0))
+lake.arima
+summary(cv(lake.arima, k=5))
+summary(cv(lake.arima, k=5, i.only=TRUE))
+})
+}
+}

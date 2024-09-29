@@ -30,6 +30,39 @@
 #' @param level level for the confidence interval (default \code{0.95}).
 #' @param ncores if \code{ncores} \eqn{> 1}, the computation is parallelized.
 #'
+#' @examples
+#'
+#' # model from help("gls", package="nlme")
+#' if (require("nlme", quietly=TRUE)){
+#' withAutoprint({
+#' fm1 <- gls(follicles ~ sin(2*pi*Time) + cos(2*pi*Time), Ovary,
+#'            correlation = corAR1(form = ~ 1 | Mare))
+#' fm1
+#' summary(cv(fm1, k=5, confint = TRUE))
+#' summary(cv(fm1, k=5, confint = TRUE, i.only = TRUE))
+#' })
+#' }
+#'
+#' if (require("stats", quietly=TRUE) &&
+#'     require("datasets", quietly=TRUE)){
+#' withAutoprint({
+#' # model adapted from help("arima")
+#' LH <- data.frame(lh = lh)
+#' lh.arima <- Arima(~lh, data=LH)
+#' lh.arima
+#' summary(cv(lh.arima, k=5))
+#' summary(cv(lh.arima, k=5, i.only=TRUE))
+#'
+#' # model adapted from help("arima")
+#' Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
+#' lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
+#'                   order=c(2, 0, 0))
+#' lake.arima
+#' summary(cv(lake.arima, k=5))
+#' summary(cv(lake.arima, k=5, i.only=TRUE))
+#' })
+#' }
+
 #' @describeIn cv.gls \code{cv()} method for \code{\link[nlme]{gls}()} models from the \pkg{nlme} package.
 #' @export
 cv.gls <- function(model,
@@ -206,6 +239,11 @@ update.ARIMA <- function(object, ...){
 #' @export
 coef.ARIMA <- function(object, ...) coef(object$arima)
 
+#' @describeIn cv.gls \code{model.matrix()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+model.matrix.ARIMA <- function(object, ...) object$model.matrix
+
 #' @param n.ahead number of future cases to predict; the default is \code{1}.
 #' @param newdata data frame with \code{n.ahead} rows containing the
 #' predictors (if any) for the predicted future cases.
@@ -214,13 +252,17 @@ coef.ARIMA <- function(object, ...) coef(object$arima)
 #' @describeIn cv.gls \code{predict()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
-predict.ARIMA <- function(object, n.ahead = 1L, newdata = NULL,
+predict.ARIMA <- function(object, n.ahead, newdata = NULL,
                           se.fit = FALSE, ...){
-  if (n.ahead == 0) {
-    return(rep(NA, length(object$response)))
+  if (missing(n.ahead) && is.null(newdata)) return(NULL)
+  x <- model.matrix(object)
+  new.x <- if (!is.null(newdata) && !is.null(model.matrix(object))) {
+    n.ahead <- nrow(newdata)
+    model.frame(object$formula[-2], data=newdata)
+  } else {
+    NULL
   }
-  x <- object$data[ , colnames(newdata), drop=FALSE]
-  predict(object$arima, n.ahead=n.ahead, newxreg=newdata,
+  predict(object$arima, n.ahead=n.ahead, newxreg=new.x,
           se.fit=se.fit, ...)
 
 }
@@ -246,7 +288,7 @@ cv.ARIMA <- function(model,
     indices.j <- fold(folds, i, predict=TRUE)
     model.i <- update(model, data = data[indices.i, , drop=FALSE])
     fit.i <- predict(model.i, n.ahead=length(indices.j),
-                     newdata=data[indices.j, x.names, drop=FALSE])
+                     newdata=data[indices.j, , drop=FALSE])
     list(
       fit.i = fit.i,
       coef.i = coef(model.i)
@@ -266,7 +308,7 @@ cv.ARIMA <- function(model,
     #   occur with args passed via ... (which is saved in dots)
     predict.args <- c(list(
       object = update(model, data = data[indices.i, , drop=FALSE]),
-      newdata = data[indices.j, x.names, drop=FALSE],
+      newdata = data[indices.j, , drop=FALSE],
       n.ahead = length(indices.j)
     ), dots)
 
