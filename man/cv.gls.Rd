@@ -74,16 +74,16 @@ frame with data to which the model is to be fit.}
 
 \item{k}{number of folds, an integer \eqn{\gt 2}; the default is \code{10}.}
 
-\item{reps}{ignored (to match \code{\link{cv}()} generic function.)}
+\item{reps}{ignored (to match \code{\link{cv}()} generic function).}
 
-\item{seed}{ignored (to match \code{\link{cv}()} generic function.)}
+\item{seed}{ignored (to match \code{\link{cv}()} generic function).}
 
 \item{criterion.name}{name of the CV criterion; can usually be
 inferred from \code{criterion}.}
 
 \item{i.only}{if \code{TRUE} (the default is \code{FALSE}), predict
 the response for cases in the i-th fold from the model fit to data
-in the preceding fold only rather than fit to data from \emph{all}
+in the preceding fold \emph{only} rather than fit to data from \emph{all}
 preceding folds.}
 
 \item{details}{return fold-wise statistics, including the CV criterion
@@ -108,7 +108,7 @@ a typical R regression model).}
 \item{subset}{subsetting expression.}
 
 \item{na.action}{function to process missing data; the default,
-\code{na.pass}, will pass missing data to the \code{\link{arima}()}
+\code{\link{na.pass}}, will pass missing data to the \code{\link{arima}()}
 function.}
 
 \item{order}{the \eqn{p, d, q} specification of the ARIMA model;
@@ -118,19 +118,32 @@ see \code{\link{arima}()} for details.}
 
 \item{object}{an object of class \code{"ARIMA"}.}
 
-\item{n.ahead}{number of future cases to predict; the default is \code{1}.}
+\item{n.ahead}{number of future cases to predict.}
 
-\item{newdata}{data frame with \code{n.ahead} rows containing the
-predictors (if any) for the predicted future cases.}
+\item{newdata}{data frame with rows containing the
+predictors (if any) for predicted future cases.}
 
 \item{se.fit}{if \code{TRUE} (the default is \code{FALSE}), compute
 the standard errors of the predictions.}
 }
+\value{
+the \code{\link{cv}()} methods return objects of class \code{"cv"}.
+\code{Arima()} returns an object of class \code{"Arima"} with the
+following components: \code{formula}, the model formula; \code{data},
+the data set to which the model was fit; \code{subset}, the subset
+expression (if specified); \code{na.nation}, see \code{\link{na.pass}}; \code{order}, the
+order of the ARIMA model; \code{call}, the function call;
+\code{dots}, any other arguments specified; \code{arima},
+the object returned by the \code{\link{arima}()} function,
+which \code{Arima()} calls;
+\code{response}, the response variable; \code{model.matrix},
+the model matrix, if there are predictors in the model.
+}
 \description{
 \code{\link{cv}()} methods for time-series models of class \code{"gls"}, fit
-by the \code{\link[nlme]{gls}()} in the \pkg{lme4} package, and
-by \code{Arima()}, which provides a formula interface to the
-\code{link{arima}()}) function.
+by \code{\link[nlme]{gls}()} in the \pkg{lme4} package, and
+for models fit by \code{Arima()}, which provides a formula interface to the
+\code{\link{arima}()}) function.
 }
 \section{Functions}{
 \itemize{

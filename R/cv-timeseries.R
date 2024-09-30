@@ -1,9 +1,9 @@
 #' Cross-Validate Mixed-Effects Model
 #'
 #' \code{\link{cv}()} methods for time-series models of class \code{"gls"}, fit
-#' by the \code{\link[nlme]{gls}()} in the \pkg{lme4} package, and
-#' by \code{Arima()}, which provides a formula interface to the
-#' \code{link{arima}()}) function.
+#' by \code{\link[nlme]{gls}()} in the \pkg{lme4} package, and
+#' for models fit by \code{Arima()}, which provides a formula interface to the
+#' \code{\link{arima}()}) function.
 #'
 #' @param model an object of class \code{"gls"} produced by the
 #' \code{\link[nlme]{gls}()} function, or of class \code{"ARIMA"}
@@ -14,11 +14,11 @@
 #' @param criterion function to compute the CV cost criterion
 #' (default \code{\link{mse}}).
 #' @param k number of folds, an integer \eqn{\gt 2}; the default is \code{10}.
-#' @param reps ignored (to match \code{\link{cv}()} generic function.)
-#' @param seed ignored (to match \code{\link{cv}()} generic function.)
+#' @param reps ignored (to match \code{\link{cv}()} generic function).
+#' @param seed ignored (to match \code{\link{cv}()} generic function).
 #' @param i.only if \code{TRUE} (the default is \code{FALSE}), predict
 #' the response for cases in the i-th fold from the model fit to data
-#' in the preceding fold only rather than fit to data from \emph{all}
+#' in the preceding fold \emph{only} rather than fit to data from \emph{all}
 #' preceding folds.
 #' @param criterion.name name of the CV criterion; can usually be
 #' inferred from \code{criterion}.
@@ -156,7 +156,7 @@ cv.gls <- function(model,
 #' a typical R regression model).
 #' @param subset subsetting expression.
 #' @param na.action function to process missing data; the default,
-#' \code{na.pass}, will pass missing data to the \code{\link{arima}()}
+#' \code{\link{na.pass}}, will pass missing data to the \code{\link{arima}()}
 #' function.
 #' @param order the \eqn{p, d, q} specification of the ARIMA model;
 #' see \code{\link{arima}()} for details.
@@ -244,11 +244,24 @@ coef.ARIMA <- function(object, ...) coef(object$arima)
 #' @export
 model.matrix.ARIMA <- function(object, ...) object$model.matrix
 
-#' @param n.ahead number of future cases to predict; the default is \code{1}.
-#' @param newdata data frame with \code{n.ahead} rows containing the
-#' predictors (if any) for the predicted future cases.
+#' @param n.ahead number of future cases to predict.
+#' @param newdata data frame with rows containing the
+#' predictors (if any) for predicted future cases.
 #' @param se.fit if \code{TRUE} (the default is \code{FALSE}), compute
 #' the standard errors of the predictions.
+#'
+#' @returns the \code{\link{cv}()} methods return objects of class \code{"cv"}.
+#'   \code{Arima()} returns an object of class \code{"Arima"} with the
+#'   following components: \code{formula}, the model formula; \code{data},
+#'   the data set to which the model was fit; \code{subset}, the subset
+#'   expression (if specified); \code{na.nation}, see \code{\link{na.pass}}; \code{order}, the
+#'   order of the ARIMA model; \code{call}, the function call;
+#'   \code{dots}, any other arguments specified; \code{arima},
+#'   the object returned by the \code{\link{arima}()} function,
+#'   which \code{Arima()} calls;
+#'   \code{response}, the response variable; \code{model.matrix},
+#'   the model matrix, if there are predictors in the model.
+#'
 #' @describeIn cv.gls \code{predict()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
