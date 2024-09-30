@@ -254,7 +254,7 @@ model.matrix.ARIMA <- function(object, ...) object$model.matrix
 #'   \code{Arima()} returns an object of class \code{"Arima"} with the
 #'   following components: \code{formula}, the model formula; \code{data},
 #'   the data set to which the model was fit; \code{subset}, the subset
-#'   expression (if specified); \code{na.nation}, see \code{\link{na.pass}}; \code{order}, the
+#'   expression (if specified); \code{na.action}, see \code{\link{na.pass}}; \code{order}, the
 #'   order of the ARIMA model; \code{call}, the function call;
 #'   \code{dots}, any other arguments specified; \code{arima},
 #'   the object returned by the \code{\link{arima}()} function,
