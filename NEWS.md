@@ -1,6 +1,6 @@
 # cv 2.0.3
 
-- New plot.cv() and plot.cvList() methods.
+- New plot.cv() and plot.cvList() methods. 
 
 - New cvInfo() accessor function with "cv", "cvList", "cvModList", and "cvSelect" methods.
 
