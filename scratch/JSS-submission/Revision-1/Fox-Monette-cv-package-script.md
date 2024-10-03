@@ -35,8 +35,11 @@ sessionInfo()
 ## [1] knitr_1.48
 ## 
 ## loaded via a namespace (and not attached):
-## [1] compiler_4.4.1    tools_4.4.1       rstudioapi_0.16.0
-## [4] xfun_0.46         evaluate_0.24.0
+##  [1] compiler_4.4.1    fastmap_1.2.0     cli_3.6.3        
+##  [4] htmltools_0.5.8.1 tools_4.4.1       rstudioapi_0.16.0
+##  [7] yaml_2.3.10       rmarkdown_2.28    pkgload_1.4.0    
+## [10] xfun_0.47         digest_0.6.37     rlang_1.1.4      
+## [13] evaluate_1.0.0
 ```
 
 ``` r
@@ -193,9 +196,12 @@ brief(m.auto)
 ```
 
 ```
-##            (Intercept) poly(horsepower, 2)1 poly(horsepower, 2)2
-## Estimate        23.446              -120.14                44.09
-## Std. Error       0.221                 4.37                 4.37
+##            (Intercept) poly(horsepower, 2)1
+## Estimate        23.446              -120.14
+## Std. Error       0.221                 4.37
+##            poly(horsepower, 2)2
+## Estimate                  44.09
+## Std. Error                 4.37
 ## 
 ##  Residual SD = 4.37 on 389 df, R-squared = 0.688
 ```
@@ -205,11 +211,11 @@ brief(m.auto)
 ```
 
 ```
-## R RNG seed set to 707059
+## R RNG seed set to 977616
 ```
 
 ```
-## cross-validation criterion (mse) = 19.385
+## cross-validation criterion (mse) = 19.231
 ```
 
 ``` r
@@ -220,9 +226,9 @@ summary(cv.auto)
 ## 10-Fold Cross Validation
 ## method: Woodbury
 ## criterion: mse
-## cross-validation criterion = 19.385
-## bias-adjusted cross-validation criterion = 19.364
-## 95% CI for bias-adjusted CV criterion = (15.876, 22.852)
+## cross-validation criterion = 19.231
+## bias-adjusted cross-validation criterion = 19.218
+## 95% CI for bias-adjusted CV criterion = (15.757, 22.679)
 ## full-sample criterion = 18.985
 ```
 
@@ -274,18 +280,18 @@ print(microbenchmark::microbenchmark(
 ```
 
 ```
-## Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k
-## = "loo"), : less accurate nanosecond times to avoid potential
-## integer overflows
+## Warning in microbenchmark::microbenchmark(hatvalues =
+## cv(m.auto, k = "loo"), : less accurate nanosecond times to
+## avoid potential integer overflows
 ```
 
 ```
 ## Unit: relative
-##       expr   min    lq  mean median     uq    max neval cld
-##  hatvalues   1.0   1.0   1.0      1   1.00   1.00    10 a  
-##   Woodbury  11.4  11.3  10.4     10   9.49   9.73    10 a  
-##      naive 190.0 189.0 165.0    167 153.00 130.00    10  b 
-##     cv.glm 330.0 329.0 300.0    297 281.00 258.00    10   c
+##       expr   min    lq  mean median     uq max neval cld
+##  hatvalues   1.0   1.0   1.0   1.00   1.00   1    10 a  
+##   Woodbury  11.3  11.1  10.5   9.84   9.23  11    10 a  
+##      naive 194.0 191.0 195.0 197.00 203.00 181    10  b 
+##     cv.glm 339.0 333.0 304.0 299.00 272.00 273    10   c
 ```
 
 ``` r
@@ -304,8 +310,10 @@ mlist[2] # 2nd degree polyomial
 ## lm(formula = mpg ~ poly(horsepower, p), data = Auto)
 ## 
 ## Coefficients:
-##          (Intercept)  poly(horsepower, p)1  poly(horsepower, p)2  
-##                 23.4                -120.1                  44.1
+##          (Intercept)  poly(horsepower, p)1  
+##                 23.4                -120.1  
+## poly(horsepower, p)2  
+##                 44.1
 ```
 
 ``` r
@@ -1007,60 +1015,71 @@ compareFolds(cvs)
 ##  9.1812  4.2507 
 ## 
 ## Coefficients by folds:
-##         (Intercept) horsepower lam.acceleration lam.displacement
-## Fold 1      9.71384   -0.17408          0.50000          0.00000
-## Fold 2      9.21713   -0.31480          0.00000          0.00000
-## Fold 3      9.61824   -0.19248          0.00000          0.00000
-## Fold 4      8.69910   -0.25523          0.50000          0.00000
-## Fold 5      9.14403   -0.14934          0.00000          0.00000
-## Fold 6      9.63481   -0.16739          0.50000          0.00000
-## Fold 7      9.98933   -0.36847          0.00000          0.00000
-## Fold 8      9.06301   -0.29721          0.00000          0.00000
-## Fold 9      8.88315   -0.22684          0.00000          0.00000
-## Fold 10     9.61727   -0.17086          0.00000          0.00000
-##         lam.horsepower lam.weight   lambda   weight   year71
-## Fold 1         0.00000    0.00000  0.00000 -0.74636  0.03764
-## Fold 2         0.00000    0.00000  0.00000 -0.47728  0.02173
-## Fold 3         0.00000    0.00000  0.00000 -0.72085  0.01128
-## Fold 4         0.00000    0.00000  0.00000 -0.53846  0.02153
-## Fold 5         0.00000    0.00000  0.00000 -0.69081  0.02531
-## Fold 6         0.00000    0.00000  0.00000 -0.74049  0.02456
-## Fold 7        -0.15447    0.00000  0.00000 -0.72843  0.02532
-## Fold 8         0.00000    0.00000  0.00000 -0.46392  0.02702
-## Fold 9         0.00000    0.00000  0.00000 -0.47136  0.00860
-## Fold 10        0.00000    0.00000  0.00000 -0.73550  0.02937
-##           year72   year73   year74   year75   year76   year77
-## Fold 1  -0.00327 -0.02477  0.05606  0.07080  0.07250  0.14420
-## Fold 2  -0.01488 -0.03770  0.04312  0.04031  0.06718  0.13094
-## Fold 3  -0.02569 -0.03872  0.05187  0.03837  0.06399  0.11593
-## Fold 4  -0.02922 -0.05181  0.04136  0.04072  0.05537  0.12292
-## Fold 5  -0.01062 -0.04625  0.05039  0.05596  0.07044  0.13356
-## Fold 6   0.00759 -0.03412  0.06266  0.06940  0.07769  0.14211
-## Fold 7  -0.01271 -0.04144  0.04568  0.03614  0.07385  0.12976
-## Fold 8  -0.02041 -0.05605  0.04437  0.06573  0.08135  0.13158
-## Fold 9  -0.03620 -0.04835  0.01906  0.03018  0.05846  0.10536
-## Fold 10 -0.00899 -0.03814  0.05408  0.04881  0.07862  0.14101
-##           year78   year79   year80   year81   year82 acceleration
-## Fold 1   0.14281  0.23266  0.35127  0.25635  0.30546             
-## Fold 2   0.14917  0.21871  0.33192  0.26196  0.30943     -0.18909
-## Fold 3   0.12601  0.20499  0.32821  0.24478  0.29204             
-## Fold 4   0.14083  0.22878  0.32947  0.25140  0.27248     -0.03484
-## Fold 5   0.14724  0.24675  0.33331  0.26938  0.32594             
-## Fold 6   0.14647  0.23532  0.34761  0.26737  0.33062             
-## Fold 7   0.14040  0.23976  0.33998  0.27652  0.30659             
-## Fold 8   0.13987  0.23011  0.32880  0.25886  0.30538     -0.17676
-## Fold 9   0.11722  0.20665  0.31533  0.23352  0.29375     -0.14514
-## Fold 10  0.14313  0.23258  0.35649  0.26214  0.32421             
-##         displacement cylinders5-6 cylinders8 originEUR originJAP
-## Fold 1                                                          
-## Fold 2      -0.09197                                            
-## Fold 3                                                          
-## Fold 4                   -0.09080   -0.10909                    
-## Fold 5                                         0.06261      0.04
-## Fold 6                                                          
-## Fold 7                                                          
-## Fold 8      -0.10542                                            
-## Fold 9      -0.13452                                            
+##         (Intercept) horsepower lam.acceleration
+## Fold 1      9.71384   -0.17408          0.50000
+## Fold 2      9.21713   -0.31480          0.00000
+## Fold 3      9.61824   -0.19248          0.00000
+## Fold 4      8.69910   -0.25523          0.50000
+## Fold 5      9.14403   -0.14934          0.00000
+## Fold 6      9.63481   -0.16739          0.50000
+## Fold 7      9.98933   -0.36847          0.00000
+## Fold 8      9.06301   -0.29721          0.00000
+## Fold 9      8.88315   -0.22684          0.00000
+## Fold 10     9.61727   -0.17086          0.00000
+##         lam.displacement lam.horsepower lam.weight   lambda
+## Fold 1           0.00000        0.00000    0.00000  0.00000
+## Fold 2           0.00000        0.00000    0.00000  0.00000
+## Fold 3           0.00000        0.00000    0.00000  0.00000
+## Fold 4           0.00000        0.00000    0.00000  0.00000
+## Fold 5           0.00000        0.00000    0.00000  0.00000
+## Fold 6           0.00000        0.00000    0.00000  0.00000
+## Fold 7           0.00000       -0.15447    0.00000  0.00000
+## Fold 8           0.00000        0.00000    0.00000  0.00000
+## Fold 9           0.00000        0.00000    0.00000  0.00000
+## Fold 10          0.00000        0.00000    0.00000  0.00000
+##           weight   year71   year72   year73   year74   year75
+## Fold 1  -0.74636  0.03764 -0.00327 -0.02477  0.05606  0.07080
+## Fold 2  -0.47728  0.02173 -0.01488 -0.03770  0.04312  0.04031
+## Fold 3  -0.72085  0.01128 -0.02569 -0.03872  0.05187  0.03837
+## Fold 4  -0.53846  0.02153 -0.02922 -0.05181  0.04136  0.04072
+## Fold 5  -0.69081  0.02531 -0.01062 -0.04625  0.05039  0.05596
+## Fold 6  -0.74049  0.02456  0.00759 -0.03412  0.06266  0.06940
+## Fold 7  -0.72843  0.02532 -0.01271 -0.04144  0.04568  0.03614
+## Fold 8  -0.46392  0.02702 -0.02041 -0.05605  0.04437  0.06573
+## Fold 9  -0.47136  0.00860 -0.03620 -0.04835  0.01906  0.03018
+## Fold 10 -0.73550  0.02937 -0.00899 -0.03814  0.05408  0.04881
+##           year76   year77   year78   year79   year80   year81
+## Fold 1   0.07250  0.14420  0.14281  0.23266  0.35127  0.25635
+## Fold 2   0.06718  0.13094  0.14917  0.21871  0.33192  0.26196
+## Fold 3   0.06399  0.11593  0.12601  0.20499  0.32821  0.24478
+## Fold 4   0.05537  0.12292  0.14083  0.22878  0.32947  0.25140
+## Fold 5   0.07044  0.13356  0.14724  0.24675  0.33331  0.26938
+## Fold 6   0.07769  0.14211  0.14647  0.23532  0.34761  0.26737
+## Fold 7   0.07385  0.12976  0.14040  0.23976  0.33998  0.27652
+## Fold 8   0.08135  0.13158  0.13987  0.23011  0.32880  0.25886
+## Fold 9   0.05846  0.10536  0.11722  0.20665  0.31533  0.23352
+## Fold 10  0.07862  0.14101  0.14313  0.23258  0.35649  0.26214
+##           year82 acceleration displacement cylinders5-6
+## Fold 1   0.30546                                       
+## Fold 2   0.30943     -0.18909     -0.09197             
+## Fold 3   0.29204                                       
+## Fold 4   0.27248     -0.03484                  -0.09080
+## Fold 5   0.32594                                       
+## Fold 6   0.33062                                       
+## Fold 7   0.30659                                       
+## Fold 8   0.30538     -0.17676     -0.10542             
+## Fold 9   0.29375     -0.14514     -0.13452             
+## Fold 10  0.32421                                       
+##         cylinders8 originEUR originJAP
+## Fold 1                                
+## Fold 2                                
+## Fold 3                                
+## Fold 4    -0.10909                    
+## Fold 5               0.06261      0.04
+## Fold 6                                
+## Fold 7                                
+## Fold 8                                
+## Fold 9                                
 ## Fold 10
 ```
 
@@ -1093,18 +1112,18 @@ brief(m.sel <- cvInfo(metaCV.auto, "selected model"))
 ```
 
 ```
-##            (Intercept) poly(horsepower, p)1 poly(horsepower, p)2
-## Estimate        23.446               -120.1                 44.1
-## Std. Error       0.217                  4.3                  4.3
-##            poly(horsepower, p)3 poly(horsepower, p)4
-## Estimate                  -3.95                -5.19
-## Std. Error                 4.30                 4.30
-##            poly(horsepower, p)5 poly(horsepower, p)6
-## Estimate                   13.3                -8.55
+##            (Intercept) poly(horsepower, p)1
+## Estimate        23.446               -120.1
+## Std. Error       0.217                  4.3
+##            poly(horsepower, p)2 poly(horsepower, p)3
+## Estimate                   44.1                -3.95
 ## Std. Error                  4.3                 4.30
-##            poly(horsepower, p)7
-## Estimate                   7.98
-## Std. Error                 4.30
+##            poly(horsepower, p)4 poly(horsepower, p)5
+## Estimate                  -5.19                 13.3
+## Std. Error                 4.30                  4.3
+##            poly(horsepower, p)6 poly(horsepower, p)7
+## Estimate                  -8.55                 7.98
+## Std. Error                 4.30                 4.30
 ## 
 ##  Residual SD = 4.3 on 384 df, R-squared = 0.702
 ```
@@ -1164,13 +1183,20 @@ summary(BEPS)
 ##  Mean   :3.14            Mean   :3.33   Mean   :2.75  
 ##  3rd Qu.:4.00            3rd Qu.:4.00   3rd Qu.:4.00  
 ##  Max.   :5.00            Max.   :5.00   Max.   :5.00  
-##     Kennedy         Europe      political.knowledge    gender   
-##  Min.   :1.00   Min.   : 1.00   Min.   :0.00        female:812  
-##  1st Qu.:2.00   1st Qu.: 4.00   1st Qu.:0.00        male  :713  
-##  Median :3.00   Median : 6.00   Median :2.00                    
-##  Mean   :3.14   Mean   : 6.73   Mean   :1.54                    
-##  3rd Qu.:4.00   3rd Qu.:10.00   3rd Qu.:2.00                    
-##  Max.   :5.00   Max.   :11.00   Max.   :3.00
+##     Kennedy         Europe      political.knowledge
+##  Min.   :1.00   Min.   : 1.00   Min.   :0.00       
+##  1st Qu.:2.00   1st Qu.: 4.00   1st Qu.:0.00       
+##  Median :3.00   Median : 6.00   Median :2.00       
+##  Mean   :3.14   Mean   : 6.73   Mean   :1.54       
+##  3rd Qu.:4.00   3rd Qu.:10.00   3rd Qu.:2.00       
+##  Max.   :5.00   Max.   :11.00   Max.   :3.00       
+##     gender   
+##  female:812  
+##  male  :713  
+##              
+##              
+##              
+## 
 ```
 
 ``` r
@@ -1200,18 +1226,18 @@ BayesRule
 ```
 
 ```
-## function(y, yhat) {
-##   if (!all(y %in% c(0, 1)))
-##     stop("response values not all 0 or 1")
-##   if (any(yhat < 0) ||
-##       any(yhat > 1))
-##     stop("fitted values outside of interval [0, 1]")
-##   yhat <- round(yhat)
-##   result <- mean(y != yhat) # proportion in error
-##   attr(result, "casewise loss") <- "y != round(yhat)"
-##   result
+## function (y, yhat) 
+## {
+##     if (!all(y %in% c(0, 1))) 
+##         stop("response values not all 0 or 1")
+##     if (any(yhat < 0) || any(yhat > 1)) 
+##         stop("fitted values outside of interval [0, 1]")
+##     yhat <- round(yhat)
+##     result <- mean(y != yhat)
+##     attr(result, "casewise loss") <- "y != round(yhat)"
+##     result
 ## }
-## <bytecode: 0x135f47008>
+## <bytecode: 0x1685f00a8>
 ## <environment: namespace:cv>
 ```
 
@@ -1529,13 +1555,20 @@ print(microbenchmark::microbenchmark(
 
 ```
 ## Unit: relative
-##          expr    min     lq   mean median     uq  max neval   cld
-##  cv.hatvalues    1.0    1.0    1.0    1.0    1.0    1    10 a    
-##       cv.wood   79.5   66.8   66.7   64.4   61.9   63    10 a    
-##      cv.exact 3540.0 3050.0 3060.0 3010.0 2840.0 2900    10  b   
-##        direct 4150.0 3500.0 3450.0 3340.0 3170.0 3220    10   c  
-##       rsample 4520.0 3820.0 3800.0 3600.0 3550.0 3870    10    d 
-##         caret 5120.0 4440.0 4310.0 4230.0 3960.0 3970    10     e
+##          expr    min     lq   mean median     uq  max neval
+##  cv.hatvalues    1.0    1.0    1.0    1.0    1.0    1    10
+##       cv.wood   75.4   66.4   74.4   68.7   64.9  121    10
+##      cv.exact 3410.0 3110.0 2950.0 3100.0 2750.0 2450    10
+##        direct 3750.0 3320.0 3220.0 3340.0 3030.0 2730    10
+##       rsample 4150.0 3710.0 3600.0 3790.0 3340.0 3050    10
+##         caret 4920.0 4270.0 4120.0 4220.0 3800.0 3560    10
+##    cld
+##  a    
+##  a    
+##   b   
+##    c  
+##     d 
+##      e
 ```
 
 ``` r
@@ -1566,54 +1599,60 @@ sessionInfo()
 ## other attached packages:
 ##  [1] caret_6.0-94        ggplot2_3.5.1       purrr_1.0.2        
 ##  [4] rsample_1.2.1       nnet_7.3-19         MASS_7.3-61        
-##  [7] latticeExtra_0.6-30 lattice_0.22-6      glmmTMB_1.1.9      
-## [10] lme4_1.1-35.5       Matrix_1.7-0        car_3.1-3          
+##  [7] latticeExtra_0.6-30 lattice_0.22-6      glmmTMB_1.1.10     
+## [10] lme4_1.1-35.5       Matrix_1.7-0        car_3.1-4          
 ## [13] carData_3.0-5       cv_2.0.3            doParallel_1.0.17  
 ## [16] iterators_1.0.14    foreach_1.5.2       knitr_1.48         
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyselect_1.2.1      timeDate_4032.109    
-##  [3] dplyr_1.1.4           TH.data_1.1-2        
-##  [5] pROC_1.18.5           rpart_4.1.23         
-##  [7] digest_0.6.36         timechange_0.3.0     
-##  [9] lifecycle_1.0.4       survival_3.7-0       
-## [11] magrittr_2.0.3        compiler_4.4.1       
-## [13] rlang_1.1.4           tools_4.4.1          
-## [15] utf8_1.2.4            data.table_1.15.4    
-## [17] interp_1.1-6          plyr_1.8.9           
-## [19] RColorBrewer_1.1-3    multcomp_1.4-26      
-## [21] abind_1.4-5           withr_3.0.1          
-## [23] numDeriv_2016.8-1.1   effects_4.2-3        
-## [25] stats4_4.4.1          grid_4.4.1           
-## [27] fansi_1.0.6           e1071_1.7-14         
-## [29] colorspace_2.1-1      future_1.34.0        
-## [31] globals_0.16.3        scales_1.3.0         
-## [33] insight_0.20.2        cli_3.6.3            
-## [35] mvtnorm_1.2-5         survey_4.4-2         
-## [37] generics_0.1.3        future.apply_1.11.2  
-## [39] rstudioapi_0.16.0     reshape2_1.4.4       
-## [41] proxy_0.4-27          minqa_1.2.8          
-## [43] DBI_1.2.3             stringr_1.5.1        
-## [45] splines_4.4.1         mitools_2.4          
-## [47] vctrs_0.6.5           hardhat_1.4.0        
-## [49] boot_1.3-30           sandwich_3.1-0       
-## [51] Formula_1.2-5         listenv_0.9.1        
-## [53] jpeg_0.1-10           gower_1.0.1          
-## [55] tidyr_1.3.1           recipes_1.1.0        
-## [57] glue_1.7.0            parallelly_1.38.0    
-## [59] nloptr_2.1.1          codetools_0.2-20     
-## [61] stringi_1.8.4         lubridate_1.9.3      
-## [63] gtable_0.3.5          deldir_2.0-4         
-## [65] munsell_0.5.1         tibble_3.2.1         
-## [67] furrr_0.3.1           pillar_1.9.0         
-## [69] ipred_0.9-15          lava_1.8.0           
-## [71] R6_2.5.1              TMB_1.9.14           
-## [73] microbenchmark_1.4.10 evaluate_0.24.0      
-## [75] png_0.1-8             backports_1.5.0      
-## [77] broom_1.0.6           class_7.3-22         
-## [79] Rcpp_1.0.13           prodlim_2024.06.25   
-## [81] nlme_3.1-165          mgcv_1.9-1           
-## [83] xfun_0.46             ModelMetrics_1.2.2.2 
-## [85] zoo_1.8-12            pkgconfig_2.0.3
+##  [1] Rdpack_2.6.1         DBI_1.2.3           
+##  [3] pROC_1.18.5          deldir_2.0-4        
+##  [5] sandwich_3.1-1       rlang_1.1.4         
+##  [7] magrittr_2.0.3       multcomp_1.4-26     
+##  [9] furrr_0.3.1          e1071_1.7-16        
+## [11] compiler_4.4.1       mgcv_1.9-1          
+## [13] reshape2_1.4.4       png_0.1-8           
+## [15] vctrs_0.6.5          stringr_1.5.1       
+## [17] pkgconfig_2.0.3      fastmap_1.2.0       
+## [19] backports_1.5.0      utf8_1.2.4          
+## [21] rmarkdown_2.28       prodlim_2024.06.25  
+## [23] nloptr_2.1.1         xfun_0.47           
+## [25] recipes_1.1.0        jpeg_0.1-10         
+## [27] broom_1.0.7          R6_2.5.1            
+## [29] stringi_1.8.4        RColorBrewer_1.1-3  
+## [31] parallelly_1.38.0    boot_1.3-31         
+## [33] pkgload_1.4.0        rpart_4.1.23        
+## [35] lubridate_1.9.3      numDeriv_2016.8-1.1 
+## [37] estimability_1.5.1   Rcpp_1.0.13         
+## [39] future.apply_1.11.2  zoo_1.8-12          
+## [41] timechange_0.3.0     splines_4.4.1       
+## [43] tidyselect_1.2.1     rstudioapi_0.16.0   
+## [45] effects_4.2-3        abind_1.4-8         
+## [47] yaml_2.3.10          timeDate_4041.110   
+## [49] TMB_1.9.15           codetools_0.2-20    
+## [51] listenv_0.9.1        tibble_3.2.1        
+## [53] plyr_1.8.9           withr_3.0.1         
+## [55] coda_0.19-4.1        evaluate_1.0.0      
+## [57] future_1.34.0        survival_3.7-0      
+## [59] proxy_0.4-27         survey_4.4-2        
+## [61] pillar_1.9.0         stats4_4.4.1        
+## [63] reformulas_0.3.0     insight_0.20.5      
+## [65] generics_0.1.3       munsell_0.5.1       
+## [67] scales_1.3.0         minqa_1.2.8         
+## [69] globals_0.16.3       xtable_1.8-4        
+## [71] class_7.3-22         glue_1.8.0          
+## [73] emmeans_1.10.4       tools_4.4.1         
+## [75] interp_1.1-6         data.table_1.16.0   
+## [77] ModelMetrics_1.2.2.2 gower_1.0.1         
+## [79] mvtnorm_1.3-1        grid_4.4.1          
+## [81] tidyr_1.3.1          mitools_2.4         
+## [83] rbibutils_2.2.16     ipred_0.9-15        
+## [85] colorspace_2.1-1     nlme_3.1-166        
+## [87] Formula_1.2-5        cli_3.6.3           
+## [89] fansi_1.0.6          lava_1.8.0          
+## [91] dplyr_1.1.4          gtable_0.3.5        
+## [93] digest_0.6.37        TH.data_1.1-2       
+## [95] htmltools_0.5.8.1    lifecycle_1.0.4     
+## [97] hardhat_1.4.0        microbenchmark_1.5.0
 ```
 
