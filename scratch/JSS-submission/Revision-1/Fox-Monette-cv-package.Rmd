@@ -561,7 +561,7 @@ In summary, when between-cluster variation is relatively large, the model \code{
 
 As @HastieTibshiraniFriedman:2009 [Sec. 7.10.2: "The Wrong and Right Way to Do Cross-validation"] explain, if the whole data are used to specify or fine-tune a statistical model, then subsequent cross-validation of the model is intrinsically misleading, because the model is selected to fit the whole data, including the part of the data that remains when each fold is removed.  Statistical modeling is partly a craft, and one could imagine applying that craft independently to successive partial data sets, each with a fold removed. The resulting procedure would be tedious, though possibly worth the effort, but it would also be difficult to realize in practice: After all, we can hardly erase our memory of statistical modeling choices between analyzing partial data sets. Alternatively, if we're able to automate the process of model specification, then we can more realistically apply CV mechanically. 
 
-The \code{"function"} method for \code{cv()} cross-validates a model-specification process in a general manner. Functions for four such model-specification processes are included in the package: \code{selectStepAIC()}, based on the \code{stepAIC()} function in the \pkg{MASS} package [@VenablesRipley:2002], performs stepwise predictor selection for regression models; \code{selectTrans()}, based on the \code{powerTransform()} function in the \pkg{car} package, transforms predictors and the response in a regression model towards normality; \code{selectTransAndStepAIC()}---the use of which we illustrate in the current section---performs both of these procedures sequentially; and \code{selectModelList()}---also illustrated in the current section---uses CV both to select one of several competing models, and then, recursively, to estimate prediction error for the selected model, a process that we term "meta cross-validation."[^adding-model-selection]
+The \code{"function"} method for \code{cv()} cross-validates a model-specification process in a general manner. Functions for four such model-specification processes are included in the package: \code{selectStepAIC()}, based on the \code{stepAIC()} function in the \pkg{MASS} package [@VenablesRipley:2002], performs stepwise predictor selection for regression models; \code{selectTrans()}, based on the \code{powerTransform()} function in the \pkg{car} package, transforms predictors and the response in a regression model towards normality; \code{selectTransStepAIC()}---the use of which we illustrate in the current section---performs both of these procedures sequentially; and \code{selectModelList()}---also illustrated in the current section---uses CV both to select one of several competing models, and then, recursively, to estimate prediction error for the selected model, a process that we term "meta cross-validation."[^adding-model-selection]
 
 [^adding-model-selection]: In a vignette on extending the \pkg{cv} package, we explain how to specify additional model-selection procedures.
 
@@ -684,7 +684,7 @@ A perhaps subtle point is that we compute the MSE for the selected model on the 
 
 [^medAbsErr]: That's slightly uncomfortable given the skewed distribution of \code{mpg}. An alternative is to use a robust measure of model lack-of-fit, such as the median absolute error instead of the mean-squared error, employing the \code{medAbsErr()} function from the \pkg{cv} package. The median absolute error, however, cannot be expressed as a casewise average (see Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
 
-The \code{"function"} method for \code{cv()} allows us to cross-validate the whole model-selection procedure. The first argument to \code{cv()}---here \code{selectTransAndStepAIC}---is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion:
+The \code{"function"} method for \code{cv()} allows us to cross-validate the whole model-selection procedure. The first argument to \code{cv()}---here \code{selectTransStepAIC}---is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion:
 ```{r Auto-transform-and-select}
 num.predictors
 cvs <- cv(selectTransStepAIC, data = Auto, seed = 76692, 
@@ -949,7 +949,7 @@ print(microbenchmark::microbenchmark(
               trControl = trainControl(method = "LOOCV")),
   times = 10, unit = "relative"), signif = 3)
 ```
-Computing time for \pkg{rsample} and \pkg{caret} for this problem is similar to direct computation of LOO CV and to \code{cv()} with \code{method="exact"}, but almost two orders of magnitude slower than \code{cv()} with \code{method="Woodbury"}, and more than three orders of magnitude slower then \code{cv()} with \code{method="hatvalues"}.
+Computing time for \pkg{rsample} and \pkg{caret} for this problem is similar to direct computation of LOO CV and to \code{cv()} with \code{method="exact"}, but almost two orders of magnitude slower than \code{cv()} with \code{method="Woodbury"}, and more than three orders of magnitude slower than \code{cv()} with \code{method="hatvalues"}.
 
 ## Comparing cv to other software for cross-validation: SAS, Stata, and Python
 
