@@ -975,7 +975,7 @@ The programming language \proglang{Python} is often the software of choice for "
 
 Functions for cross-validation are provided in \pkg{scikit-learn}, which supports $k$-fold, repeated $k$-fold, and leave-one-out CV. These functions can be applied to data sets consisting of independent observations, hierarchical groups, or time-series data.  A sample program in the \pkg{scikit-learn} documentation [@ScikitLearnDevelopers:2024] demonstrates how to implement meta cross-validation (termed "nested cross-validation" in the documentation).
 
-The approach taken by \pkg{scikit-Learn} for independent observations is similar to that in the default \code{cv()} function in the \pkg{cv} package. The approach for hierarchical data is similar, but not identical, to that in \pkg{cv} (as described in Section \ref{cross-validating-mixed-effects-models}). Our \code{cv()} package doesn't currently provide for cross-validating time-series models.
+The approach taken by \pkg{scikit-learn} for independent observations is similar to that in the default \code{cv()} function in the \pkg{cv} package. The approach for hierarchical data is similar, but not identical, to that in \pkg{cv} (as described in Section \ref{cross-validating-mixed-effects-models}). Our \code{cv()} package doesn't currently provide for cross-validating time-series models.
 
 
 # Computational notes
