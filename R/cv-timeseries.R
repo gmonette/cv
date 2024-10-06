@@ -16,10 +16,12 @@
 #' @param k number of folds, an integer \eqn{\gt 2}; the default is \code{10}.
 #' @param reps ignored (to match \code{\link{cv}()} generic function).
 #' @param seed ignored (to match \code{\link{cv}()} generic function).
-#' @param i.only if \code{TRUE} (the default is \code{FALSE}), predict
+#' @param fold.type if \code{"cumulate"} (the default), predict
 #' the response for cases in the i-th fold from the model fit to data
-#' in the preceding fold \emph{only} rather than fit to data from \emph{all}
-#' preceding folds.
+#' all preceding folds; if \code{"preceding"}, predict using cases in
+#' the immediately preceding fold only; if \code{"all"}, predict using all
+#' other folds, including those in the future (available for \code{"gls"}
+#' models but not for \code{"ARIMA"} models).
 #' @param criterion.name name of the CV criterion; can usually be
 #' inferred from \code{criterion}.
 #' @param details return fold-wise statistics, including the CV criterion
@@ -39,7 +41,8 @@
 #'            correlation = corAR1(form = ~ 1 | Mare))
 #' fm1
 #' summary(cv(fm1, k=5, confint = TRUE))
-#' summary(cv(fm1, k=5, confint = TRUE, i.only = TRUE))
+#' summary(cv(fm1, k=5, confint = TRUE, fold.type="preceding"))
+#' summary(cv(fm1, k=5, confint = TRUE, fold.type="all"))
 #' })
 #' }
 #'
@@ -51,7 +54,7 @@
 #' lh.arima <- Arima(~lh, data=LH)
 #' lh.arima
 #' summary(cv(lh.arima, k=5))
-#' summary(cv(lh.arima, k=5, i.only=TRUE))
+#' summary(cv(lh.arima, k=5, fold.type="preceding"))
 #'
 #' # model adapted from help("arima")
 #' Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
@@ -59,7 +62,7 @@
 #'                   order=c(2, 0, 0))
 #' lake.arima
 #' summary(cv(lake.arima, k=5))
-#' summary(cv(lake.arima, k=5, i.only=TRUE))
+#' summary(cv(lake.arima, k=5, fold.type="preceding"))
 #' })
 #' }
 
@@ -72,7 +75,7 @@ cv.gls <- function(model,
                    reps,
                    seed,
                    criterion.name = deparse(substitute(criterion)),
-                   i.only = FALSE,
+                   fold.type=c("cumulative", "preceding", "all"),
                    details = k <= 10L,
                    confint = n >= 400L,
                    level = 0.95,
@@ -81,7 +84,7 @@ cv.gls <- function(model,
 
   f <- function(i, ...) {
     # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i, i.only = i.only)
+    indices.i <- fold(folds, i, fold.type = fold.type)
     model.i <- update(model, data = data[indices.i, ])
     fit.all.i <- predict(model.i, newdata = data, ...)
     fit.i <- fit.all.i[fold(folds, i, predict = TRUE)]
@@ -100,7 +103,7 @@ cv.gls <- function(model,
                     ...) {
     # helper function to compute cv criterion for each fold
     #  with parallel computations
-    indices.i <- fold(folds, i, i.only = i.only)
+    indices.i <- fold(folds, i, fold.type = fold.type)
     assign(model.function.name, model.function)
     assign(cor.function.name, cor.function)
     # the following deals with a scoping issue that can
@@ -117,6 +120,8 @@ cv.gls <- function(model,
       coef.i = coef(predict.args$object)
     )
   }
+
+  fold.type <- match.arg(fold.type)
 
   call <- getCall(model)
 
@@ -135,7 +140,7 @@ cv.gls <- function(model,
     criterion = criterion,
     criterion.name = criterion.name,
     k = k,
-    i.only = i.only,
+    fold.type = fold.type,
     details = details,
     confint = confint,
     level = level,
@@ -289,7 +294,7 @@ cv.ARIMA <- function(model,
                    k = 10L,
                    reps,
                    seed,
-                   i.only = FALSE,
+                   fold.type = c("cumulative", "preceding"),
                    criterion.name = deparse(substitute(criterion)),
                    details = k <= 10L,
                    ncores = 1L,
@@ -297,7 +302,7 @@ cv.ARIMA <- function(model,
 
   f <- function(i, ...) {
     # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i, i.only = i.only)
+    indices.i <- fold(folds, i, fold.type=fold.type)
     indices.j <- fold(folds, i, predict=TRUE)
     model.i <- update(model, data = data[indices.i, , drop=FALSE])
     fit.i <- predict(model.i, n.ahead=length(indices.j),
@@ -314,7 +319,7 @@ cv.ARIMA <- function(model,
                     ...) {
     # helper function to compute cv criterion for each fold
     #  with parallel computations
-    indices.i <- fold(folds, i, i.only = i.only)
+    indices.i <- fold(folds, i, fold.type=fold.type)
     indices.j <- fold(folds, i, predict=TRUE)
     assign(model.function.name, model.function)
     # the following deals with a scoping issue that can
@@ -332,6 +337,8 @@ cv.ARIMA <- function(model,
     )
   }
 
+  fold.type <- match.arg(fold.type)
+
   x.names <- colnames(model$model.matrix)
 
   call <- getCall(model)
@@ -345,7 +352,7 @@ cv.ARIMA <- function(model,
     criterion = criterion,
     criterion.name = criterion.name,
     k = k,
-    i.only = i.only,
+    fold.type=fold.type,
     confint=FALSE,
     details = details,
     ncores = ncores,

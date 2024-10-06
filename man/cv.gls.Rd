@@ -19,7 +19,7 @@
   reps,
   seed,
   criterion.name = deparse(substitute(criterion)),
-  i.only = FALSE,
+  fold.type = c("cumulative", "preceding", "all"),
   details = k <= 10L,
   confint = n >= 400L,
   level = 0.95,
@@ -53,7 +53,7 @@ Arima(
   k = 10L,
   reps,
   seed,
-  i.only = FALSE,
+  fold.type = c("cumulative", "preceding"),
   criterion.name = deparse(substitute(criterion)),
   details = k <= 10L,
   ncores = 1L,
@@ -81,10 +81,12 @@ frame with data to which the model is to be fit.}
 \item{criterion.name}{name of the CV criterion; can usually be
 inferred from \code{criterion}.}
 
-\item{i.only}{if \code{TRUE} (the default is \code{FALSE}), predict
+\item{fold.type}{if \code{"cumulate"} (the default), predict
 the response for cases in the i-th fold from the model fit to data
-in the preceding fold \emph{only} rather than fit to data from \emph{all}
-preceding folds.}
+all preceding folds; if \code{"preceding"}, predict using cases in
+the immediately preceding fold only; if \code{"all"}, predict using all
+other folds, including those in the future (available for \code{"gls"}
+models but not for \code{"ARIMA"} models).}
 
 \item{details}{return fold-wise statistics, including the CV criterion
 and parameter estimates for cases in each fold after the first;
@@ -131,7 +133,7 @@ the \code{\link{cv}()} methods return objects of class \code{"cv"}.
 \code{Arima()} returns an object of class \code{"Arima"} with the
 following components: \code{formula}, the model formula; \code{data},
 the data set to which the model was fit; \code{subset}, the subset
-expression (if specified); \code{na.nation}, see \code{\link{na.pass}}; \code{order}, the
+expression (if specified); \code{na.action}, see \code{\link{na.pass}}; \code{order}, the
 order of the ARIMA model; \code{call}, the function call;
 \code{dots}, any other arguments specified; \code{arima},
 the object returned by the \code{\link{arima}()} function,
@@ -179,7 +181,8 @@ fm1 <- gls(follicles ~ sin(2*pi*Time) + cos(2*pi*Time), Ovary,
            correlation = corAR1(form = ~ 1 | Mare))
 fm1
 summary(cv(fm1, k=5, confint = TRUE))
-summary(cv(fm1, k=5, confint = TRUE, i.only = TRUE))
+summary(cv(fm1, k=5, confint = TRUE, fold.type="preceding"))
+summary(cv(fm1, k=5, confint = TRUE, fold.type="all"))
 })
 }
 
@@ -191,7 +194,7 @@ LH <- data.frame(lh = lh)
 lh.arima <- Arima(~lh, data=LH)
 lh.arima
 summary(cv(lh.arima, k=5))
-summary(cv(lh.arima, k=5, i.only=TRUE))
+summary(cv(lh.arima, k=5, fold.type="preceding"))
 
 # model adapted from help("arima")
 Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
@@ -199,7 +202,7 @@ lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                   order=c(2, 0, 0))
 lake.arima
 summary(cv(lake.arima, k=5))
-summary(cv(lake.arima, k=5, i.only=TRUE))
+summary(cv(lake.arima, k=5, fold.type="preceding"))
 })
 }
 }

@@ -651,6 +651,14 @@ summary.cv <- function(object, digits = getOption("digits"), ...) {
         paste0("{", paste(object[["clusters"]], collapse = ", "), "}"),
         "clusters")
   }
+  if (!is.null(object[["fold.type"]])){
+    fold.type <- switch(object[["fold.type"]],
+      cumulative = "all preceding folds",
+      preceding = "immediately preceding fold",
+      all = "all other folds"
+    )
+    cat("\ntime-series predictions based on", fold.type)
+  }
   if (!is.null(object[["method"]]))
     cat("\nmethod:", object[["method"]])
   if (!is.null(object[["criterion"]]) && object[["criterion"]] != "criterion")

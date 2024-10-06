@@ -863,17 +863,18 @@ cvSelect <- function(procedure,
     return(res)
   }
 }
-#' @param i.only if \code{TRUE} (the default is \code{FALSE}), predict
+#' @param fold.type if \code{"cumulate"} (the default), predict
 #' the response for cases in the i-th fold from the model fit to data
-#' in the preceding fold only rather than fit to data from \emph{all}
-#' preceding folds.
+#' all preceding folds; if \code{"preceding"}, predict using cases in
+#' the immediately preceding fold only; if \code{"all"}, predict using all
+#' other folds, including those in the future.
 #' @param ordered if \code{TRUE} (the default is \code{FALSE}), create
 #' ordered folds for cross-validating a timeseries model.
 #' @describeIn cvCompute used internally by \code{cv()} methods for
 #' cross-validating time-series models.
 #' @export
 cvOrdered <- function(model,
-                      i.only = FALSE,
+                      fold.type = c("cumulative", "preceding", "all"),
                       data = insight::get_data(model),
                       criterion = mse,
                       criterion.name,
@@ -891,6 +892,9 @@ cvOrdered <- function(model,
                       model.function = NULL,
                       model.function.name = NULL,
                       ...) {
+
+ fold.type <- match.arg(fold.type)
+
   if (missing(fPara) && ncores > 1)
     stop("parallel processing not available for models of class '",
          class(model), "'")
@@ -1006,7 +1010,8 @@ cvOrdered <- function(model,
       coef(model)
     else
       NULL,
-    "details" = list(criterion = crit.i, coefficients = coef.i)
+    "details" = list(criterion = crit.i, coefficients = coef.i),
+    fold.type = fold.type
   )
   if (missing(method) || is.null(method))
     result$method <- NULL
@@ -1077,14 +1082,22 @@ fold.folds <- function(folds, i, ...)
 #' @describeIn cvCompute to extract a fold from an \code{"orderedfolds"} object.
 #' @export
 fold.orderedfolds <- function(folds, i, predicted=FALSE,
-                              i.only=FALSE, ...){
+                              fold.type=c("cumulative", "preceding", "all"), ...){
+  fold.type <- match.arg(fold.type)
   if (i > (kk <- folds$k - 1)) stop("fold ", i, "out of range 1 to ", kk - 1 )
   if (predicted) {
     folds$starts[i + 1]:folds$ends[i + 1]
-  } else if (i.only) {
+  } else if (fold.type == "preceding") {
     folds$starts[i]:folds$ends[i]
-  } else {
+  } else if (fold.type == "cumulative"){
     1:folds$ends[i]
+  } else {
+    if (i == kk) {
+      1:folds$ends[i]
+    }
+    else {
+      c(1:folds$ends[i], folds$starts[i + 2]:folds$ends[folds$k])
+    }
   }
 }
 

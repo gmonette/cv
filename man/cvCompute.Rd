@@ -85,7 +85,7 @@ cvSelect(
 
 cvOrdered(
   model,
-  i.only = FALSE,
+  fold.type = c("cumulative", "preceding", "all"),
   data = insight::get_data(model),
   criterion = mse,
   criterion.name,
@@ -111,7 +111,13 @@ fold(folds, i, ...)
 
 \method{fold}{folds}(folds, i, ...)
 
-\method{fold}{orderedfolds}(folds, i, predicted = FALSE, i.only = FALSE, ...)
+\method{fold}{orderedfolds}(
+  folds,
+  i,
+  predicted = FALSE,
+  fold.type = c("cumulative", "preceding", "all"),
+  ...
+)
 
 \method{print}{folds}(x, ...)
 
@@ -239,10 +245,11 @@ is set to the value of \code{save.coef}.}
 
 \item{save.model}{save the model that's selected using the \emph{full} data set.}
 
-\item{i.only}{if \code{TRUE} (the default is \code{FALSE}), predict
+\item{fold.type}{if \code{"cumulate"} (the default), predict
 the response for cases in the i-th fold from the model fit to data
-in the preceding fold only rather than fit to data from \emph{all}
-preceding folds.}
+all preceding folds; if \code{"preceding"}, predict using cases in
+the immediately preceding fold only; if \code{"all"}, predict using all
+other folds, including those in the future.}
 
 \item{n}{number of cases, for constructed folds.}
 
