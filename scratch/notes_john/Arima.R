@@ -60,7 +60,7 @@ Arima <- function(formula,
 
     if (d > 0) {
       y <- diff(y, difference = d)
-      x <- x[-(1:d), ]
+      x <- x[-(1:d), , drop=FALSE]
     }
     res <- nlme::gls(
       y ~ x - 1,
@@ -150,7 +150,17 @@ update.ARIMA <- function(object, ...){
   result
 }
 
-coef.ARIMA <- function(object, ...) coef(object$arima)
+coef.ARIMA_arima <- function(object, ...) coef(object$arima)
+coef.ARIMA_gls <- function(object, ...) {
+  b <- object$coefficients
+  cor <- capture.output(print(object$corStruct))
+  names.b <- names(b)
+  names.c <- strsplit(trimws(cor[2]), "[[:space:]]+")[[1]]
+  c <- as.numeric(strsplit(trimws(cor[3]), "[[:space:]]+")[[1]])
+  result <- c(c, b)
+  names(result) <- c(names.c, names.b)
+  result
+}
 
 model.matrix.ARIMA <- function(object, ...) object$model.matrix
 
@@ -200,26 +210,41 @@ if (FALSE) {
   head(L1)
   head(L2)
 
-  Arima(log(level) ~ I(year - 1920),
+  a.a <- Arima(log(level) ~ I(year - 1920),
         order = c(1, 1, 1),
         data = Lake)
-  Arima(log(level) ~ I(year - 1920),
+  a.g <- Arima(log(level) ~ I(year - 1920) - 1,
         order = c(1, 1, 1),
         data = Lake,
         method = "ML",
         arima.method="gls")
+  a.a
+  a.g
+  coef(a.a)
+  coef(a.g)
 
-  Arima(level ~ I(year - 1920),
+
+  a.a <- Arima(level ~ I(year - 1920),
         order = c(2, 0, 0),
         data = Lake)
-  Arima(level ~ I(year - 1920),
+  a.g <- Arima(level ~ I(year - 1920),
         order = c(2, 0, 0),
         data = Lake,
         method = "ML",
         arima.method = "gls")
+  a.a
+  a.g
+  coef(a.a)
+  coef(a.g)
+  head(model.matrix(a.a))
+  head(model.matrix(a.g))
 
   LH <- data.frame(lh = lh)
-  Arima( ~ lh, data = LH)
-  Arima(lh ~ 1, data = LH, method = "ML", arima.method="gls")
+  a.a <- Arima( ~ lh, data = LH)
+  a.g <- Arima(lh ~ 1, data = LH, method = "ML", arima.method="gls")
+  a.a
+  summary(a.g)
+  coef(a.a)
+  coef(a.g)
 
 }
