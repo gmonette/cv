@@ -37,7 +37,7 @@ Arima <- function(formula,
       result$response <- x[, 1]
     } else {
       y <- model.response(mf, "numeric")
-      if (!is.vector(y) && is.numeric(y))
+      if (!((is.ts(y) || is.vector(y)) && is.numeric(y)))
         stop("formula must specify a single response")
       result$arima <- stats::arima(y, order = order, xreg = x, ...)
       result$response <- y
@@ -55,7 +55,7 @@ Arima <- function(formula,
     p <- order[1]
     d <- order[2]
     q <- order[3]
-    if (!is.vector(y) && is.numeric(y))
+    if (!((is.ts(y) || is.vector(y)) && is.numeric(y)))
       stop("formula must specify a single response")
 
     if (d > 0) {
@@ -80,9 +80,7 @@ Arima <- function(formula,
       subset = subset,
       na.action = na.action,
       contrasts = res$contrasts,
-      p = p,
-      d = d,
-      q = q,
+      order = c(p, d, q),
       call = cl,
       dots = dots,
       response = y,
@@ -129,17 +127,19 @@ print.ARIMA_arima <- function(x, ...){
   invisible(x)
 }
 
-update.ARIMA <- function(object, ...){
+update.ARIMA_arima <- function(object, ...){
   cl0 <- object$call
   cl <- match.call()
   args <- object$dots
   args[c("formula", "data", "subset", "na.action", "order")] <-
     object[c("formula", "data", "subset", "na.action", "order")]
+  args$arima.method <- "arima"
   dots <- list(...)
   names <- names(dots)
-  for (name in names){
-    args[[name]]  <- dots[[name]]
-  }
+  # for (name in names){
+  #   args[[name]]  <- dots[[name]]
+  # }
+  args[names] <- dots[names]
   result <- do.call(Arima, args)
   names <- names(cl)
   for (name in names){
@@ -148,6 +148,28 @@ update.ARIMA <- function(object, ...){
   }
   result$call <- cl0
   result
+}
+
+update.ARIMA_gls <- function(object, ...){
+  args <- list(...)
+  arg.names <- names(args)
+  if (!("formula" %in% arg.names)) args$formula <- object$formula
+  if (!("data" %in% arg.names)) {
+    args$data <- object$data
+    data.name <- object$call[["data"]]
+    } else {
+      data.name <- NULL
+    }
+  if (!("subset" %in% arg.names)) args$subset <- object$subset
+  if (!("na.action" %in% arg.names)) args$na.action <- object$na.action
+  if (!("order" %in% arg.names)) args$order <- object$order
+  if (!("method" %in% arg.names)) args$method <- object$method
+  args$arima.method <- "gls"
+  result <- do.call("Arima", args)
+  if (!is.null(data.name)){
+    result$call[["data"]] <- data.name
+  }
+    result
 }
 
 coef.ARIMA_arima <- function(object, ...) coef(object$arima)
@@ -176,7 +198,6 @@ predict.ARIMA_arima <- function(object, n.ahead, newdata = NULL,
   }
   predict(object$arima, n.ahead=n.ahead, newxreg=new.x,
           se.fit=se.fit, ...)
-
 }
 
 print.ARIMA_gls <- function(object, ...) {
@@ -222,7 +243,7 @@ if (FALSE) {
   a.g
   coef(a.a)
   coef(a.g)
-
+  predict(a.a, newdata=data.frame(year=c(1973, 1974)))
 
   a.a <- Arima(level ~ I(year - 1920),
         order = c(2, 0, 0),
@@ -238,6 +259,8 @@ if (FALSE) {
   coef(a.g)
   head(model.matrix(a.a))
   head(model.matrix(a.g))
+  update(a.a, order=c(1, 0, 1))
+  update(a.g, order=c(1, 0, 1))
 
   LH <- data.frame(lh = lh)
   a.a <- Arima( ~ lh, data = LH)
@@ -246,5 +269,8 @@ if (FALSE) {
   summary(a.g)
   coef(a.a)
   coef(a.g)
+  update(a.a, subset = 1:40)
+  update(a.g, subset = 1:40)
+  predict(a.a, n.ahead=3)
 
 }
