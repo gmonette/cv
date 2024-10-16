@@ -1,0 +1,5 @@
+Thank you for reading the paper and replication script so carefully. We've addressed both of the issues you identified:
+
+(1) We intentionally didn't set the seed in the call to cv() in (cv.auto <- cv(m.auto, confint = TRUE)) to show that cv() sets, saves, and reports the seed to make the results replicable. We can make our paper and script replicable by setting the seed *outside* of the call to cv(). We've now done that, invisibly in the paper and visibly in the replication script.
+
+(2) Yes, Fig. 9 was incorrect in the replication script (we failed to update it to correspond to the revised paper); it's now fixed. By the way, here and in a few other places, the results in the replication script include what's shown in the paper but add some more information -- here, panels for the factors in the model. In this case, we saved space in the paper by omitting these panels, which don't show the effect of transforming the numeric predictors.
