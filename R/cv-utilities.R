@@ -955,6 +955,7 @@ cvOrdered <- function(model,
     j <- seq_along(lead)
     for (i in 1L:(k - 1)) {
       ii <- fold(folds, i, predict = TRUE, lead=lead)
+      if (is.null(ii)) break
       jj <- j[seq_along(ii)]
       index <- cbind(ii, jj)
       yhat[index] <- result[[i]]$fit.i[jj]
@@ -968,6 +969,7 @@ cvOrdered <- function(model,
     for (i in 1L:(k - 1L)) {
       result[[i]] <- f(i)
       ii <- fold(folds, i, predict = TRUE, lead=lead)
+      if (is.null(ii)) break
       jj <- j[seq_along(ii)]
       index <- cbind(ii, jj)
       yhat[index] <- result[[i]]$fit.i[jj]
@@ -1087,7 +1089,8 @@ fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L,
   if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
   if (predicted) {
     j <- folds$starts[i + 1] + lead - 1L
-    if (min(j) > folds$n) stop("smallest index of predicted cases (", min(j),") is out of range (> ", folds$n, ")")
+    if (min(j) > folds$n) return(NULL)
+     # stop("smallest index of predicted cases (", min(j),") is out of range (> ", folds$n, ")")
     j[j <= folds$n]
   } else if (fold.type == "preceding") {
     folds$starts[i]:folds$ends[i]
