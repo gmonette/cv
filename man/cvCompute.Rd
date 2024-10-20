@@ -19,6 +19,7 @@
 \alias{GetResponse.modList}
 \alias{GetResponse.gls}
 \alias{GetResponse.ARIMA}
+\alias{plot.cvOrdered}
 \title{Utility Functions for the cv Package}
 \usage{
 cvCompute(
@@ -139,6 +140,8 @@ GetResponse(model, ...)
 \method{GetResponse}{gls}(model, ...)
 
 \method{GetResponse}{ARIMA}(model, ...)
+
+\method{plot}{cvOrdered}(x, y, xlab = "lead", ylab = x$criterion, ...)
 }
 \arguments{
 \item{model}{a regression model object.}
@@ -207,7 +210,9 @@ e.g., \code{nnet::multinom}.}
 \code{"multinom"}.}
 
 \item{...}{to match generic; passed to \code{predict()} for the default method,
-and to \code{fPara()} (for parallel computations) in \code{cvCompute()}.}
+to \code{fPara()} (for parallel computations) in \code{cvCompute()},
+and to the standard R \code{\link{plot}()} function for the
+\code{"cvOrdered"} \code{plot()} method.}
 
 \item{package}{the name of the package in which mixed-modeling function (or functions) employed resides;
 used to get the namespace of the package.}
@@ -271,7 +276,14 @@ ordered folds for cross-validating a timeseries model.}
 the index (or indices) of the case(s) to be predicted; otherwise, return the indices
 of the cases used to fit the predictive model.}
 
-\item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed}
+\item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed,
+or a \code{"cvOfdered"} object to be plotted.}
+
+\item{y}{ignored, to match the standard R \code{plot()} generic.}
+
+\item{xlab}{label for horizontal axis.}
+
+\item{ylab}{label for vertical axis.}
 }
 \value{
 The utility functions return various kinds of objects:
@@ -370,6 +382,8 @@ from a regression model.
 \item \code{GetResponse(gls)}: \code{"gls"} method.
 
 \item \code{GetResponse(ARIMA)}: \code{"ARIMA"} method.
+
+\item \code{plot(cvOrdered)}: \code{plot()} method for \code{"cvOrdered"} objects.
 
 }}
 \examples{

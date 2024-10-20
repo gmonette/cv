@@ -43,7 +43,9 @@
 #' @param folds an object of class \code{"folds"}.
 #' @param i a fold number for an object of class \code{"folds"}.
 #' @param ... to match generic; passed to \code{predict()} for the default method,
-#' and to \code{fPara()} (for parallel computations) in \code{cvCompute()}.
+#' to \code{fPara()} (for parallel computations) in \code{cvCompute()},
+#' and to the standard R \code{\link{plot}()} function for the
+#' \code{"cvOrdered"} \code{plot()} method.
 #' @param f function to be called by \code{cvCompute()} for each fold.
 #' @param fPara function to be called by \code{cvCompute()} for each fold
 #' using parallel computation.
@@ -79,7 +81,9 @@
 #' model, the response can be specified by an expression, such as \code{expression(log(income))},
 #' to be evaluated within the data set provided by the \code{data} argument.
 #' @param save.model save the model that's selected using the \emph{full} data set.
-#' @param x a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed
+#' @param x a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed,
+#' or a \code{"cvOfdered"} object to be plotted.
+#' @param y ignored, to match the standard R \code{plot()} generic.
 #' @param model.function a regression function, typically for a new \code{cv()} method,
 #' residing in a package that's not a declared dependency of the \pkg{cv} package,
 #' e.g., \code{nnet::multinom}.
@@ -1211,6 +1215,33 @@ GetResponse.gls <- function(model, ...) {
 #' @export
 GetResponse.ARIMA <- function(model, ...) {
   model$response
+}
+
+#' @importFrom graphics text
+#' @param xlab label for horizontal axis.
+#' @param ylab label for vertical axis.
+#' @describeIn cvCompute \code{plot()} method for \code{"cvOrdered"} objects.
+#' @export
+plot.cvOrdered <- function(x, y, xlab = "lead",
+                           ylab = x$criterion, ...){
+  plot(x$lead, x[["CV crit"]], type="b", pch=16,
+       col=car::carPalette()[2], xlab=xlab, ylab=ylab,
+       ylim=range(c(x[["full crit"]], x[["CV crit"]])),
+       axes=FALSE, frame.plot=TRUE,
+       ...)
+  axis(2)
+  axis(1, at=x$lead)
+  text(x$lead[1], x[["CV crit"]][1], pos=4, offset=1,
+       labels=paste0("CV ", x$criterion),
+       col=car::carPalette()[2])
+  abline(h=x[["full crit"]], lty=2, col=car::carPalette()[3],
+         lwd=2)
+  usr <- par("usr")
+  text(usr[1] + 0.02*(usr[2] - usr[1]),
+       x[["full crit"]] + 0.02*(usr[4] - usr[3]),
+       adj=c(0, 0),
+       labels=paste0("in-sample ", x$criterion),
+       col=car::carPalette()[3])
 }
 
 # not exported
