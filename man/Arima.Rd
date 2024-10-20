@@ -43,7 +43,7 @@ Arima(
   k = "n",
   reps,
   seed,
-  fold.type = c("cumulative", "preceding"),
+  fold.type = c("cumulative", "preceding", "window"),
   begin.with = max(25, ceiling(n/10)),
   lead = 1L,
   criterion.name = deparse(substitute(criterion)),
@@ -109,7 +109,8 @@ each contain a single case; that makes sense if \code{fold.type = "cumulative"}.
 \item{fold.type}{if \code{"cumulative"} (the default), predict
 the response for 1 or more cases after the i-th fold from the model fit to data
 in the \code{i}th and all preceding folds; if \code{"preceding"}, predict using cases in
-the \code{i}th fold only.}
+the \code{i}th fold only; if \code{"window"}, folds comprise a moving window
+of \code{begin.with} cases.}
 
 \item{begin.with}{the number of cases in
 the first fold. The remaining cases are divided among the subsequent

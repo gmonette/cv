@@ -19,7 +19,8 @@
 #' @param fold.type if \code{"cumulative"} (the default), predict
 #' the response for 1 or more cases after the i-th fold from the model fit to data
 #' in the \code{i}th and all preceding folds; if \code{"preceding"}, predict using cases in
-#' the \code{i}th fold only.
+#' the \code{i}th fold only; if \code{"window"}, folds comprise a moving window
+#' of \code{begin.with} cases.
 #' @param lead how far ahead to predict (can be a vector of positive integers);
 #' the default is \code{1}.
 #' @param criterion.name name of the CV criterion; can usually be
@@ -218,7 +219,7 @@ cv.ARIMA <- function(model,
                    k = "n",
                    reps,
                    seed,
-                   fold.type = c("cumulative", "preceding"),
+                   fold.type = c("cumulative", "preceding", "window"),
                    begin.with=max(25, ceiling(n/10)),
                    lead = 1L,
                    criterion.name = deparse(substitute(criterion)),
@@ -228,7 +229,7 @@ cv.ARIMA <- function(model,
 
   f <- function(i, ...) {
     # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i, fold.type=fold.type)
+    indices.i <- fold(folds, i) #, fold.type=fold.type)
     indices.j <- fold(folds, i, predict=TRUE, lead=lead)
     model.i <- update(model, data = data[indices.i, , drop=FALSE])
     fit.i <- predict(model.i, n.ahead=max(lead),
@@ -245,7 +246,7 @@ cv.ARIMA <- function(model,
                     ...) {
     # helper function to compute cv criterion for each fold
     #  with parallel computations
-    indices.i <- fold(folds, i, fold.type=fold.type)
+    indices.i <- fold(folds, i) #, fold.type=fold.type)
     indices.j <- fold(folds, i, predict=TRUE, lead=lead)
     assign(model.function.name, model.function)
     # the following deals with a scoping issue that can

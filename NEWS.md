@@ -1,6 +1,10 @@
 # cv 2.1.0
 
-- New cvOrdered() to support timeseries models, used by new cv.gls() and cv.arima() methods.
+- New Arima() function, provides formula interface to standard-R arima() function.
+
+- New cvOrdered() to support timeseries models, used by new cv.ARIMA() method.
+
+- Corresponding changes to folds() and  fold() to support timeseries data.
 
 # cv 2.0.3
 

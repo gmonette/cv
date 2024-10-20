@@ -667,14 +667,14 @@ summary.cv <- function(object, digits = getOption("digits"), ...) {
     fold.type <- switch(object[["fold.type"]],
       cumulative = "all preceding folds",
       preceding = "immediately preceding fold",
-      all = "all other folds"
+      window = "moving window folds"
     )
     cat("\ntime-series predictions based on", fold.type)
   }
   if (!is.null(object[["lead"]])){
     cat(paste0("\nprediction at lead",
-               if (length(object[["lead"]]) > 1) "s"),
-        ":", object[["lead"]])
+               if (length(object[["lead"]]) > 1) "s", ":"),
+        object[["lead"]])
   }
   if (!is.null(object[["method"]]))
     cat("\nmethod:", object[["method"]])

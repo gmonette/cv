@@ -10,7 +10,6 @@
 \alias{fold.folds}
 \alias{fold.orderedfolds}
 \alias{print.folds}
-\alias{print.orderedfolds}
 \alias{GetResponse}
 \alias{GetResponse.default}
 \alias{GetResponse.merMod}
@@ -86,7 +85,7 @@ cvSelect(
 
 cvOrdered(
   model,
-  fold.type = c("cumulative", "preceding"),
+  fold.type = c("cumulative", "preceding", "window"),
   begin.with = max(25, ceiling(n/10)),
   lead = 1L,
   data = insight::get_data(model),
@@ -106,24 +105,20 @@ cvOrdered(
   ...
 )
 
-folds(n, k, ordered = FALSE, begin.with = max(25, ceiling(n/10)))
+folds(
+  n,
+  k,
+  fold.type = c("unordered", "cumulative", "preceding", "window"),
+  begin.with = max(25L, ceiling(n/10))
+)
 
 fold(folds, i, ...)
 
 \method{fold}{folds}(folds, i, ...)
 
-\method{fold}{orderedfolds}(
-  folds,
-  i,
-  predicted = FALSE,
-  lead = 1L,
-  fold.type = c("cumulative", "preceding"),
-  ...
-)
+\method{fold}{orderedfolds}(folds, i, predicted = FALSE, lead = 1L, ...)
 
 \method{print}{folds}(x, ...)
-
-\method{print}{orderedfolds}(x, ...)
 
 GetResponse(model, ...)
 
@@ -251,10 +246,13 @@ is set to the value of \code{save.coef}.}
 
 \item{save.model}{save the model that's selected using the \emph{full} data set.}
 
-\item{fold.type}{if \code{"cumulative"} (the default), predict
+\item{fold.type}{for \code{cvCompute()}, if \code{"cumulative"} (the default), predict
 the response for cases in the i-th fold from the model fit to data
 all preceding folds; if \code{"preceding"}, predict using cases in
-the immediately preceding fold only.}
+the immediately preceding fold only; if \code{"window"}, folds comprise a moving window
+of \code{begin.with} cases. For \code{folds()}, similar, except that the
+additional value \code{"unordered"} is the default (producing unordered folds
+for ordinary CV).}
 
 \item{begin.with}{if \code{ordered} is \code{TRUE}, the number of cases in
 the first fold. The remaining cases are divided among the subsequent
@@ -264,9 +262,6 @@ the first fold. The remaining cases are divided among the subsequent
 the default is \code{1}.}
 
 \item{n}{number of cases, for constructed folds.}
-
-\item{ordered}{if \code{TRUE} (the default is \code{FALSE}), create
-ordered folds for cross-validating a timeseries model.}
 
 \item{folds}{an object of class \code{"folds"}.}
 
@@ -363,8 +358,6 @@ cross-validating time-series models.
 \item \code{fold(orderedfolds)}: to extract a fold from an \code{"orderedfolds"} object.
 
 \item \code{print(folds)}: \code{print()} method for \code{"folds"} objects.
-
-\item \code{print(orderedfolds)}: \code{print()} method for \code{"otderedfolds"} objects.
 
 \item \code{GetResponse()}: function to return the response variable
 from a regression model.

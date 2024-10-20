@@ -870,12 +870,13 @@ cvSelect <- function(procedure,
     return(res)
   }
 }
-#' @param fold.type if \code{"cumulative"} (the default), predict
+#' @param fold.type for \code{cvCompute()}, if \code{"cumulative"} (the default), predict
 #' the response for cases in the i-th fold from the model fit to data
 #' all preceding folds; if \code{"preceding"}, predict using cases in
-#' the immediately preceding fold only.
-#' @param ordered if \code{TRUE} (the default is \code{FALSE}), create
-#' ordered folds for cross-validating a timeseries model.
+#' the immediately preceding fold only; if \code{"window"}, folds comprise a moving window
+#' of \code{begin.with} cases. For \code{folds()}, similar, except that the
+#' additional value \code{"unordered"} is the default (producing unordered folds
+#' for ordinary CV).
 #' @param begin.with if \code{ordered} is \code{TRUE}, the number of cases in
 #' the first fold. The remaining cases are divided among the subsequent
 #' \code{k} - 1 folds.
@@ -883,7 +884,7 @@ cvSelect <- function(procedure,
 #' cross-validating time-series models.
 #' @export
 cvOrdered <- function(model,
-                      fold.type = c("cumulative", "preceding"),
+                      fold.type = c("cumulative", "preceding", "window"),
                       begin.with=max(25, ceiling(n/10)),
                       lead = 1L,
                       data = insight::get_data(model),
@@ -931,7 +932,7 @@ cvOrdered <- function(model,
     stop('k must be an integer > 2')
   }
   message("Note: for ordered data, k-fold CV entails k - 1 fits")
-  folds <- folds(n, k, ordered = TRUE, begin.with=begin.with)
+  folds <- folds(n, k, fold.type=fold.type, begin.with=begin.with)
   k <- folds$k
 
   yhat <- matrix(nrow=n, ncol=length(lead))
@@ -950,7 +951,10 @@ cvOrdered <- function(model,
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:(k - 1)) %dopar% {
-      fPara(i,
+      # ii <- fold(folds, i, predict = TRUE, lead=lead)
+      # if (is.null(ii)) NULL
+      # else
+        fPara(i,
           model.function = model.function,
           model.function.name = model.function.name,
           ...)
@@ -1037,15 +1041,57 @@ cvOrdered <- function(model,
 #   class(result) <- "folds"
 #   result
 # }
-folds <- function(n, k, ordered=FALSE,
-                  begin.with=max(25, ceiling(n/10))) {
-  if (ordered){
-    after.first <- n - begin.with
-    k <- min(k, after.first + 1)
-    nk <- after.first %/% (k - 1L)
-    rem <- after.first %% (k - 1L)
-    folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1)))
-    indices <- 1L:n
+# folds <- function(n, k, ordered=FALSE,
+#                   begin.with=max(25, ceiling(n/10))) {
+#   if (ordered){
+#     after.first <- n - begin.with
+#     k <- min(k, after.first + 1)
+#     nk <- after.first %/% (k - 1L)
+#     rem <- after.first %% (k - 1L)
+#     folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1)))
+#     indices <- 1L:n
+#   } else {
+#     nk <-  n %/% k # number of cases in each fold
+#     rem <- n %% k  # remainder
+#     folds <- rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
+#     indices <- if (n > k)
+#       sample(n, n) # permute cases
+#     else
+#       1L:n
+#   }
+#   ends <- cumsum(folds) # end of each fold
+#   starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
+#   result <- list(
+#     n = n,
+#     k = k,
+#     folds = folds,
+#     starts = starts,
+#     ends = ends,
+#     indices = indices
+#   )
+#   class(result) <- if (ordered) "orderedfolds" else  "folds"
+#   result
+# }
+folds <- function(n, k,
+                  fold.type=c("unordered", "cumulative", "preceding", "window"),
+                  begin.with=max(25L, ceiling(n/10))) {
+  fold.type <- match.arg(fold.type)
+    if (fold.type == "window"){
+      starts <- 1L:(n - begin.with + 1L)
+      ends <- begin.with:n
+      k <- length(starts)
+      folds <- ends - starts + 1L
+      indices <- 1L:n
+    } else if (fold.type %in% c("cumulative", "preceding")) {
+      if (fold.type == "cumulative" && missing(k)) k <- n
+      after.first <- n - begin.with
+      k <- min(k, after.first + 1)
+      nk <- after.first %/% (k - 1L)
+      rem <- after.first %% (k - 1L)
+      folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1)))
+      ends <- cumsum(folds) # end of each fold
+      starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
+      indices <- 1L:n
   } else {
     nk <-  n %/% k # number of cases in each fold
     rem <- n %% k  # remainder
@@ -1054,18 +1100,19 @@ folds <- function(n, k, ordered=FALSE,
       sample(n, n) # permute cases
     else
       1L:n
+    ends <- cumsum(folds) # end of each fold
+    starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
   }
-  ends <- cumsum(folds) # end of each fold
-  starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
   result <- list(
     n = n,
     k = k,
     folds = folds,
     starts = starts,
     ends = ends,
-    indices = indices
+    indices = indices,
+    fold.type = fold.type
   )
-  class(result) <- if (ordered) "orderedfolds" else  "folds"
+  class(result) <- if (fold.type == "unordered") "folds" else c("orderedfolds", "folds")
   result
 }
 
@@ -1087,19 +1134,41 @@ fold.folds <- function(folds, i, ...)
 #' the default is \code{1}.
 #' @describeIn cvCompute to extract a fold from an \code{"orderedfolds"} object.
 #' @export
-fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L,
-                              fold.type=c("cumulative", "preceding"), ...){
-  fold.type <- match.arg(fold.type)
+# fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L,
+#                               fold.type=c("cumulative", "preceding", "window"), ...){
+#   fold.type <- match.arg(fold.type)
+#   if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
+#   if (predicted) {
+#     j <- folds$starts[i + 1] + lead - 1L
+#     if (min(j) > folds$n) return(NULL)
+#      # stop("smallest index of predicted cases (", min(j),") is out of range (> ", folds$n, ")")
+#     j[j <= folds$n]
+#   } else if (fold.type == "preceding") {
+#     folds$starts[i]:folds$ends[i]
+#   } else if (fold.type == "cumulative") {
+#     1:folds$ends[i]
+#   } else {
+#     folds$starts[i]:folds$ends[i]
+#   }
+# }
+
+fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L, ...){
+  fold.type <- folds$fold.type
   if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
   if (predicted) {
-    j <- folds$starts[i + 1] + lead - 1L
+    if (fold.type == "window"){
+      j <- folds$ends[i] + lead
+    } else {
+      j <- folds$starts[i + 1] + lead - 1L
+    }
     if (min(j) > folds$n) return(NULL)
-     # stop("smallest index of predicted cases (", min(j),") is out of range (> ", folds$n, ")")
     j[j <= folds$n]
   } else if (fold.type == "preceding") {
     folds$starts[i]:folds$ends[i]
-  } else {
+  } else if (fold.type == "cumulative") {
     1:folds$ends[i]
+  } else {
+    folds$starts[i]:folds$ends[i]
   }
 }
 
@@ -1110,30 +1179,39 @@ print.folds <- function(x, ...) {
     cat("LOO:", x$k, "folds for", x$n, "cases")
     return(invisible(x))
   }
-  cat(x$k, "folds of approximately", round(x$n / x$k),
-      "cases each")
-  for (i in 1L:min(x$k, 10L)) {
-    cat("\n fold", paste0(i, ": "))
-    fld <- fold(x, i)
-    if (length(fld) <= 10L)
-      cat(fld)
-    else
-      cat(fld[1L:10L], "...")
-  }
-  if (x$k > 10L)
-    cat("\n ...")
+  if (x$fold.type == "window"){
+    cat(x$k, "moving-window folds of", x$folds[1],
+        "cases each")
+  } else if (x$fold.type %in% c("cumulative", "preceding")){
+    cat("initial ordered folds of", x$folds[1], "cases",
+        "\nfollowed by", x$k - 1, "folds of approximately",
+        round((x$n - x$folds[1]) / (x$k - 1)), "cases each")
+  } else {
+      cat(x$k, "folds of approximately", round(x$n / x$k),
+          "cases each")
+      for (i in 1L:min(x$k, 10L)) {
+        cat("\n fold", paste0(i, ": "))
+        fld <- fold(x, i)
+        if (length(fld) <= 10L)
+          cat(fld)
+        else
+          cat(fld[1L:10L], "...")
+      }
+      if (x$k > 10L)
+        cat("\n ...")
+    }
   cat("\n")
   invisible(x)
 }
 
-#' @describeIn cvCompute \code{print()} method for \code{"otderedfolds"} objects.
-#' @export
-print.orderedfolds <- function(x, ...) {
-  cat("initial ordered fold of", x$folds[1], "cases")
-  cat(";", x$k - 1, "additional folds of approximately", round((x$n - x$folds[1]) / (x$k - 1)),
-      "cases each\n")
-  invisible(x)
-}
+#' #' @describeIn cvCompute \code{print()} method for \code{"otderedfolds"} objects.
+#' #' @export
+#' print.orderedfolds <- function(x, ...) {
+#'   cat("initial ordered fold of", x$folds[1], "cases")
+#'   cat(";", x$k - 1, "additional folds of approximately", round((x$n - x$folds[1]) / (x$k - 1)),
+#'       "cases each\n")
+#'   invisible(x)
+#' }
 
 #' @export
 #' @describeIn cvCompute function to return the response variable
