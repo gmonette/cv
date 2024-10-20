@@ -616,20 +616,32 @@ cv.rlm <- function(model, data, criterion, k, reps = 1L, seed, ...) {
 #' @exportS3Method base::print
 print.cv <- function(x, digits = getOption("digits"), ...) {
   rnd <- function(x) {
-    if (round(log10(x)) >= digits)
+    if (max(round(log10(x))) >= digits)
       round(x)
     else
       signif(x, digits)
   }
+  crit <- rnd(x[["CV crit"]])
   if (!is.null(x[["criterion"]]) &&
       x[["criterion"]] != "criterion"){
-    cat(paste0("cross-validation criterion (",
-        x[["criterion"]],
-        ") = ",
-        rnd(x[["CV crit"]])),
-        "\n")
+    if (length(crit) == 1){
+      cat(paste0("cross-validation criterion (",
+          x[["criterion"]],
+          ") = ",
+          crit),
+          "\n")
+    } else {
+      cat(paste0("cross-validation criterion (",
+                 x[["criterion"]], "):\n"))
+      print(crit)
+    }
   } else {
-    cat("cross-validation criterion =", rnd(x[["CV crit"]]), "\n")
+    if (length(crit) == 1){
+      cat("cross-validation criterion =", crit, "\n")
+    } else {
+      cat("cross-validation criterion:")
+      print(crit)
+    }
   }
   invisible(x)
 }
@@ -640,7 +652,7 @@ print.cv <- function(x, digits = getOption("digits"), ...) {
 #' object to be plotted or summarized.
 summary.cv <- function(object, digits = getOption("digits"), ...) {
   rnd <- function(object) {
-    if (round(log10(object)) >= digits)
+    if (max(round(log10(object))) >= digits)
       round(object)
     else
       signif(object, digits)
@@ -659,12 +671,23 @@ summary.cv <- function(object, digits = getOption("digits"), ...) {
     )
     cat("\ntime-series predictions based on", fold.type)
   }
+  if (!is.null(object[["lead"]])){
+    cat(paste0("\nprediction at lead",
+               if (length(object[["lead"]]) > 1) "s"),
+        ":", object[["lead"]])
+  }
   if (!is.null(object[["method"]]))
     cat("\nmethod:", object[["method"]])
   if (!is.null(object[["criterion"]]) && object[["criterion"]] != "criterion")
     cat("\ncriterion:", object[["criterion"]])
   if (is.null(object[["SD CV crit"]])) {
-    cat("\ncross-validation criterion =", rnd(object[["CV crit"]]))
+    crit <- rnd(object[["CV crit"]])
+    if (length(crit) == 1){
+      cat("\ncross-validation criterion =", crit)
+    } else {
+      cat("\ncross-validation criterion:\n")
+      print(crit)
+    }
   } else {
     cat("\ncross-validation criterion = ",
         rnd(object[["CV crit"]]),

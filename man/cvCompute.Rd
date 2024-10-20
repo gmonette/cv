@@ -85,14 +85,14 @@ cvSelect(
 
 cvOrdered(
   model,
-  fold.type = c("cumulative", "preceding", "all"),
+  fold.type = c("cumulative", "preceding"),
+  begin.with = max(25, ceiling(n/10)),
+  lead = 1L,
   data = insight::get_data(model),
   criterion = mse,
   criterion.name,
-  k = 10L,
-  details = k <= 10L,
-  confint,
-  level = 0.95,
+  k = "n",
+  details = n <= 10000,
   method = NULL,
   ncores = 1L,
   type = "response",
@@ -105,7 +105,7 @@ cvOrdered(
   ...
 )
 
-folds(n, k, ordered = FALSE)
+folds(n, k, ordered = FALSE, begin.with = max(25, ceiling(n/10)))
 
 fold(folds, i, ...)
 
@@ -115,7 +115,8 @@ fold(folds, i, ...)
   folds,
   i,
   predicted = FALSE,
-  fold.type = c("cumulative", "preceding", "all"),
+  lead = 1L,
+  fold.type = c("cumulative", "preceding"),
   ...
 )
 
@@ -245,11 +246,17 @@ is set to the value of \code{save.coef}.}
 
 \item{save.model}{save the model that's selected using the \emph{full} data set.}
 
-\item{fold.type}{if \code{"cumulate"} (the default), predict
+\item{fold.type}{if \code{"cumulative"} (the default), predict
 the response for cases in the i-th fold from the model fit to data
 all preceding folds; if \code{"preceding"}, predict using cases in
-the immediately preceding fold only; if \code{"all"}, predict using all
-other folds, including those in the future.}
+the immediately preceding fold only.}
+
+\item{begin.with}{if \code{ordered} is \code{TRUE}, the number of cases in
+the first fold. The remaining cases are divided among the subsequent
+\code{k} - 1 folds.}
+
+\item{lead}{how far ahead to predict (a positive integer or vector of positive integers);
+the default is \code{1}.}
 
 \item{n}{number of cases, for constructed folds.}
 
@@ -261,7 +268,7 @@ ordered folds for cross-validating a timeseries model.}
 \item{i}{a fold number for an object of class \code{"folds"}.}
 
 \item{predicted}{if \code{TRUE} (the default is \code{FALSE}), return
-the indices to the cases to be predicted; otherwise, return the indices
+the index (or indices) of the case(s) to be predicted; otherwise, return the indices
 of the cases used to fit the predictive model.}
 
 \item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed}
@@ -286,9 +293,12 @@ which is literally a list of \code{"cv"} objects.
 \item \code{cvMixed()} also returns an object of class \code{"cv"} or
 \code{"cvList"}.
 
-\item \code{cvSelect} returns an object of class
+\item \code{cvSelect()} returns an object of class
 \code{"cvSelect"} inheriting from \code{"cv"}, or an object of
 class \code{"cvSelectList"} inheriting from \code{"cvList"}.
+
+\item \code{cvOrdered()} returns an object of class
+\code{"cvOrdered"} inheriting from \code{"cv"},
 
 \item \code{folds()} returns an object of class folds, for which
 there are \code{fold()} and \code{print()} methods.

@@ -1,51 +1,34 @@
 #' Cross-Validate Mixed-Effects Model
 #'
-#' \code{\link{cv}()} methods for time-series models of class \code{"gls"}, fit
-#' by \code{\link[nlme]{gls}()} in the \pkg{lme4} package, and
-#' for models fit by \code{Arima()}, which provides a formula interface to the
+#' \code{\link{cv}()} methods for time-series models
+#' fit by \code{Arima()}, which provides a formula interface to the
 #' \code{\link{arima}()}) function.
 #'
-#' @param model an object of class \code{"gls"} produced by the
-#' \code{\link[nlme]{gls}()} function, or of class \code{"ARIMA"}
+#' @param model an object of class \code{"ARIMA"}
 #' produced by the \code{Arima()} function.
 #' @param data data frame with the data to which the model was fit;
 #' can usually be inferred from the model; for \code{Arima()}, a data
 #' frame with data to which the model is to be fit.
 #' @param criterion function to compute the CV cost criterion
 #' (default \code{\link{mse}}).
-#' @param k number of folds, an integer \eqn{\gt 2}; the default is \code{10}.
+#' @param k number of folds, an integer \eqn{\gt 2}; the default is \code{"n"}, in which case
+#' the first fold is determined by \code{begin.with} and subsequent folds
+#' each contain a single case; that makes sense if \code{fold.type = "cumulative"}.
 #' @param reps ignored (to match \code{\link{cv}()} generic function).
 #' @param seed ignored (to match \code{\link{cv}()} generic function).
-#' @param fold.type if \code{"cumulate"} (the default), predict
-#' the response for cases in the i-th fold from the model fit to data
-#' all preceding folds; if \code{"preceding"}, predict using cases in
-#' the immediately preceding fold only; if \code{"all"}, predict using all
-#' other folds, including those in the future (available for \code{"gls"}
-#' models but not for \code{"ARIMA"} models).
+#' @param fold.type if \code{"cumulative"} (the default), predict
+#' the response for 1 or more cases after the i-th fold from the model fit to data
+#' in the \code{i}th and all preceding folds; if \code{"preceding"}, predict using cases in
+#' the \code{i}th fold only.
+#' @param lead how far ahead to predict (can be a vector of positive integers);
+#' the default is \code{1}.
 #' @param criterion.name name of the CV criterion; can usually be
 #' inferred from \code{criterion}.
-#' @param details return fold-wise statistics, including the CV criterion
-#' and parameter estimates for cases in each fold after the first;
-#' the default is \code{TRUE} for \eqn{k \le 10}.
-#' @param confint if \code{TRUE} (the default if \eqn{n \ge 400}), report
-#' a confidence interval for the adjusted CV criterion.
-#' @param level level for the confidence interval (default \code{0.95}).
+#' @param details return fold-wise parameter estimates for cases in each fold after the first;
+#' the default is \code{TRUE} for \eqn{k \le 10,000}.
 #' @param ncores if \code{ncores} \eqn{> 1}, the computation is parallelized.
 #'
 #' @examples
-#'
-#' # model from help("gls", package="nlme")
-#' if (require("nlme", quietly=TRUE)){
-#' withAutoprint({
-#' fm1 <- gls(follicles ~ sin(2*pi*Time) + cos(2*pi*Time), Ovary,
-#'            correlation = corAR1(form = ~ 1 | Mare))
-#' fm1
-#' summary(cv(fm1, k=5, confint = TRUE))
-#' summary(cv(fm1, k=5, confint = TRUE, fold.type="preceding"))
-#' summary(cv(fm1, k=5, confint = TRUE, fold.type="all"))
-#' })
-#' }
-#'
 #' if (require("stats", quietly=TRUE) &&
 #'     require("datasets", quietly=TRUE)){
 #' withAutoprint({
@@ -66,112 +49,30 @@
 #' })
 #' }
 
-#' @describeIn cv.gls \code{cv()} method for \code{\link[nlme]{gls}()} models from the \pkg{nlme} package.
-#' @export
-cv.gls <- function(model,
-                   data = insight::get_data(model),
-                   criterion = mse,
-                   k = 10L,
-                   reps,
-                   seed,
-                   criterion.name = deparse(substitute(criterion)),
-                   fold.type=c("cumulative", "preceding", "all"),
-                   details = k <= 10L,
-                   confint = n >= 400L,
-                   level = 0.95,
-                   ncores = 1L,
-                   ...) {
-
-  f <- function(i, ...) {
-    # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i, fold.type = fold.type)
-    model.i <- update(model, data = data[indices.i, ])
-    fit.all.i <- predict(model.i, newdata = data, ...)
-    fit.i <- fit.all.i[fold(folds, i, predict = TRUE)]
-    list(
-      fit.i = fit.i,
-      crit.all.i = criterion(y, fit.all.i),
-      coef.i = coef(model.i)
-    )
-  }
-
-  fPara <- function(i,
-                    model.function = model.function,
-                    model.function.name,
-                    cor.function = cor.function,
-                    cor.function.name = cor.function.name,
-                    ...) {
-    # helper function to compute cv criterion for each fold
-    #  with parallel computations
-    indices.i <- fold(folds, i, fold.type = fold.type)
-    assign(model.function.name, model.function)
-    assign(cor.function.name, cor.function)
-    # the following deals with a scoping issue that can
-    #   occur with args passed via ... (which is saved in dots)
-    predict.args <- c(list(
-      object = update(model, data = data[indices.i, ]),
-      newdata = data
-    ), dots)
-    fit.all.i <- do.call(predict, predict.args)
-    fit.i <- fit.all.i[fold(folds, i, predict = TRUE)]
-    list(
-      fit.i = fit.i,
-      crit.all.i = criterion(y, fit.all.i),
-      coef.i = coef(predict.args$object)
-    )
-  }
-
-  fold.type <- match.arg(fold.type)
-
-  call <- getCall(model)
-
-  model.function <- call[[1L]]
-  model.function.name <- as.character(model.function)
-  model.function <- eval(model.function)
-  cor.function <- getCall(model)[[which(names(call) == "correlation")]][[1]]
-  cor.function.name <- as.character(cor.function)
-  cor.function <- eval(cor.function)
-
-  n <- nrow(data)
-
-  cvOrdered(
-    model = model,
-    data = data,
-    criterion = criterion,
-    criterion.name = criterion.name,
-    k = k,
-    fold.type = fold.type,
-    details = details,
-    confint = confint,
-    level = level,
-    ncores = ncores,
-    f = f,
-    fPara = fPara,
-    model.function = model.function,
-    model.function.name = model.function.name,
-    cor.function = cor.function,
-    cor.function.name = cor.function.name,
-    ...
-  )
-}
-
 #' @param formula either a one-sided formula giving the response variable
 #' in an ARIMA model with no predictors, or a two-sided formula with the
 #' response on the left and terms for the predictors on the right (as in
-#' a typical R regression model).
+#' a typical R regression model); if the timeseries is differenced, the intercept
+#' is removed from the model even if the formula implies an intercept.
 #' @param subset subsetting expression.
 #' @param na.action function to process missing data; the default,
 #' \code{\link{na.pass}}, will pass missing data to the \code{\link{arima}()}
 #' function.
 #' @param order the \eqn{p, d, q} specification of the ARIMA model;
-#' see \code{\link{arima}()} for details.
+#' see \code{\link{arima}()} for details; the default is \eqn{p = 1, d = 0, q = 0},
+#' an AR(1) model.
+#' @param seasonal specification of the seasonal part of the ARIMA model;
+#' see \code{\link{arima}()} for details; the default is not to include
+#' a seasonal part of the model.
 #' @param ... further arguments to be passed to \code{\link{arima}()}
 #' or \code{Arima()}.
 #'
-#' @describeIn cv.gls model-formula wrapper for the \code{\link{arima}()} function.
+#' @describeIn Arima model-formula wrapper for the \code{\link{arima}()} function.
 #' @export
 Arima <- function(formula, data, subset=NULL, na.action=na.pass,
-                  order = c(1L, 0L, 0L), ...){
+                  order = c(1L, 0L, 0L),
+                  seasonal = list(order = c(0L, 0L, 0L), period = NA),
+                  ...){
   dots <- list(...)
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
@@ -184,17 +85,18 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
   which.int <- which("(Intercept)" == colnames(x))
   if (length(which.int > 0)) x <- x[, -which.int, drop=FALSE]
   result <- list(formula=formula, data=data, subset=subset,
-                 na.action=na.action, order=order, call=cl, dots=dots)
+                 na.action=na.action, order=order, seasonal=seasonal,
+                 call=cl, dots=dots)
   if (length(formula) == 2){
     if (!(ncol(x) == 1) && is.numeric(x[, 1]))
       stop("formula must specify a single response")
-    result$arima <- stats::arima(x[, 1], order=order, ...)
+    result$arima <- stats::arima(x[, 1], order=order, seasonal=seasonal, ...)
     result$response <- x[, 1]
   } else {
     y <- model.response(mf, "numeric")
     if (!is.vector(y) && is.numeric(y))
       stop("formula must specify a single response")
-    result$arima <- stats::arima(y, order=order, xreg=x, ...)
+    result$arima <- stats::arima(y, order=order, seasonal=seasonal, xreg=x, ...)
     result$response <- y
     result$model.matrix <- x
   }
@@ -203,7 +105,7 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
 }
 
 #' @param x an object of class \code{"ARIMA"}.
-#' @describeIn cv.gls \code{print()} method for \code{"ARIMA"} objects
+#' @describeIn Arima \code{print()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
 print.ARIMA <- function(x, ...){
@@ -214,7 +116,7 @@ print.ARIMA <- function(x, ...){
 }
 
 #' @param object an object of class \code{"ARIMA"}.
-#' @describeIn cv.gls \code{update()} method for \code{"ARIMA"} objects
+#' @describeIn Arima \code{update()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
 #'
@@ -239,12 +141,12 @@ update.ARIMA <- function(object, ...){
   result
 }
 
-#' @describeIn cv.gls \code{coef()} method for \code{"ARIMA"} objects
+#' @describeIn Arima \code{coef()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
 coef.ARIMA <- function(object, ...) coef(object$arima)
 
-#' @describeIn cv.gls \code{model.matrix()} method for \code{"ARIMA"} objects
+#' @describeIn Arima \code{model.matrix()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
 model.matrix.ARIMA <- function(object, ...) object$model.matrix
@@ -255,24 +157,43 @@ model.matrix.ARIMA <- function(object, ...) object$model.matrix
 #' @param se.fit if \code{TRUE} (the default is \code{FALSE}), compute
 #' the standard errors of the predictions.
 #'
-#' @returns the \code{\link{cv}()} methods return objects of class \code{"cv"}.
-#'   \code{Arima()} returns an object of class \code{"Arima"} with the
+#' @returns the \code{\link{cv.ARIMA}()} method returns an object of class
+#'   \code{c("cvOrdered", "cv")} (see  \code{\link{cvOrdered}()} and \code{\link{cv}()}).
+#'
+#'   \code{Arima()} returns an object of class \code{"ARIMA"} with the
 #'   following components: \code{formula}, the model formula; \code{data},
 #'   the data set to which the model was fit; \code{subset}, the subset
-#'   expression (if specified); \code{na.action}, see \code{\link{na.pass}}; \code{order}, the
-#'   order of the ARIMA model; \code{call}, the function call;
+#'   expression (if specified); \code{na.action}, see \code{\link{na.pass}};
+#'   \code{order}, the order of the ARIMA model;
+#'   \code{seasonal}, the seasonal specification;
+#'   \code{call}, the function call;
 #'   \code{dots}, any other arguments specified; \code{arima},
 #'   the object returned by the \code{\link{arima}()} function,
 #'   which \code{Arima()} calls;
 #'   \code{response}, the response variable; \code{model.matrix},
 #'   the model matrix, if there are predictors in the model.
 #'
-#' @describeIn cv.gls \code{predict()} method for \code{"ARIMA"} objects
+#' @describeIn Arima \code{fitted()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+fitted.ARIMA <- function(object, ...){
+  residuals <- object$arima$residuals
+  y <- object$response
+  y - residuals
+}
+#' @describeIn Arima \code{residuals()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+residuals.ARIMA <- function(object, ...) object$arima$residuals
+#'
+#' @describeIn Arima \code{predict()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
 predict.ARIMA <- function(object, n.ahead, newdata = NULL,
                           se.fit = FALSE, ...){
-  if (missing(n.ahead) && is.null(newdata)) return(NULL)
+  if (missing(n.ahead) && is.null(newdata)){
+    return(fitted(object))
+  }
   x <- model.matrix(object)
   new.x <- if (!is.null(newdata) && !is.null(model.matrix(object))) {
     n.ahead <- nrow(newdata)
@@ -285,30 +206,35 @@ predict.ARIMA <- function(object, n.ahead, newdata = NULL,
 
 }
 
-#' @describeIn cv.gls \code{cv()} method for \code{"ARIMA"} objects
+#' @param begin.with the number of cases in
+#' the first fold. The remaining cases are divided among the subsequent
+#' \code{k} - 1 folds.
+#' @describeIn Arima \code{cv()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
 cv.ARIMA <- function(model,
                    data = model$data,
                    criterion = mse,
-                   k = 10L,
+                   k = "n",
                    reps,
                    seed,
                    fold.type = c("cumulative", "preceding"),
+                   begin.with=max(25, ceiling(n/10)),
+                   lead = 1L,
                    criterion.name = deparse(substitute(criterion)),
-                   details = k <= 10L,
+                   details = n <= 1e4,
                    ncores = 1L,
                    ...) {
 
   f <- function(i, ...) {
     # helper function to compute cv criterion for each fold
     indices.i <- fold(folds, i, fold.type=fold.type)
-    indices.j <- fold(folds, i, predict=TRUE)
+    indices.j <- fold(folds, i, predict=TRUE, lead=lead)
     model.i <- update(model, data = data[indices.i, , drop=FALSE])
-    fit.i <- predict(model.i, n.ahead=length(indices.j),
+    fit.i <- predict(model.i, n.ahead=max(lead),
                      newdata=data[indices.j, , drop=FALSE])
     list(
-      fit.i = fit.i,
+      fit.i = fit.i[lead],
       coef.i = coef(model.i)
     )
   }
@@ -320,22 +246,23 @@ cv.ARIMA <- function(model,
     # helper function to compute cv criterion for each fold
     #  with parallel computations
     indices.i <- fold(folds, i, fold.type=fold.type)
-    indices.j <- fold(folds, i, predict=TRUE)
+    indices.j <- fold(folds, i, predict=TRUE, lead=lead)
     assign(model.function.name, model.function)
     # the following deals with a scoping issue that can
     #   occur with args passed via ... (which is saved in dots)
     predict.args <- c(list(
       object = update(model, data = data[indices.i, , drop=FALSE]),
       newdata = data[indices.j, , drop=FALSE],
-      n.ahead = length(indices.j)
-    ), dots)
+      n.ahead = max(lead)), dots)
 
     fit.i <- do.call(predict, predict.args)
     list(
-      fit.i = fit.i,
+      fit.i = fit.i[lead],
       coef.i = coef(predict.args$object)
     )
   }
+
+  n <- nrow(data)
 
   fold.type <- match.arg(fold.type)
 
@@ -353,6 +280,8 @@ cv.ARIMA <- function(model,
     criterion.name = criterion.name,
     k = k,
     fold.type=fold.type,
+    begin.with = begin.with,
+    lead = lead,
     confint=FALSE,
     details = details,
     ncores = ncores,
@@ -363,6 +292,8 @@ cv.ARIMA <- function(model,
     locals = list(x.names = x.names),
     ...
   )
-  result[["full crit"]] <- NULL
+  result[["full crit"]] <- criterion(na.omit(GetResponse(model)),
+                                     na.omit(fitted(model)))
+  result[["lead"]] <- lead
   result
 }
