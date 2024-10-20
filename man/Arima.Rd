@@ -186,7 +186,10 @@ withAutoprint({
 LH <- data.frame(lh = lh)
 lh.arima <- Arima(~lh, data=LH)
 lh.arima
-summary(cv(lh.arima, k=5))
+summary(cv.lh <- cv(lh.arima, lead=1:5))
+plot(cv.lh)
+summary(cv(lh.arima, lead=1:5, fold.type="window"))
+# too few folds (5), just to illustrate fold.type="preceding":
 summary(cv(lh.arima, k=5, fold.type="preceding"))
 
 # model adapted from help("arima")
@@ -194,8 +197,8 @@ Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
 lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                   order=c(2, 0, 0))
 lake.arima
-summary(cv(lake.arima, k=5))
-summary(cv(lake.arima, k=5, fold.type="preceding"))
+summary(cv.lake <- cv(lake.arima, lead=1:5))
+plot(cv.lake)
 })
 }
 }

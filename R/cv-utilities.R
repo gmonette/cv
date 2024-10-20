@@ -143,6 +143,10 @@
 #' (ffs <- folds(n=22, k=5))
 #' fold(ffs, 2)
 #'
+#' (ffs.ord <- folds(n = 100, fold.type="cumulative"))
+#' fold(ffs.ord, 2)
+#' fold(ffs.ord, 2, predicted=TRUE, lead=1:5)
+#'
 #' @seealso \code{\link{cv}}, \code{\link{cv.merMod}},
 #' \code{\link{cv.function}}.
 #'
@@ -1183,9 +1187,12 @@ print.folds <- function(x, ...) {
     cat(x$k, "moving-window folds of", x$folds[1],
         "cases each")
   } else if (x$fold.type %in% c("cumulative", "preceding")){
-    cat("initial ordered folds of", x$folds[1], "cases",
-        "\nfollowed by", x$k - 1, "folds of approximately",
-        round((x$n - x$folds[1]) / (x$k - 1)), "cases each")
+    fold.size <- round((x$n - x$folds[1]) / (x$k - 1))
+    all.ones <- all(x$folds[-1] == 1)
+    cat("initial ordered fold of", x$folds[1], "cases,",
+        "\nfollowed by", x$k - 1,
+        if (all.ones) "folds of 1 case each" else paste("folds of approximately",
+        fold.size, "cases each"))
   } else {
       cat(x$k, "folds of approximately", round(x$n / x$k),
           "cases each")

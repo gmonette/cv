@@ -387,6 +387,10 @@ set.seed(123)
 (ffs <- folds(n=22, k=5))
 fold(ffs, 2)
 
+(ffs.ord <- folds(n = 100, fold.type="cumulative"))
+fold(ffs.ord, 2)
+fold(ffs.ord, 2, predicted=TRUE, lead=1:5)
+
 }
 \seealso{
 \code{\link{cv}}, \code{\link{cv.merMod}},
