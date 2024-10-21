@@ -27,6 +27,12 @@ cv.c <- cv(res, lead=1:5)
 summary(cv.c)
 plot(cv.c)
 
+cv.d <- cv(res, lead=c(2, 4, 5))
+summary(cv.d)
+plot(cv.d)
+all.equal(cvInfo(cv.c, "CV criterion")[c(2, 4, 5)],
+          cvInfo(cv.d, "CV criterion"))
+
 cv.c.p <- cv(res, lead=1:5, ncores=TRUE)
 all.equal(cv.c, cv.c.p)
 
