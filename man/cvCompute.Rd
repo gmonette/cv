@@ -16,7 +16,6 @@
 \alias{GetResponse.lme}
 \alias{GetResponse.glmmTMB}
 \alias{GetResponse.modList}
-\alias{GetResponse.gls}
 \alias{GetResponse.ARIMA}
 \alias{plot.cvOrdered}
 \title{Utility Functions for the cv Package}
@@ -132,11 +131,9 @@ GetResponse(model, ...)
 
 \method{GetResponse}{modList}(model, ...)
 
-\method{GetResponse}{gls}(model, ...)
-
 \method{GetResponse}{ARIMA}(model, ...)
 
-\method{plot}{cvOrdered}(x, y, xlab = "lead", ylab = x$criterion, ...)
+\method{plot}{cvOrdered}(x, y, xlab = "lead", ylab = x$criterion, main = "Cross-Validation", ...)
 }
 \arguments{
 \item{model}{a regression model object.}
@@ -279,6 +276,8 @@ or a \code{"cvOfdered"} object to be plotted.}
 \item{xlab}{label for horizontal axis.}
 
 \item{ylab}{label for vertical axis.}
+
+\item{main}{main title for graph.}
 }
 \value{
 The utility functions return various kinds of objects:
@@ -371,8 +370,6 @@ from a regression model.
 \item \code{GetResponse(glmmTMB)}: \code{"glmmTMB"} method.
 
 \item \code{GetResponse(modList)}: \code{"modList"} method.
-
-\item \code{GetResponse(gls)}: \code{"gls"} method.
 
 \item \code{GetResponse(ARIMA)}: \code{"ARIMA"} method.
 

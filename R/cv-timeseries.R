@@ -37,6 +37,7 @@
 #' LH <- data.frame(lh = lh)
 #' lh.arima <- Arima(~lh, data=LH)
 #' lh.arima
+#' plot(lh.arima)
 #' summary(cv.lh <- cv(lh.arima, lead=1:5))
 #' plot(cv.lh)
 #' summary(cv(lh.arima, lead=1:5, fold.type="window"))
@@ -48,6 +49,7 @@
 #' lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
 #'                   order=c(2, 0, 0))
 #' lake.arima
+#' plot(lake.arima)
 #' summary(cv.lake <- cv(lake.arima, lead=1:5))
 #' plot(cv.lake)
 #' })
@@ -117,6 +119,33 @@ print.ARIMA <- function(x, ...){
   xx$call <- getCall(x)
   print(xx)
   invisible(x)
+}
+
+#' @param y ignored, to match \code{plot()} generic.
+#' @param xlab label for horizontal ("time") axis; defaults to
+#' \code{"Time"}.
+#' @param main title for diagnostic plots.
+#' @param col color for points and lines.
+#' @describeIn Arima \code{plot()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+plot.ARIMA <- function(x, y, xlab="time",
+                       main="Diagnosic Plots",
+                       col=car::carPalette()[2], ...){
+  residuals <- residuals(x)
+  save <- par(mfrow=c(2, 2), oma=c(0, 0, 1, 0))
+  on.exit(par(save))
+  plot(fitted(x), xlab=xlab, ylab=expression(hat(y)),
+       main = "Fitted Values", type="b", pch=16, col=col)
+  grid(lty=2, col="gray")
+  plot(residuals, xlab=xlab, ylab="residuals",
+       main="Residuals", type="b", pch=16, col=col)
+  grid(lty=2, col="gray")
+  acf(residuals, main="Autocorrelations\n of Residuals",
+      na.action=na.pass)
+  pacf(residuals, main="Parial Autocorrelations\n of Residuals",
+       na.action=na.pass)
+  title(main=main, outer=TRUE)
 }
 
 #' @param object an object of class \code{"ARIMA"}.

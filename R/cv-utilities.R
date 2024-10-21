@@ -1208,30 +1208,27 @@ GetResponse.glmmTMB <- function (model, ...){
 GetResponse.modList <- function(model, ...)
   GetResponse(model[[1L]])
 
-#' @describeIn cvCompute \code{"gls"} method.
-#' @export
-GetResponse.gls <- function(model, ...) {
-  insight::get_response(model)
-}
-
 #' @describeIn cvCompute \code{"ARIMA"} method.
 #' @export
 GetResponse.ARIMA <- function(model, ...) {
   model$response
 }
 
-#' @importFrom graphics text
+#' @importFrom graphics text grid title
 #' @param xlab label for horizontal axis.
 #' @param ylab label for vertical axis.
+#' @param main main title for graph.
 #' @describeIn cvCompute \code{plot()} method for \code{"cvOrdered"} objects.
 #' @export
 plot.cvOrdered <- function(x, y, xlab = "lead",
-                           ylab = x$criterion, ...){
+                           ylab = x$criterion,
+                           main = "Cross-Validation", ...){
   plot(x$lead, x[["CV crit"]], type="b", pch=16,
        col=car::carPalette()[2], xlab=xlab, ylab=ylab,
        ylim=range(c(x[["full crit"]], x[["CV crit"]])),
-       axes=FALSE, frame.plot=TRUE,
+       axes=FALSE, frame.plot=TRUE, main=main,
        ...)
+  grid(lty=2, col="gray")
   axis(2)
   axis(1, at=x$lead)
   text(x$lead[1], x[["CV crit"]][1], pos=4, offset=1,

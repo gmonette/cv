@@ -174,7 +174,7 @@ cv <- function(model, data, criterion, k, reps = 1L, seed, ...) {
 #' model.matrix model.response predict qnorm
 #' update weighted.mean weights
 #' residuals hatvalues printCoefmat sd
-#' na.pass
+#' na.pass acf pacf
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%

@@ -3,6 +3,7 @@
 \name{Arima}
 \alias{Arima}
 \alias{print.ARIMA}
+\alias{plot.ARIMA}
 \alias{update.ARIMA}
 \alias{coef.ARIMA}
 \alias{model.matrix.ARIMA}
@@ -23,6 +24,15 @@ Arima(
 )
 
 \method{print}{ARIMA}(x, ...)
+
+\method{plot}{ARIMA}(
+  x,
+  y,
+  xlab = "time",
+  main = "Diagnosic Plots",
+  col = car::carPalette()[2],
+  ...
+)
 
 \method{update}{ARIMA}(object, ...)
 
@@ -81,6 +91,15 @@ a seasonal part of the model.}
 or \code{Arima()}.}
 
 \item{x}{an object of class \code{"ARIMA"}.}
+
+\item{y}{ignored, to match \code{plot()} generic.}
+
+\item{xlab}{label for horizontal ("time") axis; defaults to
+\code{"Time"}.}
+
+\item{main}{title for diagnostic plots.}
+
+\item{col}{color for points and lines.}
 
 \item{object}{an object of class \code{"ARIMA"}.}
 
@@ -156,6 +175,9 @@ fit by \code{Arima()}, which provides a formula interface to the
 \item \code{print(ARIMA)}: \code{print()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
+\item \code{plot(ARIMA)}: \code{plot()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
 \item \code{update(ARIMA)}: \code{update()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
@@ -186,6 +208,7 @@ withAutoprint({
 LH <- data.frame(lh = lh)
 lh.arima <- Arima(~lh, data=LH)
 lh.arima
+plot(lh.arima)
 summary(cv.lh <- cv(lh.arima, lead=1:5))
 plot(cv.lh)
 summary(cv(lh.arima, lead=1:5, fold.type="window"))
@@ -197,6 +220,7 @@ Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
 lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                   order=c(2, 0, 0))
 lake.arima
+plot(lake.arima)
 summary(cv.lake <- cv(lake.arima, lead=1:5))
 plot(cv.lake)
 })
