@@ -173,8 +173,7 @@ testArima.ARIMA <- function(model, lag,
   n <- length(residuals)
   # use same lag as acf() and pacf():
   if (missing(lag)) lag <- min(floor(10*log10(n)),  n - 1L)
-  fitdf <- sum(model$order[c(1, 3)]) +
-    sum(model$seasonal$order[c(1, 3)])
+  fitdf <- length(coef(model))
   stats::Box.test(residuals, lag=lag, type=type,
                   fitdf=if (fitdf < lag) fitdf else 0)
 }
