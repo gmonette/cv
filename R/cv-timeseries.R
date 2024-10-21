@@ -273,13 +273,14 @@ cv.ARIMA <- function(model,
   }
 
   fPara <- function(i,
-                    model.function = model.function,
+                    model.function,
                     model.function.name,
                     ...) {
     # helper function to compute cv criterion for each fold
     #  with parallel computations
-    indices.i <- fold(folds, i) #, fold.type=fold.type)
+    indices.i <- fold(folds, i)
     indices.j <- fold(folds, i, predict=TRUE, lead=lead)
+    # bring Arima() into scope
     assign(model.function.name, model.function)
     # the following deals with a scoping issue that can
     #   occur with args passed via ... (which is saved in dots)
@@ -301,10 +302,8 @@ cv.ARIMA <- function(model,
 
   x.names <- colnames(model$model.matrix)
 
-  call <- getCall(model)
-  model.function <- call[[1L]]
-  model.function.name <- as.character(model.function)
-  model.function <- eval(model.function)
+  model.function.name <- "Arima"
+  model.function <- Arima
 
   result <- cvOrdered(
     model = model,
