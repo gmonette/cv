@@ -128,8 +128,8 @@ update.ARIMA <- function(object, ...){
   cl0 <- object$call
   cl <- match.call()
   args <- object$dots
-  args[c("formula", "data", "subset", "na.action", "order")] <-
-    object[c("formula", "data", "subset", "na.action", "order")]
+  args[c("formula", "data", "subset", "na.action", "order", "seasonal")] <-
+    object[c("formula", "data", "subset", "na.action", "order", "seasonal")]
   dots <- list(...)
   names <- names(dots)
   for (name in names){

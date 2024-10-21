@@ -955,13 +955,10 @@ cvOrdered <- function(model,
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
     result <- foreach(i = 1L:(k - 1)) %dopar% {
-      # ii <- fold(folds, i, predict = TRUE, lead=lead)
-      # if (is.null(ii)) NULL
-      # else
-        fPara(i,
-          model.function = model.function,
-          model.function.name = model.function.name,
-          ...)
+      fPara(i,
+        model.function = model.function,
+        model.function.name = model.function.name,
+        ...)
     }
     stopCluster(cl)
     j <- seq_along(lead)
@@ -1023,59 +1020,6 @@ cvOrdered <- function(model,
 
 #' @describeIn cvCompute used internally by \code{cv()} methods (not for direct use).
 #' @export
-# folds <- function(n, k) {
-#   nk <-  n %/% k # number of cases in each fold
-#   rem <- n %% k  # remainder
-#   folds <-
-#     rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
-#   ends <- cumsum(folds) # end of each fold
-#   starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
-#   indices <- if (n > k)
-#     sample(n, n)
-#   else
-#     1L:n # permute cases
-#   result <- list(
-#     n = n,
-#     k = k,
-#     folds = folds,
-#     starts = starts,
-#     ends = ends,
-#     indices = indices
-#   )
-#   class(result) <- "folds"
-#   result
-# }
-# folds <- function(n, k, ordered=FALSE,
-#                   begin.with=max(25, ceiling(n/10))) {
-#   if (ordered){
-#     after.first <- n - begin.with
-#     k <- min(k, after.first + 1)
-#     nk <- after.first %/% (k - 1L)
-#     rem <- after.first %% (k - 1L)
-#     folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1)))
-#     indices <- 1L:n
-#   } else {
-#     nk <-  n %/% k # number of cases in each fold
-#     rem <- n %% k  # remainder
-#     folds <- rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
-#     indices <- if (n > k)
-#       sample(n, n) # permute cases
-#     else
-#       1L:n
-#   }
-#   ends <- cumsum(folds) # end of each fold
-#   starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
-#   result <- list(
-#     n = n,
-#     k = k,
-#     folds = folds,
-#     starts = starts,
-#     ends = ends,
-#     indices = indices
-#   )
-#   class(result) <- if (ordered) "orderedfolds" else  "folds"
-#   result
-# }
 folds <- function(n, k,
                   fold.type=c("unordered", "cumulative", "preceding", "window"),
                   begin.with=max(25L, ceiling(n/10))) {
@@ -1138,24 +1082,6 @@ fold.folds <- function(folds, i, ...)
 #' the default is \code{1}.
 #' @describeIn cvCompute to extract a fold from an \code{"orderedfolds"} object.
 #' @export
-# fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L,
-#                               fold.type=c("cumulative", "preceding", "window"), ...){
-#   fold.type <- match.arg(fold.type)
-#   if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
-#   if (predicted) {
-#     j <- folds$starts[i + 1] + lead - 1L
-#     if (min(j) > folds$n) return(NULL)
-#      # stop("smallest index of predicted cases (", min(j),") is out of range (> ", folds$n, ")")
-#     j[j <= folds$n]
-#   } else if (fold.type == "preceding") {
-#     folds$starts[i]:folds$ends[i]
-#   } else if (fold.type == "cumulative") {
-#     1:folds$ends[i]
-#   } else {
-#     folds$starts[i]:folds$ends[i]
-#   }
-# }
-
 fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L, ...){
   fold.type <- folds$fold.type
   if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
@@ -1211,14 +1137,6 @@ print.folds <- function(x, ...) {
   invisible(x)
 }
 
-#' #' @describeIn cvCompute \code{print()} method for \code{"otderedfolds"} objects.
-#' #' @export
-#' print.orderedfolds <- function(x, ...) {
-#'   cat("initial ordered fold of", x$folds[1], "cases")
-#'   cat(";", x$k - 1, "additional folds of approximately", round((x$n - x$folds[1]) / (x$k - 1)),
-#'       "cases each\n")
-#'   invisible(x)
-#' }
 
 #' @export
 #' @describeIn cvCompute function to return the response variable
