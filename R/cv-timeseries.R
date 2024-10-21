@@ -38,6 +38,7 @@
 #' lh.arima <- Arima(~lh, data=LH)
 #' lh.arima
 #' plot(lh.arima)
+#' testArima(lh.arima)
 #' summary(cv.lh <- cv(lh.arima, lead=1:5))
 #' plot(cv.lh)
 #' summary(cv(lh.arima, lead=1:5, fold.type="window"))
@@ -50,6 +51,7 @@
 #'                   order=c(2, 0, 0))
 #' lake.arima
 #' plot(lake.arima)
+#' testArima(lake.arima)
 #' summary(cv.lake <- cv(lake.arima, lead=1:5))
 #' plot(cv.lake)
 #' })
@@ -146,6 +148,35 @@ plot.ARIMA <- function(x, y, xlab="time",
   pacf(residuals, main="Parial Autocorrelations\n of Residuals",
        na.action=na.pass)
   title(main=main, outer=TRUE)
+}
+
+#' @rdname Arima
+#' @export
+testArima <- function(model, ...){
+  UseMethod("testArima")
+}
+
+#' @param lag maximum lag to compute residual autocorrelation; if not
+#'   specified, the same default maximum lag as \code{\link[stats]{acf}}
+#'   is used.
+#' @param type test of autocorrelations, either \code{"Box-Pierce"} (the default)
+#'   or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()}).
+#' @describeIn Arima test autocorrelations of ARIMA model residuals;
+#'   the test is performed by \code{\link[stats]{Box.test}()}.
+#' @importFrom stats Box.test
+#' @export
+testArima.ARIMA <- function(model, lag,
+                            type = c("Box-Pierce", "Ljung-Box"),
+                            ...){
+  type <- match.arg(type)
+  residuals <- residuals(model)
+  n <- length(residuals)
+  # use same lag as acf() and pacf():
+  if (missing(lag)) lag <- min(floor(10*log10(n)),  n - 1L)
+  fitdf <- sum(model$order[c(1, 3)]) +
+    sum(model$seasonal$order[c(1, 3)])
+  stats::Box.test(residuals, lag=lag, type=type,
+                  fitdf=if (fitdf < lag) fitdf else 0)
 }
 
 #' @param object an object of class \code{"ARIMA"}.

@@ -4,6 +4,8 @@
 \alias{Arima}
 \alias{print.ARIMA}
 \alias{plot.ARIMA}
+\alias{testArima}
+\alias{testArima.ARIMA}
 \alias{update.ARIMA}
 \alias{coef.ARIMA}
 \alias{model.matrix.ARIMA}
@@ -33,6 +35,10 @@ Arima(
   col = car::carPalette()[2],
   ...
 )
+
+testArima(model, ...)
+
+\method{testArima}{ARIMA}(model, lag, type = c("Box-Pierce", "Ljung-Box"), ...)
 
 \method{update}{ARIMA}(object, ...)
 
@@ -101,6 +107,16 @@ or \code{Arima()}.}
 
 \item{col}{color for points and lines.}
 
+\item{model}{an object of class \code{"ARIMA"}
+produced by the \code{Arima()} function.}
+
+\item{lag}{maximum lag to compute residual autocorrelation; if not
+specified, the same default maximum lag as \code{\link[stats]{acf}}
+is used.}
+
+\item{type}{test of autocorrelations, either \code{"Box-Pierce"} (the default)
+or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()}).}
+
 \item{object}{an object of class \code{"ARIMA"}.}
 
 \item{n.ahead}{number of future cases to predict.}
@@ -110,9 +126,6 @@ predictors (if any) for predicted future cases.}
 
 \item{se.fit}{if \code{TRUE} (the default is \code{FALSE}), compute
 the standard errors of the predictions.}
-
-\item{model}{an object of class \code{"ARIMA"}
-produced by the \code{Arima()} function.}
 
 \item{criterion}{function to compute the CV cost criterion
 (default \code{\link{mse}}).}
@@ -178,6 +191,9 @@ created by the \code{\link{Arima}()} function.
 \item \code{plot(ARIMA)}: \code{plot()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
+\item \code{testArima(ARIMA)}: test autocorrelations of ARIMA model residuals;
+the test is performed by \code{\link[stats]{Box.test}()}.
+
 \item \code{update(ARIMA)}: \code{update()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
@@ -209,6 +225,7 @@ LH <- data.frame(lh = lh)
 lh.arima <- Arima(~lh, data=LH)
 lh.arima
 plot(lh.arima)
+testArima(lh.arima)
 summary(cv.lh <- cv(lh.arima, lead=1:5))
 plot(cv.lh)
 summary(cv(lh.arima, lead=1:5, fold.type="window"))
@@ -221,6 +238,7 @@ lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                   order=c(2, 0, 0))
 lake.arima
 plot(lake.arima)
+testArima(lake.arima)
 summary(cv.lake <- cv(lake.arima, lead=1:5))
 plot(cv.lake)
 })
