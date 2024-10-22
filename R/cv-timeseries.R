@@ -1,4 +1,4 @@
-#' Cross-Validate Mixed-Effects Model
+#' Fit and Cross-Validate ARIMA Models
 #'
 #' \code{\link{cv}()} methods for time-series models
 #' fit by \code{Arima()}, which provides a formula interface to the

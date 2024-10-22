@@ -4,7 +4,7 @@
 \alias{cv.merMod}
 \alias{cv.lme}
 \alias{cv.glmmTMB}
-\title{Cross-Validate Mixed-Effects Model}
+\title{Cross-Validate Mixed-Effects Models}
 \usage{
 \method{cv}{merMod}(
   model,

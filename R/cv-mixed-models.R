@@ -1,4 +1,4 @@
-#' Cross-Validate Mixed-Effects Model
+#' Cross-Validate Mixed-Effects Models
 #'
 #' \code{\link{cv}()} methods for mixed-effect models of class \code{"merMod"}, fit
 #' by the \code{\link[lme4]{lmer}()} and \code{\link[lme4]{glmer}()} functions

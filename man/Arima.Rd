@@ -15,7 +15,7 @@
 \alias{residuals.ARIMA}
 \alias{predict.ARIMA}
 \alias{cv.ARIMA}
-\title{Cross-Validate Mixed-Effects Model}
+\title{Fit and Cross-Validate ARIMA Models}
 \usage{
 Arima(
   formula,
