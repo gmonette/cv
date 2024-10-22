@@ -123,7 +123,15 @@ print.ARIMA <- function(x, ...){
   invisible(x)
 }
 
-#' @param y ignored, to match \code{plot()} generic.
+#' @param y which diagnostic plots to display; the default is
+#' \code{c("residuals", "portmanteau", "acf", "pacf")}, where
+#' \code{"portmanteau"} is the Box-Pierce or Ljung-Box test of
+#' the autocorrelations of the residuals.
+#' @param test one of \code{"Box-Pierce"} or \code{"Ljung-Box"},
+#' with the former the default.
+#' @param max.lag the maximum lag for the portmanteau tests; the
+#' default is the same as the maximum lag for the residuals autocorrelations
+#' and partial autocorrelations.
 #' @param xlab label for horizontal ("time") axis; defaults to
 #' \code{"Time"}.
 #' @param main title for diagnostic plots.
@@ -131,22 +139,58 @@ print.ARIMA <- function(x, ...){
 #' @describeIn Arima \code{plot()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
-plot.ARIMA <- function(x, y, xlab="time",
-                       main="Diagnosic Plots",
-                       col=car::carPalette()[2], ...){
+plot.ARIMA <- function(x,
+                       y=c("fitted", "residuals", "portmantequ", "acf", "pacf"),
+                       test=c("Box-Pierce", "Ljung-Box"),
+                       max.lag=min(floor(10*log10(n)),  n - 1L),
+                       xlab="time",
+                       main="Diagnostic Plots",
+                       col="blue", ...){
+
+  test <- match.arg(test)
+
+  which.plots <- if (missing(y)){
+    c("residuals", "portmanteau", "acf", "pacf")
+  } else {
+    match.arg(y, several.ok=TRUE)
+  }
+
   residuals <- residuals(x)
-  save <- par(mfrow=c(2, 2), oma=c(0, 0, 1, 0))
+  n <- length(residuals)
+
+  mfrow <- n2mfrow(length(which.plots))
+  save <- par(mfrow=mfrow, oma=c(0, 0, 1, 0))
   on.exit(par(save))
-  plot(fitted(x), xlab=xlab, ylab=expression(hat(y)),
+
+  if ("fitted" %in% which.plots){
+    plot(fitted(x), xlab=xlab, ylab=expression(hat(y)),
        main = "Fitted Values", type="b", pch=16, col=col)
-  grid(lty=2, col="gray")
-  plot(residuals, xlab=xlab, ylab="residuals",
+    grid(lty=2, col="gray")
+  }
+
+  if ("residuals" %in% which.plots){
+    plot(residuals, xlab=xlab, ylab="residuals",
        main="Residuals", type="b", pch=16, col=col)
-  grid(lty=2, col="gray")
-  acf(residuals, main="Autocorrelations\n of Residuals",
-      na.action=na.pass)
-  pacf(residuals, main="Parial Autocorrelations\n of Residuals",
-       na.action=na.pass)
+    grid(lty=2, col="gray")
+  }
+
+  if ("portmanteau" %in% which.plots){
+    p <- numeric(max.lag)
+    for (lag in 1:max.lag)
+      p[lag] <- testArima(x, lag=lag, type=test)[["p.value"]]
+    plot(p, xlab="Lag", ylab="p-value",
+         main=paste(test, "Tests\nfor Residuals"))
+    abline(h=0.05, lty=2, col=col)
+  }
+
+  if ("acf" %in% which.plots)
+    acf(residuals, main="Autocorrelations\n of Residuals",
+      na.action=na.pass, ci.col=col)
+
+  if ("pacf" %in% which.plots)
+    pacf(residuals, main="Parial Autocorrelations\n of Residuals",
+       na.action=na.pass, ci.col=col)
+
   title(main=main, outer=TRUE)
 }
 
@@ -163,16 +207,16 @@ testArima <- function(model, ...){
 #'   or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()}).
 #' @describeIn Arima test autocorrelations of ARIMA model residuals;
 #'   the test is performed by \code{\link[stats]{Box.test}()}.
-#' @importFrom stats Box.test
+#' @importFrom stats Box.test logLik vcov
+#' @importFrom grDevices n2mfrow
 #' @export
-testArima.ARIMA <- function(model, lag,
+testArima.ARIMA <- function(model, lag=1,
                             type = c("Box-Pierce", "Ljung-Box"),
                             ...){
   type <- match.arg(type)
   residuals <- residuals(model)
   n <- length(residuals)
   # use same lag as acf() and pacf():
-  if (missing(lag)) lag <- min(floor(10*log10(n)),  n - 1L)
   fitdf <- length(coef(model))
   stats::Box.test(residuals, lag=lag, type=type,
                   fitdf=if (fitdf < lag) fitdf else 0)
@@ -208,6 +252,16 @@ update.ARIMA <- function(object, ...){
 #' created by the \code{\link{Arima}()} function.
 #' @export
 coef.ARIMA <- function(object, ...) coef(object$arima)
+
+#' @describeIn Arima \code{vcov()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+vcov.ARIMA <- function(object, ...) vcov(object$arima)
+
+#' @describeIn Arima \code{logLik()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+logLik.ARIMA <- function(object, ...) logLik(object$arima)
 
 #' @describeIn Arima \code{model.matrix()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.

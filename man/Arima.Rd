@@ -8,6 +8,8 @@
 \alias{testArima.ARIMA}
 \alias{update.ARIMA}
 \alias{coef.ARIMA}
+\alias{vcov.ARIMA}
+\alias{logLik.ARIMA}
 \alias{model.matrix.ARIMA}
 \alias{fitted.ARIMA}
 \alias{residuals.ARIMA}
@@ -29,20 +31,26 @@ Arima(
 
 \method{plot}{ARIMA}(
   x,
-  y,
+  y = c("fitted", "residuals", "portmantequ", "acf", "pacf"),
+  test = c("Box-Pierce", "Ljung-Box"),
+  max.lag = min(floor(10 * log10(n)), n - 1L),
   xlab = "time",
-  main = "Diagnosic Plots",
-  col = car::carPalette()[2],
+  main = "Diagnostic Plots",
+  col = "blue",
   ...
 )
 
 testArima(model, ...)
 
-\method{testArima}{ARIMA}(model, lag, type = c("Box-Pierce", "Ljung-Box"), ...)
+\method{testArima}{ARIMA}(model, lag = 1, type = c("Box-Pierce", "Ljung-Box"), ...)
 
 \method{update}{ARIMA}(object, ...)
 
 \method{coef}{ARIMA}(object, ...)
+
+\method{vcov}{ARIMA}(object, ...)
+
+\method{logLik}{ARIMA}(object, ...)
 
 \method{model.matrix}{ARIMA}(object, ...)
 
@@ -98,7 +106,17 @@ or \code{Arima()}.}
 
 \item{x}{an object of class \code{"ARIMA"}.}
 
-\item{y}{ignored, to match \code{plot()} generic.}
+\item{y}{which diagnostic plots to display; the default is
+\code{c("residuals", "portmanteau", "acf", "pacf")}, where
+\code{"portmanteau"} is the Box-Pierce or Ljung-Box test of
+the autocorrelations of the residuals.}
+
+\item{test}{one of \code{"Box-Pierce"} or \code{"Ljung-Box"},
+with the former the default.}
+
+\item{max.lag}{the maximum lag for the portmanteau tests; the
+default is the same as the maximum lag for the residuals autocorrelations
+and partial autocorrelations.}
 
 \item{xlab}{label for horizontal ("time") axis; defaults to
 \code{"Time"}.}
@@ -198,6 +216,12 @@ the test is performed by \code{\link[stats]{Box.test}()}.
 created by the \code{\link{Arima}()} function.
 
 \item \code{coef(ARIMA)}: \code{coef()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
+\item \code{vcov(ARIMA)}: \code{vcov()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
+\item \code{logLik(ARIMA)}: \code{logLik()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
 \item \code{model.matrix(ARIMA)}: \code{model.matrix()} method for \code{"ARIMA"} objects
