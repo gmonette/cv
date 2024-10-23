@@ -113,3 +113,4 @@ timeseries
 arima
 cvOrdered
 gls
+Ljung

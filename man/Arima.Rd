@@ -3,6 +3,8 @@
 \name{Arima}
 \alias{Arima}
 \alias{print.ARIMA}
+\alias{summary.ARIMA}
+\alias{print.summary.ARIMA}
 \alias{plot.ARIMA}
 \alias{testArima}
 \alias{testArima.ARIMA}
@@ -10,6 +12,7 @@
 \alias{coef.ARIMA}
 \alias{vcov.ARIMA}
 \alias{logLik.ARIMA}
+\alias{AIC.ARIMA}
 \alias{model.matrix.ARIMA}
 \alias{fitted.ARIMA}
 \alias{residuals.ARIMA}
@@ -27,7 +30,16 @@ Arima(
   ...
 )
 
-\method{print}{ARIMA}(x, ...)
+\method{print}{ARIMA}(x, digits = max(3L, getOption("digits") - 3L), ...)
+
+\method{summary}{ARIMA}(object, correlation = FALSE, ...)
+
+\method{print}{summary.ARIMA}(
+  x,
+  digits = max(3L, getOption("digits") - 3L),
+  signif.stars = getOption("show.signif.stars"),
+  ...
+)
 
 \method{plot}{ARIMA}(
   x,
@@ -51,6 +63,8 @@ testArima(model, ...)
 \method{vcov}{ARIMA}(object, ...)
 
 \method{logLik}{ARIMA}(object, ...)
+
+\method{AIC}{ARIMA}(object, ..., k)
 
 \method{model.matrix}{ARIMA}(object, ...)
 
@@ -101,10 +115,18 @@ an AR(1) model.}
 see \code{\link{arima}()} for details; the default is not to include
 a seasonal part of the model.}
 
-\item{...}{further arguments to be passed to \code{\link{arima}()}
-or \code{Arima()}.}
+\item{...}{further arguments to be passed to \code{\link{arima}()},
+\code{Arima()}, or other functions and methods.}
 
 \item{x}{an object of class \code{"ARIMA"}.}
+
+\item{digits}{for printing.}
+
+\item{object}{an object of class \code{"ARIMA"}.}
+
+\item{correlation}{compute and report correlations of coefficients.}
+
+\item{signif.stars}{show "significance stars" in coefficient table?}
 
 \item{y}{which diagnostic plots to display; the default is
 \code{c("residuals", "portmanteau", "acf", "pacf")}, where
@@ -135,7 +157,10 @@ is used.}
 \item{type}{test of autocorrelations, either \code{"Box-Pierce"} (the default)
 or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()}).}
 
-\item{object}{an object of class \code{"ARIMA"}.}
+\item{k}{number of folds, an integer \eqn{\gt 2}; the default is \code{"n"}, in which case
+the first fold is determined by \code{begin.with} and subsequent folds
+each contain a single case; that makes sense if \code{fold.type = "cumulative"}.
+Ignored for the \code{ATC()} method (to match the generic).}
 
 \item{n.ahead}{number of future cases to predict.}
 
@@ -147,10 +172,6 @@ the standard errors of the predictions.}
 
 \item{criterion}{function to compute the CV cost criterion
 (default \code{\link{mse}}).}
-
-\item{k}{number of folds, an integer \eqn{\gt 2}; the default is \code{"n"}, in which case
-the first fold is determined by \code{begin.with} and subsequent folds
-each contain a single case; that makes sense if \code{fold.type = "cumulative"}.}
 
 \item{reps}{ignored (to match \code{\link{cv}()} generic function).}
 
@@ -206,6 +227,11 @@ fit by \code{Arima()}, which provides a formula interface to the
 \item \code{print(ARIMA)}: \code{print()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
+\item \code{summary(ARIMA)}: \code{summary()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
+\item \code{print(summary.ARIMA)}: \code{print()} method for \code{"summary.ARIMA"} objects.
+
 \item \code{plot(ARIMA)}: \code{plot()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
@@ -222,6 +248,9 @@ created by the \code{\link{Arima}()} function.
 created by the \code{\link{Arima}()} function.
 
 \item \code{logLik(ARIMA)}: \code{logLik()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
+\item \code{AIC(ARIMA)}: \code{AIC()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
 \item \code{model.matrix(ARIMA)}: \code{model.matrix()} method for \code{"ARIMA"} objects
@@ -247,7 +276,7 @@ withAutoprint({
 # model adapted from help("arima")
 LH <- data.frame(lh = lh)
 lh.arima <- Arima(~lh, data=LH)
-lh.arima
+summary(lh.arima)
 plot(lh.arima)
 testArima(lh.arima)
 summary(cv.lh <- cv(lh.arima, lead=1:5))
@@ -260,7 +289,7 @@ summary(cv(lh.arima, k=5, fold.type="preceding"))
 Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
 lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                   order=c(2, 0, 0))
-lake.arima
+summary(lake.arima)
 plot(lake.arima)
 testArima(lake.arima)
 summary(cv.lake <- cv(lake.arima, lead=1:5))

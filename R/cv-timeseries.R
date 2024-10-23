@@ -14,6 +14,7 @@
 #' @param k number of folds, an integer \eqn{\gt 2}; the default is \code{"n"}, in which case
 #' the first fold is determined by \code{begin.with} and subsequent folds
 #' each contain a single case; that makes sense if \code{fold.type = "cumulative"}.
+#' Ignored for the \code{ATC()} method (to match the generic).
 #' @param reps ignored (to match \code{\link{cv}()} generic function).
 #' @param seed ignored (to match \code{\link{cv}()} generic function).
 #' @param fold.type if \code{"cumulative"} (the default), predict
@@ -36,7 +37,7 @@
 #' # model adapted from help("arima")
 #' LH <- data.frame(lh = lh)
 #' lh.arima <- Arima(~lh, data=LH)
-#' lh.arima
+#' summary(lh.arima)
 #' plot(lh.arima)
 #' testArima(lh.arima)
 #' summary(cv.lh <- cv(lh.arima, lead=1:5))
@@ -49,7 +50,7 @@
 #' Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
 #' lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
 #'                   order=c(2, 0, 0))
-#' lake.arima
+#' summary(lake.arima)
 #' plot(lake.arima)
 #' testArima(lake.arima)
 #' summary(cv.lake <- cv(lake.arima, lead=1:5))
@@ -72,8 +73,8 @@
 #' @param seasonal specification of the seasonal part of the ARIMA model;
 #' see \code{\link{arima}()} for details; the default is not to include
 #' a seasonal part of the model.
-#' @param ... further arguments to be passed to \code{\link{arima}()}
-#' or \code{Arima()}.
+#' @param ... further arguments to be passed to \code{\link{arima}()},
+#' \code{Arima()}, or other functions and methods.
 #'
 #' @describeIn Arima model-formula wrapper for the \code{\link{arima}()} function.
 #' @export
@@ -113,13 +114,61 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
 }
 
 #' @param x an object of class \code{"ARIMA"}.
+#' @param digits for printing.
 #' @describeIn Arima \code{print()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
-print.ARIMA <- function(x, ...){
-  xx <- x$arima
-  xx$call <- getCall(x)
-  print(xx)
+print.ARIMA <- function (x, digits = max(3L, getOption("digits") - 3L),
+                         ...) {
+  cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
+      "\n\n", sep = "")
+  cat("Coefficients:\n")
+  print(format(coef(x), digits = digits), quote=FALSE)
+  cat("\n")
+  invisible(x)
+}
+
+#' @param correlation compute and report correlations of coefficients.
+#' @describeIn Arima \code{summary()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+summary.ARIMA <- function (object, correlation=FALSE, ...) {
+  arima <- object$arima
+  call <- object$call
+  coef <- coef(object)
+  vcov <- vcov(object)
+  corr <- if (correlation) cov2cor(vcov)
+  sigma2 <- arima$sigma2
+  logLik <- logLik(object)
+  aic <- AIC(object)
+  result <- list(call=call, coef=coef, vcov=vcov, corr=corr,
+                 sigma2=sigma2, logLik=logLik, aic=aic)
+  class(result) <- "summary.ARIMA"
+  result
+}
+
+#' @param signif.stars show "significance stars" in coefficient table?
+#' @describeIn Arima \code{print()} method for \code{"summary.ARIMA"} objects.
+#' @export
+print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
+                                signif.stars = getOption("show.signif.stars"), ...){
+  cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
+      "\n\n", sep = "")
+  coefMat <- cbind(b <- x$coef, se.b <- sqrt(diag(x$vcov)),
+                   z <- b/se.b, p = 2*pnorm(abs(z), lower.tail=FALSE))
+  rownames(coefMat) <- names(b)
+  colnames(coefMat) <- c("Estimate", "Std. Error", "z value",
+                         "Pr(>|z|")
+  printCoefmat(coefMat, digits = digits, signif.stars = signif.stars,
+               na.print = "NA", ...)
+  corr <- x$corr
+  if (!is.null(corr)){
+    cat("\nCorrelations of coefficients:\n")
+    print(corr, digits=digits)
+  }
+  cat("\nResidual standard deviation:", signif(sqrt(x$sigma2), digits))
+  cat("\nLog-likelhood =", signif(x$logLik, digits),
+      "\nAIC =", signif(x$aic, digits))
   invisible(x)
 }
 
@@ -207,7 +256,7 @@ testArima <- function(model, ...){
 #'   or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()}).
 #' @describeIn Arima test autocorrelations of ARIMA model residuals;
 #'   the test is performed by \code{\link[stats]{Box.test}()}.
-#' @importFrom stats Box.test logLik vcov
+#' @importFrom stats Box.test logLik vcov AIC cov2cor pnorm
 #' @importFrom grDevices n2mfrow
 #' @export
 testArima.ARIMA <- function(model, lag=1,
@@ -262,6 +311,13 @@ vcov.ARIMA <- function(object, ...) vcov(object$arima)
 #' created by the \code{\link{Arima}()} function.
 #' @export
 logLik.ARIMA <- function(object, ...) logLik(object$arima)
+
+#' @describeIn Arima \code{AIC()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+AIC.ARIMA <- function(object, ..., k){
+  object$arima$aic
+}
 
 #' @describeIn Arima \code{model.matrix()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
