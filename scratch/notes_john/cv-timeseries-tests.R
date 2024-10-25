@@ -111,7 +111,7 @@ fold(ff, 9)
 fold(ff, 9, predicted=TRUE)
 fold(ff, 9, predicted=TRUE, lead=20)
 
-ff <- folds(100, 10, fold.type="preceding", begin.with=20)
+ff <- folds(100, 10, fold.type="preceding")
 ff
 fold(ff, 2)
 fold(ff, 2, predicted=TRUE, lead=1:5)

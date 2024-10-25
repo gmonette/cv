@@ -1033,8 +1033,8 @@ folds <- function(n, k,
       k <- length(starts)
       folds <- ends - starts + 1L
       indices <- 1L:n
-    } else if (fold.type %in% c("cumulative", "preceding")) {
-      if (fold.type == "cumulative" && missing(k)) k <- n
+    } else if (fold.type == c("cumulative")) {
+      if (missing(k)) k <- n
       after.first <- n - begin.with
       k <- min(k, after.first + 1)
       nk <- after.first %/% (k - 1L)
@@ -1115,7 +1115,7 @@ print.folds <- function(x, ...) {
   if (x$fold.type == "window"){
     cat(x$k, "moving-window folds of", x$folds[1],
         "cases each")
-  } else if (x$fold.type %in% c("cumulative", "preceding")){
+  } else if (x$fold.type == "cumulative"){
     fold.size <- round((x$n - x$folds[1]) / (x$k - 1))
     all.ones <- all(x$folds[-1] == 1)
     cat("initial ordered fold of", x$folds[1], "cases,",
@@ -1123,18 +1123,21 @@ print.folds <- function(x, ...) {
         if (all.ones) "folds of 1 case each" else paste("folds\n  of approximately",
         fold.size, "cases each"))
   } else {
-      cat(x$k, "folds of approximately", round(x$n / x$k),
+      cat(x$k, if(x$fold.type == "preceding") "ordered",
+          "folds of approximately", round(x$n / x$k),
           "cases each")
-      for (i in 1L:min(x$k, 10L)) {
-        cat("\n fold", paste0(i, ": "))
-        fld <- fold(x, i)
-        if (length(fld) <= 10L)
-          cat(fld)
-        else
-          cat(fld[1L:10L], "...")
+      if (x$fold.type == "unordered"){
+        for (i in 1L:min(x$k, 10L)) {
+          cat("\n fold", paste0(i, ": "))
+          fld <- fold(x, i)
+          if (length(fld) <= 10L)
+            cat(fld)
+          else
+            cat(fld[1L:10L], "...")
+        }
+        if (x$k > 10L)
+          cat("\n ...")
       }
-      if (x$k > 10L)
-        cat("\n ...")
     }
   cat("\n")
   invisible(x)

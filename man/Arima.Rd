@@ -185,7 +185,8 @@ the \code{i}th fold only; if \code{"window"}, folds comprise a moving window
 of \code{begin.with} cases.}
 
 \item{begin.with}{the number of cases in
-the first fold. The remaining cases are divided among the subsequent
+the first fold; disregarded for \code{fold.type="preceding"}.
+The remaining cases are divided among the subsequent
 \code{k} - 1 folds.}
 
 \item{lead}{how far ahead to predict (can be a vector of positive integers);

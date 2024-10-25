@@ -403,7 +403,8 @@ predict.ARIMA <- function(object, n.ahead, newdata = NULL,
 }
 
 #' @param begin.with the number of cases in
-#' the first fold. The remaining cases are divided among the subsequent
+#' the first fold; disregarded for \code{fold.type="preceding"}.
+#' The remaining cases are divided among the subsequent
 #' \code{k} - 1 folds.
 #' @describeIn Arima \code{cv()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
