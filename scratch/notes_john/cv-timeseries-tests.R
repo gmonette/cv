@@ -9,10 +9,14 @@ predict(res, n.ahead=1)
 coef(res)
 update(res, data=D[-(1:10), , drop=FALSE])
 update(res, order=c(1, 1, 1))
+plot(res)
 
 cv.a <- cv(res)
 summary(cv.a)
 cv.a$details
+
+summary(cv(res, k=5, fold.type="preceding"))
+summary(cv(res, fold.type="window"))
 
 cv.a.p <- cv(res, ncores=2)
 all.equal(cv.a, cv.a.p)
@@ -67,6 +71,7 @@ predict(res.x, newdata=data.frame(year=c(1973, 1974)))
 predict(res.x, n.ahead=2, newdata=data.frame(year=c(1973, 1974)))
 predict(res.x)
 update(res.x, data=DD[-(1:10), ])
+plot(res.x)
 
 cv.ax <- cv(res.x, lead=1:5)
 summary(cv.ax)
@@ -85,7 +90,7 @@ all.equal(cv.ax.i, cv.ax.i.p)
 cv.bx.i <- cv(res.x, fold.type="window", lead=1:5)
 cv.bx.i.p <- cv(res.x, fold.type="window", lead=1:5, ncores=2)
 all.equal(cv.bx.i, cv.bx.i.p)
-cv.bx.i
+summary(cv.bx.i)
 plot(cv.bx.i)
 
 ## ------- folds --------

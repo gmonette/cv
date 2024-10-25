@@ -14,7 +14,9 @@
 #'        (the mean-squared error).
 #' @param k perform k-fold cross-validation (default is \code{10}); \code{k}
 #' may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
-#' cross-validation; for \code{folds()} and \code{cvOrdered()}, \code{k} must be a number.
+#' cross-validation; for \code{folds()}, \code{k} must be a number;
+#' for \code{cvOrdered()} the default value of \code{k} depends on
+#' \code{fold.type}.
 #' @param reps number of times to replicate k-fold CV (default is \code{1}).
 #' @param confint if \code{TRUE} (the default if the number of cases is 400
 #' or greater), compute a confidence interval for the bias-corrected CV
@@ -894,7 +896,7 @@ cvOrdered <- function(model,
                       data = insight::get_data(model),
                       criterion = mse,
                       criterion.name,
-                      k = "n",
+                      k = if (fold.type == "preceding") 10 else "n",
                       details = n <= 1e4,
                       method = NULL,
                       ncores = 1L,
@@ -1010,7 +1012,8 @@ cvOrdered <- function(model,
     else
       NULL,
     "details" = list(criterion = crit.i, coefficients = coef.i),
-    fold.type = fold.type
+    fold.type = fold.type,
+    folds = folds
   )
   if (missing(method))
     result$method <- NULL
@@ -1116,8 +1119,8 @@ print.folds <- function(x, ...) {
     fold.size <- round((x$n - x$folds[1]) / (x$k - 1))
     all.ones <- all(x$folds[-1] == 1)
     cat("initial ordered fold of", x$folds[1], "cases,",
-        "\nfollowed by", x$k - 1,
-        if (all.ones) "folds of 1 case each" else paste("folds of approximately",
+        "followed by", x$k - 1,
+        if (all.ones) "folds of 1 case each" else paste("folds\n  of approximately",
         fold.size, "cases each"))
   } else {
       cat(x$k, "folds of approximately", round(x$n / x$k),

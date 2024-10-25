@@ -90,7 +90,7 @@ cvOrdered(
   data = insight::get_data(model),
   criterion = mse,
   criterion.name,
-  k = "n",
+  k = if (fold.type == "preceding") 10 else "n",
   details = n <= 10000,
   method = NULL,
   ncores = 1L,
@@ -151,7 +151,9 @@ in the returned \code{"cv"} object).}
 
 \item{k}{perform k-fold cross-validation (default is \code{10}); \code{k}
 may be a number or \code{"loo"} or \code{"n"} for n-fold (leave-one-out)
-cross-validation; for \code{folds()} and \code{cvOrdered()}, \code{k} must be a number.}
+cross-validation; for \code{folds()}, \code{k} must be a number;
+for \code{cvOrdered()} the default value of \code{k} depends on
+\code{fold.type}.}
 
 \item{reps}{number of times to replicate k-fold CV (default is \code{1}).}
 

@@ -11,7 +11,8 @@
 #' frame with data to which the model is to be fit.
 #' @param criterion function to compute the CV cost criterion
 #' (default \code{\link{mse}}).
-#' @param k number of folds, an integer \eqn{\gt 2}; the default is \code{"n"}, in which case
+#' @param k number of folds, an integer \eqn{\gt 2}; the default value of \code{k} depends on
+#' \code{fold.type};  if \code{k = "n"},
 #' the first fold is determined by \code{begin.with} and subsequent folds
 #' each contain a single case; that makes sense if \code{fold.type = "cumulative"}.
 #' Ignored for the \code{ATC()} method (to match the generic).
@@ -410,7 +411,7 @@ predict.ARIMA <- function(object, n.ahead, newdata = NULL,
 cv.ARIMA <- function(model,
                    data = model$data,
                    criterion = mse,
-                   k = "n",
+                   k = if (fold.type == "preceding") 10 else "n",
                    reps,
                    seed,
                    fold.type = c("cumulative", "preceding", "window"),
