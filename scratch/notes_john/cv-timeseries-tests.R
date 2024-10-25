@@ -4,6 +4,7 @@ D <- data.frame(lh = lh)
 
 res <- Arima(~lh, data=D)
 res
+summary(res)
 predict(res, n.ahead=1)
 coef(res)
 update(res, data=D[-(1:10), , drop=FALSE])
@@ -60,7 +61,8 @@ all.equal(cv.c.w, cv.c.w.p)
 DD <- data.frame(level=LakeHuron, year=time(LakeHuron))
 res.x <- Arima(level ~ I(year - 1920), data=DD, order=c(2, 0, 0))
 res.x
-coef(res.x)
+summary(res.x)
+summary(Arima(level - mean(level) ~ I(year - 1920) - 1, data=DD, order=c(2, 0, 0)))
 predict(res.x, newdata=data.frame(year=c(1973, 1974)))
 predict(res.x, n.ahead=2, newdata=data.frame(year=c(1973, 1974)))
 predict(res.x)

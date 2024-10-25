@@ -92,20 +92,27 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
   mt <- attr(mf, "terms")
   x <- model.matrix(mt, mf)
   which.int <- which("(Intercept)" == colnames(x))
-  if (length(which.int > 0)) x <- x[, -which.int, drop=FALSE]
+  if (length(which.int > 0)) {
+    has.intercept <- TRUE
+    x <- x[, -which.int, drop=FALSE]
+  } else {
+    has.intercept <- FALSE
+  }
   result <- list(formula=formula, data=data, subset=subset,
                  na.action=na.action, order=order, seasonal=seasonal,
                  call=cl, dots=dots)
   if (length(formula) == 2){
     if (!(ncol(x) == 1) && is.numeric(x[, 1]))
       stop("formula must specify a single response")
-    result$arima <- stats::arima(x[, 1], order=order, seasonal=seasonal, ...)
+    result$arima <- stats::arima(x[, 1], order=order, seasonal=seasonal,
+                                 ...)
     result$response <- x[, 1]
   } else {
     y <- model.response(mf, "numeric")
     if (!is.vector(y) && is.numeric(y))
       stop("formula must specify a single response")
-    result$arima <- stats::arima(y, order=order, seasonal=seasonal, xreg=x, ...)
+    result$arima <- stats::arima(y, order=order, seasonal=seasonal, xreg=x,
+                                 include.mean=has.intercept, ...)
     result$response <- y
     result$model.matrix <- x
   }
@@ -122,7 +129,7 @@ print.ARIMA <- function (x, digits = max(3L, getOption("digits") - 3L),
                          ...) {
   cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
       "\n\n", sep = "")
-  cat("Coefficients:\n")
+  cat("Estimates:\n")
   print(format(coef(x), digits = digits), quote=FALSE)
   cat("\n")
   invisible(x)
@@ -141,8 +148,10 @@ summary.ARIMA <- function (object, correlation=FALSE, ...) {
   sigma2 <- arima$sigma2
   logLik <- logLik(object)
   aic <- AIC(object)
+  residuals <- residuals(object)
   result <- list(call=call, coef=coef, vcov=vcov, corr=corr,
-                 sigma2=sigma2, logLik=logLik, aic=aic)
+                 sigma2=sigma2, logLik=logLik, aic=aic,
+                 residuals = if (length(residuals) >= 5) residuals)
   class(result) <- "summary.ARIMA"
   result
 }
@@ -154,11 +163,20 @@ print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
                                 signif.stars = getOption("show.signif.stars"), ...){
   cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
       "\n\n", sep = "")
+  residuals <- x$residuals
+  if (!is.null(residuals)){
+    quants <- quantile(residuals, c(0, 0.25, 0.5, 0.75, 1))
+    names(quants) <- c("Min", "1st Q", "Median", "3rd Q", "Max")
+    cat("Residuals:\n")
+    print(quants, digits=digits)
+    cat("\n")
+  }
   coefMat <- cbind(b <- x$coef, se.b <- sqrt(diag(x$vcov)),
                    z <- b/se.b, p = 2*pnorm(abs(z), lower.tail=FALSE))
   rownames(coefMat) <- names(b)
   colnames(coefMat) <- c("Estimate", "Std. Error", "z value",
                          "Pr(>|z|")
+  cat("Estimates:\n")
   printCoefmat(coefMat, digits = digits, signif.stars = signif.stars,
                na.print = "NA", ...)
   corr <- x$corr
@@ -256,7 +274,7 @@ testArima <- function(model, ...){
 #'   or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()}).
 #' @describeIn Arima test autocorrelations of ARIMA model residuals;
 #'   the test is performed by \code{\link[stats]{Box.test}()}.
-#' @importFrom stats Box.test logLik vcov AIC cov2cor pnorm
+#' @importFrom stats Box.test logLik vcov AIC cov2cor pnorm quantile
 #' @importFrom grDevices n2mfrow
 #' @export
 testArima.ARIMA <- function(model, lag=1,
@@ -300,7 +318,11 @@ update.ARIMA <- function(object, ...){
 #' @describeIn Arima \code{coef()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
-coef.ARIMA <- function(object, ...) coef(object$arima)
+coef.ARIMA <- function(object, ...) {
+  coefs <- coef(object$arima)
+  names(coefs)[names(coefs) == "intercept"] <- "(Intercept)"
+  coefs
+}
 
 #' @describeIn Arima \code{vcov()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
