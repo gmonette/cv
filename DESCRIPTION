@@ -2,7 +2,7 @@ Package: cv
 Type: Package
 Title: Cross-Validating Regression Models
 Version: 2.1.0
-Date: 2024-10-23
+Date: 2024-10-26
 Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
   comment = c(ORCID = "0000-0002-1196-8012")),
 	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"))
@@ -14,9 +14,8 @@ Description: Cross-validation methods of regression models that exploit features
     Applications in R, Second Edition", and Trevor Hastie, Robert Tibshirani, 
     and Jerome Friedman (2009, ISBN 978-0-387-84857-0, Sec. 7.10), "The Elements of Statistical 
     Learning, Second Edition".
-Depends: R (>= 3.5.0), doParallel 
-Imports: car,
-         foreach, 
+Depends: R (>= 3.5.0), car, doParallel 
+Imports: foreach, 
          glmmTMB,
          graphics,
          grDevices,

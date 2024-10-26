@@ -6,6 +6,8 @@
 \alias{summary.ARIMA}
 \alias{print.summary.ARIMA}
 \alias{plot.ARIMA}
+\alias{Anova.ARIMA}
+\alias{linearHypothesis.ARIMA}
 \alias{testArima}
 \alias{testArima.ARIMA}
 \alias{update.ARIMA}
@@ -14,6 +16,7 @@
 \alias{logLik.ARIMA}
 \alias{AIC.ARIMA}
 \alias{model.matrix.ARIMA}
+\alias{model.frame.ARIMA}
 \alias{fitted.ARIMA}
 \alias{residuals.ARIMA}
 \alias{predict.ARIMA}
@@ -52,6 +55,10 @@ Arima(
   ...
 )
 
+\method{Anova}{ARIMA}(mod, type = c("II", "III", 2, 3), ...)
+
+\method{linearHypothesis}{ARIMA}(model, hypothesis.matrix, rhs = NULL, ...)
+
 testArima(model, ...)
 
 \method{testArima}{ARIMA}(model, lag = 1, type = c("Box-Pierce", "Ljung-Box"), ...)
@@ -67,6 +74,8 @@ testArima(model, ...)
 \method{AIC}{ARIMA}(object, ..., k)
 
 \method{model.matrix}{ARIMA}(object, ...)
+
+\method{model.frame}{ARIMA}(formula, ...)
 
 \method{fitted}{ARIMA}(object, ...)
 
@@ -95,7 +104,9 @@ testArima(model, ...)
 in an ARIMA model with no predictors, or a two-sided formula with the
 response on the left and terms for the predictors on the right (as in
 a typical R regression model); if the timeseries is differenced, the intercept
-is removed from the model even if the formula implies an intercept.}
+is removed from the model even if the formula implies an intercept.
+For the \code{\link[stats]{model.frame}()}
+method (to match the generic), an \code{"ARIMA"} object.}
 
 \item{data}{data frame with the data to which the model was fit;
 can usually be inferred from the model; for \code{Arima()}, a data
@@ -147,15 +158,26 @@ and partial autocorrelations.}
 
 \item{col}{color for points and lines.}
 
+\item{mod}{an object of class \code{"ARIMA"}
+produced by the \code{Arima()} function.}
+
+\item{type}{test of autocorrelations, either \code{"Box-Pierce"} (the default)
+or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()});
+for the \code{Anova()}, method, "type" of test (see \code{\link[car]{Anova}()}
+for details.)}
+
 \item{model}{an object of class \code{"ARIMA"}
 produced by the \code{Arima()} function.}
+
+\item{hypothesis.matrix}{specification of the linear hypothesis;
+for details, see \code{\link[car]{linearHypothesis}()}.}
+
+\item{rhs}{optional right-hand-side vector for the linear hypothesis;
+for details, see \code{\link[car]{linearHypothesis}()}.}
 
 \item{lag}{maximum lag to compute residual autocorrelation; if not
 specified, the same default maximum lag as \code{\link[stats]{acf}}
 is used.}
-
-\item{type}{test of autocorrelations, either \code{"Box-Pierce"} (the default)
-or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()}).}
 
 \item{k}{number of folds, an integer \eqn{\gt 2}; the default value of \code{k} depends on
 \code{fold.type};  if \code{k = "n"},
@@ -237,6 +259,12 @@ created by the \code{\link{Arima}()} function.
 \item \code{plot(ARIMA)}: \code{plot()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
+\item \code{Anova(ARIMA)}: \code{\link[car]{Anova}()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
+\item \code{linearHypothesis(ARIMA)}: \code{\link[car]{linearHypothesis}()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
 \item \code{testArima(ARIMA)}: test autocorrelations of ARIMA model residuals;
 the test is performed by \code{\link[stats]{Box.test}()}.
 
@@ -256,6 +284,9 @@ created by the \code{\link{Arima}()} function.
 created by the \code{\link{Arima}()} function.
 
 \item \code{model.matrix(ARIMA)}: \code{model.matrix()} method for \code{"ARIMA"} objects
+created by the \code{\link{Arima}()} function.
+
+\item \code{model.frame(ARIMA)}: \code{model.frame()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
 
 \item \code{fitted(ARIMA)}: \code{fitted()} method for \code{"ARIMA"} objects
@@ -292,6 +323,8 @@ Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
 lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                   order=c(2, 0, 0))
 summary(lake.arima)
+Anova(lake.arima, type=3)
+linearHypothesis(lake.arima, hypothesis=c("ar1", "ar2"))
 plot(lake.arima)
 testArima(lake.arima)
 summary(cv.lake <- cv(lake.arima, lead=1:5))

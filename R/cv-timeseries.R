@@ -6,6 +6,8 @@
 #'
 #' @param model an object of class \code{"ARIMA"}
 #' produced by the \code{Arima()} function.
+#' @param mod an object of class \code{"ARIMA"}
+#' produced by the \code{Arima()} function.
 #' @param data data frame with the data to which the model was fit;
 #' can usually be inferred from the model; for \code{Arima()}, a data
 #' frame with data to which the model is to be fit.
@@ -52,6 +54,8 @@
 #' lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
 #'                   order=c(2, 0, 0))
 #' summary(lake.arima)
+#' Anova(lake.arima, type=3)
+#' linearHypothesis(lake.arima, hypothesis=c("ar1", "ar2"))
 #' plot(lake.arima)
 #' testArima(lake.arima)
 #' summary(cv.lake <- cv(lake.arima, lead=1:5))
@@ -64,6 +68,8 @@
 #' response on the left and terms for the predictors on the right (as in
 #' a typical R regression model); if the timeseries is differenced, the intercept
 #' is removed from the model even if the formula implies an intercept.
+#' For the \code{\link[stats]{model.frame}()}
+#' method (to match the generic), an \code{"ARIMA"} object.
 #' @param subset subsetting expression.
 #' @param na.action function to process missing data; the default,
 #' \code{\link{na.pass}}, will pass missing data to the \code{\link{arima}()}
@@ -101,7 +107,7 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
   }
   result <- list(formula=formula, data=data, subset=subset,
                  na.action=na.action, order=order, seasonal=seasonal,
-                 call=cl, dots=dots)
+                 call=cl, model=mf, dots=dots)
   if (length(formula) == 2){
     if (!(ncol(x) == 1) && is.numeric(x[, 1]))
       stop("formula must specify a single response")
@@ -187,7 +193,7 @@ print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
   }
   cat("\nResidual standard deviation:", signif(sqrt(x$sigma2), digits))
   cat("\nLog-likelhood =", signif(x$logLik, digits),
-      "\nAIC =", signif(x$aic, digits))
+      "\nAIC =", signif(x$aic, digits), "\n")
   invisible(x)
 }
 
@@ -262,6 +268,40 @@ plot.ARIMA <- function(x,
   title(main=main, outer=TRUE)
 }
 
+#' @importFrom car Anova linearHypothesis
+#' @describeIn Arima \code{\link[car]{Anova}()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+Anova.ARIMA <- function(mod, type = c("II", "III", 2, 3), ...){
+  vc <- vcov(mod)
+  coefs <- coef(mod)
+  all.names <- names(coefs)
+  b.names <- colnames(model.matrix(mod))
+  has.intercept <- "(Intercept)" %in% all.names
+  if (has.intercept) b.names <- c("(Intercept)", b.names)
+  if (has.intercept) {
+    model.matrix <- cbind(1, mod$model.matrix)
+    colnames(model.matrix)[1] <- "(Intercept)"
+    mod$model.matrix <- model.matrix
+  }
+  mod$terms <- terms(mod$formula)
+  mod$arima$coef <- coefs[b.names]
+  mod$arima$var.coef <- vc[b.names, b.names]
+  NextMethod()
+}
+
+#' @param hypothesis.matrix specification of the linear hypothesis;
+#' for details, see \code{\link[car]{linearHypothesis}()}.
+#' @param rhs optional right-hand-side vector for the linear hypothesis;
+#' for details, see \code{\link[car]{linearHypothesis}()}.
+#' @describeIn Arima \code{\link[car]{linearHypothesis}()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+linearHypothesis.ARIMA <- function(model, hypothesis.matrix, rhs=NULL, ...){
+  NextMethod(vcov. = vcov(model), coef. = coef(model),
+             suppress.vcov.msg = TRUE)
+}
+
 #' @rdname Arima
 #' @export
 testArima <- function(model, ...){
@@ -272,10 +312,12 @@ testArima <- function(model, ...){
 #'   specified, the same default maximum lag as \code{\link[stats]{acf}}
 #'   is used.
 #' @param type test of autocorrelations, either \code{"Box-Pierce"} (the default)
-#'   or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()}).
+#'   or \code{"Ljung-Box"} (see \code{\link[stats]{Box.test}()});
+#'   for the \code{Anova()}, method, "type" of test (see \code{\link[car]{Anova}()}
+#'   for details.)
 #' @describeIn Arima test autocorrelations of ARIMA model residuals;
 #'   the test is performed by \code{\link[stats]{Box.test}()}.
-#' @importFrom stats Box.test logLik vcov AIC cov2cor pnorm quantile
+#' @importFrom stats Box.test logLik vcov AIC cov2cor pnorm quantile terms
 #' @importFrom grDevices n2mfrow
 #' @export
 testArima.ARIMA <- function(model, lag=1,
@@ -328,7 +370,13 @@ coef.ARIMA <- function(object, ...) {
 #' @describeIn Arima \code{vcov()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
-vcov.ARIMA <- function(object, ...) vcov(object$arima)
+vcov.ARIMA <- function(object, ...) {
+  vc <- vcov(object$arima)
+  where.intercept <- rownames(vc) == "intercept"
+  rownames(vc)[where.intercept] <- "(Intercept)"
+  colnames(vc)[where.intercept] <- "(Intercept)"
+  vc
+}
 
 #' @describeIn Arima \code{logLik()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
@@ -345,7 +393,16 @@ AIC.ARIMA <- function(object, ..., k){
 #' @describeIn Arima \code{model.matrix()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
-model.matrix.ARIMA <- function(object, ...) object$model.matrix
+model.matrix.ARIMA <- function(object, ...){
+  object$model.matrix
+}
+
+#' @describeIn Arima \code{model.frame()} method for \code{"ARIMA"} objects
+#' created by the \code{\link{Arima}()} function.
+#' @export
+model.frame.ARIMA <- function(formula, ...){
+  formula$model
+}
 
 #' @param n.ahead number of future cases to predict.
 #' @param newdata data frame with rows containing the
