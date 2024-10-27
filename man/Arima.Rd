@@ -59,7 +59,12 @@ Arima(
 
 testArima(model, ...)
 
-\method{testArima}{ARIMA}(model, lag = 1, type = c("Box-Pierce", "Ljung-Box"), ...)
+\method{testArima}{ARIMA}(
+  model,
+  lag = floor(10 * log10(n)),
+  type = c("Box-Pierce", "Ljung-Box"),
+  ...
+)
 
 \method{update}{ARIMA}(object, formula, ...)
 

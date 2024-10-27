@@ -319,13 +319,12 @@ testArima <- function(model, ...){
 #' KalmanForecast deltat ts tsp
 #' @importFrom grDevices n2mfrow
 #' @export
-testArima.ARIMA <- function(model, lag=1,
+testArima.ARIMA <- function(model, lag = floor(10*log10(n)),
                             type = c("Box-Pierce", "Ljung-Box"),
                             ...){
   type <- match.arg(type)
   residuals <- residuals(model)
   n <- length(residuals)
-  # use same lag as acf() and pacf():
   fitdf <- length(coef(model))
   stats::Box.test(residuals, lag=lag, type=type,
                   fitdf=if (fitdf < lag) fitdf else 0)
