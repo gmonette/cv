@@ -35,7 +35,9 @@
 #'
 #' @examples
 #' if (require("stats", quietly=TRUE) &&
-#'     require("datasets", quietly=TRUE)){
+#'     require("datasets", quietly=TRUE) &&
+#'     require("car") &&
+#'     require("effects")){
 #' withAutoprint({
 #' # model adapted from help("arima")
 #' LH <- data.frame(lh = lh)
@@ -60,6 +62,7 @@
 #' testArima(lake.arima)
 #' summary(cv.lake <- cv(lake.arima, lead=1:5))
 #' plot(cv.lake)
+#' plot(Effect("year", lake.arima, residuals=TRUE))
 #' })
 #' }
 
@@ -268,10 +271,10 @@ plot.ARIMA <- function(x,
   title(main=main, outer=TRUE)
 }
 
-#' @importFrom car Anova linearHypothesis
 #' @describeIn Arima \code{\link[car]{Anova}()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
-#' @export
+#' @method Anova ARIMA
+#' @exportS3Method car::Anova ARIMA
 Anova.ARIMA <- function(mod, type = c("II", "III", 2, 3), ...){
   vc <- vcov(mod)
   coefs <- coef(mod)
@@ -296,10 +299,25 @@ Anova.ARIMA <- function(mod, type = c("II", "III", 2, 3), ...){
 #' for details, see \code{\link[car]{linearHypothesis}()}.
 #' @describeIn Arima \code{\link[car]{linearHypothesis}()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
-#' @export
+#' @method linearHypothesis ARIMA
+#' @exportS3Method car::linearHypothesis ARIMA
 linearHypothesis.ARIMA <- function(model, hypothesis.matrix, rhs=NULL, ...){
   NextMethod(vcov. = vcov(model), coef. = coef(model),
              suppress.vcov.msg = TRUE)
+}
+
+#' @exportS3Method effects::effSources ARIMA
+effSources.ARIMA <- function(mod){
+  coefs <- coef(mod)
+  vc <- vcov(mod)
+  all.names <- names(coefs)
+  b.names <- colnames(model.matrix(mod))
+  has.intercept <- "(Intercept)" %in% all.names
+  if (has.intercept) b.names <- c("(Intercept)", b.names)
+  args <- list(
+    coefficients = coefs[b.names],
+    vcov = vc[b.names, b.names])
+  args
 }
 
 #' @rdname Arima

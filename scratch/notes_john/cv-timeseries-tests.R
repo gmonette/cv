@@ -72,6 +72,7 @@ predict(res.x, n.ahead=2, newdata=data.frame(year=c(1973, 1974)))
 predict(res.x)
 update(res.x, data=DD[-(1:10), ])
 plot(res.x)
+plot(Effect("year", res.x, residuals=TRUE))
 
 cv.ax <- cv(res.x, lead=1:5)
 summary(cv.ax)

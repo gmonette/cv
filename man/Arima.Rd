@@ -304,7 +304,9 @@ created by the \code{\link{Arima}()} function.
 }}
 \examples{
 if (require("stats", quietly=TRUE) &&
-    require("datasets", quietly=TRUE)){
+    require("datasets", quietly=TRUE) &&
+    require("car") &&
+    require("effects")){
 withAutoprint({
 # model adapted from help("arima")
 LH <- data.frame(lh = lh)
@@ -329,6 +331,7 @@ plot(lake.arima)
 testArima(lake.arima)
 summary(cv.lake <- cv(lake.arima, lead=1:5))
 plot(cv.lake)
+plot(Effect("year", lake.arima, residuals=TRUE))
 })
 }
 }
