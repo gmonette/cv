@@ -20,11 +20,11 @@
 #' Ignored for the \code{ATC()} method (to match the generic).
 #' @param reps ignored (to match \code{\link{cv}()} generic function).
 #' @param seed ignored (to match \code{\link{cv}()} generic function).
-#' @param fold.type if \code{"cumulative"} (the default), predict
+#' @param fold.type  if \code{"window"} (the default), folds comprise a moving window
+#' of \code{begin.with} cases; if \code{"cumulative"}, predict
 #' the response for 1 or more cases after the i-th fold from the model fit to data
 #' in the \code{i}th and all preceding folds; if \code{"preceding"}, predict using cases in
-#' the \code{i}th fold only; if \code{"window"}, folds comprise a moving window
-#' of \code{begin.with} cases.
+#' the \code{i}th fold only.
 #' @param lead how far ahead to predict (can be a vector of positive integers);
 #' the default is \code{1}.
 #' @param criterion.name name of the CV criterion; can usually be
@@ -36,6 +36,7 @@
 #' @examples
 #' if (require("stats", quietly=TRUE) &&
 #'     require("datasets", quietly=TRUE) &&
+#'     require(splines) &&
 #'     require("car") &&
 #'     require("effects")){
 #' withAutoprint({
@@ -63,6 +64,9 @@
 #' summary(cv.lake <- cv(lake.arima, lead=1:5))
 #' plot(cv.lake)
 #' plot(Effect("year", lake.arima, residuals=TRUE))
+#' lake.arima.2 <- update(lake.arima, . ~ ns(year, 3))
+#' summary(cv.lake <- cv(lake.arima.2, lead=1:5))
+#' plot(Effect("year", lake.arima.2, residuals=TRUE))
 #' })
 #' }
 
@@ -119,7 +123,7 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
     result$response <- x[, 1]
   } else {
     y <- model.response(mf, "numeric")
-    if (!is.vector(y) && is.numeric(y))
+    if (!(is.vector(y) || is.ts(y)) && is.numeric(y))
       stop("formula must specify a single response")
     result$arima <- stats::arima(y, order=order, seasonal=seasonal, xreg=x,
                                  include.mean=has.intercept, ...)
@@ -335,7 +339,8 @@ testArima <- function(model, ...){
 #'   for details.)
 #' @describeIn Arima test autocorrelations of ARIMA model residuals;
 #'   the test is performed by \code{\link[stats]{Box.test}()}.
-#' @importFrom stats Box.test logLik vcov AIC cov2cor pnorm quantile terms
+#' @importFrom stats Box.test logLik vcov AIC cov2cor pnorm quantile terms is.ts
+#' KalmanForecast deltat ts tsp
 #' @importFrom grDevices n2mfrow
 #' @export
 testArima.ARIMA <- function(model, lag=1,
@@ -355,17 +360,22 @@ testArima.ARIMA <- function(model, lag=1,
 #' created by the \code{\link{Arima}()} function.
 #' @export
 #'
-update.ARIMA <- function(object, ...){
+update.ARIMA <- function(object, formula, ...){
   cl0 <- object$call
   cl <- match.call()
   args <- object$dots
-  args[c("formula", "data", "subset", "na.action", "order", "seasonal")] <-
-    object[c("formula", "data", "subset", "na.action", "order", "seasonal")]
+  args[c("data", "subset", "na.action", "order", "seasonal")] <-
+    object[c("data", "subset", "na.action", "order", "seasonal")]
   dots <- list(...)
   names <- names(dots)
   for (name in names){
     args[[name]]  <- dots[[name]]
   }
+  args$formula <- if (missing(formula)) {
+    object$formula
+    } else {
+      update(object$formula, formula)
+    }
   result <- do.call(Arima, args)
   names <- names(cl)
   for (name in names){
@@ -490,7 +500,7 @@ cv.ARIMA <- function(model,
                    k = if (fold.type == "preceding") 10 else "n",
                    reps,
                    seed,
-                   fold.type = c("cumulative", "preceding", "window"),
+                   fold.type = c("window", "cumulative", "preceding"),
                    begin.with=max(25, ceiling(n/10)),
                    lead = 1L,
                    criterion.name = deparse(substitute(criterion)),
@@ -569,3 +579,57 @@ cv.ARIMA <- function(model,
   result
 }
 
+# the following method isn't exported and shadows
+# stats::predict.Arima(), from which it is derived
+predict.Arima <- function (object, n.ahead = 1L, newxreg = NULL, se.fit = TRUE,
+                           ...){
+  myNCOL <- function(x) if (is.null(x))
+    0
+  else NCOL(x)
+  # the following modification to stats::predict.Arima()
+  # handles newxreg data frames produced e.g. by
+  # poly() and ns()
+  if (!is.null(newxreg)) newxreg <- as.matrix(newxreg)
+  rsd <- object$residuals
+  xr <- object$call$xreg
+  xreg <- if (!is.null(xr))
+    eval.parent(xr)
+  else NULL
+  ncxreg <- myNCOL(xreg)
+  if (myNCOL(newxreg) != ncxreg)
+    stop("'xreg' and 'newxreg' have different numbers of columns")
+  xtsp <- tsp(rsd)
+  n <- length(rsd)
+  arma <- object$arma
+  coefs <- object$coef
+  narma <- sum(arma[1L:4L])
+  if (length(coefs) > narma) {
+    if (names(coefs)[narma + 1L] == "intercept") {
+      newxreg <- cbind(intercept = rep(1, n.ahead), newxreg)
+      ncxreg <- ncxreg + 1L
+    }
+    xm <- if (narma == 0)
+      drop(as.matrix(newxreg) %*% coefs)
+    else drop(as.matrix(newxreg) %*% coefs[-(1L:narma)])
+  }
+  else xm <- 0
+  if (arma[2L] > 0L) {
+    ma <- coefs[arma[1L] + 1L:arma[2L]]
+    if (any(Mod(polyroot(c(1, ma))) < 1))
+      warning("MA part of model is not invertible")
+  }
+  if (arma[4L] > 0L) {
+    ma <- coefs[sum(arma[1L:3L]) + 1L:arma[4L]]
+    if (any(Mod(polyroot(c(1, ma))) < 1))
+      warning("seasonal MA part of model is not invertible")
+  }
+  z <- KalmanForecast(n.ahead, object$model)
+  pred <- ts(z[[1L]] + xm, start = xtsp[2L] + deltat(rsd),
+             frequency = xtsp[3L])
+  if (se.fit) {
+    se <- ts(sqrt(z[[2L]] * object$sigma2), start = xtsp[2L] +
+               deltat(rsd), frequency = xtsp[3L])
+    list(pred = pred, se = se)
+  }
+  else pred
+}

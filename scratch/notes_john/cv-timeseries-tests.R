@@ -11,35 +11,35 @@ update(res, data=D[-(1:10), , drop=FALSE])
 update(res, order=c(1, 1, 1))
 plot(res)
 
-cv.a <- cv(res)
+cv.a <- cv(res, fold.type="cumulative")
 summary(cv.a)
 cv.a$details
 
 summary(cv(res, k=5, fold.type="preceding"))
 summary(cv(res, fold.type="window"))
 
-cv.a.p <- cv(res, ncores=2)
+cv.a.p <- cv(res, ncores=2, fold.type="cumulative")
 all.equal(cv.a, cv.a.p)
 
-cv.b <- cv(res, lead=5)
+cv.b <- cv(res, lead=5, fold.type="cumulative")
 summary(cv.b)
 cv.a$details
 
-cv.b.p <- cv(res, lead=5, ncores=2)
+cv.b.p <- cv(res, lead=5, ncores=2, fold.type="cumulative")
 all.equal(cv.b, cv.b.p)
 
-cv.c <- cv(res, lead=1:5)
-summary(cv.c)
-plot(cv.c)
+cv.c <- cv(res, lead=1:5, fold.type="cumulative")
+summary(cv.c, fold.type="cumulative")
+plot(cv.c, fold.type="cumulative")
 
-cv.d <- cv(res, lead=c(2, 4, 5))
+cv.d <- cv(res, lead=c(2, 4, 5), fold.type="cumulative")
 summary(cv.d)
 plot(cv.d)
 all.equal(cvInfo(cv.c, "CV criterion")[c(2, 4, 5)],
           cvInfo(cv.d, "CV criterion"))
 
-cv.c.p <- cv(res, lead=1:5, ncores=TRUE)
-all.equal(cv.c, cv.c.p)
+cv.c.p <- cv(res, lead=1:5, ncores=TRUE, fold.type="cumulative")
+all.equal(cv.c, cv.c.p, fold.type="cumulative")
 
 cv.a.i <- cv(res, k=5, fold.type="preceding")
 summary(cv.a.i)
@@ -74,11 +74,11 @@ update(res.x, data=DD[-(1:10), ])
 plot(res.x)
 plot(Effect("year", res.x, residuals=TRUE))
 
-cv.ax <- cv(res.x, lead=1:5)
+cv.ax <- cv(res.x, lead=1:5, fold.type="cumulative")
 summary(cv.ax)
 cv.ax$details
 plot(cv.ax)
-cv.ax.p <- cv(res.x, lead=1:5, ncores=2)
+cv.ax.p <- cv(res.x, lead=1:5, ncores=2, fold.type="cumulative")
 all.equal(cv.ax, cv.ax.p)
 
 cv.ax.i <- cv(res.x, k=5, fold.type="preceding")
@@ -93,6 +93,10 @@ cv.bx.i.p <- cv(res.x, fold.type="window", lead=1:5, ncores=2)
 all.equal(cv.bx.i, cv.bx.i.p)
 summary(cv.bx.i)
 plot(cv.bx.i)
+
+res.x2 <- update(res.x, . ~ . + I((year - 1920)^2))
+summary(res.x2)
+cv(res.x2, lead=1:5)
 
 ## ------- folds --------
 

@@ -63,7 +63,7 @@ testArima(model, ...)
 
 \method{testArima}{ARIMA}(model, lag = 1, type = c("Box-Pierce", "Ljung-Box"), ...)
 
-\method{update}{ARIMA}(object, ...)
+\method{update}{ARIMA}(object, formula, ...)
 
 \method{coef}{ARIMA}(object, ...)
 
@@ -90,7 +90,7 @@ testArima(model, ...)
   k = if (fold.type == "preceding") 10 else "n",
   reps,
   seed,
-  fold.type = c("cumulative", "preceding", "window"),
+  fold.type = c("window", "cumulative", "preceding"),
   begin.with = max(25, ceiling(n/10)),
   lead = 1L,
   criterion.name = deparse(substitute(criterion)),
@@ -200,11 +200,11 @@ the standard errors of the predictions.}
 
 \item{seed}{ignored (to match \code{\link{cv}()} generic function).}
 
-\item{fold.type}{if \code{"cumulative"} (the default), predict
+\item{fold.type}{if \code{"window"} (the default), folds comprise a moving window
+of \code{begin.with} cases; if \code{"cumulative"}, predict
 the response for 1 or more cases after the i-th fold from the model fit to data
 in the \code{i}th and all preceding folds; if \code{"preceding"}, predict using cases in
-the \code{i}th fold only; if \code{"window"}, folds comprise a moving window
-of \code{begin.with} cases.}
+the \code{i}th fold only.}
 
 \item{begin.with}{the number of cases in
 the first fold; disregarded for \code{fold.type="preceding"}.
@@ -305,6 +305,7 @@ created by the \code{\link{Arima}()} function.
 \examples{
 if (require("stats", quietly=TRUE) &&
     require("datasets", quietly=TRUE) &&
+    require(splines) &&
     require("car") &&
     require("effects")){
 withAutoprint({
@@ -332,6 +333,9 @@ testArima(lake.arima)
 summary(cv.lake <- cv(lake.arima, lead=1:5))
 plot(cv.lake)
 plot(Effect("year", lake.arima, residuals=TRUE))
+lake.arima.2 <- update(lake.arima, . ~ ns(year, 3))
+summary(cv.lake <- cv(lake.arima.2, lead=1:5))
+plot(Effect("year", lake.arima.2, residuals=TRUE))
 })
 }
 }

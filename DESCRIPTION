@@ -5,7 +5,8 @@ Version: 2.1.0
 Date: 2024-10-27
 Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
   comment = c(ORCID = "0000-0002-1196-8012")),
-	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"))
+	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"),
+	person("R Core", role = "ctb"))
 Description: Cross-validation methods of regression models that exploit features of various
     modeling functions to improve speed. Some of the methods implemented in the package are
     novel, as described in the package vignettes; for general introductions to cross-validation,
@@ -43,6 +44,7 @@ Suggests: boot,
           nnet,
           rmarkdown,
           spelling,
+          splines,
           testthat
 LazyData: TRUE
 VignetteBuilder: 
