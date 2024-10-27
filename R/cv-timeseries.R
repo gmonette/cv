@@ -205,14 +205,7 @@ print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
 }
 
 #' @param y which diagnostic plots to display; the default is
-#' \code{c("residuals", "portmanteau", "acf", "pacf")}, where
-#' \code{"portmanteau"} is the Box-Pierce or Ljung-Box test of
-#' the autocorrelations of the residuals.
-#' @param test one of \code{"Box-Pierce"} or \code{"Ljung-Box"},
-#' with the former the default.
-#' @param max.lag the maximum lag for the portmanteau tests; the
-#' default is the same as the maximum lag for the residuals autocorrelations
-#' and partial autocorrelations.
+#' \code{c("fitted", "residuals", "acf", "pacf")}.
 #' @param xlab label for horizontal ("time") axis; defaults to
 #' \code{"Time"}.
 #' @param main title for diagnostic plots.
@@ -221,20 +214,12 @@ print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
 #' created by the \code{\link{Arima}()} function.
 #' @export
 plot.ARIMA <- function(x,
-                       y=c("fitted", "residuals", "portmantequ", "acf", "pacf"),
-                       test=c("Box-Pierce", "Ljung-Box"),
-                       max.lag=min(floor(10*log10(n)),  n - 1L),
+                       y=c("fitted", "residuals", "acf", "pacf"),
                        xlab="time",
                        main="Diagnostic Plots",
                        col="blue", ...){
 
-  test <- match.arg(test)
-
-  which.plots <- if (missing(y)){
-    c("residuals", "portmanteau", "acf", "pacf")
-  } else {
-    match.arg(y, several.ok=TRUE)
-  }
+  which.plots <- match.arg(y, several.ok=TRUE)
 
   residuals <- residuals(x)
   n <- length(residuals)
@@ -253,15 +238,6 @@ plot.ARIMA <- function(x,
     plot(residuals, xlab=xlab, ylab="residuals",
        main="Residuals", type="b", pch=16, col=col)
     grid(lty=2, col="gray")
-  }
-
-  if ("portmanteau" %in% which.plots){
-    p <- numeric(max.lag)
-    for (lag in 1:max.lag)
-      p[lag] <- testArima(x, lag=lag, type=test)[["p.value"]]
-    plot(p, xlab="Lag", ylab="p-value",
-         main=paste(test, "Tests\nfor Residuals"))
-    abline(h=0.05, lty=2, col=col)
   }
 
   if ("acf" %in% which.plots)

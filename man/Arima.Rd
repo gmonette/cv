@@ -46,9 +46,7 @@ Arima(
 
 \method{plot}{ARIMA}(
   x,
-  y = c("fitted", "residuals", "portmantequ", "acf", "pacf"),
-  test = c("Box-Pierce", "Ljung-Box"),
-  max.lag = min(floor(10 * log10(n)), n - 1L),
+  y = c("fitted", "residuals", "acf", "pacf"),
   xlab = "time",
   main = "Diagnostic Plots",
   col = "blue",
@@ -140,16 +138,7 @@ a seasonal part of the model.}
 \item{signif.stars}{show "significance stars" in coefficient table?}
 
 \item{y}{which diagnostic plots to display; the default is
-\code{c("residuals", "portmanteau", "acf", "pacf")}, where
-\code{"portmanteau"} is the Box-Pierce or Ljung-Box test of
-the autocorrelations of the residuals.}
-
-\item{test}{one of \code{"Box-Pierce"} or \code{"Ljung-Box"},
-with the former the default.}
-
-\item{max.lag}{the maximum lag for the portmanteau tests; the
-default is the same as the maximum lag for the residuals autocorrelations
-and partial autocorrelations.}
+\code{c("fitted", "residuals", "acf", "pacf")}.}
 
 \item{xlab}{label for horizontal ("time") axis; defaults to
 \code{"Time"}.}
