@@ -96,6 +96,7 @@ testArima(model, ...)
   fold.type = c("window", "cumulative", "preceding"),
   begin.with = max(25, ceiling(n/10)),
   lead = 1L,
+  min.ahead = 1L,
   criterion.name = deparse(substitute(criterion)),
   details = n <= 10000,
   ncores = 1L,
@@ -207,6 +208,11 @@ The remaining cases are divided among the subsequent
 
 \item{lead}{how far ahead to predict (can be a vector of positive integers);
 the default is \code{1}.}
+
+\item{min.ahead}{the minimum number of "future" cases to include in
+the last fold (default \code{1}); more than one case may be required for
+some kinds of predictions for terms with data-dependent bases, such as those using
+\code{\link[stats]{poly}()} (orthogonal polynomials).}
 
 \item{criterion.name}{name of the CV criterion; can usually be
 inferred from \code{criterion}.}
@@ -327,9 +333,12 @@ testArima(lake.arima)
 summary(cv.lake <- cv(lake.arima, lead=1:5))
 plot(cv.lake)
 plot(Effect("year", lake.arima, residuals=TRUE))
-lake.arima.2 <- update(lake.arima, . ~ ns(year, 3))
-summary(cv.lake <- cv(lake.arima.2, lead=1:5))
-plot(Effect("year", lake.arima.2, residuals=TRUE))
+lake.arima.bs <- update(lake.arima, . ~ ns(year, 3))
+summary(cv(lake.arima.bs, lead=1:5))
+plot(Effect("year", lake.arima.bs, residuals=TRUE))
+lake.arima.quad <- update(lake.arima, . ~ poly(year, 2))
+summary(cv(lake.arima.quad, lead=1:5, min.ahead=3))
+plot(Effect("year", lake.arima.quad, residuals=TRUE))
 })
 }
 }

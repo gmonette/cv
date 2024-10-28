@@ -4,35 +4,9 @@
 #' fit by \code{Arima()}, which provides a formula interface to the
 #' \code{\link{arima}()}) function.
 #'
-#' @param model an object of class \code{"ARIMA"}
-#' produced by the \code{Arima()} function.
 #' @param mod an object of class \code{"ARIMA"}
 #' produced by the \code{Arima()} function.
-#' @param data data frame with the data to which the model was fit;
-#' can usually be inferred from the model; for \code{Arima()}, a data
-#' frame with data to which the model is to be fit.
-#' @param criterion function to compute the CV cost criterion
-#' (default \code{\link{mse}}).
-#' @param k number of folds, an integer \eqn{\gt 2}; the default value of \code{k} depends on
-#' \code{fold.type};  if \code{k = "n"},
-#' the first fold is determined by \code{begin.with} and subsequent folds
-#' each contain a single case; that makes sense if \code{fold.type = "cumulative"}.
-#' Ignored for the \code{ATC()} method (to match the generic).
-#' @param reps ignored (to match \code{\link{cv}()} generic function).
-#' @param seed ignored (to match \code{\link{cv}()} generic function).
-#' @param fold.type  if \code{"window"} (the default), folds comprise a moving window
-#' of \code{begin.with} cases; if \code{"cumulative"}, predict
-#' the response for 1 or more cases after the i-th fold from the model fit to data
-#' in the \code{i}th and all preceding folds; if \code{"preceding"}, predict using cases in
-#' the \code{i}th fold only.
-#' @param lead how far ahead to predict (can be a vector of positive integers);
-#' the default is \code{1}.
-#' @param criterion.name name of the CV criterion; can usually be
-#' inferred from \code{criterion}.
-#' @param details return fold-wise parameter estimates for cases in each fold after the first;
-#' the default is \code{TRUE} for \eqn{k \le 10,000}.
-#' @param ncores if \code{ncores} \eqn{> 1}, the computation is parallelized.
-#'
+
 #' @examples
 #' if (require("stats", quietly=TRUE) &&
 #'     require("datasets", quietly=TRUE) &&
@@ -64,9 +38,12 @@
 #' summary(cv.lake <- cv(lake.arima, lead=1:5))
 #' plot(cv.lake)
 #' plot(Effect("year", lake.arima, residuals=TRUE))
-#' lake.arima.2 <- update(lake.arima, . ~ ns(year, 3))
-#' summary(cv.lake <- cv(lake.arima.2, lead=1:5))
-#' plot(Effect("year", lake.arima.2, residuals=TRUE))
+#' lake.arima.bs <- update(lake.arima, . ~ ns(year, 3))
+#' summary(cv(lake.arima.bs, lead=1:5))
+#' plot(Effect("year", lake.arima.bs, residuals=TRUE))
+#' lake.arima.quad <- update(lake.arima, . ~ poly(year, 2))
+#' summary(cv(lake.arima.quad, lead=1:5, min.ahead=3))
+#' plot(Effect("year", lake.arima.quad, residuals=TRUE))
 #' })
 #' }
 
@@ -407,12 +384,6 @@ model.frame.ARIMA <- function(formula, ...){
   formula$model
 }
 
-#' @param n.ahead number of future cases to predict.
-#' @param newdata data frame with rows containing the
-#' predictors (if any) for predicted future cases.
-#' @param se.fit if \code{TRUE} (the default is \code{FALSE}), compute
-#' the standard errors of the predictions.
-#'
 #' @returns the \code{\link{cv.ARIMA}()} method returns an object of class
 #'   \code{c("cvOrdered", "cv")} (see  \code{\link{cvOrdered}()} and \code{\link{cv}()}).
 #'
@@ -441,7 +412,12 @@ fitted.ARIMA <- function(object, ...){
 #' created by the \code{\link{Arima}()} function.
 #' @export
 residuals.ARIMA <- function(object, ...) object$arima$residuals
-#'
+
+#' @param n.ahead number of future cases to predict.
+#' @param newdata data frame with rows containing the
+#' predictors (if any) for predicted future cases.
+#' @param se.fit if \code{TRUE} (the default is \code{FALSE}), compute
+#' the standard errors of the predictions.
 #' @describeIn Arima \code{predict()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
@@ -462,10 +438,42 @@ predict.ARIMA <- function(object, n.ahead, newdata = NULL,
 
 }
 
+#' @param model an object of class \code{"ARIMA"}
+#' produced by the \code{Arima()} function.
+#' @param mod an object of class \code{"ARIMA"}
+#' produced by the \code{Arima()} function.
+#' @param data data frame with the data to which the model was fit;
+#' can usually be inferred from the model; for \code{Arima()}, a data
+#' frame with data to which the model is to be fit.
+#' @param criterion function to compute the CV cost criterion
+#' (default \code{\link{mse}}).
+#' @param k number of folds, an integer \eqn{\gt 2}; the default value of \code{k} depends on
+#' \code{fold.type};  if \code{k = "n"},
+#' the first fold is determined by \code{begin.with} and subsequent folds
+#' each contain a single case; that makes sense if \code{fold.type = "cumulative"}.
+#' Ignored for the \code{ATC()} method (to match the generic).
+#' @param reps ignored (to match \code{\link{cv}()} generic function).
+#' @param seed ignored (to match \code{\link{cv}()} generic function).
+#' @param fold.type  if \code{"window"} (the default), folds comprise a moving window
+#' of \code{begin.with} cases; if \code{"cumulative"}, predict
+#' the response for 1 or more cases after the i-th fold from the model fit to data
+#' in the \code{i}th and all preceding folds; if \code{"preceding"}, predict using cases in
+#' the \code{i}th fold only.
 #' @param begin.with the number of cases in
 #' the first fold; disregarded for \code{fold.type="preceding"}.
 #' The remaining cases are divided among the subsequent
 #' \code{k} - 1 folds.
+#' @param lead how far ahead to predict (can be a vector of positive integers);
+#' the default is \code{1}.
+#' @param min.ahead the minimum number of "future" cases to include in
+#' the last fold (default \code{1}); more than one case may be required for
+#' some kinds of predictions for terms with data-dependent bases, such as those using
+#' \code{\link[stats]{poly}()} (orthogonal polynomials).
+#' @param criterion.name name of the CV criterion; can usually be
+#' inferred from \code{criterion}.
+#' @param details return fold-wise parameter estimates for cases in each fold after the first;
+#' the default is \code{TRUE} for \eqn{k \le 10,000}.
+#' @param ncores if \code{ncores} \eqn{> 1}, the computation is parallelized.
 #' @describeIn Arima \code{cv()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
@@ -478,6 +486,7 @@ cv.ARIMA <- function(model,
                    fold.type = c("window", "cumulative", "preceding"),
                    begin.with=max(25, ceiling(n/10)),
                    lead = 1L,
+                   min.ahead = 1L,
                    criterion.name = deparse(substitute(criterion)),
                    details = n <= 1e4,
                    ncores = 1L,
@@ -485,8 +494,9 @@ cv.ARIMA <- function(model,
 
   f <- function(i, ...) {
     # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i) #, fold.type=fold.type)
-    indices.j <- fold(folds, i, predict=TRUE, lead=lead)
+    indices.i <- fold(folds, i)
+    indices.j <- fold(folds, i, predict=TRUE, lead=lead,
+                      up.to.max.lead=TRUE)
     model.i <- update(model, data = data[indices.i, , drop=FALSE])
     fit.i <- predict(model.i, n.ahead=max(lead),
                      newdata=data[indices.j, , drop=FALSE])
@@ -503,7 +513,8 @@ cv.ARIMA <- function(model,
     # helper function to compute cv criterion for each fold
     #  with parallel computations
     indices.i <- fold(folds, i)
-    indices.j <- fold(folds, i, predict=TRUE, lead=lead)
+    indices.j <- fold(folds, i, predict=TRUE, lead=lead,
+                      up.to.max.lead=TRUE)
     # bring Arima() into scope
     assign(model.function.name, model.function)
     # the following deals with a scoping issue that can
@@ -538,6 +549,7 @@ cv.ARIMA <- function(model,
     fold.type=fold.type,
     begin.with = begin.with,
     lead = lead,
+    min.ahead = min.ahead,
     confint=FALSE,
     details = details,
     ncores = ncores,

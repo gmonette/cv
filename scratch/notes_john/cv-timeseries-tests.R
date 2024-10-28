@@ -94,9 +94,10 @@ all.equal(cv.bx.i, cv.bx.i.p)
 summary(cv.bx.i)
 plot(cv.bx.i)
 
-res.x2 <- update(res.x, . ~ . + I((year - 1920)^2))
+res.x2 <- update(res.x, . ~ poly(year, 2))
 summary(res.x2)
-cv(res.x2, lead=1:5)
+summary(cv(res.x2, min.ahead=5))
+summary(cv(res.x2, lead=2, min.ahead=5))
 
 ## ------- folds --------
 

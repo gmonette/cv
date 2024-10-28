@@ -87,6 +87,7 @@ cvOrdered(
   fold.type = c("cumulative", "preceding", "window"),
   begin.with = max(25, ceiling(n/10)),
   lead = 1L,
+  min.ahead = 1L,
   data = insight::get_data(model),
   criterion = mse,
   criterion.name,
@@ -107,15 +108,16 @@ cvOrdered(
 folds(
   n,
   k,
-  fold.type = c("unordered", "cumulative", "preceding", "window"),
-  begin.with = max(25L, ceiling(n/10))
+  fold.type = c("unordered", "window", "cumulative", "preceding"),
+  begin.with = max(25L, ceiling(n/10)),
+  min.ahead = 1L
 )
 
 fold(folds, i, ...)
 
 \method{fold}{folds}(folds, i, ...)
 
-\method{fold}{orderedfolds}(folds, i, predicted = FALSE, lead = 1L, ...)
+\method{fold}{orderedfolds}(folds, i, predicted = FALSE, lead = 1L, up.to.max.lead = FALSE, ...)
 
 \method{print}{folds}(x, ...)
 
@@ -257,8 +259,13 @@ for ordinary CV).}
 the first fold. The remaining cases are divided among the subsequent
 \code{k} - 1 folds.}
 
-\item{lead}{how far ahead to predict (a positive integer or vector of positive integers);
-the default is \code{1}.}
+\item{lead}{how far ahead to predict (a positive integer or vector of positive integers
+not necessarily consecutive); the default is \code{1}.}
+
+\item{min.ahead}{the minimum number of "future" cases to include in
+the last fold (default \code{1}); more than one case may be required for
+some kinds of predictions for terms with data-dependent bases, such as those using
+\code{\link[stats]{poly}()} (orthogonal polynomials).}
 
 \item{n}{number of cases, for constructed folds.}
 
@@ -269,6 +276,13 @@ the default is \code{1}.}
 \item{predicted}{if \code{TRUE} (the default is \code{FALSE}), return
 the index (or indices) of the case(s) to be predicted; otherwise, return the indices
 of the cases used to fit the predictive model.}
+
+\item{up.to.max.lead}{if \code{TRUE} (the default is \code{FALSE}) and
+\code{predicted} is \code{TRUE}, return the indices not only corresponding
+to the cases to be predicted as given by \code{lead} but of all cases
+up the the maximum implied by \code{lead}; used internally
+to help support predictions for some model terms with data-dependent
+bases, such as \code{\link[stats]{poly}()}.}
 
 \item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed,
 or a \code{"cvOfdered"} object to be plotted.}

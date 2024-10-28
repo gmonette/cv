@@ -886,6 +886,10 @@ cvSelect <- function(procedure,
 #' @param begin.with if \code{ordered} is \code{TRUE}, the number of cases in
 #' the first fold. The remaining cases are divided among the subsequent
 #' \code{k} - 1 folds.
+#' @param min.ahead the minimum number of "future" cases to include in
+#' the last fold (default \code{1}); more than one case may be required for
+#' some kinds of predictions for terms with data-dependent bases, such as those using
+#' \code{\link[stats]{poly}()} (orthogonal polynomials).
 #' @describeIn cvCompute used internally by \code{cv()} methods for
 #' cross-validating time-series models.
 #' @export
@@ -893,6 +897,7 @@ cvOrdered <- function(model,
                       fold.type = c("cumulative", "preceding", "window"),
                       begin.with=max(25, ceiling(n/10)),
                       lead = 1L,
+                      min.ahead = 1L,
                       data = insight::get_data(model),
                       criterion = mse,
                       criterion.name,
@@ -938,7 +943,8 @@ cvOrdered <- function(model,
     stop('k must be an integer > 2')
   }
   message("Note: for ordered data, k-fold CV entails k - 1 fits")
-  folds <- folds(n, k, fold.type=fold.type, begin.with=begin.with)
+  folds <- folds(n, k, fold.type=fold.type, begin.with=begin.with,
+                 min.ahead=min.ahead)
   k <- folds$k
 
   yhat <- matrix(nrow=n, ncol=length(lead))
@@ -1024,25 +1030,25 @@ cvOrdered <- function(model,
 #' @describeIn cvCompute used internally by \code{cv()} methods (not for direct use).
 #' @export
 folds <- function(n, k,
-                  fold.type=c("unordered", "cumulative", "preceding", "window"),
-                  begin.with=max(25L, ceiling(n/10))) {
+                  fold.type=c("unordered", "window", "cumulative", "preceding"),
+                  begin.with=max(25L, ceiling(n/10)), min.ahead=1L) {
   fold.type <- match.arg(fold.type)
-    if (fold.type == "window"){
-      starts <- 1L:(n - begin.with + 1L)
-      ends <- begin.with:n
-      k <- length(starts)
-      folds <- ends - starts + 1L
-      indices <- 1L:n
-    } else if (fold.type == c("cumulative")) {
-      if (missing(k)) k <- n
-      after.first <- n - begin.with
-      k <- min(k, after.first + 1)
-      nk <- after.first %/% (k - 1L)
-      rem <- after.first %% (k - 1L)
-      folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1)))
-      ends <- cumsum(folds) # end of each fold
-      starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
-      indices <- 1L:n
+  if (fold.type == "window"){
+    starts <- 1L:(n - begin.with - min.ahead + 2L)
+    ends <- begin.with:(n - min.ahead + 1L)
+    k <- length(starts)
+    folds <- ends - starts + 1L
+    indices <- 1L:n
+  } else if (fold.type == c("cumulative")) {
+    if (missing(k)) k <- n
+    after.first <- n - begin.with - min.ahead + 1L
+    k <- min(k, after.first + 1)
+    nk <- after.first %/% (k - 1L)
+    rem <- after.first %% (k - 1L)
+    folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1)))
+    ends <- cumsum(folds) # end of each fold
+    starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
+    indices <- 1L:n
   } else {
     nk <-  n %/% k # number of cases in each fold
     rem <- n %% k  # remainder
@@ -1061,12 +1067,12 @@ folds <- function(n, k,
     starts = starts,
     ends = ends,
     indices = indices,
-    fold.type = fold.type
+    fold.type = fold.type,
+    min.ahead = min.ahead
   )
   class(result) <- if (fold.type == "unordered") "folds" else c("orderedfolds", "folds")
   result
 }
-
 
 #' @describeIn cvCompute to extract a fold from a \code{"folds"} object.
 #' @export
@@ -1081,18 +1087,35 @@ fold.folds <- function(folds, i, ...)
 #' @param predicted if \code{TRUE} (the default is \code{FALSE}), return
 #' the index (or indices) of the case(s) to be predicted; otherwise, return the indices
 #' of the cases used to fit the predictive model.
-#' @param lead how far ahead to predict (a positive integer or vector of positive integers);
-#' the default is \code{1}.
+#' @param lead how far ahead to predict (a positive integer or vector of positive integers
+#' not necessarily consecutive); the default is \code{1}.
+#' @param up.to.max.lead if \code{TRUE} (the default is \code{FALSE}) and
+#' \code{predicted} is \code{TRUE}, return the indices not only corresponding
+#' to the cases to be predicted as given by \code{lead} but of all cases
+#' up the the maximum implied by \code{lead}; used internally
+#' to help support predictions for some model terms with data-dependent
+#' bases, such as \code{\link[stats]{poly}()}.
 #' @describeIn cvCompute to extract a fold from an \code{"orderedfolds"} object.
 #' @export
-fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L, ...){
+fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L,
+                              up.to.max.lead=FALSE, ...){
   fold.type <- folds$fold.type
   if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
   if (predicted) {
     if (fold.type == "window"){
-      j <- folds$ends[i] + lead
+      j <- if (up.to.max.lead) {
+        stop <- max(max(lead), folds$min.ahead)
+        (folds$ends[i] + 1L):(folds$ends[i] + stop)
+      } else {
+        folds$ends[i] + lead
+      }
     } else {
-      j <- folds$starts[i + 1] + lead - 1L
+      j <- if (up.to.max.lead) {
+        stop <- max(max(lead), folds$min.ahead)
+        folds$starts[i + 1L]:(folds$starts[i + 1L] + stop - 1L)
+      } else {
+        folds$starts[i + 1L] + lead - 1L
+      }
     }
     if (min(j) > folds$n) return(NULL)
     j[j <= folds$n]
