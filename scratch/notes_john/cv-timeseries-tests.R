@@ -109,6 +109,13 @@ cv.ms
 summary(cv.ms)
 plot(cv.ms)
 
+cv.ms.cum <- cv(ms, lead=1:5, min.ahead=3,
+                fold.type="cumulative", data=DD)
+plot(cv.ms.cum, legend=list(x="topright"))
+
+cv.ms.pre <- cv(ms, k=6, lead=1:5, min.ahead=3,
+                fold.type="preceding", data=DD)
+plot(cv.ms.pre, legend=list(x="topright"))
 
 ## ------- folds --------
 
