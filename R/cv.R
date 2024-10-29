@@ -639,7 +639,7 @@ print.cv <- function(x, digits = getOption("digits"), ...) {
     if (length(crit) == 1){
       cat("cross-validation criterion =", crit, "\n")
     } else {
-      cat("cross-validation criterion:")
+      cat("cross-validation criterion:\n")
       print(crit)
     }
   }

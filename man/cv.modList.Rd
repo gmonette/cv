@@ -6,6 +6,7 @@
 \alias{print.cvModList}
 \alias{summary.cvModList}
 \alias{plot.cvModList}
+\alias{plot.cvOrderedModList}
 \alias{as.data.frame.cvModList}
 \title{Cross-Validate Several Models Fit to the Same Data}
 \usage{
@@ -39,6 +40,19 @@ models(...)
   col = palette()[2L],
   lwd = 2L,
   grid = TRUE,
+  ...
+)
+
+\method{plot}{cvOrderedModList}(
+  x,
+  y,
+  col = palette()[-1L],
+  lwd = 2L,
+  xlab = "Predictions at Lead",
+  ylab,
+  main = "Model Comparison",
+  grid = TRUE,
+  legend = list(x = "bottomright", y = NULL),
   ...
 )
 
@@ -118,11 +132,15 @@ axis) and \code{at=seq(along=x)} (i.e., 1 to the number of models)
 are used and can't be modified.}
 
 \item{col}{color for the line and points, defaults to the second
-element of the color palette; see \code{\link{palette}()}.}
+element of the color palette or to colors starting at the second; see \code{\link{palette}()}.}
 
 \item{lwd}{line width for the line (defaults to 2).}
 
 \item{grid}{if \code{TRUE} (the default), include grid lines on the graph.}
+
+\item{legend}{location for the legend; a two-element list with
+\code{x} and \code{y} elements; see \code{\link[graphics]{legend}[()]};
+may be set to \code{FALSE} to suppress the legend.}
 
 \item{row.names}{optional row names for the result,
 defaults to \code{NULL}.}
@@ -158,6 +176,8 @@ different response variables.
 \item \code{summary(cvModList)}: \code{summary()} method for \code{"cvModList"} objects.
 
 \item \code{plot(cvModList)}: \code{plot()} method for \code{"cvModList"} objects.
+
+\item \code{plot(cvOrderedModList)}: \code{plot()} method for \code{"cvOrderedModList"} objects.
 
 \item \code{as.data.frame(cvModList)}: \code{as.data.frame()} method for
 \code{"cvModList"} objects.

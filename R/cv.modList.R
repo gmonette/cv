@@ -63,7 +63,7 @@
 #' axis) and \code{at=seq(along=x)} (i.e., 1 to the number of models)
 #' are used and can't be modified.
 #' @param col color for the line and points, defaults to the second
-#' element of the color palette; see \code{\link{palette}()}.
+#' element of the color palette or to colors starting at the second; see \code{\link{palette}()}.
 #' @param lwd line width for the line (defaults to 2).
 #' @param object an object to summarize.
 #' @return \code{models()} returns a \code{"modList"} object, the
@@ -99,91 +99,99 @@
 
 #' @describeIn cv.modList \code{cv()} method for \code{"modList"} objects.
 #' @exportS3Method
-cv.modList <-
-  function(model,
-           data,
-           criterion = mse,
-           k,
-           reps = 1L,
-           seed,
-           quietly = TRUE,
-           meta = FALSE,
-           ...) {
-    if (missing(seed) && !(k == "loo" || k == "n")) {
-      seed <- sample(1e6, 1L)
-      message("R RNG seed set to ", seed)
-    }
-    if (meta) {
-      if (missing(k))
-        k <- 10L
-      if (k == "loo" || k == "n")
-        seed <- NULL
-      if (missing(data))
-        data <- insight::get_data(model[[1L]])
-      return(
+cv.modList <- function(model,
+                       data,
+                       criterion = mse,
+                       k,
+                       reps = 1L,
+                       seed,
+                       quietly = TRUE,
+                       meta = FALSE,
+                       ...) {
+
+  if (missing(seed) && (missing(k) || !(k == "loo" || k == "n"))) {
+    seed <- sample(1e6, 1L)
+    message("R RNG seed set to ", seed)
+  }
+  if (meta) {
+    if (missing(k))
+      k <- 10L
+    if (k == "loo" || k == "n")
+      seed <- NULL
+    if (missing(data))
+      data <- insight::get_data(model[[1L]])
+    return(
+      cv(
+        selectModelList,
+        data = data,
+        criterion = criterion,
+        k = k,
+        reps = reps,
+        seed = seed,
+        working.model = model,
+        ...
+      )
+    )
+  }
+  n.models <- length(model)
+  result <- vector(n.models, mode = "list")
+  names(result) <- names(model)
+  class(result) <- "cvModList"
+  for (i in 1L:n.models) {
+    result[[i]] <- if (missing(k)) {
+      if (quietly) {
+        suppressMessages(cv(
+          model[[i]],
+          data = data,
+          criterion = criterion,
+          seed = seed,
+          reps = reps,
+          ...
+        ))
+      } else {
         cv(
-          selectModelList,
+          model[[i]],
+          data = data,
+          criterion = criterion,
+          seed = seed,
+          reps = reps,
+          ...
+        )
+      }
+    } else {
+      if (quietly) {
+        suppressMessages(cv(
+          model[[i]],
           data = data,
           criterion = criterion,
           k = k,
-          reps = reps,
           seed = seed,
-          working.model = model,
+          reps = reps,
+          ...
+        ))
+      } else {
+        cv(
+          model[[i]],
+          data = data,
+          criterion = criterion,
+          k = k,
+          seed = seed,
+          reps = reps,
           ...
         )
-      )
-    }
-    n.models <- length(model)
-    result <- vector(n.models, mode = "list")
-    names(result) <- names(model)
-    class(result) <- "cvModList"
-    for (i in 1L:n.models) {
-      result[[i]] <- if (missing(k)) {
-        if (quietly) {
-          suppressMessages(cv(
-            model[[i]],
-            data = data,
-            criterion = criterion,
-            seed = seed,
-            reps = reps,
-            ...
-          ))
-        } else {
-          cv(
-            model[[i]],
-            data = data,
-            criterion = criterion,
-            seed = seed,
-            reps = reps,
-            ...
-          )
-        }
-      } else {
-        if (quietly) {
-          suppressMessages(cv(
-            model[[i]],
-            data = data,
-            criterion = criterion,
-            k = k,
-            seed = seed,
-            reps = reps,
-            ...
-          ))
-        } else {
-          cv(
-            model[[i]],
-            data = data,
-            criterion = criterion,
-            k = k,
-            seed = seed,
-            reps = reps,
-            ...
-          )
-        }
       }
     }
-    result
   }
+  ordered <- sapply(result, function(m) inherits(m, "cvOrdered"))
+  if (any(ordered)){
+    if (!all(ordered)) warning("some, but not all, CV for timeseries models")
+    else {
+      class(result) <- c("cvOrderedModList", class(result))
+      if (missing(k)) message("Note: R RNG seed disregarded for ordered CV")
+    }
+  }
+  result
+}
 
 #' @describeIn cv.modList create a list of models.
 #' @export
@@ -275,7 +283,7 @@ summary.cvModList <- function(object, ...) {
 
 #' @describeIn cv.modList \code{plot()} method for \code{"cvModList"} objects.
 #' @importFrom grDevices palette
-#' @importFrom graphics abline arrows axis box par points strwidth
+#' @importFrom graphics abline arrows axis box legend lines par points strwidth
 #' @importFrom stats na.omit
 #' @exportS3Method
 plot.cvModList <- function(x,
@@ -456,6 +464,47 @@ plot.cvModList <- function(x,
   axis.args$at <- seq(along = x)
   do.call(axis, axis.args)
 }
+
+#' @param legend location for the legend; a two-element list with
+#' \code{x} and \code{y} elements; see \code{\link[graphics]{legend}[()]};
+#' may be set to \code{FALSE} to suppress the legend.
+#' @describeIn cv.modList \code{plot()} method for \code{"cvOrderedModList"} objects.
+#' @exportS3Method
+plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
+                                  lwd = 2L,
+                                  xlab = "Predictions at Lead",
+                                  ylab,
+                                  main="Model Comparison",
+                                  grid = TRUE,
+                                  legend=list(x="bottomright", y=NULL),
+                                  ...){
+  cv <- sapply(x, function(x) x[["CV crit"]])
+  ylim <- range(cv)
+
+  criterion <- x[[1]]$criterion
+  if (criterion == "criterion") criterion <- NULL
+  if (missing(ylab)) ylab <- paste0("CV Criterion",
+                                    if(!is.null(criterion))
+                                      paste0(": ", criterion))
+
+  plot(1:nrow(cv), cv[, 1], xlab=xlab, ylab=ylab,
+       ylim=ylim, type="n", main=main, ...)
+  for (j in 1:ncol(cv)){
+    lines(1:nrow(cv), cv[, j], lty=j, col=col[j], pch=j,
+          lwd=lwd, type="b")
+  }
+
+  if (grid) grid(col="gray", lty=2L)
+
+  if (!isFALSE(legend)) {
+    legend(legend$x, legend$y, legend=colnames(cv),
+           col=col[1:ncol(cv)], lty=1:ncol(cv), lwd=2,
+           pch=1:ncol(cv), title="Model", inset=0.02)
+  }
+
+  invisible(NULL)
+}
+
 
 #' @export
 `[.cvModList` <- function(x, ...) {

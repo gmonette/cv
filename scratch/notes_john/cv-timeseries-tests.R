@@ -104,8 +104,9 @@ summary(res.bs)
 summary(cv(res.bs, lead=1:5))
 
 ms <- models(lin=res.x, quad=res.x2, bs=res.bs)
-cv.ms <- cv(ms, lead=1:5, min.ahead=3, k="n", data=DD)
+cv.ms <- cv(ms, lead=1:5, min.ahead=3, data=DD)
 cv.ms
+summary(cv.ms)
 plot(cv.ms)
 
 

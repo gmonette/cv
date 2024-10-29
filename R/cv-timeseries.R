@@ -44,6 +44,10 @@
 #' lake.arima.quad <- update(lake.arima, . ~ poly(year, 2))
 #' summary(cv(lake.arima.quad, lead=1:5, min.ahead=3))
 #' plot(Effect("year", lake.arima.quad, residuals=TRUE))
+#' plot(cv(models(linear = lake.arima,
+#'                bspline = lake.arima.bs,
+#'                quadratic = lake.arima.quad),
+#'         lead=1:5, min.ahead=3, data=Lake))
 #' })
 #' }
 
