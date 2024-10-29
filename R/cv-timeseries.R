@@ -334,6 +334,7 @@ update.ARIMA <- function(object, formula, ...){
     if (name == "" || name == "object") next
     cl0[[name]] <- cl[[name]]
   }
+  cl0[["formula"]] <- args$formula
   result$call <- cl0
   result
 }

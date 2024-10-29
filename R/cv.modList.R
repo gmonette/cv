@@ -203,9 +203,9 @@ models <- function(...) {
   if (!all(n[1L] == n[-1L])) {
     stop("models are fit to data sets of differing numbers of cases")
   }
-  response <- GetResponse(models[[1L]])
+  response <- as.vector(GetResponse(models[[1L]]))
   for (i in 2L:length(models)) {
-    if (!isTRUE(all.equal(response, GetResponse(models[[i]]),
+    if (!isTRUE(all.equal(response, as.vector(GetResponse(models[[i]])),
                           check.attributes = FALSE))) {
       stop("models are not all fit to the same response variable")
     }

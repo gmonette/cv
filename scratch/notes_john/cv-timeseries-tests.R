@@ -96,8 +96,18 @@ plot(cv.bx.i)
 
 res.x2 <- update(res.x, . ~ poly(year, 2))
 summary(res.x2)
-summary(cv(res.x2, min.ahead=5))
-summary(cv(res.x2, lead=2, min.ahead=5))
+summary(cv(res.x2, lead=1:5, min.ahead=3))
+
+library(splines)
+res.bs <- update(res.x, . ~ bs(year, 3))
+summary(res.bs)
+summary(cv(res.bs, lead=1:5))
+
+ms <- models(lin=res.x, quad=res.x2, bs=res.bs)
+cv.ms <- cv(ms, lead=1:5, min.ahead=3, k="n", data=DD)
+cv.ms
+plot(cv.ms)
+
 
 ## ------- folds --------
 
