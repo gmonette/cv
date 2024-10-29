@@ -1253,7 +1253,7 @@ plot.cvOrdered <- function(x, y, xlab = "lead",
                            ylab = x$criterion,
                            main = "Cross-Validation", ...){
   plot(x$lead, x[["CV crit"]], type="b", pch=16,
-       col=car::carPalette()[2], xlab=xlab, ylab=ylab,
+       col=palette()[2], xlab=xlab, ylab=ylab,
        ylim=range(c(x[["full crit"]], x[["CV crit"]])),
        axes=FALSE, frame.plot=TRUE, main=main,
        ...)
@@ -1262,15 +1262,15 @@ plot.cvOrdered <- function(x, y, xlab = "lead",
   axis(1, at=x$lead)
   text(x$lead[1], x[["CV crit"]][1], pos=4, offset=1,
        labels=paste0("CV ", x$criterion),
-       col=car::carPalette()[2])
-  abline(h=x[["full crit"]], lty=2, col=car::carPalette()[3],
+       col=palette()[2])
+  abline(h=x[["full crit"]], lty=2, col=palette()[3],
          lwd=2)
   usr <- par("usr")
   text(usr[1] + 0.02*(usr[2] - usr[1]),
        x[["full crit"]] + 0.02*(usr[4] - usr[3]),
        adj=c(0, 0),
        labels=paste0("in-sample ", x$criterion),
-       col=car::carPalette()[3])
+       col=palette()[3])
 }
 
 # not exported
