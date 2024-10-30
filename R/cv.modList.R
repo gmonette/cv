@@ -479,6 +479,7 @@ plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
                                   legend=list(x="bottomright", y=NULL),
                                   ...){
   cv <- sapply(x, function(x) x[["CV crit"]])
+  cv.means <- sapply(x, function(x) x[["mean CV crit"]])
   ylim <- range(cv)
 
   criterion <- x[[1]]$criterion
@@ -489,9 +490,17 @@ plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
 
   plot(1:nrow(cv), cv[, 1], xlab=xlab, ylab=ylab,
        ylim=ylim, type="n", main=main, ...)
+  if (!is.null(cv.means[1])){
+    x.means <- mean(c(1, nrow(cv))) + 0.125
+    abline(v=x.means, col="gray")
+    title(main="Mean CV Criteria", line=0.125, cex.main=1, col.main="gray")
+  }
   for (j in 1:ncol(cv)){
     lines(1:nrow(cv), cv[, j], lty=j, col=col[j], pch=j,
           lwd=lwd, type="b")
+    if (!is.null(cv.means[j]))
+      points(x.means, cv.means[j], col=col[j],
+             pch = j, cex=1.5, lwd=3)
   }
 
   if (grid) grid(col="gray", lty=2L)

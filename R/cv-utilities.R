@@ -1005,10 +1005,12 @@ cvOrdered <- function(model,
     use <- !is.na(yh)
     cv[i] <- criterion(as.vector(y)[use], as.vector(yh)[use])
   }
+  mean.cv <- if (length(cv) > 1) mean(cv)
 
   if (is.na(cv.full)) cv.full <- NULL
   result <- list(
     "CV crit" = cv,
+    "mean CV crit" = mean.cv,
     "full crit" = cv.full,
     "k" =  k,
     "method" = method,

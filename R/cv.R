@@ -688,6 +688,8 @@ summary.cv <- function(object, digits = getOption("digits"), ...) {
     } else {
       cat("\ncross-validation criterion:\n")
       print(crit)
+      if (!is.null(object[["mean CV crit"]]))
+        cat("mean cross-validation criterion =", object[["mean CV crit"]])
     }
   } else {
     cat("\ncross-validation criterion = ",
