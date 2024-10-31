@@ -197,7 +197,8 @@ print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
 plot.ARIMA <- function(x,
                        y=c("fitted", "residuals", "acf", "pacf"),
                        xlab="time",
-                       main="Diagnostic Plots",
+                       main=paste("Diagnostic Plots for",
+                                  deparse(substitute(x))),
                        col="blue", ...){
 
   which.plots <- match.arg(y, several.ok=TRUE)

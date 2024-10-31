@@ -48,7 +48,7 @@ Arima(
   x,
   y = c("fitted", "residuals", "acf", "pacf"),
   xlab = "time",
-  main = "Diagnostic Plots",
+  main = paste("Diagnostic Plots for", deparse(substitute(x))),
   col = "blue",
   ...
 )
