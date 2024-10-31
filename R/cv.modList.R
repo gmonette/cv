@@ -493,7 +493,8 @@ plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
   if (!is.null(cv.means[1])){
     x.means <- mean(c(1, nrow(cv))) + 0.125
     abline(v=x.means, col="gray")
-    title(main="Mean CV Criteria", line=0.125, cex.main=1, col.main="gray")
+    title(main="Mean CV Criterion", line=0.125, cex.main=1,
+          font.main=1, col.main="darkgray")
   }
   for (j in 1:ncol(cv)){
     lines(1:nrow(cv), cv[, j], lty=j, col=col[j], pch=j,
