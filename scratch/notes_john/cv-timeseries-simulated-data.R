@@ -9,6 +9,7 @@ sigma.eps <- 1
 b1 <- 1
 b2 <- 1
 a <- 1
+b.x <- 0.01
 n <- 1e3
 
 set.seed(94962)
@@ -19,6 +20,8 @@ for (i in 2:n){
 }
 acf(x)
 pacf(x)
+x <- x + b.x*1:n
+plot(x, type="l")
 
 eps <- numeric(n)
 eps[1] <- rnorm(1, 0, sigma)
@@ -30,6 +33,8 @@ acf(eps)
 pacf(eps)
 
 y <- a + b1*x + b2*x^2 + eps
+plot(y, type="l")
+
 D <- data.frame(x, y)
 
 m.ls <- lm(y ~ poly(x, 2, raw=TRUE), data=D)
@@ -73,11 +78,16 @@ system.time(cv.m.p <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
 all.equal(cv.m, cv.m.p)
 
 system.time(cv.m.c <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
-           lead=1:5, data=D, fold.type="cumulative", k=100))
+           lead=1:5, data=D, fold.type="cumulative"))
 summary(cv.m.c)
-plot(cv.m.c, legend=list(x=3, y=3.5))
+plot(cv.m.c, legend=list(x=3, y=40))
 
-system.time(cv.m.p <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
+system.time(cv.m.c.100 <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
+                             lead=1:5, data=D, fold.type="cumulative", k=100))
+summary(cv.m.c.100)
+plot(cv.m.c.100, legend=list(x=3, y=40))
+
+system.time(cv.m.pr <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
                          lead=1:5, data=D, fold.type="preceding", k=10))
-summary(cv.m.p)
-plot(cv.m.p, legend=list(x="topright"))
+summary(cv.m.pr)
+plot(cv.m.pr, legend=list(x="topright"))
