@@ -71,3 +71,13 @@ plot(cv.m, legend=list(x=3, y=3.5))
 system.time(cv.m.p <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
                        lead=1:5, data=D, ncores=2))
 all.equal(cv.m, cv.m.p)
+
+system.time(cv.m.c <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
+           lead=1:5, data=D, fold.type="cumulative", k=100))
+summary(cv.m.c)
+plot(cv.m.c, legend=list(x=3, y=3.5))
+
+system.time(cv.m.p <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
+                         lead=1:5, data=D, fold.type="preceding", k=10))
+summary(cv.m.p)
+plot(cv.m.p, legend=list(x="topright"))
