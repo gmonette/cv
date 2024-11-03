@@ -53,6 +53,8 @@ models(...)
   main = "Model Comparison",
   grid = TRUE,
   legend = list(x = "bottomright", y = NULL),
+  means = TRUE,
+  in.sample = TRUE,
   ...
 )
 
@@ -141,6 +143,12 @@ element of the color palette or to colors starting at the second; see \code{\lin
 \item{legend}{location for the legend; a two-element list with
 \code{x} and \code{y} elements; see \code{\link[graphics]{legend}[()]};
 may be set to \code{FALSE} to suppress the legend.}
+
+\item{means}{show the mean CV criterion for each model across
+leads (if available, default \code{TRUE}).}
+
+\item{in.sample}{draw a horizontal line at the in-sample CV criterion
+for each model (default \code{TRUE}).}
 
 \item{row.names}{optional row names for the result,
 defaults to \code{NULL}.}

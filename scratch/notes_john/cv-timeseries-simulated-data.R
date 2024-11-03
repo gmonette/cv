@@ -71,7 +71,7 @@ plot(effects::Effect("x", m.3, residuals=TRUE),
 system.time(cv.m <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
            lead=1:5, data=D))
 summary(cv.m)
-plot(cv.m, legend=list(x=3, y=3.5))
+plot(cv.m, legend=list(x=3, y=30))
 
 system.time(cv.m.p <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
                        lead=1:5, data=D, ncores=2))

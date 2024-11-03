@@ -468,6 +468,10 @@ plot.cvModList <- function(x,
 #' @param legend location for the legend; a two-element list with
 #' \code{x} and \code{y} elements; see \code{\link[graphics]{legend}[()]};
 #' may be set to \code{FALSE} to suppress the legend.
+#' @param means show the mean CV criterion for each model across
+#' leads (if available, default \code{TRUE}).
+#' @param in.sample draw a horizontal line at the in-sample CV criterion
+#' for each model (default \code{TRUE}).
 #' @describeIn cv.modList \code{plot()} method for \code{"cvOrderedModList"} objects.
 #' @exportS3Method
 plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
@@ -476,11 +480,14 @@ plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
                                   ylab,
                                   main="Model Comparison",
                                   grid = TRUE,
-                                  legend=list(x="bottomright", y=NULL),
+                                  legend = list(x="bottomright", y=NULL),
+                                  means = TRUE,
+                                  in.sample = TRUE,
                                   ...){
   cv <- sapply(x, function(x) x[["CV crit"]])
   cv.means <- sapply(x, function(x) x[["mean CV crit"]])
-  ylim <- range(cv)
+  cv.full <- sapply(x, function(x) x[["full crit"]])
+  ylim <- range(c(cv, cv.full))
 
   criterion <- x[[1]]$criterion
   if (criterion == "criterion") criterion <- NULL
@@ -490,7 +497,7 @@ plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
 
   plot(1:nrow(cv), cv[, 1], xlab=xlab, ylab=ylab,
        ylim=ylim, type="n", main=main, ...)
-  if (!is.null(cv.means[1])){
+  if (means && !is.null(cv.means[1])){
     x.means <- mean(c(1, nrow(cv))) + 0.125
     abline(v=x.means, col="gray")
     title(main="Mean CV Criterion", line=0.125, cex.main=1,
@@ -499,9 +506,10 @@ plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
   for (j in 1:ncol(cv)){
     lines(1:nrow(cv), cv[, j], lty=j, col=col[j], pch=j,
           lwd=lwd, type="b")
-    if (!is.null(cv.means[j]))
+    if (means && !is.null(cv.means[j]))
       points(x.means, cv.means[j], col=col[j],
              pch = j, cex=1.5, lwd=3)
+    if (in.sample) abline(h=cv.full[j], lwd=1, lty=1, col=col[j])
   }
 
   if (grid) grid(col="gray", lty=2L)
