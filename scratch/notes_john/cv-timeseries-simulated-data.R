@@ -72,6 +72,7 @@ system.time(cv.m <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
            lead=1:5, data=D))
 summary(cv.m)
 plot(cv.m, legend=list(x=3, y=30))
+plot(cv.m, legend=list(x=3, y=5), in.sample=FALSE)
 
 system.time(cv.m.p <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
                        lead=1:5, data=D, ncores=2))
@@ -88,6 +89,8 @@ summary(cv.m.c.100)
 plot(cv.m.c.100, legend=list(x=3, y=40))
 
 system.time(cv.m.pr <- cv(models(linear=m.1, quadratic=m.2, cubic=m.3),
-                         lead=1:5, data=D, fold.type="preceding", k=10))
+                         lead=1:5, data=D, fold.type="preceding", k=25))
 summary(cv.m.pr)
 plot(cv.m.pr, legend=list(x="topright"))
+plot(cv.m.pr, legend=list(x="topright"), in.sample=FALSE)
+

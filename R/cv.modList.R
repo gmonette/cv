@@ -487,7 +487,7 @@ plot.cvOrderedModList <- function(x, y, col=palette()[-1L],
   cv <- sapply(x, function(x) x[["CV crit"]])
   cv.means <- sapply(x, function(x) x[["mean CV crit"]])
   cv.full <- sapply(x, function(x) x[["full crit"]])
-  ylim <- range(c(cv, cv.full))
+  ylim <- range(c(cv, if (in.sample) cv.full))
 
   criterion <- x[[1]]$criterion
   if (criterion == "criterion") criterion <- NULL
