@@ -35,14 +35,14 @@ pacf(eps)
 y <- a + b1*x + b2*x^2 + eps
 plot(y, type="l")
 
-D <- data.frame(x, y)
+D <- data.frame(x, y, time=1:n)
 
 m.ls <- lm(y ~ poly(x, 2, raw=TRUE), data=D)
 summary(m.ls)
 acf(residuals(m.ls))
 pacf(residuals(m.ls))
 
-summary(Arima(~ x, order=c(1, 0, 0), data=D))
+summary(Arima(x ~ time, order=c(1, 0, 0), data=D))
 
 m.1 <- Arima(y ~ x, order=c(2, 0, 0), data=D)
 summary(m.1)
