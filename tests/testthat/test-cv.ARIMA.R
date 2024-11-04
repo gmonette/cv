@@ -60,7 +60,7 @@ test_that('CV of ARIMA fold.type="preceding" parallel', {
 # test computation of MSE
 
   # for "preceding" folds
-  #
+
 m.2nd <- update(lake.arima, data=Lake[21:40, ])
 m.3rd <- update(lake.arima, data=Lake[41:60, ])
 yhat <- rep(NA, 98)
@@ -89,4 +89,21 @@ cv.lake.cum.3 <- cv(lake.arima, fold.type="cumulative",
 test_that('MSE for CV of ARIMA fold.type="cumulative"', {
   expect_equal(colMeans((yhat - matrix(levels, 98, 3))^2, na.rm=TRUE),
                as.vector(cv.lake.cum.3$"CV crit"))
+})
+
+  # for "window" folds
+
+yhat <- matrix(NA, 98, 3)
+for (i in 25:97){
+  m <- update(lake.arima, data=Lake[(i - 24):i, ])
+  last <- if (i < 96) 3 else if (i == 96) 2 else 1
+  index <- matrix(c((i + 1):(i + last), 1:last), last, 2)
+  yhat[index] <-  predict(m, n.ahead=last,
+                          newdata=Lake[(i + 1):(i + last), ])
+}
+cv.lake.win.3 <- cv(lake.arima, fold.type="window",
+                    lead=1:3)
+test_that('MSE for CV of ARIMA fold.type="window"', {
+  expect_equal(colMeans((yhat - matrix(levels, 98, 3))^2, na.rm=TRUE),
+               as.vector(cv.lake.win.3$"CV crit"))
 })
