@@ -63,20 +63,22 @@ test_that('CV of ARIMA fold.type="preceding" parallel', {
 
 m.2nd <- update(lake.arima, data=Lake[21:40, ])
 m.3rd <- update(lake.arima, data=Lake[41:60, ])
-yhat <- rep(NA, 98)
-yhat[21] <- predict(m.first, newdata=Lake[21, , drop=FALSE])
-yhat[41] <- predict(m.2nd, newdata=Lake[41, , drop=FALSE])
-yhat[61] <- predict(m.3rd, newdata=Lake[61, , drop=FALSE])
-yhat[80] <- predict(m.last, newdata=Lake[80, , drop=FALSE])
+yhat <- matrix(NA, 98, 3)
+levels <- matrix(Lake$level, 98, 3)
+yhat[matrix(c(21:23, 1:3), 3, 2)] <- predict(m.first, newdata=Lake[21:23, , drop=FALSE])
+yhat[matrix(c(41:43, 1:3), 3, 2)] <- predict(m.2nd, newdata=Lake[41:43, , drop=FALSE])
+yhat[matrix(c(61:63, 1:3), 3, 2)] <- predict(m.3rd, newdata=Lake[61:63, , drop=FALSE])
+yhat[matrix(c(80:82, 1:3), 3, 2)] <- predict(m.last, newdata=Lake[80:82, , drop=FALSE])
+cv.lake.pre.3 <- cv(lake.arima, fold.type="preceding", k=5,
+                    lead=1:3)
 test_that('MSE for CV of ARIMA fold.type="preceding"', {
-  expect_equal(mean((Lake$level - yhat)^2, na.rm=TRUE),
-               as.vector(cv.lake.pre$"CV crit"))
+  expect_equal(colMeans((levels - yhat)^2, na.rm=TRUE),
+               as.vector(cv.lake.pre.3$"CV crit"))
 })
 
   # for "cumulative" folds
 
 yhat <- matrix(NA, 98, 3)
-levels <- matrix(Lake$level, 98, 3)
 for (i in 25:97){
   m <- update(lake.arima, data=Lake[1:i, ])
   last <- if (i < 96) 3 else if (i == 96) 2 else 1
@@ -87,7 +89,7 @@ for (i in 25:97){
 cv.lake.cum.3 <- cv(lake.arima, fold.type="cumulative",
                     lead=1:3)
 test_that('MSE for CV of ARIMA fold.type="cumulative"', {
-  expect_equal(colMeans((yhat - matrix(levels, 98, 3))^2, na.rm=TRUE),
+  expect_equal(colMeans((yhat - levels)^2, na.rm=TRUE),
                as.vector(cv.lake.cum.3$"CV crit"))
 })
 
@@ -104,6 +106,6 @@ for (i in 25:97){
 cv.lake.win.3 <- cv(lake.arima, fold.type="window",
                     lead=1:3)
 test_that('MSE for CV of ARIMA fold.type="window"', {
-  expect_equal(colMeans((yhat - matrix(levels, 98, 3))^2, na.rm=TRUE),
+  expect_equal(colMeans((yhat - levels)^2, na.rm=TRUE),
                as.vector(cv.lake.win.3$"CV crit"))
 })
