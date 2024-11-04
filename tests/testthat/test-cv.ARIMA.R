@@ -56,3 +56,17 @@ test_that('CV of ARIMA fold.type="preceding" parallel', {
   expect_equal(cv.lake.pre,
                cv(lake.arima, fold.type="preceding", k=5, ncores=2))
 })
+
+# test computation of MSE
+
+m.2nd <- update(lake.arima, data=Lake[21:40, ])
+m.3rd <- update(lake.arima, data=Lake[41:60, ])
+yhat <- rep(NA, 98)
+yhat[21] <- predict(m.first, newdata=Lake[21, , drop=FALSE])
+yhat[41] <- predict(m.2nd, newdata=Lake[41, , drop=FALSE])
+yhat[61] <- predict(m.3rd, newdata=Lake[61, , drop=FALSE])
+yhat[80] <- predict(m.last, newdata=Lake[80, , drop=FALSE])
+test_that('MSE for CV of ARIMA fold.type="preceding"', {
+  expect_equal(mean((Lake$level - yhat)^2, na.rm=TRUE),
+               as.vector(cv.lake.pre$"CV crit"))
+})
