@@ -20,6 +20,13 @@ test_that('Arima() fitted values are correct', {
                as.vector(Lake$level - lake.arima.2$residuals))
 })
 
+  # test residuals
+
+test_that('Arima() fitted values are correct', {
+  expect_equal(as.vector(residuals(lake.arima)),
+               as.vector(residuals(lake.arima.2)))
+})
+
   # test predictions
 
 test_that('Arima() predictions are correct', {
