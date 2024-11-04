@@ -1,8 +1,35 @@
-# test that correct models are fit for CV of ARIMA models
+# test that Arima() and predict.ARIMA() work properly
 
 Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
 lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                     order=c(2, 0, 0))
+
+  # test model fit
+
+lake.arima.2 <- arima(x = Lake$level, xreg = Lake$year - 1920,
+                      order = c(2, 0, 0))
+test_that('Arima() fits model correctly', {
+  expect_equal(as.vector(coef(lake.arima)),
+               as.vector(coef(lake.arima.2)))
+})
+
+  # test fitted values
+
+test_that('Arima() fitted values are correct', {
+  expect_equal(as.vector(predict(lake.arima)),
+               as.vector(Lake$level - lake.arima.2$residuals))
+})
+
+  # test predictions
+
+test_that('Arima() predictions are correct', {
+  expect_equal(as.vector(predict(lake.arima, n.ahead=3,
+                                 newdata=data.frame(year=1973:1975))),
+               as.vector(predict(lake.arima.2, n.ahead=3,
+                                 newxreg = (1973:1975) - 1920)$pred))
+})
+
+# test that correct models are fit for CV of ARIMA models
 
 cv.lake.cum <- cv(lake.arima, fold.type="cumulative")
 m.first <- update(lake.arima, data=Lake[1:25, ])
