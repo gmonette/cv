@@ -1055,7 +1055,7 @@ folds <- function(n, k,
     nk <-  n %/% k # number of cases in each fold
     rem <- n %% k  # remainder
     folds <- rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
-    indices <- if (n > k)
+    indices <- if (n > k && fold.type != "preceding")
       sample(n, n) # permute cases
     else
       1L:n
