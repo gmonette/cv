@@ -4,7 +4,7 @@ Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
 lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                     order=c(2, 0, 0))
 
-  # test model fit
+  # test coefficients
 
 lake.arima.2 <- arima(x = Lake$level, xreg = Lake$year - 1920,
                       order = c(2, 0, 0))
@@ -22,7 +22,7 @@ test_that('Arima() fitted values are correct', {
 
   # test residuals
 
-test_that('Arima() fitted values are correct', {
+test_that('Arima() residuals are correct', {
   expect_equal(as.vector(residuals(lake.arima)),
                as.vector(residuals(lake.arima.2)))
 })
