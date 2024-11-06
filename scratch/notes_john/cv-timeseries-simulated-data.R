@@ -94,3 +94,10 @@ summary(cv.m.pr)
 plot(cv.m.pr, legend=list(x="topright"))
 plot(cv.m.pr, legend=list(x="topright"), in.sample=FALSE)
 
+
+system.time(cv.lin <- cv(m.1, lead=1:5, data=D,
+                         fold.type="cumulative"))
+
+system.time(cv.lin <- cv(m.1, lead=1:5, data=D,
+                         fold.type="cumulative", ncores=2))
+

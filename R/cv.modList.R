@@ -109,9 +109,11 @@ cv.modList <- function(model,
                        meta = FALSE,
                        ...) {
 
-  if (missing(seed) && (missing(k) || !(k == "loo" || k == "n"))) {
+  rng.message <- if (missing(seed) && (missing(k) || !(k == "loo" || k == "n"))) {
     seed <- sample(1e6, 1L)
-    message("R RNG seed set to ", seed)
+    TRUE
+  } else {
+    FALSE
   }
   if (meta) {
     if (missing(k))
@@ -187,9 +189,13 @@ cv.modList <- function(model,
     if (!all(ordered)) warning("some, but not all, CV for timeseries models")
     else {
       class(result) <- c("cvOrderedModList", class(result))
-      if (missing(k)) message("Note: R RNG seed disregarded for ordered CV")
     }
   }
+
+  if (!all(ordered) && rng.message){
+    message("R RNG seed set to ", seed)
+  }
+
   result
 }
 
