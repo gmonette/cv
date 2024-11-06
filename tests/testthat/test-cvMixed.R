@@ -1,3 +1,9 @@
+## The tests in this file run only if the environment variable
+##   RUN_ALL_CV_TESTS is set to true, in which case the tests create
+##   a number of objects in the global environment, and the tests are slow.
+##   Use, e.g. Sys.setenv(RUN_ALL_CV_TESTS = "true")
+##   and Sys.unsetenv("RUN_ALL_CV_TESTS") to set the environment variable.
+
 # test parallel computations for mixed models
 
 if (Sys.getenv("RUN_ALL_CV_TESTS") == "true"){
