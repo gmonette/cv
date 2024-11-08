@@ -7,11 +7,11 @@ arma2psi <- function(ar=0, ma=0, ar.seasonal=0, ma.seasonal=0,
                      trunc.at=0.001){
   lag.max.tot <- if (!missing(period)) lag.max*period else lag.max
   psi <- ARMAtoMA(ar = ar, ma = ma, lag.max=lag.max.tot)
-  psi.seasonal <- if (!missing(period)) {
-    ARMAtoMA(ar = ar.seasonal, ma = ma.seasonal, lag.max=lag.max)
-  }
-  if (!missing(period)) psi <- psi + as.vector(rbind(matrix(0, period - 1, lag.max),
+  if (!missing(period)) {
+    psi.seasonal <- ARMAtoMA(ar = ar.seasonal, ma = ma.seasonal, lag.max=lag.max)
+    psi <- psi + as.vector(rbind(matrix(0, period - 1, lag.max),
                                                      psi.seasonal))
+  }
   if (trunc.psi){
     which.psi <- which(abs(psi) >= trunc.at)
     if (length(which.psi) == 0) {
