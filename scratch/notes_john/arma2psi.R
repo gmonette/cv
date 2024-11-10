@@ -1,7 +1,6 @@
 # Ripley, B. D. (2002). “Time series in R 1.5.0”. R News, 2(2), 2–7.
 # https://www.r-project.org/doc/Rnews/Rnews_2002-2.pdf
 
-
 arma2psi <- function(ar=0, ma=0, ar.seasonal=0, ma.seasonal=0,
                      period, lag.max=100, trunc.psi=TRUE,
                      trunc.at=0.001){
