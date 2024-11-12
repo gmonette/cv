@@ -145,9 +145,10 @@
 #' (ffs <- folds(n=22, k=5))
 #' fold(ffs, 2)
 #'
-#' (ffs.ord <- folds(n = 100, fold.type="cumulative"))
+#' (ffs.ord <- orderedFolds(1:100, fold.type="cumulative"))
 #' fold(ffs.ord, 2)
 #' fold(ffs.ord, 2, predicted=TRUE, lead=1:5)
+#' # note: 'end' and 'stop' used in different contexts
 #'
 #' @seealso \code{\link{cv}}, \code{\link{cv.merMod}},
 #' \code{\link{cv.function}}.
@@ -916,6 +917,10 @@ cvOrdered <- function(model,
 
  fold.type <- match.arg(fold.type)
 
+ if (!inherits(data, "ts_data_frame")){
+   stop("'data' must be a 'ts_data_frame'")
+ }
+
   if (missing(fPara) && ncores > 1L)
     stop("parallel processing not available for models of class '",
          class(model), "'")
@@ -943,8 +948,8 @@ cvOrdered <- function(model,
     stop('k must be an integer > 2')
   }
   message("Note: for ordered data, k-fold CV entails k - 1 fits")
-  folds <- folds(n, k, fold.type=fold.type, begin.with=begin.with,
-                 min.ahead=min.ahead)
+  folds <- orderedFolds(time(y), k, fold.type=fold.type, begin.with=begin.with,
+                        min.ahead=min.ahead)
   k <- folds$k
 
   yhat <- matrix(nrow=n, ncol=length(lead))
@@ -971,7 +976,7 @@ cvOrdered <- function(model,
     stopCluster(cl)
     j <- seq_along(lead)
     for (i in 1L:(k - 1)) {
-      ii <- fold(folds, i, predict = TRUE, lead=lead)
+      ii <- fold(folds, i, predict = TRUE, lead=lead, indices=TRUE)
       if (is.null(ii)) break
       jj <- j[seq_along(ii)]
       index <- cbind(ii, jj)
@@ -985,7 +990,8 @@ cvOrdered <- function(model,
     j <- seq_along(lead)
     for (i in 1L:(k - 1L)) {
       result[[i]] <- f(i)
-      ii <- fold(folds, i, predict = TRUE, lead=lead)
+      ii <- fold(folds, i, predict = TRUE, lead=lead, indices=TRUE,
+                 up.to.max.lead=TRUE)
       if (is.null(ii)) break
       jj <- j[seq_along(ii)]
       index <- cbind(ii, jj)
@@ -1006,9 +1012,9 @@ cvOrdered <- function(model,
     cv[i] <- criterion(as.vector(y)[use], as.vector(yh)[use])
   }
   mean.cv <- if (length(cv) > 1) mean(cv)
-
   if (is.na(cv.full)) cv.full <- NULL
   result <- list(
+    yhat = yhat, ### debug
     "CV crit" = cv,
     "mean CV crit" = mean.cv,
     "full crit" = cv.full,
@@ -1031,16 +1037,49 @@ cvOrdered <- function(model,
 
 #' @describeIn cvCompute used internally by \code{cv()} methods (not for direct use).
 #' @export
-folds <- function(n, k,
-                  fold.type=c("unordered", "window", "cumulative", "preceding"),
-                  begin.with=max(25L, ceiling(n/10)), min.ahead=1L) {
+folds <- function(n, k) {
+  nk <-  n %/% k # number of cases in each fold
+  rem <- n %% k  # remainder
+  folds <-
+    rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
+  ends <- cumsum(folds) # end of each fold
+  starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
+  indices <- if (n > k)
+    sample(n, n)
+  else
+    1L:n # permute cases
+  result <- list(
+    n = n,
+    k = k,
+    folds = folds,
+    starts = starts,
+    ends = ends,
+    indices = indices
+  )
+  class(result) <- "folds"
+  result
+}
+
+#' @describeIn cvCompute used internally by \code{cvOrdered()} and related
+#' \code{cv()} methods (not for direct use).
+#' @param times the result of \code{times(x)} where \code{x}
+#' is a \code{"ts"} object.
+#' @param indices if \code{TRUE} (the default is \code{FALSE})
+#' return raw indices rather than times.
+#' @export
+orderedFolds <- function(times, k,
+                         fold.type=c("window", "cumulative", "preceding"),
+                         begin.with=max(25L, ceiling(n/10)), min.ahead=1L) {
   fold.type <- match.arg(fold.type)
+  n <- length(times)
+  indices <- seq_along(times)
+  tsp(indices) <- tsp(times)
+  class(indices) <- "ts"
   if (fold.type == "window"){
     starts <- 1L:(n - begin.with - min.ahead + 2L)
     ends <- begin.with:(n - min.ahead + 1L)
     k <- length(starts)
     folds <- ends - starts + 1L
-    indices <- 1L:n
   } else if (fold.type == c("cumulative")) {
     if (missing(k)) k <- n
     after.first <- n - begin.with - min.ahead + 1L
@@ -1050,29 +1089,25 @@ folds <- function(n, k,
     folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1)))
     ends <- cumsum(folds) # end of each fold
     starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
-    indices <- 1L:n
   } else {
     nk <-  n %/% k # number of cases in each fold
     rem <- n %% k  # remainder
     folds <- rep(nk, k) + c(rep(1L, rem), rep(0L, k - rem)) # allocate remainder
-    indices <- if (n > k && fold.type != "preceding")
-      sample(n, n) # permute cases
-    else
-      1L:n
     ends <- cumsum(folds) # end of each fold
     starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
   }
   result <- list(
+    times = times,
     n = n,
     k = k,
-    folds = folds,
     starts = starts,
     ends = ends,
-    indices = indices,
+    folds = folds,
     fold.type = fold.type,
-    min.ahead = min.ahead
+    min.ahead = min.ahead,
+    indices = indices
   )
-  class(result) <- if (fold.type == "unordered") "folds" else c("orderedfolds", "folds")
+  class(result) <- "orderedFolds"
   result
 }
 
@@ -1086,6 +1121,54 @@ fold <- function(folds, i, ...)
 fold.folds <- function(folds, i, ...)
     folds$indices[folds$starts[i]:folds$ends[i]]
 
+#' @describeIn cvCompute \code{fold()} method for \code{"orderedFolds"} objects.
+#' @export
+fold.orderedFolds <- function(folds, i, predicted=FALSE, lead=1L,
+                              up.to.max.lead=FALSE, indices=FALSE, ...){
+  fold.type <- folds$fold.type
+  times <- folds$times
+  if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
+  if (predicted) {
+    if (fold.type == "window"){
+      j <- if (up.to.max.lead) {
+        stop <- max(max(lead), folds$min.ahead)
+        ends <- times[folds$ends[i] + stop]
+        c(start = min(times[folds$ends[i] + 1L]),
+          end = if (all(is.na(ends))) NA else max(ends, na.rm=TRUE))
+      } else {
+        ends <- times[folds$ends[i] + lead]
+        c(start = min(times[folds$ends[i] + lead]),
+          end = if (all(is.na(ends))) NA else
+            max(ends, na.rm=TRUE))
+      }
+    } else {
+      j <- if (up.to.max.lead) {
+        stop <- max(max(lead), folds$min.ahead)
+        c(start = min(times[folds$starts[i + 1L]]),
+          end = suppressWarnings(max(times[folds$starts[i + 1L] + stop - 1L],
+                                     na.rm=TRUE)))
+      } else {
+        c(start = min(times[folds$starts[i + 1L] + lead - 1L]),
+          end = suppressWarnings(max(times[folds$starts[i + 1L] + lead - 1L],
+                                     na.rm=TRUE)))
+      }
+    }
+    if (is.na(j["start"])) return(NULL)
+ #   if (is.na(j["end"])) j["end"] <- times[folds$n]
+    if (!is.finite(j["end"])) j["end"] <- times[folds$n]
+    if (!indices) {
+      j["stop"] <- j["end"]
+      return(j)
+    } else {
+      return(as.vector(window(folds$indices, start=j["start"], end=j["end"])))
+    }
+  } else if (fold.type == "cumulative"){
+    c(start = times[1], stop = times[folds$ends[i]])
+  } else {
+    c(start = times[folds$starts[i]], stop = times[folds$ends[i]])
+  }
+}
+
 #' @param predicted if \code{TRUE} (the default is \code{FALSE}), return
 #' the index (or indices) of the case(s) to be predicted; otherwise, return the indices
 #' of the cases used to fit the predictive model.
@@ -1097,42 +1180,66 @@ fold.folds <- function(folds, i, ...)
 #' up the the maximum implied by \code{lead}; used internally
 #' to help support predictions for some model terms with data-dependent
 #' bases, such as \code{\link[stats]{poly}()}.
-#' @describeIn cvCompute to extract a fold from an \code{"orderedfolds"} object.
-#' @export
-fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L,
-                              up.to.max.lead=FALSE, ...){
-  fold.type <- folds$fold.type
-  if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
-  if (predicted) {
-    if (fold.type == "window"){
-      j <- if (up.to.max.lead) {
-        stop <- max(max(lead), folds$min.ahead)
-        (folds$ends[i] + 1L):(folds$ends[i] + stop)
-      } else {
-        folds$ends[i] + lead
-      }
-    } else {
-      j <- if (up.to.max.lead) {
-        stop <- max(max(lead), folds$min.ahead)
-        folds$starts[i + 1L]:(folds$starts[i + 1L] + stop - 1L)
-      } else {
-        folds$starts[i + 1L] + lead - 1L
-      }
-    }
-    if (min(j) > folds$n) return(NULL)
-    j[j <= folds$n]
-  } else if (fold.type == "preceding") {
-    folds$starts[i]:folds$ends[i]
-  } else if (fold.type == "cumulative") {
-    1:folds$ends[i]
-  } else {
-    folds$starts[i]:folds$ends[i]
-  }
-}
+# #' @describeIn cvCompute to extract a fold from an \code{"orderedfolds"} object.
+# #' @export
+# fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L,
+#                               up.to.max.lead=FALSE, ...){
+#   fold.type <- folds$fold.type
+#   if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
+#   if (predicted) {
+#     if (fold.type == "window"){
+#       j <- if (up.to.max.lead) {
+#         stop <- max(max(lead), folds$min.ahead)
+#         (folds$ends[i] + 1L):(folds$ends[i] + stop)
+#       } else {
+#         folds$ends[i] + lead
+#       }
+#     } else {
+#       j <- if (up.to.max.lead) {
+#         stop <- max(max(lead), folds$min.ahead)
+#         folds$starts[i + 1L]:(folds$starts[i + 1L] + stop - 1L)
+#       } else {
+#         folds$starts[i + 1L] + lead - 1L
+#       }
+#     }
+#     if (min(j) > folds$n) return(NULL)
+#     j[j <= folds$n]
+#   } else if (fold.type == "preceding") {
+#     folds$starts[i]:folds$ends[i]
+#   } else if (fold.type == "cumulative") {
+#     1:folds$ends[i]
+#   } else {
+#     folds$starts[i]:folds$ends[i]
+#   }
+# }
 
 #' @describeIn cvCompute \code{print()} method for \code{"folds"} objects.
 #' @export
 print.folds <- function(x, ...) {
+  if (x$k == x$n) {
+    cat("LOO:", x$k, "folds for", x$n, "cases")
+    return(invisible(x))
+  }
+  cat(x$k,
+      "folds of approximately", round(x$n / x$k),
+      "cases each")
+  for (i in 1L:min(x$k, 10L)) {
+    cat("\n fold", paste0(i, ": "))
+    fld <- fold(x, i)
+    if (length(fld) <= 10L)
+      cat(fld)
+    else
+      cat(fld[1L:10L], "...")
+  }
+  if (x$k > 10L)
+    cat("\n ...")
+  cat("\n")
+  invisible(x)
+}
+
+#' @describeIn cvCompute \code{print()} method for \code{"orderedFolds"} objects.
+#' @export
+print.orderedFolds <- function(x, ...) {
   if (x$k == x$n) {
     cat("LOO:", x$k, "folds for", x$n, "cases")
     return(invisible(x))
@@ -1146,24 +1253,11 @@ print.folds <- function(x, ...) {
     cat("initial ordered fold of", x$folds[1], "cases,",
         "followed by", x$k - 1,
         if (all.ones) "folds of 1 case each" else paste("folds\n  of approximately",
-        fold.size, "cases each"))
+                                                        fold.size, "cases each"))
   } else {
-      cat(x$k, if(x$fold.type == "preceding") "ordered",
-          "folds of approximately", round(x$n / x$k),
-          "cases each")
-      if (x$fold.type == "unordered"){
-        for (i in 1L:min(x$k, 10L)) {
-          cat("\n fold", paste0(i, ": "))
-          fld <- fold(x, i)
-          if (length(fld) <= 10L)
-            cat(fld)
-          else
-            cat(fld[1L:10L], "...")
-        }
-        if (x$k > 10L)
-          cat("\n ...")
-      }
-    }
+    cat(x$k, "ordered folds of approximately", round(x$n / x$k),
+        "cases each")
+  }
   cat("\n")
   invisible(x)
 }

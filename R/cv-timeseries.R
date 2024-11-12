@@ -77,6 +77,11 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
                   order = c(1L, 0L, 0L),
                   seasonal = list(order = c(0L, 0L, 0L), period = NA),
                   ...){
+  if (!inherits(data, "ts_data_frame")) {
+    data <- as.ts(data)
+    message("Note: 'data' coerced to 'ts_data_frame'")
+  }
+  tsp <- tsp(data[, 1])
   dots <- list(...)
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
@@ -101,11 +106,20 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
       stop("formula must specify a single response")
     result$arima <- stats::arima(x[, 1], order=order, seasonal=seasonal,
                                  ...)
-    result$response <- x[, 1]
+    response <- x[, 1]
+    if (!is.ts(response)) {
+      tsp(response) <- tsp
+      class(response) <- c("tsp", class(response))
+    }
+    result$response <- response
   } else {
     y <- model.response(mf, "numeric")
     if (!(is.vector(y) || is.ts(y)) && is.numeric(y))
       stop("formula must specify a single response")
+    if (!is.ts(y)) {
+      tsp(y) <- tsp
+      class(y) <- c("tsp", class(y))
+    }
     result$arima <- stats::arima(y, order=order, seasonal=seasonal, xreg=x,
                                  include.mean=has.intercept, ...)
     result$response <- y
@@ -185,53 +199,56 @@ print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
   invisible(x)
 }
 
-#' @param y which diagnostic plots to display; the default is
-#' \code{c("fitted", "residuals", "acf", "pacf")}.
-#' @param xlab label for horizontal ("time") axis; defaults to
-#' \code{"Time"}.
-#' @param main title for diagnostic plots.
-#' @param col color for points and lines.
+#  #' @param y which diagnostic plots to display; the default is
+#  #' \code{c("fitted", "residuals", "acf", "pacf")}.
+#  #' @param xlab label for horizontal ("time") axis; defaults to
+#  #' \code{"Time"}.
+#  #' @param main title for diagnostic plots.
+#  #' @param col color for points and lines.
 #' @describeIn Arima \code{plot()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
 #' @export
-plot.ARIMA <- function(x,
-                       y=c("fitted", "residuals", "acf", "pacf"),
-                       xlab="time",
-                       main=paste("Diagnostic Plots for",
-                                  deparse(substitute(x))),
-                       col="blue", ...){
-
-  which.plots <- match.arg(y, several.ok=TRUE)
-
-  residuals <- residuals(x)
-  n <- length(residuals)
-
-  mfrow <- n2mfrow(length(which.plots))
-  save <- par(mfrow=mfrow, oma=c(0, 0, 1, 0))
-  on.exit(par(save))
-
-  if ("fitted" %in% which.plots){
-    plot(fitted(x), xlab=xlab, ylab=expression(hat(y)),
-       main = "Fitted Values", type="b", pch=16, col=col)
-    grid(lty=2, col="gray")
-  }
-
-  if ("residuals" %in% which.plots){
-    plot(residuals, xlab=xlab, ylab="residuals",
-       main="Residuals", type="b", pch=16, col=col)
-    grid(lty=2, col="gray")
-  }
-
-  if ("acf" %in% which.plots)
-    acf(residuals, main="Autocorrelations\n of Residuals",
-      na.action=na.pass, ci.col=col)
-
-  if ("pacf" %in% which.plots)
-    pacf(residuals, main="Parial Autocorrelations\n of Residuals",
-       na.action=na.pass, ci.col=col)
-
-  title(main=main, outer=TRUE)
+plot.ARIMA <- function(x, ...){
+  tsdiag(x$arima, ...)
 }
+# plot.ARIMA <- function(x,
+#                        y=c("fitted", "residuals", "acf", "pacf"),
+#                        xlab="time",
+#                        main=paste("Diagnostic Plots for",
+#                                   deparse(substitute(x))),
+#                        col="blue", ...){
+#
+#   which.plots <- match.arg(y, several.ok=TRUE)
+#
+#   residuals <- residuals(x)
+#   n <- length(residuals)
+#
+#   mfrow <- n2mfrow(length(which.plots))
+#   save <- par(mfrow=mfrow, oma=c(0, 0, 1, 0))
+#   on.exit(par(save))
+#
+#   if ("fitted" %in% which.plots){
+#     plot(fitted(x), xlab=xlab, ylab=expression(hat(y)),
+#        main = "Fitted Values", type="b", pch=16, col=col)
+#     grid(lty=2, col="gray")
+#   }
+#
+#   if ("residuals" %in% which.plots){
+#     plot(residuals, xlab=xlab, ylab="residuals",
+#        main="Residuals", type="b", pch=16, col=col)
+#     grid(lty=2, col="gray")
+#   }
+#
+#   if ("acf" %in% which.plots)
+#     acf(residuals, main="Autocorrelations\n of Residuals",
+#       na.action=na.pass, ci.col=col)
+#
+#   if ("pacf" %in% which.plots)
+#     pacf(residuals, main="Parial Autocorrelations\n of Residuals",
+#        na.action=na.pass, ci.col=col)
+#
+#   title(main=main, outer=TRUE)
+# }
 
 #' @describeIn Arima \code{\link[car]{Anova}()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.
@@ -298,7 +315,7 @@ testArima <- function(model, ...){
 #' @describeIn Arima test autocorrelations of ARIMA model residuals;
 #'   the test is performed by \code{\link[stats]{Box.test}()}.
 #' @importFrom stats Box.test logLik vcov AIC cov2cor pnorm quantile terms is.ts
-#' KalmanForecast deltat ts tsp
+#' KalmanForecast deltat ts tsp as.ts time tsdiag tsp<- window
 #' @importFrom grDevices n2mfrow
 #' @export
 testArima.ARIMA <- function(model, lag = floor(10*log10(n)),
@@ -448,9 +465,13 @@ predict.ARIMA <- function(object, n.ahead, newdata = NULL,
 #' produced by the \code{Arima()} function.
 #' @param mod an object of class \code{"ARIMA"}
 #' produced by the \code{Arima()} function.
-#' @param data data frame with the data to which the model was fit;
-#' can usually be inferred from the model; for \code{Arima()}, a data
-#' frame with data to which the model is to be fit.
+#' @param data time-series data frame with the data to which the model was fit;
+#' can usually be inferred from the model; for \code{Arima()}, a time-series data
+#' frame with data to which the model is to be fit. \code{data} must be
+#' a time-series data frame, i.e., a \code{"ts_data_frame"} object, whose
+#' columns are each \code{\link[stats]{ts}} objects with common times; if it
+#' is not, an attempt will be made to coerce it to a  \code{"ts_data_frame"} object
+#' by \code{as.ts.data.frame()}.
 #' @param criterion function to compute the CV cost criterion
 #' (default \code{\link{mse}}).
 #' @param k number of folds, an integer \eqn{\gt 2}; the default value of \code{k} depends on
@@ -503,9 +524,11 @@ cv.ARIMA <- function(model,
     indices.i <- fold(folds, i)
     indices.j <- fold(folds, i, predict=TRUE, lead=lead,
                       up.to.max.lead=TRUE)
-    model.i <- update(model, data = data[indices.i, , drop=FALSE])
-    fit.i <- predict(model.i, n.ahead=max(lead),
-                     newdata=data[indices.j, , drop=FALSE])
+    model.i <- update(model, data = window(data, start=indices.i["start"],
+                                           end=indices.i["stop"]))
+    fit.i <- as.vector(predict(model.i, n.ahead=max(lead),
+                     newdata=window(data, start=indices.j["start"],
+                                    end=indices.j["stop"])))
     list(
       fit.i = fit.i[lead],
       coef.i = coef(model.i)
@@ -526,8 +549,10 @@ cv.ARIMA <- function(model,
     # the following deals with a scoping issue that can
     #   occur with args passed via ... (which is saved in dots)
     predict.args <- c(list(
-      object = update(model, data = data[indices.i, , drop=FALSE]),
-      newdata = data[indices.j, , drop=FALSE],
+      object = update(model, data = window(data, start=indices.i["start"],
+                                           end=indices.i["stop"])),
+      newdata = window(data, start=indices.j["start"],
+                       end=indices.j["stop"]),
       n.ahead = max(lead)), dots)
 
     fit.i <- do.call(predict, predict.args)
@@ -535,6 +560,11 @@ cv.ARIMA <- function(model,
       fit.i = fit.i[lead],
       coef.i = coef(predict.args$object)
     )
+  }
+
+  if (!inherits(data, "ts_data_frame")) {
+    data <- as.ts(data)
+    message("Note: 'data' coerced to 'ts_data_frame'")
   }
 
   n <- nrow(data)
@@ -571,6 +601,74 @@ cv.ARIMA <- function(model,
   result[["lead"]] <- lead
   result
 }
+
+#' @describeIn Arima \code{as.ts()} method for \code{"data.frame"} objects;
+#' produces an object of class \code{"ts_data_frame"} inheriting from \code{"data.frame"}.
+#' @param start the beginning time (see \code{link[stats]{ts}()}).
+#' @param end the ending time (can be inferred from the data,
+#' see \code{link[stats]{ts}()}).
+#' @param frequency the period of the time series (e.g., \code{4}
+#' for quarterly data, see \code{link[stats]{ts}()}).
+#' @exportS3Method stats::as.ts
+as.ts.data.frame <- function(x, start=1, end, frequency=1, ...){
+  which.ts <- which(sapply(x, is.ts))
+  if (missing(start)){
+    if (length(which.ts) > 0L) {
+      tsp <- tsp(x[[min(which.ts)]])
+    } else {
+      z <- numeric(nrow(x))
+      z <- ts(z)
+      tsp <- tsp(z)
+    }
+  } else {
+    z <- numeric(nrow(x))
+    z <- if (missing(end)){
+      ts(z, start=start, frequency=frequency)
+    } else {
+      ts(z, start=start, end=end, frequency=frequency)
+    }
+    tsp <- tsp(z)
+  }
+  nms <- names(x)
+  for (j in 1L:ncol(x)){
+    if (j %in% which.ts){
+      if (!all(tsp == tsp(x[, j]))){
+        stop("incompatible 'ts' definition for ", nms[j])
+      }
+      next
+    }
+    xx <- x[, j]
+    tsp(xx) <- tsp
+    class(xx) <- c("ts", class(xx))
+    x[, j] <- xx
+  }
+  class(x) <- c("ts_data_frame", class(x))
+  x
+}
+
+#' @describeIn Arima \code{as.ts()} method for \code{"ts_data_frame"} objects;
+#' returns the object unchanged.
+#' @exportS3Method stats::as.ts
+as.ts.ts_data_frame <- function(x, ...) x
+
+#' @describeIn Arima \code{window()} method for \code{"ts_data_frame"} objects;
+#' returns a subset of the object, also a \code{"ts_data_frame"}, with correctly subsetted \code{"ts"}
+#' objects as columns.
+#' @exportS3Method stats::window
+window.ts_data_frame <- function(x, start=NULL, end=NULL, ...){
+  result <- lapply(x, function(z) window(z, start=start, end=end, ...))
+  result <- as.data.frame(result)
+  class(result) <- c("ts_data_frame", class(x))
+  result
+}
+
+#' @describeIn Arima \code{time()} method for \code{"ts_data_frame"} objects;
+#' returns the (common) times associated with the columns of the \code{"ts_data_frame"}.
+#' @exportS3Method stats::time
+time.ts_data_frame <- function(x, ...){
+  time(x[, 1])
+}
+
 
 # the following method isn't exported and shadows
 # stats::predict.Arima(), from which it is derived

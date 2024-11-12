@@ -6,10 +6,12 @@
 \alias{cvSelect}
 \alias{cvOrdered}
 \alias{folds}
+\alias{orderedFolds}
 \alias{fold}
 \alias{fold.folds}
-\alias{fold.orderedfolds}
+\alias{fold.orderedFolds}
 \alias{print.folds}
+\alias{print.orderedFolds}
 \alias{GetResponse}
 \alias{GetResponse.default}
 \alias{GetResponse.merMod}
@@ -105,10 +107,12 @@ cvOrdered(
   ...
 )
 
-folds(
-  n,
+folds(n, k)
+
+orderedFolds(
+  times,
   k,
-  fold.type = c("unordered", "window", "cumulative", "preceding"),
+  fold.type = c("window", "cumulative", "preceding"),
   begin.with = max(25L, ceiling(n/10)),
   min.ahead = 1L
 )
@@ -117,9 +121,19 @@ fold(folds, i, ...)
 
 \method{fold}{folds}(folds, i, ...)
 
-\method{fold}{orderedfolds}(folds, i, predicted = FALSE, lead = 1L, up.to.max.lead = FALSE, ...)
+\method{fold}{orderedFolds}(
+  folds,
+  i,
+  predicted = FALSE,
+  lead = 1L,
+  up.to.max.lead = FALSE,
+  indices = FALSE,
+  ...
+)
 
 \method{print}{folds}(x, ...)
+
+\method{print}{orderedFolds}(x, ...)
 
 GetResponse(model, ...)
 
@@ -269,6 +283,9 @@ some kinds of predictions for terms with data-dependent bases, such as those usi
 
 \item{n}{number of cases, for constructed folds.}
 
+\item{times}{the result of \code{times(x)} where \code{x}
+is a \code{"ts"} object.}
+
 \item{folds}{an object of class \code{"folds"}.}
 
 \item{i}{a fold number for an object of class \code{"folds"}.}
@@ -283,6 +300,9 @@ to the cases to be predicted as given by \code{lead} but of all cases
 up the the maximum implied by \code{lead}; used internally
 to help support predictions for some model terms with data-dependent
 bases, such as \code{\link[stats]{poly}()}.}
+
+\item{indices}{if \code{TRUE} (the default is \code{FALSE})
+return raw indices rather than times.}
 
 \item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed,
 or a \code{"cvOfdered"} object to be plotted.}
@@ -366,13 +386,18 @@ cross-validating time-series models.
 
 \item \code{folds()}: used internally by \code{cv()} methods (not for direct use).
 
+\item \code{orderedFolds()}: used internally by \code{cvOrdered()} and related
+\code{cv()} methods (not for direct use).
+
 \item \code{fold()}: to extract a fold from a \code{"folds"} object.
 
 \item \code{fold(folds)}: \code{fold()} method for \code{"folds"} objects.
 
-\item \code{fold(orderedfolds)}: to extract a fold from an \code{"orderedfolds"} object.
+\item \code{fold(orderedFolds)}: \code{fold()} method for \code{"orderedFolds"} objects.
 
 \item \code{print(folds)}: \code{print()} method for \code{"folds"} objects.
+
+\item \code{print(orderedFolds)}: \code{print()} method for \code{"orderedFolds"} objects.
 
 \item \code{GetResponse()}: function to return the response variable
 from a regression model.
@@ -400,9 +425,10 @@ set.seed(123)
 (ffs <- folds(n=22, k=5))
 fold(ffs, 2)
 
-(ffs.ord <- folds(n = 100, fold.type="cumulative"))
+(ffs.ord <- orderedFolds(1:100, fold.type="cumulative"))
 fold(ffs.ord, 2)
 fold(ffs.ord, 2, predicted=TRUE, lead=1:5)
+# note: 'end' and 'stop' used in different contexts
 
 }
 \seealso{

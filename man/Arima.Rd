@@ -21,6 +21,10 @@
 \alias{residuals.ARIMA}
 \alias{predict.ARIMA}
 \alias{cv.ARIMA}
+\alias{as.ts.data.frame}
+\alias{as.ts.ts_data_frame}
+\alias{window.ts_data_frame}
+\alias{time.ts_data_frame}
 \title{Fit and Cross-Validate ARIMA Models}
 \usage{
 Arima(
@@ -44,14 +48,7 @@ Arima(
   ...
 )
 
-\method{plot}{ARIMA}(
-  x,
-  y = c("fitted", "residuals", "acf", "pacf"),
-  xlab = "time",
-  main = paste("Diagnostic Plots for", deparse(substitute(x))),
-  col = "blue",
-  ...
-)
+\method{plot}{ARIMA}(x, ...)
 
 \method{Anova}{ARIMA}(mod, type = c("II", "III", 2, 3), ...)
 
@@ -102,6 +99,14 @@ testArima(model, ...)
   ncores = 1L,
   ...
 )
+
+\method{as.ts}{data.frame}(x, start = 1, end, frequency = 1, ...)
+
+\method{as.ts}{ts_data_frame}(x, ...)
+
+\method{window}{ts_data_frame}(x, start = NULL, end = NULL, ...)
+
+\method{time}{ts_data_frame}(x, ...)
 }
 \arguments{
 \item{formula}{either a one-sided formula giving the response variable
@@ -112,9 +117,13 @@ is removed from the model even if the formula implies an intercept.
 For the \code{\link[stats]{model.frame}()}
 method (to match the generic), an \code{"ARIMA"} object.}
 
-\item{data}{data frame with the data to which the model was fit;
-can usually be inferred from the model; for \code{Arima()}, a data
-frame with data to which the model is to be fit.}
+\item{data}{time-series data frame with the data to which the model was fit;
+can usually be inferred from the model; for \code{Arima()}, a time-series data
+frame with data to which the model is to be fit. \code{data} must be
+a time-series data frame, i.e., a \code{"ts_data_frame"} object, whose
+columns are each \code{\link[stats]{ts}} objects with common times; if it
+is not, an attempt will be made to coerce it to a  \code{"ts_data_frame"} object
+by \code{as.ts.data.frame()}.}
 
 \item{subset}{subsetting expression.}
 
@@ -142,16 +151,6 @@ a seasonal part of the model.}
 \item{correlation}{compute and report correlations of coefficients.}
 
 \item{signif.stars}{show "significance stars" in coefficient table?}
-
-\item{y}{which diagnostic plots to display; the default is
-\code{c("fitted", "residuals", "acf", "pacf")}.}
-
-\item{xlab}{label for horizontal ("time") axis; defaults to
-\code{"Time"}.}
-
-\item{main}{title for diagnostic plots.}
-
-\item{col}{color for points and lines.}
 
 \item{mod}{an object of class \code{"ARIMA"}
 produced by the \code{Arima()} function.}
@@ -221,6 +220,14 @@ inferred from \code{criterion}.}
 the default is \code{TRUE} for \eqn{k \le 10,000}.}
 
 \item{ncores}{if \code{ncores} \eqn{> 1}, the computation is parallelized.}
+
+\item{start}{the beginning time (see \code{link[stats]{ts}()}).}
+
+\item{end}{the ending time (can be inferred from the data,
+see \code{link[stats]{ts}()}).}
+
+\item{frequency}{the period of the time series (e.g., \code{4}
+for quarterly data, see \code{link[stats]{ts}()}).}
 }
 \value{
 the \code{\link{cv.ARIMA}()} method returns an object of class
@@ -300,6 +307,19 @@ created by the \code{\link{Arima}()} function.
 
 \item \code{cv(ARIMA)}: \code{cv()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.
+
+\item \code{as.ts(data.frame)}: \code{as.ts()} method for \code{"data.frame"} objects;
+produces an object of class \code{"ts_data_frame"} inheriting from \code{"data.frame"}.
+
+\item \code{as.ts(ts_data_frame)}: \code{as.ts()} method for \code{"ts_data_frame"} objects;
+returns the object unchanged.
+
+\item \code{window(ts_data_frame)}: \code{window()} method for \code{"ts_data_frame"} objects;
+returns a subset of the object, also a \code{"ts_data_frame"}, with correctly subsetted \code{"ts"}
+objects as columns.
+
+\item \code{time(ts_data_frame)}: \code{time()} method for \code{"ts_data_frame"} objects;
+returns the (common) times associated with the columns of the \code{"ts_data_frame"}.
 
 }}
 \examples{
