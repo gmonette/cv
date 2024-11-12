@@ -264,7 +264,7 @@ created by the \code{\link{Arima}()} function.
 \item \code{print(summary.ARIMA)}: \code{print()} method for \code{"summary.ARIMA"} objects.
 
 \item \code{plot(ARIMA)}: \code{plot()} method for \code{"ARIMA"} objects
-created by the \code{\link{Arima}()} function.
+created by the \code{\link{Arima}()} function; calls \code{\link[stats]{tsdiag}()}.
 
 \item \code{Anova(ARIMA)}: \code{\link[car]{Anova}()} method for \code{"ARIMA"} objects
 created by the \code{\link{Arima}()} function.

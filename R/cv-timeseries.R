@@ -199,56 +199,12 @@ print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
   invisible(x)
 }
 
-#  #' @param y which diagnostic plots to display; the default is
-#  #' \code{c("fitted", "residuals", "acf", "pacf")}.
-#  #' @param xlab label for horizontal ("time") axis; defaults to
-#  #' \code{"Time"}.
-#  #' @param main title for diagnostic plots.
-#  #' @param col color for points and lines.
 #' @describeIn Arima \code{plot()} method for \code{"ARIMA"} objects
-#' created by the \code{\link{Arima}()} function.
+#' created by the \code{\link{Arima}()} function; calls \code{\link[stats]{tsdiag}()}.
 #' @export
 plot.ARIMA <- function(x, ...){
   tsdiag(x$arima, ...)
 }
-# plot.ARIMA <- function(x,
-#                        y=c("fitted", "residuals", "acf", "pacf"),
-#                        xlab="time",
-#                        main=paste("Diagnostic Plots for",
-#                                   deparse(substitute(x))),
-#                        col="blue", ...){
-#
-#   which.plots <- match.arg(y, several.ok=TRUE)
-#
-#   residuals <- residuals(x)
-#   n <- length(residuals)
-#
-#   mfrow <- n2mfrow(length(which.plots))
-#   save <- par(mfrow=mfrow, oma=c(0, 0, 1, 0))
-#   on.exit(par(save))
-#
-#   if ("fitted" %in% which.plots){
-#     plot(fitted(x), xlab=xlab, ylab=expression(hat(y)),
-#        main = "Fitted Values", type="b", pch=16, col=col)
-#     grid(lty=2, col="gray")
-#   }
-#
-#   if ("residuals" %in% which.plots){
-#     plot(residuals, xlab=xlab, ylab="residuals",
-#        main="Residuals", type="b", pch=16, col=col)
-#     grid(lty=2, col="gray")
-#   }
-#
-#   if ("acf" %in% which.plots)
-#     acf(residuals, main="Autocorrelations\n of Residuals",
-#       na.action=na.pass, ci.col=col)
-#
-#   if ("pacf" %in% which.plots)
-#     pacf(residuals, main="Parial Autocorrelations\n of Residuals",
-#        na.action=na.pass, ci.col=col)
-#
-#   title(main=main, outer=TRUE)
-# }
 
 #' @describeIn Arima \code{\link[car]{Anova}()} method for \code{"ARIMA"} objects
 #' created by the \code{\link{Arima}()} function.

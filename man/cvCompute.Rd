@@ -389,7 +389,8 @@ cross-validating time-series models.
 \item \code{orderedFolds()}: used internally by \code{cvOrdered()} and related
 \code{cv()} methods (not for direct use).
 
-\item \code{fold()}: to extract a fold from a \code{"folds"} object.
+\item \code{fold()}: to extract a fold from a \code{"folds"} or
+\code{"orderedFolds"} object.
 
 \item \code{fold(folds)}: \code{fold()} method for \code{"folds"} objects.
 
@@ -428,7 +429,6 @@ fold(ffs, 2)
 (ffs.ord <- orderedFolds(1:100, fold.type="cumulative"))
 fold(ffs.ord, 2)
 fold(ffs.ord, 2, predicted=TRUE, lead=1:5)
-# note: 'end' and 'stop' used in different contexts
 
 }
 \seealso{

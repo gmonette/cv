@@ -148,7 +148,6 @@
 #' (ffs.ord <- orderedFolds(1:100, fold.type="cumulative"))
 #' fold(ffs.ord, 2)
 #' fold(ffs.ord, 2, predicted=TRUE, lead=1:5)
-#' # note: 'end' and 'stop' used in different contexts
 #'
 #' @seealso \code{\link{cv}}, \code{\link{cv.merMod}},
 #' \code{\link{cv.function}}.
@@ -1111,7 +1110,8 @@ orderedFolds <- function(times, k,
   result
 }
 
-#' @describeIn cvCompute to extract a fold from a \code{"folds"} object.
+#' @describeIn cvCompute to extract a fold from a \code{"folds"} or
+#' \code{"orderedFolds"} object.
 #' @export
 fold <- function(folds, i, ...)
   UseMethod("fold")
@@ -1134,33 +1134,31 @@ fold.orderedFolds <- function(folds, i, predicted=FALSE, lead=1L,
         stop <- max(max(lead), folds$min.ahead)
         ends <- times[folds$ends[i] + stop]
         c(start = min(times[folds$ends[i] + 1L]),
-          end = if (all(is.na(ends))) NA else max(ends, na.rm=TRUE))
+          stop = if (all(is.na(ends))) NA else max(ends, na.rm=TRUE))
       } else {
         ends <- times[folds$ends[i] + lead]
         c(start = min(times[folds$ends[i] + lead]),
-          end = if (all(is.na(ends))) NA else
+          stop = if (all(is.na(ends))) NA else
             max(ends, na.rm=TRUE))
       }
     } else {
       j <- if (up.to.max.lead) {
         stop <- max(max(lead), folds$min.ahead)
         c(start = min(times[folds$starts[i + 1L]]),
-          end = suppressWarnings(max(times[folds$starts[i + 1L] + stop - 1L],
+          stop = suppressWarnings(max(times[folds$starts[i + 1L] + stop - 1L],
                                      na.rm=TRUE)))
       } else {
         c(start = min(times[folds$starts[i + 1L] + lead - 1L]),
-          end = suppressWarnings(max(times[folds$starts[i + 1L] + lead - 1L],
+          stop = suppressWarnings(max(times[folds$starts[i + 1L] + lead - 1L],
                                      na.rm=TRUE)))
       }
     }
     if (is.na(j["start"])) return(NULL)
- #   if (is.na(j["end"])) j["end"] <- times[folds$n]
-    if (!is.finite(j["end"])) j["end"] <- times[folds$n]
+    if (!is.finite(j["stop"])) j["stop"] <- times[folds$n]
     if (!indices) {
-      j["stop"] <- j["end"]
       return(j)
     } else {
-      return(as.vector(window(folds$indices, start=j["start"], end=j["end"])))
+      return(as.vector(window(folds$indices, start=j["start"], end=j["stop"])))
     }
   } else if (fold.type == "cumulative"){
     c(start = times[1], stop = times[folds$ends[i]])
@@ -1180,38 +1178,6 @@ fold.orderedFolds <- function(folds, i, predicted=FALSE, lead=1L,
 #' up the the maximum implied by \code{lead}; used internally
 #' to help support predictions for some model terms with data-dependent
 #' bases, such as \code{\link[stats]{poly}()}.
-# #' @describeIn cvCompute to extract a fold from an \code{"orderedfolds"} object.
-# #' @export
-# fold.orderedfolds <- function(folds, i, predicted=FALSE, lead=1L,
-#                               up.to.max.lead=FALSE, ...){
-#   fold.type <- folds$fold.type
-#   if (i > (kk <- folds$k - 1L)) stop("fold ", i, " out of range 1 to ", kk)
-#   if (predicted) {
-#     if (fold.type == "window"){
-#       j <- if (up.to.max.lead) {
-#         stop <- max(max(lead), folds$min.ahead)
-#         (folds$ends[i] + 1L):(folds$ends[i] + stop)
-#       } else {
-#         folds$ends[i] + lead
-#       }
-#     } else {
-#       j <- if (up.to.max.lead) {
-#         stop <- max(max(lead), folds$min.ahead)
-#         folds$starts[i + 1L]:(folds$starts[i + 1L] + stop - 1L)
-#       } else {
-#         folds$starts[i + 1L] + lead - 1L
-#       }
-#     }
-#     if (min(j) > folds$n) return(NULL)
-#     j[j <= folds$n]
-#   } else if (fold.type == "preceding") {
-#     folds$starts[i]:folds$ends[i]
-#   } else if (fold.type == "cumulative") {
-#     1:folds$ends[i]
-#   } else {
-#     folds$starts[i]:folds$ends[i]
-#   }
-# }
 
 #' @describeIn cvCompute \code{print()} method for \code{"folds"} objects.
 #' @export
