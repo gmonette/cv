@@ -30,8 +30,6 @@
 Arima(
   formula,
   data,
-  subset = NULL,
-  na.action = na.pass,
   order = c(1L, 0L, 0L),
   seasonal = list(order = c(0L, 0L, 0L), period = NA),
   ...
@@ -124,12 +122,6 @@ a time-series data frame, i.e., a \code{"ts_data_frame"} object, whose
 columns are each \code{\link[stats]{ts}} objects with common times; if it
 is not, an attempt will be made to coerce it to a  \code{"ts_data_frame"} object
 by \code{as.ts.data.frame()}.}
-
-\item{subset}{subsetting expression.}
-
-\item{na.action}{function to process missing data; the default,
-\code{\link{na.pass}}, will pass missing data to the \code{\link{arima}()}
-function.}
 
 \item{order}{the \eqn{p, d, q} specification of the ARIMA model;
 see \code{\link{arima}()} for details; the default is \eqn{p = 1, d = 0, q = 0},
@@ -235,8 +227,7 @@ the \code{\link{cv.ARIMA}()} method returns an object of class
 
 \code{Arima()} returns an object of class \code{"ARIMA"} with the
 following components: \code{formula}, the model formula; \code{data},
-the data set to which the model was fit; \code{subset}, the subset
-expression (if specified); \code{na.action}, see \code{\link{na.pass}};
+the data set to which the model was fit;
 \code{order}, the order of the ARIMA model;
 \code{seasonal}, the seasonal specification;
 \code{call}, the function call;

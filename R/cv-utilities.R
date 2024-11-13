@@ -1007,7 +1007,7 @@ cvOrdered <- function(model,
   names (cv) <- paste("lead", lead)
   for (i in seq_along(lead)){
     yh <- yhat[, i]
-    use <- !is.na(yh)
+    use <- !(is.na(yh) | is.na(y))
     cv[i] <- criterion(as.vector(y)[use], as.vector(yh)[use])
   }
   mean.cv <- if (length(cv) > 1) mean(cv)

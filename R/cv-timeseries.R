@@ -58,10 +58,6 @@
 #' is removed from the model even if the formula implies an intercept.
 #' For the \code{\link[stats]{model.frame}()}
 #' method (to match the generic), an \code{"ARIMA"} object.
-#' @param subset subsetting expression.
-#' @param na.action function to process missing data; the default,
-#' \code{\link{na.pass}}, will pass missing data to the \code{\link{arima}()}
-#' function.
 #' @param order the \eqn{p, d, q} specification of the ARIMA model;
 #' see \code{\link{arima}()} for details; the default is \eqn{p = 1, d = 0, q = 0},
 #' an AR(1) model.
@@ -73,7 +69,7 @@
 #'
 #' @describeIn Arima model-formula wrapper for the \code{\link{arima}()} function.
 #' @export
-Arima <- function(formula, data, subset=NULL, na.action=na.pass,
+Arima <- function(formula, data,
                   order = c(1L, 0L, 0L),
                   seasonal = list(order = c(0L, 0L, 0L), period = NA),
                   ...){
@@ -85,8 +81,9 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
   dots <- list(...)
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
-  m <- match(c("formula", "data", "subset", "na.action"), names(mf), 0L)
+  m <- match(c("formula", "data"), names(mf), 0L)
   mf <- mf[c(1L, m)]
+  mf$na.action <- na.pass
   mf[[1L]] <- quote(stats::model.frame)
   mf <- eval(mf, parent.frame())
   mt <- attr(mf, "terms")
@@ -98,19 +95,19 @@ Arima <- function(formula, data, subset=NULL, na.action=na.pass,
   } else {
     has.intercept <- FALSE
   }
-  result <- list(formula=formula, data=data, subset=subset,
-                 na.action=na.action, order=order, seasonal=seasonal,
+  result <- list(formula=formula, data=data,
+                 order=order, seasonal=seasonal,
                  call=cl, model=mf, dots=dots)
   if (length(formula) == 2){
     if (!(ncol(x) == 1) && is.numeric(x[, 1]))
       stop("formula must specify a single response")
-    result$arima <- stats::arima(x[, 1], order=order, seasonal=seasonal,
-                                 ...)
     response <- x[, 1]
     if (!is.ts(response)) {
       tsp(response) <- tsp
       class(response) <- c("tsp", class(response))
     }
+    result$arima <- stats::arima(response, order=order, seasonal=seasonal,
+                                 ...)
     result$response <- response
   } else {
     y <- model.response(mf, "numeric")
@@ -174,7 +171,7 @@ print.summary.ARIMA <- function(x, digits = max(3L, getOption("digits") - 3L),
       "\n\n", sep = "")
   residuals <- x$residuals
   if (!is.null(residuals)){
-    quants <- quantile(residuals, c(0, 0.25, 0.5, 0.75, 1))
+    quants <- quantile(residuals, c(0, 0.25, 0.5, 0.75, 1), na.rm=TRUE)
     names(quants) <- c("Min", "1st Q", "Median", "3rd Q", "Max")
     cat("Residuals:\n")
     print(quants, digits=digits)
@@ -294,8 +291,8 @@ update.ARIMA <- function(object, formula, ...){
   cl0 <- object$call
   cl <- match.call()
   args <- object$dots
-  args[c("data", "subset", "na.action", "order", "seasonal")] <-
-    object[c("data", "subset", "na.action", "order", "seasonal")]
+  args[c("data", "order", "seasonal")] <-
+    object[c("data", "order", "seasonal")]
   dots <- list(...)
   names <- names(dots)
   for (name in names){
@@ -368,8 +365,7 @@ model.frame.ARIMA <- function(formula, ...){
 #'
 #'   \code{Arima()} returns an object of class \code{"ARIMA"} with the
 #'   following components: \code{formula}, the model formula; \code{data},
-#'   the data set to which the model was fit; \code{subset}, the subset
-#'   expression (if specified); \code{na.action}, see \code{\link{na.pass}};
+#'   the data set to which the model was fit;
 #'   \code{order}, the order of the ARIMA model;
 #'   \code{seasonal}, the seasonal specification;
 #'   \code{call}, the function call;
@@ -480,8 +476,8 @@ cv.ARIMA <- function(model,
     indices.i <- fold(folds, i)
     indices.j <- fold(folds, i, predict=TRUE, lead=lead,
                       up.to.max.lead=TRUE)
-    model.i <- update(model, data = window(data, start=indices.i["start"],
-                                           end=indices.i["stop"]))
+    model.i <- suppressWarnings(update(model, data = window(data, start=indices.i["start"],
+                                           end=indices.i["stop"])))
     fit.i <- as.vector(predict(model.i, n.ahead=max(lead),
                      newdata=window(data, start=indices.j["start"],
                                     end=indices.j["stop"])))
@@ -505,8 +501,8 @@ cv.ARIMA <- function(model,
     # the following deals with a scoping issue that can
     #   occur with args passed via ... (which is saved in dots)
     predict.args <- c(list(
-      object = update(model, data = window(data, start=indices.i["start"],
-                                           end=indices.i["stop"])),
+      object = suppressWarnings(update(model, data = window(data, start=indices.i["start"],
+                                           end=indices.i["stop"]))),
       newdata = window(data, start=indices.j["start"],
                        end=indices.j["stop"]),
       n.ahead = max(lead)), dots)
