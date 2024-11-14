@@ -143,3 +143,98 @@ test_that('MSE for CV of ARIMA fold.type="window"', {
   expect_equal(colMeans((yhat - levels)^2, na.rm=TRUE),
                as.vector(cv.lake.win.3$"CV crit"))
 })
+
+# test CV for seasonal model
+
+Presidents <- as.ts(data.frame(approval=presidents,
+                               time=time(presidents)))
+
+  # test Arima() for seasonal model with differencing
+
+m.pres.arima <- arima(Presidents$approval, order=c(1, 1, 0), seasonal=c(1, 0, 0),
+                      xreg = Presidents$time)
+m.pres.Arima <- Arima(approval ~ time, data=Presidents,
+                      order=c(1, 1, 0), seasonal=c(1, 0, 0))
+
+test_that('Arima() fits seasonal model correctly', {
+  expect_equal(as.vector(coef(m.pres.arima)),
+               as.vector(coef(m.pres.Arima)))
+})
+
+times <- Presidents$time
+n <- length(times)
+
+  # for "cumulative" folds
+
+yhat <- matrix(NA, n, 3)
+for (i in 25:(n - 1)){
+  m <- update(m.pres.Arima, data=window(Presidents, times[1], times[i]))
+  last <- if (i <= (n - 3)) 3 else if (i == (n - 2)) 2 else 1
+  index <- matrix(c((i + 1):(i + last), 1:last), last, 2)
+  yhat[index] <-  as.vector(fit <- predict(m, n.ahead=last,
+                                           newdata=window(Presidents,
+                                                          times[i + 1], times[i + last])))
+}
+cv.m.pres.3.c <- cv(m.pres.Arima, fold.type="cumulative",
+                  lead=1:3)
+test_that('MSE for CV of seasonal ARIMA fold.type="cumulative"', {
+  expect_equal(colMeans((yhat - as.vector(Presidents$approval))^2, na.rm=TRUE),
+               as.vector(cv.m.pres.3.c$"CV crit"))
+})
+
+
+  # for "window" folds
+
+yhat <- matrix(NA, n, 3)
+for (i in 1:95){
+  m <- update(m.pres.Arima, data=window(Presidents, times[i], times[i + 24]))
+  last <- if (i <= 93) 3 else if (i == 94) 2 else 1
+  index <- matrix(c((i + 25):(i + 24 + last), 1:last), last, 2)
+  yhat[index] <-  as.vector(fit <- predict(m, n.ahead=last,
+                                           newdata=window(Presidents,
+                                                          times[i + 25], times[i + 24 + last])))
+}
+cv.m.pres.3.w <- cv(m.pres.Arima, fold.type="window",
+                    lead=1:3)
+test_that('MSE for CV of seasonal ARIMA fold.type="window"', {
+  expect_equal(colMeans((yhat - as.vector(Presidents$approval))^2, na.rm=TRUE),
+               as.vector(cv.m.pres.3.w$"CV crit"))
+})
+
+  # for "preceding" folds
+
+yhat <- matrix(NA, n, 3)
+for (i in (1 + 12*(0:8))){
+  m <- update(m.pres.Arima, data=window(Presidents, times[i], times[i + 11]))
+  index <- matrix(c((i + 12):(i + 14), 1:3), 3, 2)
+  yhat[index] <-  as.vector(fit <- predict(m, n.ahead=3,
+                                           newdata=window(Presidents,
+                                                          times[i + 12], times[i + 14])))
+}
+cv.m.pres.3.p <- cv(m.pres.Arima, fold.type="preceding", k=10,
+                    lead=1:3)
+test_that('MSE for CV of seasonal ARIMA fold.type="preceding"', {
+  expect_equal(colMeans((yhat - as.vector(Presidents$approval))^2, na.rm=TRUE),
+               as.vector(cv.m.pres.3.p$"CV crit"))
+})
+
+
+  # test parallel computations for CV of seasonal model
+
+test_that("parallel computations work for CV of seasonal model 'cumulative' folds",{
+  expect_equal(cv.m.pres.3.c,
+               cv(m.pres.Arima, fold.type="cumulative",
+                  lead=1:3, ncores=2))
+})
+
+test_that("parallel computations work for CV of seasonal model 'window' folds",{
+  expect_equal(cv.m.pres.3.w,
+               cv(m.pres.Arima, fold.type="window",
+                  lead=1:3, ncores=2))
+})
+
+test_that("parallel computations work for CV of seasonal model 'preceding' folds",{
+  expect_equal(cv.m.pres.3.p,
+               cv(m.pres.Arima, fold.type="preceding", k=10,
+                  lead=1:3, ncores=2))
+})

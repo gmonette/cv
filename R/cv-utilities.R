@@ -966,7 +966,7 @@ cvOrdered <- function(model,
     dots <- list(...)
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    result <- foreach(i = 1L:(k - 1)) %dopar% {
+    result <- foreach(i = 1L:(k - 1L)) %dopar% {
       fPara(i,
         model.function = model.function,
         model.function.name = model.function.name,
@@ -974,8 +974,9 @@ cvOrdered <- function(model,
     }
     stopCluster(cl)
     j <- seq_along(lead)
-    for (i in 1L:(k - 1)) {
-      ii <- fold(folds, i, predict = TRUE, lead=lead, indices=TRUE)
+    for (i in 1L:(k - 1L)) {
+      ii <- fold(folds, i, predict = TRUE, lead=lead, indices=TRUE,
+                 up.to.max.lead=TRUE)
       if (is.null(ii)) break
       jj <- j[seq_along(ii)]
       index <- cbind(ii, jj)
@@ -1013,7 +1014,6 @@ cvOrdered <- function(model,
   mean.cv <- if (length(cv) > 1) mean(cv)
   if (is.na(cv.full)) cv.full <- NULL
   result <- list(
-    yhat = yhat, ### debug
     "CV crit" = cv,
     "mean CV crit" = mean.cv,
     "full crit" = cv.full,

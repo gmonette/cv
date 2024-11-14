@@ -507,7 +507,8 @@ cv.ARIMA <- function(model,
                        end=indices.j["stop"]),
       n.ahead = max(lead)), dots)
 
-    fit.i <- do.call(predict, predict.args)
+    fit.i <- as.vector(do.call(predict, predict.args))
+
     list(
       fit.i = fit.i[lead],
       coef.i = coef(predict.args$object)
@@ -548,8 +549,9 @@ cv.ARIMA <- function(model,
     locals = list(x.names = x.names),
     ...
   )
-  result[["full crit"]] <- criterion(na.omit(GetResponse(model)),
-                                     na.omit(fitted(model)))
+  yy <- as.vector(GetResponse(model))
+  yyhat <- as.vector(fitted(model))
+  result[["full crit"]] <- criterion(na.omit(yy), na.omit(yyhat))
   result[["lead"]] <- lead
   result
 }
