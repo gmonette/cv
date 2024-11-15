@@ -605,7 +605,7 @@ as.ts.data.frame <- function(x, start=1, end, frequency=1, ...){
 #' @describeIn Arima constructor function for \code{"ts_data_frame"} objects.
 #' @export
 ts_data_frame <- function(..., start, end, frequency){
-  as.ts(data.frame(...), start=start, end=end, frequency)
+  as.ts(data.frame(...), start=start, end=end, frequency=frequency)
 }
 
 #' @describeIn Arima \code{as.ts()} method for \code{"ts_data_frame"} objects;
