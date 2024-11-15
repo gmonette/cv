@@ -22,6 +22,7 @@
 \alias{predict.ARIMA}
 \alias{cv.ARIMA}
 \alias{as.ts.data.frame}
+\alias{ts_data_frame}
 \alias{as.ts.ts_data_frame}
 \alias{window.ts_data_frame}
 \alias{time.ts_data_frame}
@@ -100,6 +101,8 @@ testArima(model, ...)
 
 \method{as.ts}{data.frame}(x, start = 1, end, frequency = 1, ...)
 
+ts_data_frame(..., start, end, frequency)
+
 \method{as.ts}{ts_data_frame}(x, ...)
 
 \method{window}{ts_data_frame}(x, start = NULL, end = NULL, ...)
@@ -132,7 +135,9 @@ see \code{\link{arima}()} for details; the default is not to include
 a seasonal part of the model.}
 
 \item{...}{further arguments to be passed to \code{\link{arima}()},
-\code{Arima()}, or other functions and methods.}
+\code{Arima()}, or other functions and methods; for \code{ts_data_frame()},
+arguments to be passed to \code{\link{data.frame}()}, typically the
+variables to constitute the \code{"ts_data_frame"} object.}
 
 \item{x}{an object of class \code{"ARIMA"}.}
 
@@ -302,6 +307,8 @@ created by the \code{\link{Arima}()} function.
 \item \code{as.ts(data.frame)}: \code{as.ts()} method for \code{"data.frame"} objects;
 produces an object of class \code{"ts_data_frame"} inheriting from \code{"data.frame"}.
 
+\item \code{ts_data_frame()}: constructor function for \code{"ts_data_frame"} objects.
+
 \item \code{as.ts(ts_data_frame)}: \code{as.ts()} method for \code{"ts_data_frame"} objects;
 returns the object unchanged.
 
@@ -333,7 +340,7 @@ summary(cv(lh.arima, lead=1:5, fold.type="window"))
 summary(cv(lh.arima, k=5, fold.type="preceding"))
 
 # model adapted from help("arima")
-Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
+Lake <- ts_data_frame(level=LakeHuron, year=time(LakeHuron))
 lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                   order=c(2, 0, 0))
 summary(lake.arima)

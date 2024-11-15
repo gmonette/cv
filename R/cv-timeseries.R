@@ -27,7 +27,7 @@
 #' summary(cv(lh.arima, k=5, fold.type="preceding"))
 #'
 #' # model adapted from help("arima")
-#' Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
+#' Lake <- ts_data_frame(level=LakeHuron, year=time(LakeHuron))
 #' lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
 #'                   order=c(2, 0, 0))
 #' summary(lake.arima)
@@ -65,7 +65,9 @@
 #' see \code{\link{arima}()} for details; the default is not to include
 #' a seasonal part of the model.
 #' @param ... further arguments to be passed to \code{\link{arima}()},
-#' \code{Arima()}, or other functions and methods.
+#' \code{Arima()}, or other functions and methods; for \code{ts_data_frame()},
+#' arguments to be passed to \code{\link{data.frame}()}, typically the
+#' variables to constitute the \code{"ts_data_frame"} object.
 #'
 #' @describeIn Arima model-formula wrapper for the \code{\link{arima}()} function.
 #' @export
@@ -600,6 +602,12 @@ as.ts.data.frame <- function(x, start=1, end, frequency=1, ...){
   x
 }
 
+#' @describeIn Arima constructor function for \code{"ts_data_frame"} objects.
+#' @export
+ts_data_frame <- function(..., start, end, frequency){
+  as.ts(data.frame(...), start=start, end=end, frequency)
+}
+
 #' @describeIn Arima \code{as.ts()} method for \code{"ts_data_frame"} objects;
 #' returns the object unchanged.
 #' @exportS3Method stats::as.ts
@@ -608,7 +616,7 @@ as.ts.ts_data_frame <- function(x, ...) x
 #' @describeIn Arima \code{window()} method for \code{"ts_data_frame"} objects;
 #' returns a subset of the object, also a \code{"ts_data_frame"}, with correctly subsetted \code{"ts"}
 #' objects as columns.
-#' @exportS3Method stats::window
+#' @export
 window.ts_data_frame <- function(x, start=NULL, end=NULL, ...){
   result <- lapply(x, function(z) window(z, start=start, end=end, ...))
   result <- as.data.frame(result)

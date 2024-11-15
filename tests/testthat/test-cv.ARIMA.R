@@ -1,6 +1,6 @@
 # test that Arima() and predict.ARIMA() work properly
 
-Lake <- data.frame(level=LakeHuron, year=time(LakeHuron))
+Lake <- ts_data_frame(level=LakeHuron, year=time(LakeHuron))
 lake.arima <- Arima(level ~ I(year - 1920), data=Lake,
                     order=c(2, 0, 0))
 
@@ -146,8 +146,8 @@ test_that('MSE for CV of ARIMA fold.type="window"', {
 
 # test CV for seasonal model
 
-Presidents <- as.ts(data.frame(approval=presidents,
-                               time=time(presidents)))
+Presidents <- ts_data_frame(approval=presidents,
+                               time=time(presidents))
 
   # test Arima() for seasonal model with differencing
 
