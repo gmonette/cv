@@ -79,7 +79,7 @@ Arima <- function(formula, data,
     data <- as.ts(data)
     message("Note: 'data' coerced to 'ts_data_frame'")
   }
-  tsp <- tsp(data[, 1])
+  tsp <- tsp(data[, 1L])
   dots <- list(...)
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
@@ -100,10 +100,10 @@ Arima <- function(formula, data,
   result <- list(formula=formula, data=data,
                  order=order, seasonal=seasonal,
                  call=cl, model=mf, dots=dots)
-  if (length(formula) == 2){
-    if (!(ncol(x) == 1) && is.numeric(x[, 1]))
+  if (length(formula) == 2L){
+    if (!(ncol(x) == 1L) && is.numeric(x[, 1L]))
       stop("formula must specify a single response")
-    response <- x[, 1]
+    response <- x[, 1L]
     if (!is.ts(response)) {
       tsp(response) <- tsp
       class(response) <- c("tsp", class(response))
@@ -218,7 +218,7 @@ Anova.ARIMA <- function(mod, type = c("II", "III", 2, 3), ...){
   if (has.intercept) b.names <- c("(Intercept)", b.names)
   if (has.intercept) {
     model.matrix <- cbind(1, mod$model.matrix)
-    colnames(model.matrix)[1] <- "(Intercept)"
+    colnames(model.matrix)[1L] <- "(Intercept)"
     mod$model.matrix <- model.matrix
   }
   mod$terms <- terms(mod$formula)
@@ -406,7 +406,7 @@ predict.ARIMA <- function(object, n.ahead, newdata = NULL,
   x <- model.matrix(object)
   new.x <- if (!is.null(newdata) && !is.null(model.matrix(object))) {
     n.ahead <- nrow(newdata)
-    model.frame(object$formula[-2], data=newdata)
+    model.frame(object$formula[-2L], data=newdata)
   } else {
     NULL
   }
@@ -461,7 +461,7 @@ predict.ARIMA <- function(object, n.ahead, newdata = NULL,
 cv.ARIMA <- function(model,
                    data = model$data,
                    criterion = mse,
-                   k = if (fold.type == "preceding") 10 else "n",
+                   k = if (fold.type == "preceding") 10L else "n",
                    reps,
                    seed,
                    fold.type = c("window", "cumulative", "preceding"),
@@ -566,7 +566,7 @@ cv.ARIMA <- function(model,
 #' @param frequency the period of the time series (e.g., \code{4}
 #' for quarterly data, see \code{link[stats]{ts}()}).
 #' @exportS3Method stats::as.ts
-as.ts.data.frame <- function(x, start=1, end, frequency=1, ...){
+as.ts.data.frame <- function(x, start=1L, end, frequency=1L, ...){
   which.ts <- which(sapply(x, is.ts))
   if (missing(start)){
     if (length(which.ts) > 0L) {
@@ -628,7 +628,7 @@ window.ts_data_frame <- function(x, start=NULL, end=NULL, ...){
 #' returns the (common) times associated with the columns of the \code{"ts_data_frame"}.
 #' @exportS3Method stats::time
 time.ts_data_frame <- function(x, ...){
-  time(x[, 1])
+  time(x[, 1L])
 }
 
 
@@ -658,7 +658,7 @@ predict.Arima <- function (object, n.ahead = 1L, newxreg = NULL, se.fit = TRUE,
   narma <- sum(arma[1L:4L])
   if (length(coefs) > narma) {
     if (names(coefs)[narma + 1L] == "intercept") {
-      newxreg <- cbind(intercept = rep(1, n.ahead), newxreg)
+      newxreg <- cbind(intercept = rep(1L, n.ahead), newxreg)
       ncxreg <- ncxreg + 1L
     }
     xm <- if (narma == 0)

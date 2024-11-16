@@ -611,7 +611,7 @@ cvSelect <- function(procedure,
                      model,
                      y.expression,
                      k = 10L,
-                     confint = n >= 400,
+                     confint = n >= 400L,
                      level = 0.95,
                      reps = 1L,
                      save.coef,
@@ -901,7 +901,7 @@ cvOrdered <- function(model,
                       data = insight::get_data(model),
                       criterion = mse,
                       criterion.name,
-                      k = if (fold.type == "preceding") 10 else "n",
+                      k = if (fold.type == "preceding") 10L else "n",
                       details = n <= 1e4,
                       method = NULL,
                       ncores = 1L,
@@ -955,8 +955,8 @@ cvOrdered <- function(model,
 
   if (details) {
     crit.i <- NULL
-    coef.i <- vector(k - 1, mode = "list")
-    names(coef.i) <- paste("fold", 1L:(k - 1), sep = ".")
+    coef.i <- vector(k - 1L, mode = "list")
+    names(coef.i) <- paste("fold", 1L:(k - 1L), sep = ".")
   } else {
     crit.i <- NULL
     coef.i <- NULL
@@ -1011,7 +1011,7 @@ cvOrdered <- function(model,
     use <- !(is.na(yh) | is.na(y))
     cv[i] <- criterion(as.vector(y)[use], as.vector(yh)[use])
   }
-  mean.cv <- if (length(cv) > 1) mean(cv)
+  mean.cv <- if (length(cv) > 1L) mean(cv)
   if (is.na(cv.full)) cv.full <- NULL
   result <- list(
     "CV crit" = cv,
@@ -1082,10 +1082,10 @@ orderedFolds <- function(times, k,
   } else if (fold.type == c("cumulative")) {
     if (missing(k)) k <- n
     after.first <- n - begin.with - min.ahead + 1L
-    k <- min(k, after.first + 1)
+    k <- min(k, after.first + 1L)
     nk <- after.first %/% (k - 1L)
     rem <- after.first %% (k - 1L)
-    folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1)))
+    folds <- c(begin.with, rep(nk, k - 1L) + c(rep(1L, rem), rep(0L, k - rem - 1L)))
     ends <- cumsum(folds) # end of each fold
     starts <- c(1L, ends + 1L)[-(k + 1L)] # start of each fold
   } else {
@@ -1161,7 +1161,7 @@ fold.orderedFolds <- function(folds, i, predicted=FALSE, lead=1L,
       return(as.vector(window(folds$indices, start=j["start"], end=j["stop"])))
     }
   } else if (fold.type == "cumulative"){
-    c(start = times[1], stop = times[folds$ends[i]])
+    c(start = times[1L], stop = times[folds$ends[i]])
   } else {
     c(start = times[folds$starts[i]], stop = times[folds$ends[i]])
   }
@@ -1211,13 +1211,13 @@ print.orderedFolds <- function(x, ...) {
     return(invisible(x))
   }
   if (x$fold.type == "window"){
-    cat(x$k, "moving-window folds of", x$folds[1],
+    cat(x$k, "moving-window folds of", x$folds[1L],
         "cases each")
   } else if (x$fold.type == "cumulative"){
-    fold.size <- round((x$n - x$folds[1]) / (x$k - 1))
-    all.ones <- all(x$folds[-1] == 1)
-    cat("initial ordered fold of", x$folds[1], "cases,",
-        "followed by", x$k - 1,
+    fold.size <- round((x$n - x$folds[1L]) / (x$k - 1L))
+    all.ones <- all(x$folds[-1L] == 1L)
+    cat("initial ordered fold of", x$folds[1L], "cases,",
+        "followed by", x$k - 1L,
         if (all.ones) "folds of 1 case each" else paste("folds\n  of approximately",
                                                         fold.size, "cases each"))
   } else {
@@ -1286,7 +1286,7 @@ GetResponse.lme <- function(model, ...)
 #' @export
 GetResponse.glmmTMB <- function (model, ...){
   y <- insight::get_response(model)
-  if (length(dim(y)) == 2 && dim(y)[2] == 1) y <- y[, 1]
+  if (length(dim(y)) == 2L && dim(y)[2L] == 1L) y <- y[, 1L]
   if (!is.vector(y))
     stop("non-vector response")
   if (!is.numeric(y))
@@ -1314,25 +1314,25 @@ GetResponse.ARIMA <- function(model, ...) {
 plot.cvOrdered <- function(x, y, xlab = "lead",
                            ylab = x$criterion,
                            main = "Cross-Validation", ...){
-  plot(x$lead, x[["CV crit"]], type="b", pch=16,
-       col=palette()[2], xlab=xlab, ylab=ylab,
+  plot(x$lead, x[["CV crit"]], type="b", pch=16L,
+       col=palette()[2L], xlab=xlab, ylab=ylab,
        ylim=range(c(x[["full crit"]], x[["CV crit"]])),
        axes=FALSE, frame.plot=TRUE, main=main,
        ...)
-  grid(lty=2, col="gray")
-  axis(2)
-  axis(1, at=x$lead)
-  text(x$lead[1], x[["CV crit"]][1], pos=4, offset=1,
+  grid(lty=2L, col="gray")
+  axis(2L)
+  axis(1L, at=x$lead)
+  text(x$lead[1L], x[["CV crit"]][1L], pos=4L, offset=1,
        labels=paste0("CV ", x$criterion),
-       col=palette()[2])
-  abline(h=x[["full crit"]], lty=2, col=palette()[3],
-         lwd=2)
+       col=palette()[2L])
+  abline(h=x[["full crit"]], lty=2L, col=palette()[3L],
+         lwd=2L)
   usr <- par("usr")
-  text(usr[1] + 0.02*(usr[2] - usr[1]),
-       x[["full crit"]] + 0.02*(usr[4] - usr[3]),
+  text(usr[1L] + 0.02*(usr[2L] - usr[1L]),
+       x[["full crit"]] + 0.02*(usr[4L] - usr[3L]),
        adj=c(0, 0),
        labels=paste0("in-sample ", x$criterion),
-       col=palette()[3])
+       col=palette()[3L])
 }
 
 # not exported

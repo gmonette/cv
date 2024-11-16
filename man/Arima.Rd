@@ -86,7 +86,7 @@ testArima(model, ...)
   model,
   data = model$data,
   criterion = mse,
-  k = if (fold.type == "preceding") 10 else "n",
+  k = if (fold.type == "preceding") 10L else "n",
   reps,
   seed,
   fold.type = c("window", "cumulative", "preceding"),
@@ -99,7 +99,7 @@ testArima(model, ...)
   ...
 )
 
-\method{as.ts}{data.frame}(x, start = 1, end, frequency = 1, ...)
+\method{as.ts}{data.frame}(x, start = 1L, end, frequency = 1L, ...)
 
 ts_data_frame(..., start, end, frequency)
 
