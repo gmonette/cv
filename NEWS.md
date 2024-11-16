@@ -1,10 +1,16 @@
 # cv 2.1.0
 
-- New Arima() function, provides formula interface to standard-R arima() function.
+- Support for timeseries cross-validation:
 
-- New cvOrdered() to support timeseries models, used by new cv.ARIMA() method.
+    - New Arima() function, provides formula interface to standard-R arima() function.
 
-- Corresponding changes to folds() and  fold() to support timeseries data.
+    - New cvOrdered() to support timeseries models, used by new cv.ARIMA() method.
+
+    - Corresponding new orderedFolds() and modifications to fold() to support timeseries data.
+    
+    - New "ts_data_frame" objects with columns of compatible "ts" objects.
+    
+    - Many new methods for standard generics to support these features.
 
 # cv 2.0.3
 
