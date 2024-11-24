@@ -104,7 +104,9 @@ Predict.ARIMA <- function(model, all.cases=FALSE, n.ahead,
   psi <- arma2psi(ar=ar, ma=ma, ar.seasonal=ar.seasonal,
                   ma.seasonal=ma.seasonal, ...)
   max.lag <- length(psi)
-  b <- coef[-(1:sum(0 != c(ar, ma, ar.seasonal, ma.seasonal)))]
+  arma.coefs <- c(ar, ma, ar.seasonal, ma.seasonal)
+  arma.coefs <- arma.coefs[arma.coefs != 0]
+  b <- coef[-(1:length(arma.coefs))]
   if (missing(n.ahead)){
     yhat <- residuals.psi <- rep(NA, n)
     tsp(yhat) <- tsp(residuals.psi) <- ttsp
