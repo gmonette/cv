@@ -165,6 +165,7 @@ if (FALSE){
                      order=c(0, 0, 1))
   plot(residuals(m.pres.ma.1), Predict(m.pres.ma.1, all=TRUE)$residuals)
   plot(fitted(m.pres.ma.1), Predict(m.pres.ma.1, all=TRUE)$yhat)
+  abline(0, 1)
   which(abs(fitted(m.pres.ma.1) -
               Predict(m.pres.ma.1, all=TRUE)$yhat) > 0.001)
   which(is.na(Presidents$approval))
@@ -176,15 +177,21 @@ if (FALSE){
                        order=c(1, 0, 0))
   plot(residuals(m.pres.ar.1), Predict(m.pres.ar.1, all=TRUE)$residuals)
   plot(fitted(m.pres.ar.1), Predict(m.pres.ar.1, all=TRUE)$yhat)
+  abline(0, 1)
 
   predict(m.pres.ar.1$arima, n.ahead=5)
   Predict(m.pres.ar.1, n.ahead=5)
+  predict(m.pres.ar.1$arima, n.ahead=5)$pred -
+    Predict(m.pres.ar.1, n.ahead=5)$yhat
 
   m.pres.arima.2.0.1 <- Arima(~ approval, data=Presidents,
                        order=c(2, 0, 1))
   plot(residuals(m.pres.arima.2.0.1), Predict(m.pres.arima.2.0.1, all=TRUE)$residuals)
   plot(fitted(m.pres.arima.2.0.1), Predict(m.pres.arima.2.0.1, all=TRUE)$yhat)
+  abline(0, 1)
 
   predict(m.pres.arima.2.0.1$arima, n.ahead=5)
   Predict(m.pres.arima.2.0.1, n.ahead=5)
+  predict(m.pres.arima.2.0.1$arima, n.ahead=5)$pred -
+    Predict(m.pres.arima.2.0.1, n.ahead=5)$yhat
 }
