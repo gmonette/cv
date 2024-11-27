@@ -4,9 +4,9 @@
 arma2psi <- function(ar=0, ma=0, ar.seasonal=0, ma.seasonal=0,
                      period, lag.max=100, trunc.psi=TRUE,
                      trunc.at=0.001, ...){
-  lag.max.tot <- if (!missing(period)) lag.max*period else lag.max
+  lag.max.tot <- if (!(missing(period) || is.na(period))) lag.max*period else lag.max
   psi <- ARMAtoMA(ar = ar, ma = ma, lag.max=lag.max.tot)
-  if (!missing(period)) {
+  if (!(missing(period) || is.na(period))) {
     psi.seasonal <- ARMAtoMA(ar = ar.seasonal, ma = ma.seasonal, lag.max=lag.max)
     psi <- psi + as.vector(rbind(matrix(0, period - 1, lag.max),
                                                      psi.seasonal))
@@ -64,6 +64,7 @@ Predict.ARIMA <- function(model, all.cases=FALSE, n.ahead,
   ttsp <- tsp(times)
   X <- model.matrix(model)
   residuals <- as.vector(residuals(model))
+  response <- as.vector(model$response)
   tsp(residuals) <- ttsp
   class(residuals) <- "ts"
   n <- length(residuals)
@@ -71,7 +72,12 @@ Predict.ARIMA <- function(model, all.cases=FALSE, n.ahead,
   residuals[i.na] <- 0
   order <- model$order
   seasonal <- model$seasonal
-  if (is.list(seasonal)) seasonal <- seasonal$order
+  if (is.list(seasonal)) {
+    period <- seasonal$period
+    seasonal <- seasonal$order
+  } else {
+    period <- NA
+  }
   coef <- coef(model)
   coef.nms <- names(coef)
   if ("(Intercept)" %in% coef.nms){
@@ -101,8 +107,15 @@ Predict.ARIMA <- function(model, all.cases=FALSE, n.ahead,
   } else {
     0
   }
+
+  if (is.na(period) && any(seasonal != 0)){
+    period <- ttsp[3]
+  }
+
+  diff <- order[2]
+  seasonal.diff <- seasonal[2]
   psi <- arma2psi(ar=ar, ma=ma, ar.seasonal=ar.seasonal,
-                  ma.seasonal=ma.seasonal, ...)
+                  ma.seasonal=ma.seasonal, period=period, ...)
   max.lag <- length(psi)
   arma.coefs <- c(ar, ma, ar.seasonal, ma.seasonal)
   arma.coefs <- arma.coefs[arma.coefs != 0]
@@ -115,9 +128,6 @@ Predict.ARIMA <- function(model, all.cases=FALSE, n.ahead,
     for (i in is) {
       pre.i <- predict_i(i)
       yhat[i] <- pre.i["yhat.i"]
-      # if (i %in% i.na){
-      #   residuals[i] <- pre.i["res.i"]
-      # }
       residuals.psi[i] <- pre.i["res.i"]
       }
   } else {
@@ -143,7 +153,46 @@ Predict.ARIMA <- function(model, all.cases=FALSE, n.ahead,
       yhat[i] <- pre.i["yhat.i"]
     }
   }
+  if (diff > 0) {
+    start <- if (!missing(n.ahead)){
+      length(response) - diff + 1
+    } else {
+      ## FIXME: should handle each predicted case separately
+      1
+    }
+    yhat[is.na(yhat)] <- 0
+#    if (seasonal.diff == 0) {
+      y.previous <- response[start:(start + diff - 1)]
+      y.previous[is.na(y.previous)] <- mean(response, na.rm=TRUE)
+    # } else {
+    #   y.previous <- rep(0, diff)
+    # }
+    yhat <- diffinv(yhat, lag=1, differences=diff, xi=y.previous)[-(1:diff)]
+    tsp(yhat) <- tsp(residuals.psi)
+    class(yhat) <- c("ts", class(yhat))
+  }
+
+  if (seasonal.diff > 0) {
+    start <- if (!missing(n.ahead)){
+      length(response) - seasonal.diff*period + 1
+    } else {
+      1
+    }
+    yhat[is.na(yhat)] <- 0
+#    if (diff == 0){
+      y.previous <- response[start:(start + seasonal.diff*period - 1)]
+      y.previous[is.na(y.previous)] <- mean(response, na.rm=TRUE)
+    # } else {
+    #   y.previous <- rep(0, seasonal.diff*period)
+    # }
+    yhat <- diffinv(yhat, lag=period, differences=seasonal.diff,
+                    xi=y.previous)[-(1:(seasonal.diff*period))]
+    tsp(yhat) <- tsp(residuals.psi)
+    class(yhat) <- c("ts", class(yhat))
+  }
+
   list(yhat=yhat, residuals=residuals.psi, psi=psi)
+
 }
 
 if (FALSE){
@@ -159,9 +208,56 @@ if (FALSE){
   Predict(m.pres.ma)
 
   m.pres.diff <- Arima(~ approval, data=Presidents,
-                     order=c(1, 1, 0))
+                     order=c(0, 1, 1))
   summary(m.pres.diff)
   Predict(m.pres.diff)
+  Predict(m.pres.diff, n.ahead=5)$yhat
+  predict(m.pres.diff$arima, n.ahead=5)$pred
+
+  m.pres.diff.2 <- Arima(~ approval, data=Presidents,
+                       order=c(0, 1, 2))
+  summary(m.pres.diff.2)
+  Predict(m.pres.diff.2, n.ahead=5)$yhat
+  predict(m.pres.diff.2$arima, n.ahead=5)$pred
+
+  m.pres.diff.3 <- Arima(~ approval, data=Presidents,
+                         order=c(1, 1, 0))
+  summary(m.pres.diff.3)
+  Predict(m.pres.diff.3, n.ahead=5)$yhat
+  predict(m.pres.diff.3$arima, n.ahead=5)$pred
+
+  m.pres.diff.4 <- Arima(~ approval, data=Presidents,
+                         order=c(0, 2, 1))
+  summary(m.pres.diff.4)
+  Predict(m.pres.diff.4, n.ahead=5)$yhat
+  predict(m.pres.diff.4$arima, n.ahead=5)$pred
+
+  m.pres.diff.5 <- Arima(~ approval, data=Presidents,
+                         order=c(1, 2, 0))
+  summary(m.pres.diff.5)
+  Predict(m.pres.diff.5, n.ahead=5, trunc.at=0.0001)$yhat
+  predict(m.pres.diff.5$arima, n.ahead=5)$pred
+
+  m.pres.diff.6 <- Arima(~ approval, data=Presidents,
+                         order=c(0, 0, 0),
+                         seasonal=c(0, 1, 1))
+  summary(m.pres.diff.6)
+  Predict(m.pres.diff.6, n.ahead=8)$yhat
+  predict(m.pres.diff.6$arima, n.ahead=8)$pred
+
+  m.pres.diff.7 <- Arima(~ approval, data=Presidents,
+                         order=c(0, 0, 0),
+                         seasonal=c(1, 1, 0))
+  summary(m.pres.diff.7)
+  Predict(m.pres.diff.7, n.ahead=8)$yhat
+  predict(m.pres.diff.7$arima, n.ahead=8)$pred
+
+  m.pres.diff.8 <- Arima(~ approval, data=Presidents,
+                         order=c(0, 1, 1),
+                         seasonal=c(0, 1, 1))
+  summary(m.pres.diff.8)
+  Predict(m.pres.diff.8, n.ahead=8)$yhat
+  predict(m.pres.diff.8$arima, n.ahead=8)$pred
 
   m.pres.ma.1 <- Arima(~ approval, data=Presidents,
                      order=c(0, 0, 1))
@@ -172,8 +268,8 @@ if (FALSE){
               Predict(m.pres.ma.1, all=TRUE)$yhat) > 0.001)
   which(is.na(Presidents$approval))
 
-  predict(m.pres.ma.1$arima, n.ahead=5)
-  Predict(m.pres.ma.1, n.ahead=5)
+  predict(m.pres.ma.1$arima, n.ahead=5)$pred
+  Predict(m.pres.ma.1, n.ahead=5)$yhat
 
   m.pres.ar.1 <- Arima(~ approval, data=Presidents,
                        order=c(1, 0, 0))
@@ -181,8 +277,8 @@ if (FALSE){
   plot(fitted(m.pres.ar.1), Predict(m.pres.ar.1, all=TRUE)$yhat)
   abline(0, 1)
 
-  predict(m.pres.ar.1$arima, n.ahead=5)
-  Predict(m.pres.ar.1, n.ahead=5)
+  predict(m.pres.ar.1$arima, n.ahead=5)$pred
+  Predict(m.pres.ar.1, n.ahead=5)$yhat
   predict(m.pres.ar.1$arima, n.ahead=5)$pred -
     Predict(m.pres.ar.1, n.ahead=5)$yhat
 
@@ -192,8 +288,8 @@ if (FALSE){
   plot(fitted(m.pres.arima.2.0.1), Predict(m.pres.arima.2.0.1, all=TRUE)$yhat)
   abline(0, 1)
 
-  predict(m.pres.arima.2.0.1$arima, n.ahead=5)
-  Predict(m.pres.arima.2.0.1, n.ahead=5)
+  predict(m.pres.arima.2.0.1$arima, n.ahead=5)$pred
+  Predict(m.pres.arima.2.0.1, n.ahead=5)$yhat
   predict(m.pres.arima.2.0.1$arima, n.ahead=5)$pred -
     Predict(m.pres.arima.2.0.1, n.ahead=5)$yhat
 }
