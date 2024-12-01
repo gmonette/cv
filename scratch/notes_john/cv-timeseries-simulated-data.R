@@ -100,18 +100,3 @@ system.time(cv.lin <- cv(m.1, lead=1:5, data=D,
 
 system.time(cv.lin <- cv(m.1, lead=1:5, data=D,
                          fold.type="cumulative", ncores=2))
-
-# inverse differences commute
-set.seed(123)
-x <- rnorm(10, 10, 1)
-x
-diffinv(diffinv(x, lag=1, differences=2),
-        lag=4, differences=1)
-diffinv(diffinv(x, lag=4, differences=1),
-        lag=1, differences=2)
-
-# inverse differences with initial values don't commute
-diffinv(diffinv(x, lag=1, differences=2, xi=1:2),
-        lag=4, differences=1, xi=3:6)
-diffinv(diffinv(x, lag=4, differences=1, xi=3:6),
-        lag=1, differences=2, xi=1:2)

@@ -292,4 +292,21 @@ if (FALSE){
   Predict(m.pres.arima.2.0.1, n.ahead=5)$yhat
   predict(m.pres.arima.2.0.1$arima, n.ahead=5)$pred -
     Predict(m.pres.arima.2.0.1, n.ahead=5)$yhat
+
+
+  # inverse differences commute
+  set.seed(123)
+  x <- rnorm(10, 10, 1)
+  x
+  diffinv(diffinv(x, lag=1, differences=2),
+          lag=4, differences=1)
+  diffinv(diffinv(x, lag=4, differences=1),
+          lag=1, differences=2)
+
+  # inverse differences with initial values don't commute
+  diffinv(diffinv(x, lag=1, differences=2, xi=1:2),
+          lag=4, differences=1, xi=3:6)
+  diffinv(diffinv(x, lag=4, differences=1, xi=3:6),
+          lag=1, differences=2, xi=1:2)
+
 }
