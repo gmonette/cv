@@ -104,6 +104,7 @@ if(FALSE){   # tests
   colnames(x) <- c('one','two')
   rownames(x) <- 1:36
   Diff(x, period = 12)
+  Diff(x, period = 12) %>% class
   #
   # if x is a vector
   #
@@ -262,7 +263,7 @@ if(FALSE){
 #   - xreghist and yhist history (a multiple of largest period for past up to at)
 # - Algorithm:
 #   - difference  cbind(xreghist, xregpred) and yhist like fit
-#   - predict useing ARMA model
+#   - predict using ARMA model
 #   - undifference ARMA model prediction
 #
 #
@@ -393,8 +394,8 @@ if(FALSE) {  # test inversion
   model <- cv::Arima(y~ 1 +x, data = dd, order = c(1,0,1), seasonal = list(order = c(1,1,1), period = 3))
   model <- cv::Arima(y~ x, data = dd, order = c(1,1,1), seasonal = list(order = c(1,1,1), period = 3))
 
- # str(model)
- # str(modelns)
+  # str(model)
+  # str(modelns)
 }
 
 
@@ -454,15 +455,32 @@ pred <- function(model, newdata, n.ahead = 1) {
   xreg_new <- model.matrix(model_new)
   y_new <- model_new$response
 
+  diff_order <- model$order[2]
+  seasonal_diff_order <- model$seasonal$order[2]
+
+  ##FIXME: following should be use truncation of leadup data with a warning
+  ##       and extension of prediction xreg followed by truncation
+
+  if(seasonal_diff_order > 0) {
+    if((sum(!is.na(y_new)) %% seasonal_diff_order) != 0 ){
+      stop('Number of lead-up data rows should be a multiple of seasonal differencing order (',
+           seasonal_diff_order,')')
+    }
+    if((sum(is.na(y_new)) %% seasonal_diff_order) != 0 ) {
+      stop('Number of predicted data rows should be a multiple of seasonal differencing order (',
+           seasonal_diff_order,')')
+    }
+  }
 
   coefs <- coef(model)
-  # if ("(Intercept)" %in% coef.nms){   # from cv::Predict.ARIMA
-  #   X <- if (!is.null(X)){
-  #     cbind(1, X)
-  #   } else {
-  #     matrix(1, nrow=n, ncol=1)
-  #   }
-  # }
+
+  if ("(Intercept)" %in% names(coefs)){   # from cv::Predict.ARIMA
+    xreg_new <- if (!is.null(xreg_new)){
+      cbind(1, xreg_new)
+    } else {
+      matrix(1, nrow=length(y_new), ncol=1)
+    }
+  }
   ar <- coefs[grepl('^ar[0-9]+$',names(coefs))]
   ma <- coefs[grepl('^ma[0-9]+$',names(coefs))]
   sar <- coefs[grepl('^sar[0-9]+$',names(coefs))]
@@ -480,18 +498,18 @@ pred <- function(model, newdata, n.ahead = 1) {
     y_new_diff <- Diff(y_new_diff,
                        seasonal = model$seasonal$order[2],
                        period = model$seasonal$period)
+    xreg_new_diff <- Diff(xreg_new_diff,
+                          seasonal = model$seasonal$order[2],
+                          period = model$seasonal$period)
   }
   if(model$order[2] > 0) {
     y_new_diff <- Diff(y_new_diff,
                        order = model$order[2])
+    xreg_new_diff <- Diff(xreg_new_diff,
+                          order = model$order[2])
   }
 
-
-  y_new_diff <- Diff(y_new, order = D)
-  xreg_new_diff <- if(!is.null(xreg_new)) Diff(xreg_new, order = D) else NULL
-
   # Demean differenced Y
-  #
 
   mean_y_new_diff <- mean(y_new_diff, na.rm = T)
   y_new_diff_cent <- y_new_diff - mean_y_new_diff
@@ -510,21 +528,28 @@ pred <- function(model, newdata, n.ahead = 1) {
 
   for(i in topred) y_new_diff_cent[i] <- convolve(y_new_diff_cent[1:(i-1)], Pi)
 
-  new_pred <- y_new_diff_cent + mean_y_new_diff + if(!is.null(beta)) t(xreg_new_diff) * beta else 0
+  new_pred <- y_new_diff_cent + mean_y_new_diff + if(!is.null(beta)) xreg_new_diff %*% beta else 0
   y_new_diff[topred] <- new_pred[topred]
-  y_pred <- Diffinv(y_new_diff)
+
+  if(diff_order > 0 || seasonal_diff_order > 0){
+    y_pred <- Diffinv(y_new_diff)
+  } else {
+    y_pred <- y_new_diff
+  }
 
   newdata[[as.character(model$call$formula[[2]])]] <- y_pred
   newdata$.predicted <- rep(c(FALSE,TRUE), c(nrow(newdata) - sum(is.na(y_new)), sum(is.na(y_new))))
+  attr(newdata,'Pi') <- Pi
+  attr(newdata,'Mod') <- Mod(polyroot(c(1, -Pi)))
   newdata
 }
 
-if(TRUE){   # test pred
+if(FALSE){   # test pred
 
   # sample model data
 
   N <- 9999
-  eps <- arima.sim(list(ar=.8,ma=.8), n = N)
+  eps <- arima.sim(list(ar=.9,ma=.8), n = N)
   x <- rnorm(N)
   dd <- data.frame(y = cumsum(eps + x), x = x)
 
@@ -538,7 +563,8 @@ if(TRUE){   # test pred
 
   model <- cv::Arima(y~ 1 +x, data = dd, order = c(1,0,1), seasonal = list(order = c(1,1,1), period = 3))
   model <- cv::Arima(y~ x, data = dd, order = c(1,1,1), seasonal = list(order = c(1,1,1), period = 3))
-  modelns <- cv::Arima(y ~ x, data = dd, order = c(1,1,1))
+  model <- cv::Arima(y ~ x, data = dd, order = c(1,1,1))
+  model <- cv::Arima(y ~ x, data = dd, order = c(1,0,1))
 
   # str(model)
   #
@@ -546,7 +572,34 @@ if(TRUE){   # test pred
   ret <- pred(model, newdata)
   library(latticeExtra)
   head(ret)
+  tail(ret)
   ret$time <- 1:nrow(ret)
-  xyplot(y~ time, ret, groups = .predicted) %>% print
+  xyplot(y ~ time, ret, groups = .predicted) %>% print
 
+  # no differencing
+
+  # model data
+  N <- 9999
+  eps <- arima.sim(list(ar=.9,ma=.8), n = N)
+  x <- rnorm(N)
+  dd <- data.frame(y = eps + x, x = x)
+
+  model <- cv::Arima(y ~ x, data = dd, order = c(1,0,1))
+
+  # leadup data and prediction data
+  n.ahead <- 4
+  eps_pred <- c(arima.sim(list(ar=.8,ma=.8), n = Ns), rep(NA, n.ahead))
+  x_pred <- rnorm(Ns + n.ahead)
+  newdata <- data.frame(y = cumsum(eps_pred + x_pred), x = x_pred)
+
+  model
+  ret <- pred(model, newdata)
+  ret$time <- 1:nrow(ret)
+  xyplot(y ~ time, ret, groups = .predicted) %>% print
+
+  attr(ret, 'Mod')
+
+  # debug(pred)
+  # undebug(pred)
 }
+
