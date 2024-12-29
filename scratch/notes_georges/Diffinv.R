@@ -653,7 +653,7 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE) {
 
 
 
-IF(FALSE){  # testing pred
+if(FALSE){  # testing pred
 
   library(car)
 
@@ -929,6 +929,51 @@ IF(FALSE){  # testing pred
                       order=c(1, 0, 0))
   preddata4 <- pred(lake.Arima4, pred_df, demean = FALSE)
   xyplot(level ~ year, preddata4, groups = .predicted, auto.key = T)
+
+  ## Model with no x's
+
+  lake.Arima0 <- Arima(~ level, data = Lake, order = c(2,0,1))
+
+  preddata0 <- pred(lake.Arima0, newdata, demean = FALSE)
+  xyplot(level ~ year, preddata0,groups = .predicted, auto.key = T) +
+    xyplot(level ~ year, Lake)
+
+# Model with no x's (internal prediction) ####
+
+  lake.Arima0 <- Arima(~ level, data = Lake, order = c(2,0,1))
+
+  newdata <- Lake[21:40,]
+  newdata$level[11:20] <- NA
+
+  preddata0 <- pred(lake.Arima0, newdata, demean = FALSE)
+
+  xyplot(level ~ year, Lake) +
+    xyplot(level ~ year, preddata0,groups = .predicted, auto.key = T)
+
+  lake.MA1 <- Arima(~ level, data = Lake, order = c(0,0,1))
+
+  newdata <- Lake[21:50,]
+  newdata$level[11:30] <- NA
+
+  preddata0 <- pred(lake.MA1, newdata, demean = FALSE)
+  xyplot(level ~ year, Lake) +
+    xyplot(level ~ year, preddata0,groups = .predicted, auto.key = T)
+
+  lake.MA4 <- Arima(~ level, data = Lake, order = c(0,0,4))
+
+  newdata <- Lake[21:50,]
+  newdata$level[11:30] <- NA
+
+  preddata0 <- pred(lake.MA4, newdata, demean = FALSE)
+  xyplot(level ~ year, Lake) +
+    xyplot(level ~ year, preddata0,groups = .predicted, auto.key = T)
+
+  newdata <- Lake[1:50,]
+  newdata$level[11:50] <- NA
+
+  preddata0 <- pred(lake.MA4, newdata, demean = FALSE)
+  xyplot(level ~ year, Lake) +
+    xyplot(level ~ year, preddata0, groups = .predicted, auto.key = T)
 
 }
 
