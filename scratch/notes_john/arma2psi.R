@@ -213,6 +213,7 @@ if (FALSE){
   Predict(m.pres.diff)
   Predict(m.pres.diff, n.ahead=5)$yhat
   predict(m.pres.diff$arima, n.ahead=5)$pred
+  pred(m.pres.diff$arima)
 
   m.pres.diff.2 <- Arima(~ approval, data=Presidents,
                        order=c(0, 1, 2))
@@ -309,4 +310,36 @@ if (FALSE){
   diffinv(diffinv(x, lag=4, differences=1, xi=3:6),
           lag=1, differences=2, xi=1:2)
 
+}
+
+newModMatrix1 <- function(formula, newdata){
+  model.matrix(formula[-2L], data=newdata)
+}
+
+newModMatrix <- function(object, newdata){
+  model.matrix(delete.response(terms(model.frame(object))),
+               data=newdata)
+}
+
+newModMatrix2 <- function(object, newdata){
+  object |> model.frame() |> terms() |> delete.response() |>
+    model.matrix(data=newdata)
+}
+
+if (FALSE){
+
+  Lake <- data.frame(level = LakeHuron, year = time(LakeHuron))
+  Lake[] <- lapply(Lake, as.vector)        # to avert problems with rbind, merge
+  lake.Arima <- Arima(level ~ I(year - 1920), data=Lake,
+                      order=c(2, 0, 1))
+
+  newdata <- data.frame(year=1973:1980)
+  newModMatrix1(formula(lake.Arima), newdata=newdata)
+  newModMatrix(lake.Arima, newdata=newdata)
+  newModMatrix2(lake.Arima, newdata=newdata)
+
+  lake.Arima.2 <- update(lake.Arima, . ~ poly(year, 2))
+  newModMatrix1(formula(lake.Arima.2), newdata=newdata)
+  newModMatrix(lake.Arima.2, newdata=newdata)
+  newModMatrix2(lake.Arima.2, newdata=newdata)
 }
