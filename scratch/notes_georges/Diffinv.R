@@ -1,5 +1,39 @@
 #'
-#' NEW (up to 2024-12-28):
+#' 2024-12-29:
+#'  TODO:
+#' - Recheck what happens with models that have no Xs: FIXED
+#' - Avoid saving any more history than needed.
+#'   NOTE 1: When using 'pred', diffts only saves what it
+#'         receives from prediction data frame with
+#'         lead-up and prediction data. Since one is still
+#'         using Arima to fit models, the fact that diffts
+#'         keeps all it gets might not be crucial.
+#'   NOTE 2: This depends on the order of the ARIMA model:
+#'     - For each differencing (seasonal or orginary)
+#'       we need to have 'order' leadup observations.
+#'     - For AR components, we need 'order' leadup observations
+#'       after differencing. For seasonal AR we need
+#'       'order' x 'period' leadup observations.
+#'     - For MA components, the number of leadup observations
+#'       needed depends on the invertibility of the MA process.
+#'       It might be a good idea to include a warning about this.
+#'   For prediction, the number of leadup observations needed
+#'   by 'pred' is only what's given above. The fitting of the
+#'   model uses ordinay ARIMA.
+#' - See what happens with 0 residuals. DONE see end of test for pred.
+#'   Summary: it makes a difference. The pattern in lead-up Ys
+#'   is ignored.
+#' - Include code in 'pred' to get lead.up and n.ahead
+#'   model.matrix and response name without invoking external
+#'   function. DONE but not well.
+#'     Moved get_Arima_objects to local function in pred. It wasn't
+#'     clear which part of the processing of the data frame
+#'     could be excluded.
+#' - Make merging work with data sets containing ts variables
+#'     DONE: New 'Merge' function and merge.ts_data_frame do this.
+#'
+#'
+#' 2024-12-28:
 #'
 #' - rewrote diffts and diffinvts to work without the constraint
 #'   that the number of leadup cases and the number of cases to predict
@@ -394,63 +428,96 @@ if(FALSE) {  # test inversion
 #'
 #' This is a quick fix. I realize there are better ways to do this.
 #'
-getArimaObjects <-
-  function(formula, data,
-           order = c(1L, 0L, 0L),
-           seasonal = list(order = c(0L, 0L, 0L), period = NA),
-           ...){
-    if (!inherits(data, "ts_data_frame")) {
-      data <- as.ts(data)
-      message("Note: 'data' coerced to 'ts_data_frame'")
-    }
-    tsp <- tsp(data[, 1L])
-    dots <- list(...)
-    cl <- match.call()
-    mf <- match.call(expand.dots = FALSE)
-    m <- match(c("formula", "data"), names(mf), 0L)
-    mf <- mf[c(1L, m)]
-    mf$na.action <- na.pass
-    mf[[1L]] <- quote(stats::model.frame)
-    mf <- eval(mf, parent.frame())
-    mt <- attr(mf, "terms")
-    x <- model.matrix(mt, mf)
-    which.int <- which("(Intercept)" == colnames(x))
-    if (length(which.int > 0)) {
-      has.intercept <- TRUE
-      x <- x[, -which.int, drop=FALSE]
-    } else {
-      has.intercept <- FALSE
-    }
-    result <- list(formula=formula, data=data,
-                   order=order, seasonal=seasonal,
-                   call=cl, model=mf, dots=dots)
-    if (length(formula) == 2L){
-      if (!(ncol(x) == 1L) && is.numeric(x[, 1L]))
-        stop("formula must specify a single response")
-      response <- x[, 1L]
-      if (!is.ts(response)) {
-        tsp(response) <- tsp
-        class(response) <- c("tsp", class(response))
-      }
-      #result$arima <- stats::arima(response, order=order, seasonal=seasonal,
-      #                             ...)
-      result$response <- response
-    } else {
-      y <- model.response(mf, "numeric")
-      if (!(is.vector(y) || is.ts(y)) && is.numeric(y))
-        stop("formula must specify a single response")
-      if (!is.ts(y)) {
-        tsp(y) <- tsp
-        class(y) <- c("tsp", class(y))
-      }
-#      result$arima <- stats::arima(y, order=order, seasonal=seasonal, xreg=x,
-#                                   include.mean=has.intercept, ...)
-      result$response <- y
-      result$model.matrix <- x
-    }
-    class(result) <- "ARIMA"
-    result
+
+
+#' Merge for data.frames that may contain ts objects
+#'
+#' Predicting with [cv::Arima()] models may require merging
+#' data frames that contain `ts` object or that inherit from
+#' `ts_data_frame`.  [Merge()] is designed to circumvent
+#' problems that arise when merging such data frames with
+#' [base::merge()].
+#'
+#' @param x,y data frames to be merged
+#' @param by names of columns used for merging, default:
+#'        `intersect(names(x), names(y))`.
+#' @param all which columns to include in the merged data set,
+#'        default: TRUE. Use `all.y = FALSE`
+#'        to select all rows from 'x', or `all.x = FALSE`
+#'        to select all rows from 'y', or `all = FALSE` to
+#'        select rows whose values for `by` variables occur
+#'        in both 'x' and 'y'.
+#' @param ... other arguments passed to [base::merge()]
+#'
+#' @return A data frame merging the data frames `x` and `y`,
+#' preserving the `ts` class of individual variables and
+#' the `ts_data_frame` class if either `x` or `y` inherit
+#' that class.
+#'
+#' @export
+Merge <- function(x, y, by = intersect(names(x), names(y)), all = TRUE, ...)
+{
+  # merge that works with 'ts' objects
+  istsdf <- inherits(x, 'ts_data_frame') || inherits(y, 'ts_data_frame')
+  istsx <- sapply(x, is.ts)
+  istsy <- sapply(y, is.ts)
+  freqx <- sapply(x, frequency)
+  freqy <- sapply(y, frequency)
+
+  x[istsx] <- lapply(x[istsx], function(x) { class(x) <- setdiff(class(x),'ts'); x})
+  y[istsy] <- lapply(y[istsy], function(x) { class(x) <- setdiff(class(x),'ts'); x})
+
+  m <- merge(x, y, by = by, all = all, ...)
+  m[names(istsx)[istsx]] <- lapply(names(istsx)[istsx], function(nn) ts(m[nn], frequency = freqx[nn]))
+  m[names(istsy)[istsy]] <- lapply(names(istsy)[istsy], function(nn) ts(m[nn], frequency = freqy[nn]))
+  if(istsdf) class(m) <- unique(c(class(m), 'ts_data_frame'))
+  m
+}
+#' @rdname Merge
+#' @export
+merge.ts_data_frame <- function(x, y, ...)
+  {
+    Merge(x, y, ...)
   }
+
+
+if(FALSE) { # Test Merge
+
+  #
+  # Note that we can't just provide a ts_data_frame method for merge
+  # since the problem occurs even if the data frame is not a
+  # 'ts_data_frame' but contains 'ts' variables.
+  #
+  library(car)
+  Lake <- as.ts(data.frame(level = LakeHuron, year = time(LakeHuron)))
+  Lake2 <- data.frame(level = LakeHuron, year = time(LakeHuron))
+  class(Lake)
+  class(Lake2)
+  Lake$level
+  Lake2$level
+  mm <- merge(Lake, data.frame(year = 1973:1980), all = T)                 # works
+  class(mm)    # ok
+  class(mm$level)  # ok
+  # but
+  # merge(Lake, data.frame(year = 1973:1980, level = NA), all = T)   # doesn't work
+  # merge(Lake2, data.frame(year = 1973:1980, level = NA), all = T)   # doesn't work
+  mm <- Merge(Lake, data.frame(year = 1973:1980, level = NA))        # works
+  Arima(level ~ year, mm, order = c(2,0,0))
+
+  # Problem?: returned values are ts matrices
+  # but okay for fitting Arima models
+  sapply(Lake, class)
+  sapply(mm, class)
+  sapply(Lake, dim)
+  sapply(mm, dim)
+  fit.Arima <- Arima(level ~ year, mm, order = c(2,0,0))
+  fit.Arima
+
+}
+
+
+
+
 
 #' Prediction with ARIMA model
 #'
@@ -478,13 +545,29 @@ getArimaObjects <-
 #'        using either a data frame or a matrix if the values
 #'        are 'pre-differenced' if a model uses differencing.
 #'
-#'  @return A data frame similar to 'newdata' with predicted
+#' @return A data frame similar to 'newdata' with predicted
 #'          responses replacing the NA's for the response, along with a
 #'          new variable named '_predicted_' with the
 #'          value 'TRUE' in each row in which the response
 #'          has been predicted.
+#' @examples
+#' library(car)
+#' library(lattice)
+#' Lake <- data.frame(level = LakeHuron, year = time(LakeHuron))
+#' xyplot(level ~ year, Lake)
+#' model <- Arima(level ~ year, Lake, order = c(2,0,0))
+#'
+#' newdata <- Merge(Lake, data.frame(level = NA, year = 1973:1980))
+#' preddata <- pred(model, newdata)
+#' xyplot(level ~ year, preddata, groups = .predicted, auto.key = T)
+#'
+#' newdata <- Lake[1:50,]
+#' newdata$level[41:50] <- NA
+#' preddata <- pred(model, newdata)
+#' xyplot(level ~ year, preddata, groups = .predicted, auto.key = T)
 #' @export
-pred <- function(model, newdata, demean = FALSE, differenced = FALSE) {
+pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
+                 zero_residuals = FALSE) {
   #
   # Future arguments for method: n.ahead = NA, xregnew, differenced = FALSE
   #
@@ -537,16 +620,77 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE) {
   # but it can use distant future data to estimate the
   # coefficients used to predict the near future.
 
+  model_objects <-
+    function(formula, data,
+             order = c(1L, 0L, 0L),
+             seasonal = list(order = c(0L, 0L, 0L), period = NA),
+             fit = FALSE,
+             ...){
+      if (!inherits(data, "ts_data_frame")) {
+        data <- as.ts(data)
+        message("Note: 'data' coerced to 'ts_data_frame'")
+      }
+      tsp <- tsp(data[, 1L])
+      dots <- list(...)
+      cl <- match.call()
+      mf <- match.call(expand.dots = FALSE)
+      m <- match(c("formula", "data"), names(mf), 0L)
+      mf <- mf[c(1L, m)]
+      mf$na.action <- na.pass
+      mf[[1L]] <- quote(stats::model.frame)
+      mf <- eval(mf, parent.frame())
+      mt <- attr(mf, "terms")
+      x <- model.matrix(mt, mf)
+      which.int <- which("(Intercept)" == colnames(x))
+      if (length(which.int > 0)) {
+        has.intercept <- TRUE
+        x <- x[, -which.int, drop=FALSE]
+      } else {
+        has.intercept <- FALSE
+      }
+      result <- list(formula=formula, data=data,
+                     order=order, seasonal=seasonal,
+                     call=cl, model=mf, dots=dots)
+      if (length(formula) == 2L){
+        if (!(ncol(x) == 1L) && is.numeric(x[, 1L]))
+          stop("formula must specify a single response")
+        response <- x[, 1L]
+        if (!is.ts(response)) {
+          tsp(response) <- tsp
+          class(response) <- c("tsp", class(response))
+        }
+        if(fit) result$arima <- stats::arima(response, order=order, seasonal=seasonal,
+                                             ...)
+        result$response <- response
+      } else {
+        y <- model.response(mf, "numeric")
+        if (!(is.vector(y) || is.ts(y)) && is.numeric(y))
+          stop("formula must specify a single response")
+        if (!is.ts(y)) {
+          tsp(y) <- tsp
+          class(y) <- c("tsp", class(y))
+        }
+        if(fit) result$arima <- stats::arima(y, order=order, seasonal=seasonal, xreg=x,
+                                             include.mean=has.intercept, ...)
+        result$response <- y
+        result$model.matrix <- x
+      }
+      class(result) <- "ARIMA"
+      result
+    }
+
+
   #
   # Get y and xreg matrix from new Ys and xreg
   #
   # model_new <- update(model, data = ts_data_frame(newdata)) # produced errors from arima
-  model_new <- getArimaObjects(formula(model), data = ts_data_frame(newdata))
+  model_new <- model_objects(formula(model), data = ts_data_frame(newdata))
   xreg_new <- model.matrix(model_new)                           # FIX if no XREG
   y_new <- model_new$response
 
   diff_order <- model$order[2]
   seasonal_diff_order <- model$seasonal$order[2]
+
 
   n.leadup <- sum(!is.na(y_new))
   n.ahead <- sum(is.na(y_new))
@@ -592,14 +736,14 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE) {
     y_new_diff <- Diff(y_new_diff,
                        seasonal = model$seasonal$order[2],
                        period = model$seasonal$period)
-    if(!differenced) xreg_new_diff <- Diff(xreg_new_diff,
+    if(!differenced && !is.null(xreg_new_diff)) xreg_new_diff <- Diff(xreg_new_diff,
                                            seasonal = model$seasonal$order[2],
                                            period = model$seasonal$period)
   }
   if(model$order[2] > 0) {
     y_new_diff <- Diff(y_new_diff,
                        order = model$order[2])
-    if(!differenced) xreg_new_diff <- Diff(xreg_new_diff,
+    if(!differenced && !is.null(xreg_new_diff)) xreg_new_diff <- Diff(xreg_new_diff,
                                            order = model$order[2])
   }
 
@@ -628,12 +772,14 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE) {
 
   topred <- which(is.na(y_new_res))
 
+  if(zero_residuals) y_new_res[] <- 0
+
   for(i in topred) y_new_res[i] <- convolve(y_new_res[1:(i-1)], Pi)
 
   new_pred <- y_new_res + {
     if(demean) mean_y_new_res else 0
   } + {
-    if(!is.null(beta)) xreg_new_diff %*% beta else 0
+    if(length(beta)) xreg_new_diff %*% beta else 0
   }
   y_new_diff[topred] <- new_pred[topred]  # to keep diff attributes
 
@@ -653,15 +799,14 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE) {
 
 
 
-if(FALSE){  # testing pred
+if(FALSE){  # testing pred ----
 
   library(car)
 
   Lake <- data.frame(level = LakeHuron, year = time(LakeHuron))
-  Lake[] <- lapply(Lake, as.vector)        # to avert problems with rbind, merge
 
   #
-  ## ARMA(2,1) model ############
+  ## ARMA(2,1) model ----
   #
 
   # using Arima
@@ -683,7 +828,7 @@ if(FALSE){  # testing pred
 
   # Using pred to predict future observations with lake.Arima
 
-  newdata <- rbind(Lake, data.frame(level = NA, year = 1973:1980))
+  newdata <- Merge(Lake, data.frame(level = 10, year = 1973:1980), all =TRUE)
 
   preddata <- pred(lake.Arima, newdata, demean = FALSE) # not demeaning ARMA residuals
   preddata2 <- pred(lake.Arima, newdata, demean = TRUE)
@@ -737,7 +882,7 @@ if(FALSE){  # testing pred
 
 
   #
-  ## ARIMA(2,1, 1) model ####
+  # ARIMA(2,1, 1) model ----
   #
 
   # using Arima
@@ -754,13 +899,13 @@ if(FALSE){  # testing pred
   xreg <- with(Lake, cbind( year - 1920))
   lake.arima <- with(Lake, arima(clevel, xreg = xreg, order = c(2, 1, 1 ),
                                  include.mean = FALSE))
-  newxreg <- cbind(1973:1980 - 1920)
+  newxreg <- as.matrix(1973:1980 - 1920)
   pred.arima <- predict(lake.arima, n.ahead = 8, newxreg = newxreg)
   pred.arima
 
-  # Using pred to predict future observations with lake.Arima
+  # Using pred to predict future observations with lake.Arima ----
 
-  newdata <- merge(Lake, data.frame(clevel = NA, year = 1973:1980), all = TRUE)
+  newdata <- Merge(Lake, data.frame(clevel = NA, year = 1973:1980), all = TRUE)
 
   preddata <- pred(lake.Arima, newdata, demean = FALSE) # not demeaning ARMA residuals
   preddata2 <- pred(lake.Arima, newdata, demean = TRUE)
@@ -813,7 +958,7 @@ if(FALSE){  # testing pred
   #
 
   #
-  ## ARIMA(2,0, 1) with decadal differencing  ####
+  ## ARIMA(2,0, 1) with decadal differencing  ----
   #
 
   # using Arima
@@ -839,19 +984,19 @@ if(FALSE){  # testing pred
 
   # Using pred to predict future observations with lake.Arima
 
-  newdata <- merge(Lake, data.frame(clevel = NA, year = 1973:1980), all = TRUE)
+  newdata <- Merge(Lake, data.frame(clevel = NA, year = 1973:1980), all = TRUE)
 
   preddata <- pred(lake.Arima, newdata, demean = FALSE) # not demeaning ARMA residuals
   preddata2 <- pred(lake.Arima, newdata, demean = TRUE)
 
-  preddata[] <- lapply(preddata, as.vector)
+  # preddata[] <- lapply(preddata, as.vector)
 
   preddata$source <- ifelse(preddata$.predicted, 'pred not demeaned', 'data')
   preddata2$source <- ifelse(preddata2$.predicted, 'pred demeaned', 'data')
 
   # Comparing with predict.Arima and predict.arima
 
-  preds <- merge(preddata, preddata2, all = TRUE)
+  preds <- Merge(preddata, preddata2, all = TRUE)
   preds <- merge(
     preds,
     data.frame(
@@ -891,10 +1036,10 @@ if(FALSE){  # testing pred
   #   with using demeaned residuals and restoring the means afterwards.
   #
 
-  ## Using pred to predict with new lead-up data ####
+  # Using pred to predict with new lead-up data ----
 
   #
-  ## ARMA(2,1) model ############
+  # ARMA(2,1) model ----
   #
 
 
@@ -923,14 +1068,14 @@ if(FALSE){  # testing pred
   preddata3 <- pred(lake.Arima, pred_df, demean = FALSE)
   xyplot(level ~ year, preddata3, groups = .predicted, auto.key = T)
 
-  ## Higher order AR
+  # Higher order AR ----
 
   lake.Arima4 <- Arima(level ~ I(year - 1920), data=Lake,
-                      order=c(1, 0, 0))
+                       order=c(1, 0, 0))
   preddata4 <- pred(lake.Arima4, pred_df, demean = FALSE)
   xyplot(level ~ year, preddata4, groups = .predicted, auto.key = T)
 
-  ## Model with no x's
+  # Model with no x's ----
 
   lake.Arima0 <- Arima(~ level, data = Lake, order = c(2,0,1))
 
@@ -938,7 +1083,7 @@ if(FALSE){  # testing pred
   xyplot(level ~ year, preddata0,groups = .predicted, auto.key = T) +
     xyplot(level ~ year, Lake)
 
-# Model with no x's (internal prediction) ####
+  # Models with no x's (internal prediction) ----
 
   lake.Arima0 <- Arima(~ level, data = Lake, order = c(2,0,1))
 
@@ -950,12 +1095,14 @@ if(FALSE){  # testing pred
   xyplot(level ~ year, Lake) +
     xyplot(level ~ year, preddata0,groups = .predicted, auto.key = T)
 
-  lake.MA1 <- Arima(~ level, data = Lake, order = c(0,0,1))
+  # No x's with differencing ----
+
+  lake.MA1 <- Arima(~ level, data = Lake, order = c(1,1,0))
 
   newdata <- Lake[21:50,]
   newdata$level[11:30] <- NA
 
-  preddata0 <- pred(lake.MA1, newdata, demean = FALSE)
+  preddata0 <- pred(lake.MA1, newdata, demean = FALSE) # didn't work
   xyplot(level ~ year, Lake) +
     xyplot(level ~ year, preddata0,groups = .predicted, auto.key = T)
 
@@ -975,9 +1122,70 @@ if(FALSE){  # testing pred
   xyplot(level ~ year, Lake) +
     xyplot(level ~ year, preddata0, groups = .predicted, auto.key = T)
 
+  # Zero residuals ----
+
+  pred_df <- subset(Lake, year %in% 1911:1940)
+  pred_df$level[(nrow(pred_df) - 24):nrow(pred_df)] <- NA
+
+  lake.Arima <- Arima(level ~ I(year - 1920), data=Lake,
+                      order=c(2, 0, 0))
+  preddata <- pred(lake.Arima4, pred_df, demean = FALSE)
+  preddatazr <- pred(lake.Arima4, pred_df, demean = FALSE, zero = T)
+
+  xyplot(level ~ year, preddata, groups = .predicted, auto.key = T)+
+    xyplot(level ~ year, preddatazr, groups = .predicted,
+           par.settings = list(superpose.symbol=list(pch=c(1,4))))
+
+  fits <- within(
+    list() ,
+    {
+
+      lake.Arima102 <- Arima(level ~ I(year - 1920), data=Lake,
+                             order=c(1, 0, 2))
+      lake.Arima200 <- Arima(level ~ I(year - 1920), data=Lake,
+                             order=c(2, 0, 0))
+      lake.Arima210 <- Arima(level ~ I(year - 1920), data=Lake,
+                             order=c(2, 1, 0))
+    }
+  )
+  orders <- c('(1,0,2)','(2,0,0)', '(2,1,0)')
+  names(fits) <- orders
+
+  preds <- lapply(fits, pred, newdata = pred_df, demean = FALSE)
+  predsz <- lapply(fits, pred, newdata = pred_df, zero = T, demean = FALSE)
+  preddata <- preds[[1]] %>% subset(!.predicted)
+
+  preds <- lapply(preds, subset, .predicted)
+  predsz <- lapply(predsz, subset, .predicted)
+
+  preddata$source <- 'data'
+
+  preds <- lapply(seq_along(preds),
+                  function(i) {
+                    preds[[i]]$source <- names(preds)[i]
+                    preds[[i]]
+                  }
+  )
+  predsz <- lapply(seq_along(predsz),
+                   function(i) {
+                     predsz[[i]]$source <- paste(names(predsz)[i], 'zero')
+                     predsz[[i]]
+                   }
+  )
+
+  zz <- Reduce(Merge, c(preds, predsz))
+  zz <- Merge(zz, preddata)
+  zz <- sortdf(zz, ~ year)
+
+  pars <- list(superpose.symbol = list(pch = 1+ c(1,1,2,2,3,3,0), col = c('black','red')))
+  xyplot(level ~ year, zz, groups = source, auto.key = T,
+         par.settings = pars)
+
+
+
 }
 
 
-
+# END here ----
 
 
