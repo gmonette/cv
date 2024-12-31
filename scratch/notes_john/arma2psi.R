@@ -317,7 +317,7 @@ newModMatrix1 <- function(formula, newdata){
 }
 
 newModMatrix <- function(object, newdata){
-  model.matrix(delete.response(terms(object$model)),
+  model.matrix(delete.response(terms(model.frame(object))),
                data=newdata)
 }
 
