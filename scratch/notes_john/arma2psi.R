@@ -321,6 +321,11 @@ newModMatrix <- function(object, newdata){
                data=newdata)
 }
 
+newModMatrix2 <- function(object, newdata){
+  object |> model.frame() |> terms() |> delete.response() |>
+    model.matrix(data=newdata)
+}
+
 if (FALSE){
 
   Lake <- data.frame(level = LakeHuron, year = time(LakeHuron))
@@ -331,8 +336,10 @@ if (FALSE){
   newdata <- data.frame(year=1973:1980)
   newModMatrix1(formula(lake.Arima), newdata=newdata)
   newModMatrix(lake.Arima, newdata=newdata)
+  newModMatrix2(lake.Arima, newdata=newdata)
 
   lake.Arima.2 <- update(lake.Arima, . ~ poly(year, 2))
   newModMatrix1(formula(lake.Arima.2), newdata=newdata)
   newModMatrix(lake.Arima.2, newdata=newdata)
+  newModMatrix2(lake.Arima.2, newdata=newdata)
 }
