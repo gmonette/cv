@@ -569,8 +569,9 @@ if(FALSE) { # Test Merge
 pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
                  zero_residuals = FALSE) {
   #
-  # NOTE 22025-01-02 Currently needs a fix for newModMatrix
-  # with models with no RHS.
+  # Changes 2025-01-04:
+  #    Various fixes for effect of newModMatrix when there
+  #    is no RHS and/or differencing with no Intercept
   #
   # Future arguments for method: n.ahead = NA, xregnew, differenced = FALSE
   #
@@ -624,38 +625,13 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
   # coefficients used to predict the near future.
 
   newModMatrix <- function(object, newdata){
-
-    # Combining ideas from both of John's suggestions:
-
-    X <- model.matrix(delete.response(terms(object$model)),
-                      data=newdata)
-    # if (length(formula(object)) == 3){
-    #   return(X)
-    # } else {
-    #   return(X[, -ncol(X), drop=FALSE])
-    # }
-    # Issues:
-    #  For models with predictors, X has all rows (including
-    #    rows for NA Ys) but may have too many columns
-    #    OK: we can select the columns we need from beta later
-    #  models without predictors have incorrect rows: missing rows with NA Ys
-    #    OK: we can construct a matrix with an intercept term
-    #        and the right number of rows later when needed
-    #  Note some models without predictors may nevertheless need an
-    #    intercept, e.g. non-differenced models get an intercept
-    #    even if it isn't implied by a formula (e.g. missing RHS)
-
-
-  }
-  newModMatrix <- function(object, newdata){
     # Problem
     # If a model does not have a RHS then the returned
     # matrix does not include rows for NA Ys
-    # but fixed later.
+    # but issue fixed in later code.
     X <- model.matrix(delete.response(terms(object$model)),
                       data=newdata)
-
-        if (length(formula(object)) == 3){
+    if (length(formula(object)) == 3){
       return(X)
     } else {
       return(X[, -ncol(X), drop=FALSE])
@@ -711,20 +687,20 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
   xreg_new_diff <- xreg_new
 
   if(model$seasonal$order[2] > 0) {
-    # stopifnot(length(y_new) %% model$seasonal$period == 0)
-    # stopifnot(sum(is.na(y_new)) %% model$seasonal$period == 0)
+
     y_new_diff <- Diff(y_new_diff,
                        seasonal = model$seasonal$order[2],
                        period = model$seasonal$period)
-    if(!differenced && !is.null(xreg_new_diff)) xreg_new_diff <- Diff(xreg_new_diff,
-                                           seasonal = model$seasonal$order[2],
-                                           period = model$seasonal$period)
+    if(!differenced && !is.null(xreg_new_diff)) xreg_new_diff <-
+        Diff(xreg_new_diff,
+             seasonal = model$seasonal$order[2],
+                        period = model$seasonal$period)
   }
   if(model$order[2] > 0) {
     y_new_diff <- Diff(y_new_diff,
                        order = model$order[2])
-    if(!differenced && !is.null(xreg_new_diff)) xreg_new_diff <- Diff(xreg_new_diff,
-                                           order = model$order[2])
+    if(!differenced && !is.null(xreg_new_diff)) xreg_new_diff <-
+        Diff(xreg_new_diff, order = model$order[2])
   }
 
   # Residualize differenced Ys
