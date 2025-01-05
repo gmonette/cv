@@ -569,6 +569,9 @@ if(FALSE) { # Test Merge
 pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
                  zero_residuals = FALSE) {
   #
+  # NOTE 22025-01-02 Currently needs a fix for newModMatrix
+  # with models with no RHS.
+  #
   # Future arguments for method: n.ahead = NA, xregnew, differenced = FALSE
   #
   # Changes from previous version:
@@ -620,73 +623,57 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
   # but it can use distant future data to estimate the
   # coefficients used to predict the near future.
 
-  model_objects <-
-    function(formula, data,
-             order = c(1L, 0L, 0L),
-             seasonal = list(order = c(0L, 0L, 0L), period = NA),
-             fit = FALSE,
-             ...){
-      if (!inherits(data, "ts_data_frame")) {
-        data <- as.ts(data)
-        message("Note: 'data' coerced to 'ts_data_frame'")
-      }
-      tsp <- tsp(data[, 1L])
-      dots <- list(...)
-      cl <- match.call()
-      mf <- match.call(expand.dots = FALSE)
-      m <- match(c("formula", "data"), names(mf), 0L)
-      mf <- mf[c(1L, m)]
-      mf$na.action <- na.pass
-      mf[[1L]] <- quote(stats::model.frame)
-      mf <- eval(mf, parent.frame())
-      mt <- attr(mf, "terms")
-      x <- model.matrix(mt, mf)
-      which.int <- which("(Intercept)" == colnames(x))
-      if (length(which.int > 0)) {
-        has.intercept <- TRUE
-        x <- x[, -which.int, drop=FALSE]
-      } else {
-        has.intercept <- FALSE
-      }
-      result <- list(formula=formula, data=data,
-                     order=order, seasonal=seasonal,
-                     call=cl, model=mf, dots=dots)
-      if (length(formula) == 2L){
-        if (!(ncol(x) == 1L) && is.numeric(x[, 1L]))
-          stop("formula must specify a single response")
-        response <- x[, 1L]
-        if (!is.ts(response)) {
-          tsp(response) <- tsp
-          class(response) <- c("tsp", class(response))
-        }
-        if(fit) result$arima <- stats::arima(response, order=order, seasonal=seasonal,
-                                             ...)
-        result$response <- response
-      } else {
-        y <- model.response(mf, "numeric")
-        if (!(is.vector(y) || is.ts(y)) && is.numeric(y))
-          stop("formula must specify a single response")
-        if (!is.ts(y)) {
-          tsp(y) <- tsp
-          class(y) <- c("tsp", class(y))
-        }
-        if(fit) result$arima <- stats::arima(y, order=order, seasonal=seasonal, xreg=x,
-                                             include.mean=has.intercept, ...)
-        result$response <- y
-        result$model.matrix <- x
-      }
-      class(result) <- "ARIMA"
-      result
+  newModMatrix <- function(object, newdata){
+
+    # Combining ideas from both of John's suggestions:
+
+    X <- model.matrix(delete.response(terms(object$model)),
+                      data=newdata)
+    # if (length(formula(object)) == 3){
+    #   return(X)
+    # } else {
+    #   return(X[, -ncol(X), drop=FALSE])
+    # }
+    # Issues:
+    #  For models with predictors, X has all rows (including
+    #    rows for NA Ys) but may have too many columns
+    #    OK: we can select the columns we need from beta later
+    #  models without predictors have incorrect rows: missing rows with NA Ys
+    #    OK: we can construct a matrix with an intercept term
+    #        and the right number of rows later when needed
+    #  Note some models without predictors may nevertheless need an
+    #    intercept, e.g. non-differenced models get an intercept
+    #    even if it isn't implied by a formula (e.g. missing RHS)
+
+
+  }
+  newModMatrix <- function(object, newdata){
+    # Problem
+    # If a model does not have a RHS then the returned
+    # matrix does not include rows for NA Ys
+    # but fixed later.
+    X <- model.matrix(delete.response(terms(object$model)),
+                      data=newdata)
+
+        if (length(formula(object)) == 3){
+      return(X)
+    } else {
+      return(X[, -ncol(X), drop=FALSE])
     }
+  }
+
+  # following may have dropped rows for NA Ys
+  # when the formula has no RHS. Fixed later in code.
+  xreg_new <- newModMatrix(model, ts_data_frame(newdata))
+  which.int <- which("(Intercept)" == colnames(xreg_new))
+  if (length(which.int > 0)) {
+    xreg_new <- xreg_new[, -which.int, drop=FALSE]
+  }
 
 
-  #
-  # Get y and xreg matrix from new Ys and xreg
-  #
-  # model_new <- update(model, data = ts_data_frame(newdata)) # produced errors from arima
-  model_new <- model_objects(formula(model), data = ts_data_frame(newdata))
-  xreg_new <- model.matrix(model_new)                           # FIX if no XREG
-  y_new <- model_new$response
+  # FIX? This can surely be improved, Fails if LHS includes a transformation
+  y_name <- as.character(model$call$formula[[2]])
+  y_new <- newdata[[y_name]]
 
   diff_order <- model$order[2]
   seasonal_diff_order <- model$seasonal$order[2]
@@ -695,35 +682,28 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
   n.leadup <- sum(!is.na(y_new))
   n.ahead <- sum(is.na(y_new))
 
-  ##FIXME: following use truncation of leadup data with a warning
-  ##       and extension of prediction xreg followed by truncation
-
-  # if(seasonal_diff_order > 0) {
-  #   if((sum(!is.na(y_new)) %% seasonal_diff_order) != 0 ){
-  #
-  #     stop('Number of lead-up data rows should be a multiple of seasonal differencing order (',
-  #          seasonal_diff_order,')')
-  #   }
-  #   if((sum(is.na(y_new)) %% seasonal_diff_order) != 0 ) {
-  #     stop('Number of predicted data rows should be a multiple of seasonal differencing order (',
-  #          seasonal_diff_order,')')
-  #   }
-  # }
-
   coefs <- coef(model)
-
-  if ("(Intercept)" %in% names(coefs)){   # from cv::Predict.ARIMA
-    xreg_new <- if (!is.null(xreg_new)){
-      cbind(1, xreg_new)
-    } else {
-      matrix(1, nrow=length(y_new), ncol=1)
-    }
-  }
   ar <- coefs[grepl('^ar[0-9]+$',names(coefs))]
   ma <- coefs[grepl('^ma[0-9]+$',names(coefs))]
   sar <- coefs[grepl('^sar[0-9]+$',names(coefs))]
   sma <-  coefs[grepl('^sma[0-9]+$',names(coefs))]
   beta <- coefs[-seq_len(length(ar) + length(ma) + length(sar) + length(sma))]
+
+  # At this stage, xreg_new might be row deficient if there
+  # were no predictors other than the intercept
+  # AND/OR it might have excess columns
+  # We remove excess columns and might leave nothing if the
+  # model only has a Intercept which was removed.
+  #
+  xreg_new <- xreg_new[,intersect(names(beta), colnames(xreg_new) ), drop = FALSE]
+
+  if ("(Intercept)" %in% names(coefs)){   # from cv::Predict.ARIMA
+    xreg_new <- if (length(xreg_new)){
+      cbind(1, xreg_new)
+    } else {
+      matrix(1, nrow=length(y_new), ncol=1)
+    }
+  }
 
   # Get differenced Ys and xreg
 
@@ -749,7 +729,7 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
 
   # Residualize differenced Ys
 
-  y_new_res <- y_new_diff - if(!is.null(xreg_new_diff)) xreg_new_diff %*% beta else 0
+  y_new_res <- y_new_diff - if(length(xreg_new_diff)) xreg_new_diff %*% beta else 0
 
   #
   # Demean differenced Y ????
@@ -789,7 +769,7 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
     y_pred <- y_new_diff
   }
 
-  newdata[[as.character(model$call$formula[[2]])]] <- y_pred
+  newdata[[y_name]] <- y_pred
   newdata$.predicted <- rep(c(FALSE,TRUE), c(nrow(newdata) - sum(is.na(y_new)), sum(is.na(y_new))))
   attr(newdata,'Pi') <- Pi
   attr(newdata,'Mod') <- Mod(polyroot(c(1, -Pi)))
@@ -802,6 +782,7 @@ pred <- function(model, newdata, demean = FALSE, differenced = FALSE,
 if(FALSE){  # testing pred ----
 
   library(car)
+  library(latticeExtra)
 
   Lake <- data.frame(level = LakeHuron, year = time(LakeHuron))
 
@@ -828,7 +809,7 @@ if(FALSE){  # testing pred ----
 
   # Using pred to predict future observations with lake.Arima
 
-  newdata <- Merge(Lake, data.frame(level = 10, year = 1973:1980), all =TRUE)
+  newdata <- Merge(Lake, data.frame(level = NA, year = 1973:1980), all =TRUE)
 
   preddata <- pred(lake.Arima, newdata, demean = FALSE) # not demeaning ARMA residuals
   preddata2 <- pred(lake.Arima, newdata, demean = TRUE)
@@ -867,10 +848,10 @@ if(FALSE){  # testing pred ----
   preds$difference <- with(preds, level - ref)
 
   xyplot(level ~ year, preds, groups = source,
-         auto.key = TRUE, par.settings = list(superpose.symbol = list(pch = 0:5)))
+         auto.key = TRUE, par.settings = list(superpose.symbol = list(pch = 1:5)))
 
   xyplot(difference ~ year, preds, groups = source,
-         auto.key = TRUE, par.settings = list(superpose.symbol = list(pch = 0:5)))
+         auto.key = TRUE, par.settings = list(superpose.symbol = list(pch = 1:5)))
 
   # Remarks:
   #
@@ -1175,17 +1156,87 @@ if(FALSE){  # testing pred ----
 
   zz <- Reduce(Merge, c(preds, predsz))
   zz <- Merge(zz, preddata)
-  zz <- sortdf(zz, ~ year)
+  zz[] <- zz[order(zz$year),]
 
   pars <- list(superpose.symbol = list(pch = 1+ c(1,1,2,2,3,3,0), col = c('black','red')))
   xyplot(level ~ year, zz, groups = source, auto.key = T,
          par.settings = pars)
 
+  # Transformed predictors NOT WORKING ----
+  if(FALSE){
+  fits <- within(
+    list() ,
+    {
+
+      lake.Arima102 <- Arima(sqrt(level) ~ I(year - 1920), data=Lake,
+                             order=c(1, 0, 2))
+      lake.Arima200 <- Arima(sqrt(level) ~ I(year - 1920), data=Lake,
+                             order=c(2, 0, 0))
+      lake.Arima210 <- Arima(sqrt(level) ~ I(year - 1920), data=Lake,
+                             order=c(2, 1, 0))
+    }
+  )
+
+  orders <- c('(1,0,2)','(2,0,0)', '(2,1,0)')
+  names(fits) <- orders
+  predict(fits[[1]])
+  pred(fits[[1]], pred_df)
+  preds <- lapply(fits, pred, newdata = pred_df)
+  preddata <- preds[[1]] %>% subset(!.predicted)
+
+  preds <- lapply(preds, subset, .predicted)
+  predsz <- lapply(predsz, subset, .predicted)
+
+  preddata$source <- 'data'
+
+  preds <- lapply(seq_along(preds),
+                  function(i) {
+                    preds[[i]]$source <- names(preds)[i]
+                    preds[[i]]
+                  }
+  )
+  predsz <- lapply(seq_along(predsz),
+                   function(i) {
+                     predsz[[i]]$source <- paste(names(predsz)[i], 'zero')
+                     predsz[[i]]
+                   }
+  )
+
+  zz <- Reduce(Merge, c(preds, predsz))
+  zz <- Merge(zz, preddata)
+  zz <- zz[order(zz$year),]
+
+  pars <- list(superpose.symbol = list(pch = 1+ c(1,1,2,2,3,3,0), col = c('black','red')))
+  xyplot(level ~ year, zz, groups = source, auto.key = T,
+         par.settings = pars)
+  }
+
+  # Test using models with and without RHS and with and without differencing
+
+  lax <- Arima(level ~ I(year - 2000), data = Lake, order = c(2,0,1))
+  coef(lax)
+  preddata <- pred(lax, newdata)
+  xyplot(level ~ year, preddata, groups = .predicted)
+
+  lay <- Arima(~level , data = Lake, order = c(2,0,1))
+  coef(lay)
+  preddata <- pred(lay, newdata)
+  xyplot(level ~ year, preddata, groups = .predicted)
+
+
+  laxd <- Arima(level ~ I(year - 2000) , data = Lake, order = c(2,1,1))
+  coef(laxd)  # no intercept
+  preddata <- pred(laxd, newdata)
+  xyplot(level ~ year, preddata, groups = .predicted)
+
+
+  layd <- Arima(~level , data = Lake, order = c(2,1,1))
+  coef(layd)  # no intercept
+  preddata <- pred(layd, newdata)
+  xyplot(level ~ year, preddata)
 
 
 }
 
 
 # END here ----
-
-
