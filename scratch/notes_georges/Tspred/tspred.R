@@ -415,6 +415,9 @@ tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
   # on other arguments to 'Arima'.
   #
   model_new <- update(model, data = newdata)
+
+  # FIXME: look at original model matrix for an intercept
+
   xreg_new <- model.matrix(model_new)
 
   diff_order <- model$order[2]
