@@ -231,7 +231,7 @@ cv.auto.10[2]
 cv.auto.loo <- cv(mlist, data = Auto, k = "loo")
 cv.auto.loo[2]
 ```
-The \code{models()} function takes an arbitrary number of regression models as its arguments, which are optionally named, to create a \code{"modList"} object. Alternatively, as here, we can supply a pre-constructed, optionally named, list of models as the single argument to \code{models()}. To visualize the results, comparing the models, we invoke the \code{plot()} method for the \code{"cvModList"} objects returned by \code{cv()} (see Figure \ref{fig:polynomial-regression-CV-graph-2}):
+The \code{models()} function takes an arbitrary number of regression models as its arguments, which are optionally named, to create a \code{"modList"} object. Alternatively, as here, we can supply a pre-constructed, optionally named, list of models as the single argument to \code{models()}. To visualize the results, comparing the models, we invoke the \code{plot()} method for the \code{"cvModList"} objects returned by \code{cv()} (see Figure \ref{fig:polynomial-regression-CV-graph-2}):[^plot-confint]
 
 ```{r, polynomial-regression-CV-graph-2, fig.show="hold"}
 #| fig.height = 5,
@@ -244,6 +244,8 @@ plot(cv.auto.10, main = "Polynomial Regressions, 10-Fold CV",
 plot(cv.auto.loo, main = "Polynomial Regressions, LOO CV",
      axis.args = list(labels = 1:10), xlab = "Degree of Polynomial, p")
 ```
+
+[^plot-confint]: The objects \code{cv.auto.10} and \code{cv.auto.loo} do not include confidence intervals for the CV MSE estimates because, as we explained, there are fewer than 400 cases in the \code{Auto} data. Consequently, confidence intervals are not shown in the graphs in Figure \ref{fig:polynomial-regression-CV-graph-2}. We can force `cv()` to compute confidence intervals by adding the argument `confint = TRUE`; we invite the reader to do this and to verify that the resulting confidence intervals are very broad, as was the case for the quadratic model fit to the \code{Auto} data in the preceding section.
 
 In this example, 10-fold and LOO CV produce generally similar results, and also results that are similar to those produced by the estimated error variance $\widehat{\sigma}^2$ for each model (cf., Figure \ref{fig:mpg-horsepower-polynomials} (b) on page \pageref{fig:mpg-horsepower-polynomials}), except for the highest-degree polynomials, where the CV results more clearly suggest over-fitting.
 \newpage
@@ -622,7 +624,7 @@ The component + residual ("C+R") plots in Figure \ref{fig:Auto-explore-cr-plots}
 
 Some background: As @Weisberg:2014 [Sec. 8.2] explains, there are technical advantages to having (numeric) predictors in linear regression analysis that are themselves linearly related. If the predictors *aren't* linearly related, then the relationships between them can often be straightened by power transformations. Transformations can be selected after graphical examination of the data, or by analytic methods, such as transforming the predictors towards multivariate normality, which implies linearity. Once the relationships between the predictors are linearized, it can be advantageous similarly to transform the conditional distribution of the response variable towards normality. Selecting transformations analytically raises the possibility of automating the process, as required for cross-validation.
 
-The \code{powerTransform()} function in the \pkg{car} package transforms variables towards multivariate normality by a generalization of Box and Cox's maximum-likelihood-like approach [@BoxCox:1964]. Several "families" of power transformations can be used, including the original Box-Cox family (which is the default), simple powers (and roots), and two adaptations of the Box-Cox family to data that may include negative values and zeros: the Box-Cox-with-negatives family and the Yeo-Johnson family; see @Weisberg:2014 [Chap. 8] and @FoxWeisberg:2019 [Chap. 3] for details. We proceed to transform the numeric predictors in the \code{Auto} regression towards multivariate normality: 
+The \code{powerTransform()} function in the \pkg{car} package transforms variables towards multivariate normality by a generalization of Box and Cox's maximum-likelihood-like approach [@BoxCox:1964]. Although the multinormal likelihood is maximized, the variables are transformed individually. Several "families" of power transformations can be used, including the original Box-Cox family (which is the default), simple powers (and roots), and two adaptations of the Box-Cox family to data that may include negative values and zeros: the Box-Cox-with-negatives family and the Yeo-Johnson family; see @Weisberg:2014 [Chap. 8] and @FoxWeisberg:2019 [Chap. 3] for details. We proceed to transform the numeric predictors in the \code{Auto} regression towards multivariate normality: 
 ```{r Auto-transform}
 num.predictors <- c("displacement", "horsepower", "weight", 
                     "acceleration")
@@ -644,28 +646,7 @@ Having transformed the predictors towards multivariate normality, we now conside
 summary(powerTransform(m))
 m <- update(m, log(mpg) ~ .)
 ```
-
-The transformed numeric variables are much better-behaved (cf., Figure \ref{fig:Auto-explore-scatterplot-matrix}, on page \pageref{fig:Auto-explore-scatterplot-matrix}, and Figure \ref{fig:Auto-transformed-scatterplot-matrix}):
-```{r Auto-transformed-scatterplot-matrix}
-#| out.width = "95%",
-#| fig.align = 'center',
-#| fig.height = 5.5,
-#| fig.cap = "Scatterplot matrix for the transformed numeric variables in the \\code{Auto} data."
-scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight 
-                  + acceleration, 
-                  smooth=list(spread = FALSE), data = A, pch = ".")
-```
-
-And the partial relationships in the model fit to the transformed data are much more nearly linear (cf., Figure \ref{fig:Auto-explore-cr-plots}, on page \pageref{fig:Auto-explore-cr-plots}, and Figure \ref{fig:Auto-transformed-cr-plots}):
-
-```{r Auto-transformed-cr-plots}
-#| out.width = "70%",
-#| fig.align = 'center',
-#| fig.height = 4.25,
-#| fig.cap = "Component + residual plots for the regression model fit to the transformed \\code{Auto} data."
-crPlots(m, terms = ~ displacement + horsepower + weight + acceleration, 
-        pch = ".", ylab = "C+R", las = 2)
-```
+The transformed numeric variables are much better-behaved and the partial relationships in the model fit to the transformed data are much more nearly linear (as we invite the reader to verify by redrawing the scatterplot matrix for the transformed variables and the C+R plots for the regression fit to the transformed data).
 
 After transforming both the numeric predictors and the response, we proceed to use the \code{stepAIC()} function in the \pkg{MASS} package to perform predictor selection, employing the BIC model-selection criterion (by setting the \code{k} argument of \code{stepAIC()} to $\log n$):
 ```{r stepAIC}
@@ -686,7 +667,7 @@ mse(Auto$mpg, fitted(m.auto))
 
 A perhaps subtle point is that we compute the MSE for the selected model on the original \code{mpg} response scale rather than the log scale, so as to make the selected model comparable to the working model.[^medAbsErr] 
 
-[^medAbsErr]: That's slightly uncomfortable given the skewed distribution of \code{mpg}. An alternative is to use a robust measure of model lack-of-fit, such as the median absolute error instead of the mean-squared error, employing the \code{medAbsErr()} function from the \pkg{cv} package. The median absolute error, however, cannot be expressed as a casewise average (see Appendix A.2).
+[^medAbsErr]: That's slightly uncomfortable given the skewed distribution of \code{mpg}. An alternative is to use a robust measure of model lack-of-fit, such as the median absolute error instead of the mean-squared error, employing the \code{medAbsErr()} function from the \pkg{cv} package. The median absolute error, however, cannot be expressed as a casewise average (see Appendix A.2). Yet another possibility, suggested to us by a reviewer of an earlier version of this paper, is to compute the MSE for both models on the log-response scale rather than on the original scale of the response. This suggestion is quite general, in that the essential point is to use the \emph{same} response scale for all models to be compared, not necessarilty the \emph{original} scale of the response.
 
 The \code{"function"} method for \code{cv()} allows us to cross-validate the whole model-selection procedure. The first argument to \code{cv()}---here \code{selectTransStepAIC}---is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion:
 ```{r Auto-transform-and-select}
@@ -922,7 +903,7 @@ cv(mod.attrition, k = "loo", criterion = BayesRule)
 
 Let's compare the computational efficiency of the various implementations, also showing the use of \code{method = "Woodbury"} and \code{method =" hatvalues"} for \code{cv()}, which, in this example, produce numerically identical results to the default \code{method = "exact"}:[^times-10]
 
-[^times-10]: As before, we ask \code{microbenchmark()} to report relative timings, and also as before, we set \code{times = 10} rather than the default \code{times = 100}, with the consequence that we fail to detect a statistically reliable difference between using the Woodbury matrix identity and using hatvalues for the \code{cv()} computations.
+[^times-10]: As before, we ask \code{microbenchmark()} to report relative timings, and also as before, we set \code{times = 10} rather than the default \code{times = 100}.
 
 ```{r compare-rsample-cv, cache=TRUE}
 set.seed(53437)
