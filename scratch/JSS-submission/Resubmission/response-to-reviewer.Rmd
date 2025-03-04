@@ -1,0 +1,39 @@
+---
+title: "Response to the Reviewer"
+author: "John Fox and Georges Monette"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1.  "I was surprised to see references to alternative packages only at the end of the paper rather than in the introduction. It might be beneficial to include a sentence in the introduction to clarify this."
+
+Actually, we already had the following two sentences in the introductory section: "A number of existing R packages include functions for cross-validating regression models. We briefly situate the **cv** package relative to other R software for cross-validation, and to other statistical software (in particular, SAS, Stata, and Python), in Section 6." We elaborate slightly in the resubmission, indicating *which* R packages we take up in Section 6. We believe that the discussion itself should remain at the end of the paper, *after* we have discussed the facilities for cross-validation in the **cv** package.
+
+2.  "What is the purpose of using insight::get_data on page 5? The insight package is also mentioned on page 31. I believe it would be helpful to include a brief explanation of why it is being used."
+
+As suggested, we added a brief explanation of the advantage of using the **insight** package, which provides a robust way to access model components for many classes of statistical models.
+
+3.  "Does the package allow for the addition of an uncertainty interval to the plots in Figure 2? I think that including a measure of uncertainty would be useful."
+
+Yes, it does. As we explained on p. 5 of the original paper in discussing the `confint` argument to `cv()`, "`confint`, whether or not to compute a confidence interval for the CV criterion, defaulting to `TRUE` if there are at least 400 cases." The `Auto` data used in the preliminary example has fewer than 400 cases. When there are confidence limits in the `"cv"` objects, the `plot()` method used for Fig. 2 draws confidence intervals. We've added a footnote explaining this behaviour and have also explained why we adopted the $n \ge 400$ rule for computing confidence intervals by default.
+
+4.  "In Section 4.1, six pages of the text are devoted to transformations before the actual CV content is addressed. Would it be possible/appropriate to shorten the discussion on transformations?"
+
+We've compressed this material, primarily by removing the scatterplot matrix and C+R plots for the transformed data. We'd prefer not to abbreviate the section further: The purpose of the section is to show how to automate a complex model-selection method, so we think that it's important to explain how the method is applied "manually" before automating it.
+
+5.  "On page 21, when you state “We proceed to transform the numeric predictors in the Auto regression towards multivariate normality”, I assume that the transformations being applied are marginal rather than joint, as joint transformations would cause the covariates to lose their interpretation. If so, then perhaps it would be worth clarifying that powerTransform adjusts the margins to achieve multivariate Gaussianity."
+
+Yes, the predictors are transformed individually with the object of making their joint distribution as close to multinormal as possible. We have clarified this point in the resubmssion.
+
+6.  "On page 29, when computing mse(Auto\$mpg, exp(fitted(m.step))), I think that you could use the relationship between the normal and log-normal distributions to correct for bias."
+
+Yes, one could compute the MSE on the log-scale for both models (which we think is what the reviewer is getting at here). This is a good point, and has a more general implication: It's necessary to compare models on the same response scale, but that need not be the original response scale. We've added to what was footnote 12 on p. 25 of the original submission to explain this option (crediting the reviewer).
+
+7.  "Finally, the computational section in Section 7 might be better placed in an appendix. It seems somewhat odd to conclude the paper with these details."
+
+We agree with this point, and what was Section 7 is now an appendix.
+
