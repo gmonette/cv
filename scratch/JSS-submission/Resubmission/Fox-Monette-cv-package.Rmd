@@ -53,7 +53,7 @@ Cross-validation speaks to both of these issues. In CV, the data are randomly di
 
 Because the $n$ models are each fit to $n - 1$ cases, LOO CV produces a nearly unbiased estimate of the prediction error compared with a model fit to $n$ cases. The $n$ regression models are highly statistically dependent, however, based as they are on nearly the same data, and so the resulting estimate of prediction error has larger variance than if the predictions from the models fit to the $n$ data sets were independent.
 
-Because predictions are based on smaller data sets, each of size approximately $n - n/k$, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) is more biased than estimated prediction error for LOO CV. It is possible, however, to correct $k$-fold CV for bias (see Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
+Because predictions are based on smaller data sets, each of size approximately $n - n/k$, estimated prediction error for $k$-fold CV with $k = 5$ or $10$ (commonly employed choices) is more biased than estimated prediction error for LOO CV. It is possible, however, to correct $k$-fold CV for bias (see Appendix A.2).
 
 The relative *variance* of prediction error for LOO CV and $k$-fold CV (with $k < n$) is more complicated: Because the overlap between the data sets with each fold omitted is smaller for $k$-fold CV than for LOO CV, the dependencies among the predictions are smaller for the former than for the latter, tending to produce smaller variance in prediction error for $k$-fold CV. In contrast, there are factors that tend to inflate the variance of prediction error in $k$-fold CV, including the reduced size of the data sets with each fold omitted and the randomness induced by the selection of folds---in LOO CV the folds are not random.
 
@@ -74,9 +74,9 @@ methods("cv")
 
 * The \code{"default"} \code{cv()} method works (perhaps with a bit of coaxing) with many other existing regression-model classes for which there is an \code{update()} method that accepts a \code{data} argument. More generally, the \pkg{cv} package is designed to be extensible, as discussed in Section \ref{extending-the-cv-package}.
 
-A number of existing \proglang{R} packages include functions for cross-validating regression models. We briefly situate the \pkg{cv} package relative to other \proglang{R} software for cross-validation, and to other statistical software (in particular, \proglang{SAS}, \proglang{Stata}, and \proglang{Python}), in Section \ref{comparing-cv-to-other-software-for-cross-validation}.
+A number of existing \proglang{R} packages include functions for cross-validating regression models. In Section \ref{comparing-cv-to-other-software-for-cross-validation}, we briefly situate the \pkg{cv} package relative to other \proglang{R} software for cross-validation (directly comparing \pkg{cv} to the \pkg{rsample} and \pkg{caret} packages), and to other statistical software (in particular, \proglang{SAS}, \proglang{Stata}, and \proglang{Python}).
 
-The final section of the paper (Section \ref{computational-notes}) describes some computational details, including efficient CV computations for linear and generalized-linear models, and computation of bias-corrected CV criteria.
+An appendix to the paper describes some computational details, including efficient CV computations for linear and generalized-linear models, and computation of bias-corrected CV criteria.
 
 In the interest of brevity, we won't describe all of the features of the \pkg{cv} package here, concentrating on the aspects of the package that are relatively novel. For example, the \code{cv()} function can perform computations in parallel and can independently replicate a cross-validation procedure several times. There are also data-management facilities in the package, such as coercing the objects produced by the \code{cv()} function into data frames for further analysis. These and other features not discussed in this paper are taken up in the vignettes distributed with the package, which also provide greater detail on some topics that we do describe, such as extensions to the package.
 
@@ -143,7 +143,7 @@ which takes the following arguments:
 
 * \code{model}, an \code{"lm"} object, the only required argument.
 
-* \code{data}, which can usually be inferred from the \code{model} object.
+* \code{data}, which can usually be inferred from the \code{model} object, using the \code{get_data()` function from the \pkg{insight} package [@LudeckeWaggonerMakowski:2019]. The \pkg{insight} package provides a robust way to access model components for many classes of statistical models.
 
 * \code{criterion}, a function to compute the CV criterion (defaulting to \code{mse}).
 
@@ -153,7 +153,7 @@ which takes the following arguments:
 
 * \code{seed}, the seed for \proglang{R}'s pseudo-random number generator; if not specified a value is randomly selected, reported, and saved, so that the CV procedure is replicable.
 
-* \code{confint}, whether or not to compute a confidence interval for the CV criterion, defaulting to \code{TRUE} if there are at least 400 cases; a confidence interval is computed only if the CV criterion can be expressed as the average of casewise components (see Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals} for details).
+* \code{confint}, whether or not to compute a confidence interval for the CV criterion, defaulting to \code{TRUE} if there are at least 400 cases; a confidence interval is computed only if the CV criterion can be expressed as the average of casewise components (see Appendix A.2 for details).
 
 * \code{level}, the level for the confidence interval (defaulting to \code{0.95}).
 
@@ -178,7 +178,7 @@ brief(m.auto)
 (cv.auto <- cv(m.auto, confint = TRUE))
 summary(cv.auto)
 ```
-The `print()` method for `"cv"` objects reports the CV estimate of MSE; the `summary()` method, which we'll use extensively in the sequel, in addition reports a bias-adjusted estimate of the MSE (the bias adjustment is explained in Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}), and the MSE is also computed for the original, full-sample regression. Because the number of cases $n = 392 < 400$ for the \code{Auto} data, we set the argument \code{confint = TRUE} to obtain a confidence interval for the MSE, which proves to be quite wide.
+The `print()` method for `"cv"` objects reports the CV estimate of MSE; the `summary()` method, which we'll use extensively in the sequel, in addition reports a bias-adjusted estimate of the MSE (the bias adjustment is explained in Appendix A.2), and the MSE is also computed for the original, full-sample regression. Because the number of cases $n = 392 < 400$ for the \code{Auto} data, we set the argument \code{confint = TRUE} to obtain a confidence interval for the MSE, which proves to be quite wide.
 
 To perform LOO CV:
 
@@ -686,7 +686,7 @@ mse(Auto$mpg, fitted(m.auto))
 
 A perhaps subtle point is that we compute the MSE for the selected model on the original \code{mpg} response scale rather than the log scale, so as to make the selected model comparable to the working model.[^medAbsErr] 
 
-[^medAbsErr]: That's slightly uncomfortable given the skewed distribution of \code{mpg}. An alternative is to use a robust measure of model lack-of-fit, such as the median absolute error instead of the mean-squared error, employing the \code{medAbsErr()} function from the \pkg{cv} package. The median absolute error, however, cannot be expressed as a casewise average (see Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
+[^medAbsErr]: That's slightly uncomfortable given the skewed distribution of \code{mpg}. An alternative is to use a robust measure of model lack-of-fit, such as the median absolute error instead of the mean-squared error, employing the \code{medAbsErr()} function from the \pkg{cv} package. The median absolute error, however, cannot be expressed as a casewise average (see Appendix A.2).
 
 The \code{"function"} method for \code{cv()} allows us to cross-validate the whole model-selection procedure. The first argument to \code{cv()}---here \code{selectTransStepAIC}---is a model-selection function capable of refitting the model with a fold omitted and returning a CV criterion:
 ```{r Auto-transform-and-select}
@@ -783,7 +783,7 @@ To cross-validate this multinomial-logit model we need an appropriate cost crite
 ```{r BayesRule}
 BayesRule
 ```
-After doing some error checking, \code{BayesRule()} rounds the predicted probability \code{yhat} of a 1 ("success") response in a binary regression model to 0 or 1 to obtain a categorical prediction, and then reports the proportion of incorrect predictions. Because the Bayes's rule criterion is an average of casewise components (as, e.g., is the MSE), a \code{"casewise loss"} attribute is attached to the result, enabling the computation of bias correction and confidence intervals (as discussed in Section \ref{computation-of-the-bias-corrected-cv-criterion-and-confidence-intervals}).
+After doing some error checking, \code{BayesRule()} rounds the predicted probability \code{yhat} of a 1 ("success") response in a binary regression model to 0 or 1 to obtain a categorical prediction, and then reports the proportion of incorrect predictions. Because the Bayes's rule criterion is an average of casewise components (as, e.g., is the MSE), a \code{"casewise loss"} attribute is attached to the result, enabling the computation of bias correction and confidence intervals (as discussed in Appendix A.2).
 
 It is straightforward to adapt Bayes's rule to a polytomous response:
 ```{r BayesRuleMulti}
@@ -811,7 +811,7 @@ We check first whether the default \code{cv()} method works "out-of-the-box" for
 ```{r BEPS-test-default, error=TRUE}
 cv(m.beps, seed = 3465, criterion = BayesRuleMulti)
 ```
-The default method of \code{GetResponse()} (a function supplied by the \pkg{cv} package---see \code{?GetResponse}) fails for a \code{"multinom"} object. A straightforward solution is to supply a \code{GetResponse.multinom()} method that returns the factor response [using the \code{get\_response()} function from the \pkg{insight} package, @LudeckeWaggonerMakowski:2019],
+The default method of \code{GetResponse()} (a function supplied by the \pkg{cv} package---see \code{?GetResponse}) fails for a \code{"multinom"} object. A straightforward solution is to supply a \code{GetResponse.multinom()} method that returns the factor response [using the \code{get\_response()} function from the \pkg{insight} package,
 ```{r GetResponse.multinom}
 GetResponse.multinom <- function(model, ...) {
   insight::get_response(model)
@@ -979,12 +979,12 @@ The programming language \proglang{Python} is often the software of choice for "
 
 Functions for cross-validation are provided in \pkg{scikit-learn}, which supports $k$-fold, repeated $k$-fold, and leave-one-out CV. These functions can be applied to data sets consisting of independent observations, hierarchical groups, or time-series data.  A sample program in the \pkg{scikit-learn} documentation [@ScikitLearnDevelopers:2024] demonstrates how to implement meta cross-validation (termed "nested cross-validation" in the documentation).
 
-The approach taken by \pkg{scikit-learn} for independent observations is similar to that in the default \code{cv()} function in the \pkg{cv} package. The approach for hierarchical data is similar, but not identical, to that in \pkg{cv} (as described in Section \ref{cross-validating-mixed-effects-models}). Our \code{cv()} package doesn't currently provide for cross-validating time-series models.
+The approach taken by \pkg{scikit-learn} for independent observations is similar to that in the default \code{cv()} method in the \pkg{cv} package. The approach for hierarchical data is similar, but not identical, to that in \pkg{cv} (as described in Section \ref{cross-validating-mixed-effects-models}). Our \pkg{cv} package doesn't currently provide for cross-validating time-series models, but we anticipate that the next version of the package will.
 
 
-# Computational notes
+# Appendix: Computational notes {-}
 
-## Efficient computations for linear and generalized linear models
+## A.1 Efficient computations for linear and generalized linear models {-}
 
 The most straightforward way to implement cross-validation in \proglang{R} for statistical modeling functions that are written in the canonical manner is to use \code{update()} to refit the model with each fold removed. This is the approach taken in the default method for \code{cv()}, and it is appropriate if the cases are independently sampled. Refitting the model in this manner for each fold is generally feasible when the number of folds is modest, but can be prohibitively costly for leave-one-out cross-validation when the number of cases is large.
 
@@ -1025,7 +1025,7 @@ The Woodbury identity also requires that the model matrix be of full rank. We im
 
 We then treat re-estimation of the model with a case or cases deleted as a WLS problem, using the hatvalues or the Woodbury matrix identity. The resulting fitted values for the deleted fold aren't exact---that is, except for the Gaussian family, the result isn't identical to what we would obtain by literally refitting the model---but in our (limited) experience, the approximation is very good, especially for LOO CV, which is when we would be most tempted to use it. Nevertheless, because these results are approximate, the default for the \code{"glm"} \code{cv()} method is to perform the exact computation, which entails refitting the model with each fold omitted.
 
-## Computation of the bias-corrected CV criterion and confidence intervals
+## A.2 Computation of the bias-corrected CV criterion and confidence intervals {-}
 
 Let $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ represent a cross-validation cost criterion, such as mean-squared error, computed for all of the $n$ values of the response $\mathbf{y}$ based on fitted values $\widehat{\mathbf{y}}$ from the model fit to all of the data. We require that $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}})$ is the mean of casewise components, that is, $\mathrm{CV}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n\mathrm{cv}(y_i, \widehat{y}_i)$.[^contrast-function] For example, $\mathrm{MSE}(\mathbf{y}, \widehat{\mathbf{y}}) = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$.[^casewise-loss]
 
