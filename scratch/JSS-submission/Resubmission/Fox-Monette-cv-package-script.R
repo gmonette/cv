@@ -127,6 +127,16 @@ plot(cv.auto.10, main = "Polynomial Regressions, 10-Fold CV",
 plot(cv.auto.loo, main = "Polynomial Regressions, LOO CV",
      axis.args = list(labels = 1:10), xlab = "Degree of Polynomial, p")
 
+     # re-run with confidence intervals:
+
+cv.auto.10.ci <- cv(mlist, data = Auto, seed = 2120, confint = TRUE)
+cv.auto.loo.ci <- cv(mlist, data = Auto, k = "loo", method="Woodbury",
+                     confint = TRUE)
+plot(cv.auto.10.ci, main = "Polynomial Regressions, 10-Fold CV",
+     axis.args = list(labels = 1:10), xlab = "Degree of Polynomial, p")
+plot(cv.auto.loo.ci, main = "Polynomial Regressions, LOO CV",
+     axis.args = list(labels = 1:10), xlab = "Degree of Polynomial, p")
+
 # Sec. 3: Cross-validating mixed-effects models
 
   # Sec. 3.1: High-School and Beyond data
@@ -427,13 +437,13 @@ m <- update(m.auto, data = A)
 summary(powerTransform(m))
 m <- update(m, log(mpg) ~ .)
 
-      # Fig. 8
+      # scatterplot matrix for transformed data
 
 scatterplotMatrix(~ log(mpg) + displacement + horsepower + weight
                   + acceleration,
                   smooth=list(spread = FALSE), data = A, pch = ".")
 
-      # Fig. 9
+      # C+R plots for transformed data
 
 crPlots(m, pch = ".", ylab = "C+R", las = 2)
 
@@ -446,6 +456,12 @@ brief(m.step)
 mse(Auto$mpg, exp(fitted(m.step)))
 
 mse(Auto$mpg, fitted(m.auto))
+
+      # comparing on the log-response scale
+
+mse(Auto$mpg, fitted(m.step))
+
+mse(Auto$mpg, log(fitted(m.auto)))
 
     # apply CV to the data transformation and model selection process
 
@@ -464,7 +480,7 @@ metaCV.auto <- cv(selectModelList, data = Auto,
                   seed = 2120)
 summary(metaCV.auto)
 brief(m.sel <- cvInfo(metaCV.auto, "selected model"))
-# CV for selected model
+    # CV for selected model
 cv(m.sel, seed = 2120)
 
   # equivalent, using meta = TRUE
@@ -487,7 +503,7 @@ m.beps <- multinom(vote ~ age + gender + economic.cond.national
 
     # effect plot for the Europe x political knowledge interaction
 
-    # Fig. 10
+    # Fig. 8
 
 plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
             xlevels = list(Europe = 1:11, political.knowledge = 0:3),
