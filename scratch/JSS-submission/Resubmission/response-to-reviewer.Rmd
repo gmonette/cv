@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Actually, we already had the following two sentences in the introductory section: "A number of existing R packages include functions for cross-validating regression models. We briefly situate the **cv** package relative to other R software for cross-validation, and to other statistical software (in particular, SAS, Stata, and Python), in Section 6." We elaborate slightly in the resubmission, indicating in the introduction *which* R packages we take up in Section 6. We believe that the discussion itself should remain at the end of the paper, *after* we have described the facilities for cross-validation in the **cv** package.
 
-2.  "What is the purpose of using insight::get_data on page 5? The insight package is also mentioned on page 31. I believe it would be helpful to include a brief explanation of why it is being used."
+2.  "What is the purpose of using `insight::get_data` on page 5? The **insight** package is also mentioned on page 31. I believe it would be helpful to include a brief explanation of why it is being used."
 
 As suggested, we added a brief explanation of the advantage of using the **insight** package, which provides a robust way to access model components for many classes of statistical models.
 
