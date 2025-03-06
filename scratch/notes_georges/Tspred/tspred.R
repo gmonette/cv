@@ -357,6 +357,14 @@ if(DO_TESTS) {  # test inversion
 
 }
 
+{ # delete
+dd_pred <- dd
+dd_pred$y[nrow(dd)-(9:1) +1] <- NA
+newdata <- dd_pred
+model <- models[[1]]
+  }
+
+
 tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
   #
   # Rough version function to see if the idea works
@@ -414,11 +422,15 @@ tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
   # applied to an ARIMA object does depending
   # on other arguments to 'Arima'.
   #
-  model_new <- update(model, data = newdata)
+
+  # model_new <- update(model, data = newdata)
+  # xreg_new <- model.matrix(model_new)
+  xreg_new <- model.matrix(formula(model), data = newdata)
+  xreg_new <- xreg_new[,!grepl("(Intercept)",colnames(xreg_new)), drop = FALSE]
+
 
   # FIXME: look at original model matrix for an intercept
 
-  xreg_new <- model.matrix(model_new)
 
   diff_order <- model$order[2]
   seasonal_diff_order <- model$seasonal$order[2]
@@ -442,7 +454,7 @@ tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
   coefs <- coef(model)
 
   if ("(Intercept)" %in% names(coefs)){   # from cv::Predict.ARIMA
-    xreg_new <- if (!is.null(xreg_new)){
+    xreg_new <- if (!length(xreg_new)){
       cbind(1, xreg_new)
     } else {
       matrix(1, nrow=length(y_new), ncol=1)
