@@ -9,6 +9,8 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+We thank the reviewer for his or her close reading of the paper.
+
 1.  "I was surprised to see references to alternative packages only at the end of the paper rather than in the introduction. It might be beneficial to include a sentence in the introduction to clarify this."
 
 Actually, we already had the following two sentences in the introductory section: "A number of existing R packages include functions for cross-validating regression models. We briefly situate the **cv** package relative to other R software for cross-validation, and to other statistical software (in particular, SAS, Stata, and Python), in Section 6." We elaborate slightly in the resubmission, indicating in the introduction *which* R packages we take up in Section 6. We believe that the discussion itself should remain at the end of the paper, *after* we have described the facilities for cross-validation in the **cv** package.
@@ -25,11 +27,11 @@ Yes, it does. As we explained on p. 5 of the original paper in discussing the `c
 
 We've compressed this material by removing the code and graphs for the scatterplot matrix and C+R plots for the transformed data, shortening the paper by 2 pages. We'd prefer not to abbreviate the section further: The purpose of the section is to show how to automate a complex model-selection method, so we think that it's important to explain how the method is applied "manually" before automating it.
 
-5.  "On page 21, when you state “We proceed to transform the numeric predictors in the Auto regression towards multivariate normality”, I assume that the transformations being applied are marginal rather than joint, as joint transformations would cause the covariates to lose their interpretation. If so, then perhaps it would be worth clarifying that powerTransform adjusts the margins to achieve multivariate Gaussianity."
+5.  "On page 21, when you state “We proceed to transform the numeric predictors in the `Auto` regression towards multivariate normality”, I assume that the transformations being applied are marginal rather than joint, as joint transformations would cause the covariates to lose their interpretation. If so, then perhaps it would be worth clarifying that `powerTransform` adjusts the margins to achieve multivariate Gaussianity."
 
 Yes, the predictors are transformed individually with the object of making their joint distribution as close to multinormal as possible. We have clarified this point in the resubmission.
 
-6.  "On page 29, when computing `mse(Auto\$mpg, exp(fitted(m.step)))`, I think that you could use the relationship between the normal and log-normal distributions to correct for bias."
+6.  "On page 29, when computing `mse(Auto$mpg, exp(fitted(m.step)))`, I think that you could use the relationship between the normal and log-normal distributions to correct for bias."
 
 Yes, one could compute the MSE on the log-scale for both models (which we think is what the reviewer is getting at here). This is a good point, and has a more general implication: It's necessary to compare models on the same response scale, but that need not be the original response scale. We've added to what was footnote 12 on p. 25 of the original submission (now footnote 13 on p. 23) to explain this option (crediting the reviewer).
 
