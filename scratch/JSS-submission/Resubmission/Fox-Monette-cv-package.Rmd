@@ -143,7 +143,7 @@ which takes the following arguments:
 
 * \code{model}, an \code{"lm"} object, the only required argument.
 
-* \code{data}, which can usually be inferred from the \code{model} object, using the \code{get_data()` function from the \pkg{insight} package [@LudeckeWaggonerMakowski:2019]. The \pkg{insight} package provides a robust way to access model components for many classes of statistical models.
+* \code{data}, the data to which the model was fit, and which can usually be inferred from the \code{model} object, using the \code{get_data()} function from the \pkg{insight} package [@LudeckeWaggonerMakowski:2019]. The \pkg{insight} package provides a robust way to access model components for many classes of statistical models.
 
 * \code{criterion}, a function to compute the CV criterion (defaulting to \code{mse}).
 
