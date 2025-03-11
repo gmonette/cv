@@ -357,15 +357,45 @@ if(DO_TESTS) {  # test inversion
 
 }
 
-{ # delete
-dd_pred <- dd
-dd_pred$y[nrow(dd)-(9:1) +1] <- NA
-newdata <- dd_pred
-model <- models[[1]]
+convolveC <- inline::cfunction(c(x = 'numeric', w = 'numeric', nahead = 'integer'),
+                          "
+  int *nmore = INTEGER(nahead);
+  SEXP ret = PROTECT(allocVector(REALSXP, *nmore));
+  int lenx = length(x);
+  int lenw = length(w);
+  int i, j, n, lastx;
+
+  double *px, *pw, *pret;
+  double sum;
+
+  px = REAL(x);
+  pw = REAL(w);
+  pret = REAL(ret);
+
+  lastx = lenx - 1;
+
+  for(j = 0; j < *nmore; j ++){
+    sum = 0.0;
+    n = (lenx + j) < lenw ? (lenx + j) : lenw;
+    for(i = 0; i < n; i++){
+      sum += ( i < j ? REAL(ret)[j - 1 - i] : px[lastx + j - i]) * pw[i];
+    }
+    REAL(ret)[j] = sum;
   }
 
+  UNPROTECT(1);
+  return ret;
+")
 
-tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
+convolveR <- function(y, w, nahead) {
+  # nahead not used, set to 1
+  yrev <- rev(y)
+  len <- min(length(y),length(w))
+  sum(yrev[1:len]*w[1:len])
+}
+
+
+tspred <- function(model, newdata, refit = FALSE, demean = FALSE, convolve = convolveC) {
   #
   # Rough version function to see if the idea works
   #
@@ -425,12 +455,8 @@ tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
 
   # model_new <- update(model, data = newdata)
   # xreg_new <- model.matrix(model_new)
-  xreg_new <- model.matrix(formula(model), data = newdata)
+  xreg_new <- model.matrix(formula(model)[-2], data = newdata)
   xreg_new <- xreg_new[,!grepl("(Intercept)",colnames(xreg_new)), drop = FALSE]
-
-
-  # FIXME: look at original model matrix for an intercept
-
 
   diff_order <- model$order[2]
   seasonal_diff_order <- model$seasonal$order[2]
@@ -453,8 +479,8 @@ tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
 
   coefs <- coef(model)
 
-  if ("(Intercept)" %in% names(coefs)){   # from cv::Predict.ARIMA
-    xreg_new <- if (!length(xreg_new)){
+  if (any(grepl("(Intercept)", names(coefs)))){   # from cv::Predict.ARIMA
+    xreg_new <- if (length(xreg_new)){
       cbind(1, xreg_new)
     } else {
       matrix(1, nrow=length(y_new), ncol=1)
@@ -489,15 +515,10 @@ tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
 
   Pi <- arma2pi(ar = ar, ma = ma, ar.seasonal = sar, ma.seasonal = sma)
 
-  convolve <- function(y, w) {
-    yrev <- rev(y)
-    len <- min(length(y),length(w))
-    sum(yrev[1:len]*w[1:len])
-  }
 
   to_pred_diff <- which(is.na(y_new_diff))
 
-  for(i in to_pred_diff) y_new_diff[i] <- convolve(y_new_diff[1:(i-1)], Pi)
+  for(i in to_pred_diff) y_new_diff[i] <- convolve(y_new_diff[1:(i-1)], Pi, 1L)
 
   if(diff_order > 0 || seasonal_diff_order > 0){
     y_pred <- Diffinv(y_new_diff)
@@ -517,19 +538,23 @@ tspred <- function(model, newdata, refit = FALSE, demean = FALSE) {
 
 if(DO_TESTS){   # test tspred
 
-  #
-  # sample model data
-  #
-
   {
     # Generate sample data using (1,1,1) model
     set.seed(321)
+    set.seed(323)
 
     N <- 9999
-    eps <- arima.sim(list(ar = .9, ma = .8), n = N)
+    # slowly stationary cycling with period
+    eps <- arima.sim(list(ar = c(1.9,-.95), ma = 0.9), n = N)
+
     x <- rnorm(N)
-    dd <- (data.frame(y = cumsum(eps + x), x = x))
+
+    dd <- (data.frame(y = eps + x, x = x))
     dd$time <- seq_len(nrow(dd))
+    # Plot3d(y ~ time + x, dd, xlim = c(-1000,1000))
+    # Ell3d()
+    xyplot(y ~ time, dd, type = 'l')
+
   }
 
   system.time({
@@ -540,107 +565,167 @@ if(DO_TESTS){   # test tspred
         `111/111(3)` <- cv::Arima(y ~ x, data = dd, order = c(1,1,1), seasonal = list(order = c(1,1,1), period = 3))
         `101` <- cv::Arima(y ~ x, data = dd, order = c(1,0,1))
         `111` <- cv::Arima(y ~ x, data = dd, order = c(1,1,1))
+        `211C` <- cv::Arima(y ~ x, data = dd, order = c(2,1,1))
       }
     ) %>% rev
   })
 
 
-  # Predicting last 9 observations with different models fit to all data
-
-  dd_pred <- dd
-  dd_pred$y[nrow(dd)-(9:1) +1] <- NA
-
-  system.time(
-    # predicting from 4 models
-    preds <- lapply(models, function(mod) tspred(mod, dd_pred) )
-  )
-
-  tail(dd_pred, 15)
-  tail(preds[[3]],15)
-
-  # Plot last 31 observations
-
-  end <- nrow(dd) - (30:0)
-  ylim <- range(c(dd[end,1],sapply(preds, \(pred) pred[pred$.predicted,1])))
-
-  cols <- trellis.par.get('superpose.line')$col
-
-  xyplot(y ~ time , dd[end,],
-         ylim = ylim,
-         type = 'b') %>% print
-
-  {
-    xyplot(y ~ time , dd[end,], type = 'b', lwd = 4,
-           ylim = ylim,
-           key = simpleKey(
-             cex = 1,
-             space = 'right',
-             lines = TRUE,
-             col = cols,
-             text = c('101/111', '111/111','101','111')
-           ),
-           sub = 'Predicting last 9 from whole series using all data for leadup. Correct model: 111'
-    ) +
-      xyplot(y ~ time, subset(preds[[1]], .predicted), col = 'red', type = 'b') +
-      xyplot(y ~ time, subset(preds[[2]], .predicted), col = 'black', type = 'b') +
-      xyplot(y ~ time, subset(preds[[3]], .predicted), col = 'green', type = 'b') +
-      xyplot(y ~ time, subset(preds[[4]], .predicted), col = 'magenta', type = 'b')
-  } %>% print
+  lapply(models, summary)
 
 
   #
   # Show preds as function
   #
-
+#     pred <- dd_pred
 
   Show_pred <- function(models, data, pred, last = nrow(data), main = '', sub = ''){
+    #
+    # models   named list of arima models using data with variables y and time
+    # pred     data with final 'nahead' y's missing
+    # last     number of final times to show
+    #
     # FIX:
     # assumes dependent var is named 'y'
-    # assumes 4 models
+    #
+    # data <- dd
+    # models <- models
+    # pred <- dd_pred
+    # last <- 30
+    # main <- ''
+    # sub <- ''
 
+
+    models <- lapply(models, update, data = pred[!is.na(pred$y),]) # omit final observations in model
 
     system.time(
       preds <- lapply(models, function(mod) tspred(mod, pred) )
     )
+    system.time(
+      preds.arima <- lapply(names(models), function(nn){
+        mod <- models[[nn]]
+        ret <- (predict(mod, n.ahead = sum(is.na(pred$y)),
+                        newdata = pred[is.na(pred$y),,drop = FALSE]))
+        ret <- type.convert(data.frame(time = time(ret),
+                                       y = ret,
+                                       model = nn,
+                                       method = 'predict'), as.is = TRUE)
+        ret
+      }
+      )
+    )
+    preds.arima <- do.call(rbind, preds.arima)
+
+# lapply(preds.arima, \(obj) {time(obj)})
+
+    out <- lapply(names(preds),
+                  \(nn) {
+                    ret <- preds[[nn]]
+                    ret$model <- nn
+                    ret$method <- 'tspred'
+                    ret[ret$.predicted,, drop = FALSE]
+                  })
+    outdd <- do.call(rbind, out)
+    outdd <- type.convert(outdd, as.is = TRUE)
+    data$model <- 'data'
+    data$method <- 'tspred'
+    data <- type.convert(data, as.is = TRUE)
+    plotdata <- merge.default(data, outdd, all = T)
+    plotdata <- merge.default(plotdata, preds.arima, all = TRUE)
 
     # Plot last observations
 
-    toplot <- nrow(data) - last:1 + 1
+    toplot <- plotdata$time > max(plotdata$time) - last -1
+    plotdata <- plotdata[toplot,]
+    plotdata <- plotdata[order(plotdata$time),]
 
-    ylim <- range(c(data[toplot,'y'],sapply(preds, \(pred) pred[pred$.predicted,'y'])))
+    ylimdata <- range(plotdata[plotdata$model == 'data','y'])
+    ylimdiff <- ylimdata[2] - ylimdata[1]
+    ylimdata[2] <- ylimdata[2] + 2 * ylimdiff
+    ylimdata[1] <- ylimdata[1] - 2 * ylimdiff
+    # ylimall <- range(plotdata[,'y'])
+    ylim <- ylimdata
 
-    # cols <- trellis.par.get('superpose.line')$col
-    cols = c('black','red','green','blue')
-    trellis.par.set('superpose.line', list(col = cols))
 
+    # # cols <- trellis.par.get('superpose.line')$col
+    # cols = c('black','red','green','blue')
+    # trellis.par.set('superpose.line', list(col = cols))
+    # trellis.par.set('superpose.symbol', list(col = cols))
 
-    {
-      xyplot(y ~ time , dd[toplot,], type = 'b', lwd = 4,
+    spida2::tab(plotdata, ~ method + model)
+
+    print(xyplot(y ~ time, data, type = 'l'))
+
+      print(xyplot(y ~ time | method, plotdata, type = 'b', groups = model,
              ylim = ylim,
-             key = simpleKey(
-               cex = 1,
-               space = 'right',
-               lines = TRUE,
-               col = cols,
-               text = names(preds)
-             ),
+             auto.key = T,
+             # layout = c(2,2),
              #par.settings = list(superpose.line=list(col = cols)),
              main = main,
              sub = sub
-      ) +  # FIXME for varying number of models
-        xyplot(y ~ time, subset(preds[[1]], .predicted), col = cols[1], type = 'b') +
-        xyplot(y ~ time, subset(preds[[2]], .predicted), col = cols[2], type = 'b') +
-        xyplot(y ~ time, subset(preds[[3]], .predicted), col = cols[3], type = 'b') +
-        xyplot(y ~ time, subset(preds[[4]], .predicted), col = cols[4], type = 'b')
-    }
+      ))
+      print(xyplot(y ~ time | model, plotdata, type = 'b', groups = method,
+             ylim = ylim,
+             auto.key = T,
+             # layout = c(1,2),
+             #par.settings = list(superpose.line=list(col = cols)),
+             main = main,
+             sub = sub
+      ))
+      invisible(NULL)
   }
 
-  dd_pred <- dd
-  dd_pred$y[nrow(dd_pred)-(9:1) +1] <- NA
-  main = 'Predicting last 9 from whole series using all data for leadup'
-  sub = 'Correct model: 111'
 
-  Show_pred(models, dd, dd_pred, last = nrow(dd), main = main, sub = sub) %>% print
+  { # Simulate and plot
+    {
+      # Generate sample data using (2,0,1) model
+      # set.seed(321)
+      # set.seed(323)
+      # set.seed(329)
+
+      N <- 9999
+      # slowly stationary cycling with period
+      eps <- arima.sim(list(ar = c(1.9,-.95), ma = 0.9), n = N)
+
+      x <- rnorm(N)
+
+      # dd <- (data.frame(y = eps + x, x = x))
+      dd <- (data.frame(y = cumsum(eps) + x, x = x))  # integrate
+      sub = 'Correct model: 211'
+
+      dd$time <- seq_len(nrow(dd))
+      # Plot3d(y ~ time + x, dd, xlim = c(-1000,1000))
+      # Ell3d()
+      xyplot(y ~ time, dd, type = 'l')
+
+    }
+
+    system.time({
+      models <- within(
+        list(),
+        {
+          `101/111(3)` <- cv::Arima(y ~ 1 +x, data = dd, order = c(1,0,1), seasonal = list(order = c(1,1,1), period = 3))
+          `111/111(3)` <- cv::Arima(y ~ x, data = dd, order = c(1,1,1), seasonal = list(order = c(1,1,1), period = 3))
+          `101` <- cv::Arima(y ~ x, data = dd, order = c(1,0,1))
+          `111` <- cv::Arima(y ~ x, data = dd, order = c(1,1,1))
+          `211C` <- cv::Arima(y ~ x, data = dd, order = c(2,1,1))
+        }
+      ) %>% rev
+    })
+
+    lapply(models, summary)
+
+
+    dd_pred <- dd
+    dd_pred$y[nrow(dd_pred)-(9:1) +1] <- NA
+    main <- 'Predicting last 9 from whole series using all data for leadup'
+
+    gd(7, pch =1:7, lwd = 2)
+
+    Show_pred(models, dd, dd_pred, last = 20, main = main, sub = sub)
+
+  }  # end of simulate and plot
+
   Show_pred(models, dd, dd_pred, last = 100, main = main, sub = sub) %>% print
   Show_pred(models, dd, dd_pred, last = 30, main = main, sub = sub) %>% print
 
