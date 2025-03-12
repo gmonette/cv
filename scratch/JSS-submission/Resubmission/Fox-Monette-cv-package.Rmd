@@ -157,7 +157,7 @@ which takes the following arguments:
 
 * \code{level}, the level for the confidence interval (defaulting to \code{0.95}).
 
-* \code{method}, the computational method to employ: \code{"hatvalues"} is relevant only for LOO CV and bases computation on the hatvalues for the linear model; \code{"Woodbury"} employs the Woodbury matrix identity to compute the CV criterion with each fold deleted; \code{"naive"} updates the model using the \code{update()} function; and \code{"auto"} (the default) selects \code{"hatvalues"} for LOO CV and \code{"Woodbury"} for $k$-fold CV, both of which are much more efficient than directly recomputing the least-squares fit (see below and Section \ref{efficient-computations-for-linear-and-generalized-linear-models}).
+* \code{method}, the computational method to employ: \code{"hatvalues"} is relevant only for LOO CV and bases computation on the hatvalues for the linear model; \code{"Woodbury"} employs the Woodbury matrix identity to compute the CV criterion with each fold deleted; \code{"naive"} updates the model using the \code{update()} function; and \code{"auto"} (the default) selects \code{"hatvalues"} for LOO CV and \code{"Woodbury"} for $k$-fold CV, both of which are much more efficient than directly recomputing the least-squares fit (see below and Appendix A.1).
 
 * \code{ncores}, the number of cores to employ for parallel computation; if \code{ncores = 1} (the default), the computations are not parallelized.
 
