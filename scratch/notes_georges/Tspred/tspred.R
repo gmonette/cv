@@ -8,6 +8,7 @@ DO_TESTS <- FALSE
 library(latticeExtra)
 Layer <- latticeExtra::layer # to avoid conflict with tidyverse
 library(magrittr)
+library(sarima)
 library(cv)
 
 Diff <- function(
@@ -313,6 +314,7 @@ arma2psi <- function(ar=0, ma=0, ar.seasonal=0, ma.seasonal=0,
 
 arma2pi <- function(ar=0, ma=0, ar.seasonal=0, ma.seasonal=0,
                     period, lag.max=100, trunc.pi=TRUE,
+                    taper = log(2)/half_taper, half_taper = NA,
                     trunc.at=0.001, ...){
   #
   # Returns 'pi' weights to predict Y(t+h) recursively from Y(t-k),...,Y(t)
@@ -342,7 +344,12 @@ arma2pi <- function(ar=0, ma=0, ar.seasonal=0, ma.seasonal=0,
       Pi <- Pi[1:max(which.pi)]
     }
   }
-  Pi
+  if(!is.na(taper)) {
+    Pi * exp(-taper*(seq_along(Pi)-1))
+  } else
+  {
+    Pi
+  }
 }
 
 if(DO_TESTS) {  # test inversion
@@ -350,59 +357,97 @@ if(DO_TESTS) {  # test inversion
   arma2psi(ar = arma2pi(ma=c(-.2,-.2)))
 
   arma2pi(ma = arma2psi(ar=c(.45,.45)))
+  arma2pi(ma = arma2psi(ar=c(-1.95,-.99)))
+
   arma2psi(ar = arma2pi(ma=c(-.45,-.45)))
 
   arma2pi(ma = arma2psi(ar=c(.499,.499)))  # nearly non-stationary
   arma2psi(ar = arma2pi(ma=c(-.499,-.499)))  # nearly non-invertible
 
+  arma2pi(ma = arma2psi(ar=c(-1.99,-.995)))  # nearly non-stationary
+  arma2psi(ar = arma2pi(ma=c(-1.99,-.995)))  # nearly non-invertible
+
 }
+# library(inline)
+# convolveC <- inline::cfunction(
+#   c(x = 'numeric', w = 'numeric', nahead = 'integer'),
+#   "
+#   int *nmore = INTEGER(nahead);
+#   SEXP ret = PROTECT(R_allocVector(REALSXP, *nmore));
+#   int lenx = length(x);
+#   int lenw = length(w);
+#   int i, j, n, lastx;
+#
+#   double *px, *pw, *pret;
+#   double sum;
+#
+#   px = REAL(x);
+#   pw = REAL(w);
+#   pret = REAL(ret);
+#
+#   lastx = lenx - 1;
+#
+#   for(j = 0; j < *nmore; j ++){
+#     sum = 0.0;
+#     n = (lenx + j) < lenw ? (lenx + j) : lenw;
+#     for(i = 0; i < n; i++){
+#       sum += ( i < j ? REAL(ret)[j - 1 - i] : px[lastx + j - i]) * pw[i];
+#     }
+#     REAL(ret)[j] = sum;
+#   }
+#
+#   UNPROTECT(1);
+#   return ret;
+# ")
 
-convolveC <- inline::cfunction(c(x = 'numeric', w = 'numeric', nahead = 'integer'),
-                          "
-  int *nmore = INTEGER(nahead);
-  SEXP ret = PROTECT(allocVector(REALSXP, *nmore));
-  int lenx = length(x);
-  int lenw = length(w);
-  int i, j, n, lastx;
-
-  double *px, *pw, *pret;
-  double sum;
-
-  px = REAL(x);
-  pw = REAL(w);
-  pret = REAL(ret);
-
-  lastx = lenx - 1;
-
-  for(j = 0; j < *nmore; j ++){
-    sum = 0.0;
-    n = (lenx + j) < lenw ? (lenx + j) : lenw;
-    for(i = 0; i < n; i++){
-      sum += ( i < j ? REAL(ret)[j - 1 - i] : px[lastx + j - i]) * pw[i];
-    }
-    REAL(ret)[j] = sum;
-  }
-
-  UNPROTECT(1);
-  return ret;
-")
-
-rts <- function(n, ar = numeric(0), ma = numeric(0), int = 0, xcoef = 0) {
+rts <- function(n, ar = numeric(0), ma = numeric(0), int = 0,
+                period = numeric(0), sar = numeric(0),
+                sma = numeric(0), sint = 0,
+                sigma = 1,
+                xcoef = 0) {
+  if(length(period) && period > 0){
+    require(sarima)
+    model_arg <- list(nseasons = period, sigma2 = sigma^2)
+    if(int > 0) model_arg <- c(model_arg, list(iorder = int))
+    if(length(ar)) model_arg <- c(model_arg, list(ar = ar))
+    if(length(ma)) model_arg <- c(model_arg, list(ma = ma))
+    if(length(sar)) model_arg <- c(model_arg, list(sar = sar))
+    if(length(sma)) model_arg <- c(model_arg, list(sma = sma))
+    if(sint > 0) model_arg <- c(model_arg, list(siorder = sint))
+    eps <- sim_sarima(n = n, model = model_arg,)
+  } else {
   model_arg <- list(order= c(length(ar), int, length(ma)))
   if(length(ar)) model_arg <- c(model_arg, list(ar = ar))
   if(length(ma)) model_arg <- c(model_arg, list(ma = ma))
-  print(model_arg)
+
   eps <- arima.sim(
     n = n,
     model = model_arg
   )
   if(int > 0) eps <- eps[-seq(1,int)]
+  eps <- as.vector(eps)
+  }
+
   x <- rnorm(n)
 
   ret <- data.frame(y = xcoef * x + eps, x = x, time = 1:n, toend = n:1)
   attr(ret, 'model') <- list(model = model_arg, xcoef = xcoef)
   ret
 
+}
+if(DO_TESTS) {
+  rts(100, ar = .9) %>% xyplot(y ~ time,., type = 'l')
+  rts(1000, ar = c(1.9, -.901)) %>% xyplot(y ~ time,., type = 'l')
+  rts(1000, ar = c(1.9, -.901), int = 1) %>% xyplot(y ~ time,., type = 'l')
+  rts(1000, period = 3, sar = .9, ar = c(1.9, -.901)) %>% xyplot(y ~ time,., type = 'l')
+  rts(1000, period = 3, sar = c(1.9, -.901), ar = c(1.9, -.901)) %>% xyplot(y ~ time,., type = 'l')
+  rts(1000, period = 3, sar = c(1.9, -.91), ar = c(1.9, -.91)) %>% xyplot(y ~ time,., type = 'l')
+  set.seed(123)
+  rts(1000, period = 12, sar = c(1.9, -.91), ar = c(1.9, -.91)) %>% xyplot(y ~ time,., type = 'l')
+  rts(1000, period = 12, sma = c(-1.9, -.91), ma = c(-1.9, -.91)) %>% xyplot(y ~ time,., type = 'l')
+
+  rts(10, period = 4, sar = .9)$y %>% class
+  rts(20, ar = .9, sint = 1)$y %>% class
 }
 
 convolveR <- function(y, w, nahead) {
@@ -412,8 +457,9 @@ convolveR <- function(y, w, nahead) {
   sum(yrev[1:len]*w[1:len])
 }
 
-Show_pred <- function(models, data, last = 1, show = 10, main = '', sub = '',
-                      ylim = NULL, ...){
+Show_pred <- function(models, data, last = 1,
+                      show = 10, main = '', sub = '',
+                      ylim = NULL, half_taper = 50, ...){
   #
   # To do a comparison of tspred with predict.ARIMA one uses the whole
   # data set as lead.up data and last 'last' observations for prediction
@@ -436,8 +482,12 @@ Show_pred <- function(models, data, last = 1, show = 10, main = '', sub = '',
 
   models <- lapply(models, update, data = pred[!is.na(pred$y),]) # omit final observations in model
 
+
   system.time(
     preds <- lapply(models, function(mod) tspred(mod, pred) )
+  )
+  system.time(
+    preds_taper <- lapply(models, function(mod) tspred(mod, pred, half_taper = half_taper) )
   )
   system.time(
     preds.arima <- lapply(names(models), function(nn){
@@ -465,10 +515,25 @@ Show_pred <- function(models, data, last = 1, show = 10, main = '', sub = '',
                 })
   outdd <- do.call(rbind, out)
   outdd <- type.convert(outdd, as.is = TRUE)
+
+  # tapered prediction
+  out_taper <- lapply(names(preds_taper),
+                function(nn) {
+                  ret <- preds_taper[[nn]]
+                  ret$model <- nn
+                  ret$method <- 'tspred-taper'
+                  ret[ret$.predicted,, drop = FALSE]
+                })
+  outdd_taper <- do.call(rbind, out_taper)
+  outdd_taper <- type.convert(outdd_taper, as.is = TRUE)
+
+
   data$model <- 'data'
   data$method <- 'tspred'
+
   data <- type.convert(data, as.is = TRUE)
-  plotdata <- merge.default(data, outdd, all = T)
+  plotdata <- merge.default(data, outdd, all = TRUE)
+  plotdata <- merge.default(plotdata, outdd_taper, all = TRUE)
   plotdata <- merge.default(plotdata, preds.arima, all = TRUE)
 
   # Plot last observations
@@ -490,7 +555,7 @@ Show_pred <- function(models, data, last = 1, show = 10, main = '', sub = '',
   # trellis.par.set('superpose.line', list(col = cols))
   # trellis.par.set('superpose.symbol', list(col = cols))
 
-  spida2::tab(plotdata, ~ method + model)
+  print(spida2::tab(plotdata, ~ method + model))
 
   print(xyplot(y ~ time, data, type = 'l', sub = sub))
 
@@ -505,7 +570,7 @@ Show_pred <- function(models, data, last = 1, show = 10, main = '', sub = '',
   plot3 <- (xyplot(y ~ time | model, plotdata, type = 'b', groups = method,
                #ylim = ylim,
                auto.key = list(space='top', columns = 3),
-               # layout = c(1,2),
+               layout = c(3,3),
                #par.settings = list(superpose.line=list(col = cols)),
                main = main,
                sub = sub
@@ -515,7 +580,12 @@ Show_pred <- function(models, data, last = 1, show = 10, main = '', sub = '',
     plot3 <- update(plot3, ylim = ylim)
   }
   print(plot2)
+  print("   ")
   print(plot3)
+  stretch <- function(x,expand =1.2) mean(x) + expand * (x - mean(x))
+  ylim <- stretch(quantile(plotdata$y, c(.1,.9)))
+  print("    ")
+  print(update(plot3, ylim = ylim))
 
   invisible(NULL)
 }
@@ -523,7 +593,10 @@ Show_pred <- function(models, data, last = 1, show = 10, main = '', sub = '',
 
 
 
-tspred <- function(model, newdata, refit = FALSE, demean = FALSE, convolve = convolveC) {
+tspred <- function(model, newdata, refit = FALSE,
+                   demean = FALSE,
+                   convolve = convolveR,
+                   half_taper = NA) {
   #
   # Rough version function to see if the idea works
   #
@@ -641,7 +714,10 @@ tspred <- function(model, newdata, refit = FALSE, demean = FALSE, convolve = con
 
   # Pi weights
 
-  Pi <- arma2pi(ar = ar, ma = ma, ar.seasonal = sar, ma.seasonal = sma)
+  Pi <- arma2pi(ar = ar, ma = ma,
+                ar.seasonal = sar,
+                ma.seasonal = sma,
+                half_taper = half_taper)
 
 
   to_pred_diff <- which(is.na(y_new_diff))
