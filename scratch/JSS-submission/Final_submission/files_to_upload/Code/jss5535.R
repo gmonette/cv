@@ -8,6 +8,33 @@
 
 sessionInfo()
 
+## R version 4.5.0 (2025-04-11)
+## Platform: aarch64-apple-darwin20
+## Running under: macOS Sequoia 15.4.1
+##
+## Matrix products: default
+## BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+##
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+##
+## time zone: America/Toronto
+## tzcode source: internal
+##
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods
+## [7] base
+##
+## loaded via a namespace (and not attached):
+##  [1] digest_0.6.37     R6_2.6.1          fastmap_1.2.0
+##  [4] xfun_0.52         cachem_1.1.0      rticles_0.27
+##  [7] knitr_1.50        htmltools_0.5.8.1 rmarkdown_2.29
+## [10] lifecycle_1.0.4   cli_3.6.5         sass_0.4.10
+## [13] jquerylib_0.1.4   compiler_4.5.0    rstudioapi_0.17.1
+## [16] tools_4.5.0       evaluate_1.0.3    bslib_0.9.0
+## [19] yaml_2.3.10       jsonlite_2.0.0    rlang_1.1.6
+
 # set some options
 options(digits=5)
 palette(car::carPalette())
@@ -655,3 +682,64 @@ print(microbenchmark::microbenchmark(
 # session info at end of script:
 
 sessionInfo()
+
+## R version 4.5.0 (2025-04-11)
+## Platform: aarch64-apple-darwin20
+## Running under: macOS Sequoia 15.4.1
+##
+## Matrix products: default
+## BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+##
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+##
+## time zone: America/Toronto
+## tzcode source: internal
+##
+## attached base packages:
+## [1] parallel  stats     graphics  grDevices utils     datasets
+## [7] methods   base
+##
+## other attached packages:
+##  [1] caret_7.0-1         ggplot2_3.5.2       purrr_1.0.4
+##  [4] rsample_1.3.0       nnet_7.3-20         MASS_7.3-65
+##  [7] latticeExtra_0.6-30 lattice_0.22-7      glmmTMB_1.1.11
+## [10] lme4_1.1-37         Matrix_1.7-3        car_3.1-3
+## [13] carData_3.0-5       cv_2.0.3            doParallel_1.0.17
+## [16] iterators_1.0.14    foreach_1.5.2
+##
+## loaded via a namespace (and not attached):
+##  [1] Rdpack_2.6.4         DBI_1.2.3            pROC_1.18.5
+##  [4] deldir_2.0-4         sandwich_3.1-1       rlang_1.1.6
+##  [7] magrittr_2.0.3       multcomp_1.4-28      furrr_0.3.1
+## [10] e1071_1.7-16         compiler_4.5.0       mgcv_1.9-3
+## [13] reshape2_1.4.4       png_0.1-8            vctrs_0.6.5
+## [16] stringr_1.5.1        pkgconfig_2.0.3      fastmap_1.2.0
+## [19] backports_1.5.0      rmarkdown_2.29       prodlim_2025.04.28
+## [22] nloptr_2.2.1         xfun_0.52            cachem_1.1.0
+## [25] jsonlite_2.0.0       recipes_1.3.0        jpeg_0.1-11
+## [28] broom_1.0.8          R6_2.6.1             stringi_1.8.7
+## [31] bslib_0.9.0          RColorBrewer_1.1-3   parallelly_1.43.0
+## [34] boot_1.3-31          rpart_4.1.24         lubridate_1.9.4
+## [37] jquerylib_0.1.4      numDeriv_2016.8-1.1  Rcpp_1.0.14
+## [40] knitr_1.50           future.apply_1.11.3  zoo_1.8-14
+## [43] timechange_0.3.0     splines_4.5.0        tidyselect_1.2.1
+## [46] rstudioapi_0.17.1    effects_4.2-2        abind_1.4-8
+## [49] yaml_2.3.10          timeDate_4041.110    TMB_1.9.17
+## [52] codetools_0.2-20     listenv_0.9.1        tibble_3.2.1
+## [55] plyr_1.8.9           withr_3.0.2          evaluate_1.0.3
+## [58] future_1.40.0        survival_3.8-3       proxy_0.4-27
+## [61] survey_4.4-2         pillar_1.10.2        stats4_4.5.0
+## [64] rticles_0.27         reformulas_0.4.1     insight_1.2.0
+## [67] generics_0.1.3       scales_1.4.0         minqa_1.2.8
+## [70] globals_0.17.0       class_7.3-23         glue_1.8.0
+## [73] tools_4.5.0          interp_1.1-6         data.table_1.17.0
+## [76] ModelMetrics_1.2.2.2 gower_1.0.2          mvtnorm_1.3-3
+## [79] grid_4.5.0           tidyr_1.3.1          mitools_2.4
+## [82] rbibutils_2.3        ipred_0.9-15         colorspace_2.1-1
+## [85] nlme_3.1-168         Formula_1.2-5        cli_3.6.5
+## [88] lava_1.8.1           dplyr_1.1.4          gtable_0.3.6
+## [91] sass_0.4.10          digest_0.6.37        TH.data_1.1-3
+## [94] farver_2.1.2         htmltools_0.5.8.1    lifecycle_1.0.4
+## [97] hardhat_1.4.1        microbenchmark_1.5.0
