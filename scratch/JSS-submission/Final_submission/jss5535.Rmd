@@ -131,9 +131,9 @@ legend("topright", inset=0.02,
 
 We'll focus on the relationship of \code{mpg} (miles per gallon) to \code{horsepower}, as displayed in Figure\ \ref{fig:mpg-horsepower-polynomials} (a). The relationship between the two variables is monotone, decreasing, and nonlinear. Following @JamesEtAl:2021, we'll consider approximating the relationship by a polynomial regression, with the degree of the polynomial $p$ ranging from 1 (a linear regression) to 10.[^log-trans] Polynomial fits  for $p = 1$ to $5$ are shown in Figure \ref{fig:mpg-horsepower-polynomials} (a). The linear fit is clearly inappropriate; the fits for $p = 2$ (quadratic) through $4$ are very similar; and the degree-5 polynomial may over-fit the data by chasing one or two relatively high \code{mpg} values at the right (but see the CV results reported below).
 
-[^log-trans]: Although it serves to illustrate the use of CV, a polynomial is not the best choice here. Consider, for example, the scatterplot for log-transformed \code{mpg} and \code{horsepower}, produced by \code{plot(mpg $\sim$ horsepower, data=Auto, log="xy")} (execution of which is left to the reader). We revisit the \code{Auto} data in Section \ref{cross-validating-model-specification}.
+[^log-trans]: Although it serves to illustrate the use of CV, a polynomial is not the best choice here. Consider, for example, the scatterplot for log-transformed \code{mpg} and \code{horsepower}, produced by \code{plot(mpg $\sim$ horsepower, data = Auto, log = "xy")} (execution of which is left to the reader). We revisit the \code{Auto} data in Section \ref{cross-validating-model-specification}.
 
-Figure \ref{fig:mpg-horsepower-polynomials} (b) shows two measures of estimated (squared) error as a function of polynomial-regression degree: The mean-squared error ("MSE"), defined as $\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$, and the usual residual variance, defined as $\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2$. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
+Figure \ref{fig:mpg-horsepower-polynomials} (b) shows two measures of estimated (squared) error as a function of polynomial-regression degree: The mean-squared error ("MSE"), defined as $\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2$, and the usual residual variance, defined as $\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2$. Here $y_i$ is the response and $\widehat{y}_i$ the fitted value for the $i$th case. The former necessarily declines with $p$ (or, more strictly, can't increase with $p$), while the latter gets slightly larger for the largest values of $p$, with the "best" value, by a small margin, for $p = 7$.
 
 The generic \code{cv()} function has an \code{"lm"} method,
 ```{r cv-lm-method}
@@ -411,7 +411,7 @@ xyplot(y ~ x | SD_ratio, data = Data, group = patient,
         panel.abline(a = 10, b = 1))
 ```
 
-Using data like these, a researcher may attempt to obtain an estimate of the within-patient effect of dosage by fitting mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variation at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models are sequentially nested in their fixed effects: (1) \code{~ 1}, intercept only; (2) \code{~ 1 + x}, intercept and effect of \code{x}; and (3) \code{~ 1 + x + xm}, intercept, effect of \code{x}, and a contextual variable, \code{xm}, consisting of the within-patient mean of \code{x}. The final model, (4) \code{~ 1 + I(x - xm)}, uses an intercept and the centered-within-group variable \code{x - xm}. We thus fit four models to four data sets for a total of 16 models.
+Using data like these, a researcher may attempt to obtain an estimate of the within-patient effect of dosage by fitting mixed models with a random intercept. We will illustrate how this approach results in estimates that are highly sensitive to the relative variation at the two levels of the mixed model by considering four models, all of which include a random intercept.  The first three models are sequentially nested in their fixed effects: (1) \code{~ 1}, intercept only; (2) \code{~ 1 + x}, intercept and effect of \code{x}; and (3) \code{~ 1 + x + xm}, intercept, effect of \code{x}, and a contextual variable, \code{xm}, consisting of the within-patient mean of \code{x}. The final model, (4) \code{~ 1 + I(x - xm)}, uses an intercept and the centered-within-group variable \code{x - xm}. We thus fit four models to each of the four data sets for a total of 16 models.
 
 ```{r model-fits,include=FALSE, cache=TRUE}
 model.formulas <- c(
@@ -696,7 +696,7 @@ Some noteworthy points:
 
 [^meta-cv]: What we call here "meta CV" has also been termed "nested CV" [e.g., in the \pkg{cvms} package by @OlsenZachariae:2024]. We prefer, however, to reserve the term "nested CV" for the procedure described by @BatesHastieTibshirani:2023.
 
-In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of \code{mpg} to \code{horsepower} for the \code{Auto} data, saving the 10 models, named \code{m.1} through \code{m.10}, in the list \code{mlist}. We then used \code{cv()} to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
+In Section \ref{comparing-competing-models}, following @JamesEtAl:2021[Secs. 5.1, 5.3], we fit polynomial regressions up to degree 10 to the relationship of \code{mpg} to \code{horsepower} for the \code{Auto} data, saving the 10 models, named \code{m.1} through \code{m.10}, in the object \code{mlist}. We then used \code{cv()} to compare the cross-validated MSE for the 10 models, discovering that the 7th degree polynomial had the smallest MSE (by a small margin). 
 
 If we select the 7th degree polynomial model, intending to use it for prediction, the CV estimate of the MSE for this model will be optimistic. One solution is to cross-validate the process of using CV to select the "best" model---that is, to apply meta-CV. The function \code{selectModelList()}, which is suitable for use with \code{cv()}, implements this idea.
 
@@ -735,7 +735,7 @@ The polytomous (multi-category) response variable is \code{vote}, a factor with 
 * \code{age}, in years.
 * \code{econ.cond.national} and \code{econ.cond.household}, the respondent's ratings of the state of the economy, on 1 to 5 scales.
 * \code{Blair}, \code{Hague}, and \code{Kennedy}, ratings of the leaders of the Labour, Conservative, and Liberal Democratic parties, on 1 to 5 scales.
-* \code{Europe}, an 11-point scale on attitude towards European integration, with high scores representing "Euro-skepticism."
+* \code{Europe}, an 11-point scale for attitude towards European integration, with high scores representing "Euro-skepticism."
 * \code{political.knowledge}, knowledge of the parties' positions on European integration, with scores from 0 to 3.
 * \code{gender}, \code{"female"} or \code{"male"}.
 
@@ -758,7 +758,7 @@ plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
      lines = list(col = c("blue", "red", "orange")),
      axes = list(x = list(rug = FALSE), y = list(style = "stacked")))
 ```
-As political knowledge increases, voters tend to align their votes more closely with the party positions on European integration: The Conservative Party was relatively Euro-skeptic, while Labour and the Liberal Democrats were more supportive of the UK's participation in the EU.
+As political knowledge increased, voters tended to align their votes more closely with the party positions on European integration: The Conservative Party was relatively Euro-skeptic, while Labour and the Liberal Democrats were more supportive of the UK's participation in the EU.
 
 To cross-validate this multinomial-logit model we need an appropriate cost criterion. None of the criteria in the \pkg{cv} package will do---for example, \code{mse()} is appropriate only for a numeric response. The \code{BayesRule()} criterion, also supplied by \pkg{cv}, which is for a binary response, comes close:
 ```{r BayesRule}
@@ -960,7 +960,7 @@ The programming language \proglang{Python} is often the software of choice for "
 
 Functions for cross-validation are provided in \pkg{scikit-learn}, which supports $k$-fold, repeated $k$-fold, and leave-one-out CV. These functions can be applied to data sets consisting of independent observations, hierarchical groups, or time-series data.  A sample program in the \pkg{scikit-learn} documentation [@ScikitLearnDevelopers:2024] demonstrates how to implement meta cross-validation (termed "nested cross-validation" in the documentation).
 
-The approach taken by \pkg{scikit-learn} for independent observations is similar to that in the default \code{cv()} method in the \pkg{cv} package. The approach for hierarchical data is similar, but not identical, to that in \pkg{cv} (as described in Section \ref{cross-validating-mixed-effects-models}). Our \pkg{cv} package doesn't currently provide for cross-validating time-series models, but we anticipate that the next version of the package will.
+The approach taken by \pkg{scikit-learn} for independent observations is similar to that in the default \code{cv()} method in the \pkg{cv} package. The approach for hierarchical data is similar, but not identical, to that in \pkg{cv} (as described in Section \ref{cross-validating-mixed-effects-models}). Our \pkg{cv} package doesn't currently provide for cross-validating time-series models, but we anticipate that a future version of the package will.
 
 
 # Appendix: Computational notes {-}

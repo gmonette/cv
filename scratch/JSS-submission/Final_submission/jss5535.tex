@@ -98,7 +98,7 @@ part of the data. Data-division, however, suffers from two problems: (1)
 Dividing the data decreases the sample size and thus increases sampling
 error; and (2), even more disconcertingly, the results can vary
 substantially based on the random division of the data, particularly in
-smaller samples. See \citet[Sec. 5.3]{Harrell:2015} for cogent remarks
+smaller samples. See \citet[Sec.~5.3]{Harrell:2015} for cogent remarks
 about data-division and cross-validation.
 
 Cross-validation speaks to both of these issues. In CV, the data are
@@ -156,7 +156,7 @@ see '?methods' for accessing help and source code
 \end{CodeChunk}
 
 The \code{cv()} function is introduced in the context of a preliminary
-example in Section \ref{preliminary-example-polynomial-regression} of
+example in Section~\ref{preliminary-example-polynomial-regression} of
 the paper.
 
 \begin{itemize}
@@ -184,7 +184,7 @@ the paper.
   coaxing) with many other existing regression-model classes for which
   there is an \code{update()} method that accepts a \code{data}
   argument. More generally, the \pkg{cv} package is designed to be
-  extensible, as discussed in Section \ref{extending-the-cv-package}.
+  extensible, as discussed in Section~\ref{extending-the-cv-package}.
 \end{itemize}
 
 A number of existing \proglang{R} packages include functions for
@@ -259,7 +259,7 @@ measurement: For details see \code{help("Auto",}
 \begin{CodeChunk}
 \begin{figure}
 
-{\centering \subfloat[\label{fig:mpg-horsepower-polynomials-1}]{\includegraphics[width=0.45\linewidth]{Figures/mpg-horsepower-polynomials-1} }~~~\subfloat[\label{fig:mpg-horsepower-polynomials-2}]{\includegraphics[width=0.45\linewidth]{Figures/mpg-horsepower-polynomials-2} }
+{\centering \subfloat[\label{fig:mpg-horsepower-polynomials-1}]{\includegraphics[width=0.45\linewidth]{jss5535_files/figure-latex/mpg-horsepower-polynomials-1} }~~~\subfloat[\label{fig:mpg-horsepower-polynomials-2}]{\includegraphics[width=0.45\linewidth]{jss5535_files/figure-latex/mpg-horsepower-polynomials-2} }
 
 }
 
@@ -277,9 +277,9 @@ polynomial \(p\) ranging from 1 (a linear regression) to 10.\footnote{Although
   it serves to illustrate the use of CV, a polynomial is not the best
   choice here. Consider, for example, the scatterplot for
   log-transformed \code{mpg} and \code{horsepower}, produced by
-  \code{plot(mpg $\sim$ horsepower, data=Auto, log="xy")} (execution of
-  which is left to the reader). We revisit the \code{Auto} data in
-  Section \ref{cross-validating-model-specification}.} Polynomial fits
+  \code{plot(mpg $\sim$ horsepower, data = Auto, log = "xy")} (execution
+  of which is left to the reader). We revisit the \code{Auto} data in
+  Section~\ref{cross-validating-model-specification}.} Polynomial fits
 for \(p = 1\) to \(5\) are shown in Figure
 \ref{fig:mpg-horsepower-polynomials} (a). The linear fit is clearly
 inappropriate; the fits for \(p = 2\) (quadratic) through \(4\) are very
@@ -287,16 +287,17 @@ similar; and the degree-5 polynomial may over-fit the data by chasing
 one or two relatively high \code{mpg} values at the right (but see the
 CV results reported below).
 
-Figure \ref{fig:mpg-horsepower-polynomials} (b) shows two measures of
+Figure~\ref{fig:mpg-horsepower-polynomials} (b) shows two measures of
 estimated (squared) error as a function of polynomial-regression degree:
 The mean-squared error (``MSE''), defined as
 \(\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2\), and
 the usual residual variance, defined as
 \(\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2\).
-The former necessarily declines with \(p\) (or, more strictly, can't
-increase with \(p\)), while the latter gets slightly larger for the
-largest values of \(p\), with the ``best'' value, by a small margin, for
-\(p = 7\).
+Here \(y_i\) is the response and \(\widehat{y}_i\) the fitted value for
+the \(i\)th case. The former necessarily declines with \(p\) (or, more
+strictly, can't increase with \(p\)), while the latter gets slightly
+larger for the largest values of \(p\), with the ``best'' value, by a
+small margin, for \(p = 7\).
 
 The generic \code{cv()} function has an \code{"lm"} method,
 
@@ -598,7 +599,7 @@ R> plot(cv.auto.loo, main = "Polynomial Regressions, LOO CV",
 \end{CodeInput}
 \begin{figure}
 
-{\centering \subfloat[\label{fig:polynomial-regression-CV-graph-2-1}]{\includegraphics[width=0.5\linewidth]{Figures/polynomial-regression-CV-graph-2-1} }~~~\subfloat[\label{fig:polynomial-regression-CV-graph-2-2}]{\includegraphics[width=0.5\linewidth]{Figures/polynomial-regression-CV-graph-2-2} }
+{\centering \subfloat[\label{fig:polynomial-regression-CV-graph-2-1}]{\includegraphics[width=0.5\linewidth]{jss5535_files/figure-latex/polynomial-regression-CV-graph-2-1} }~~~\subfloat[\label{fig:polynomial-regression-CV-graph-2-2}]{\includegraphics[width=0.5\linewidth]{jss5535_files/figure-latex/polynomial-regression-CV-graph-2-2} }
 
 }
 
@@ -673,7 +674,7 @@ data}\label{example-the-high-school-and-beyond-data}
 Following their use by \citet{RaudenbushBryk:2002}, data from the 1982
 \emph{High School and Beyond} (``HSB'') survey have become a staple of
 the literature on mixed-effects models. The HSB data are used by
-\citet[Sec. 7.2.2]{FoxWeisberg:2019} to illustrate the application of
+\citet[Sec.~7.2.2]{FoxWeisberg:2019} to illustrate the application of
 linear mixed models to hierarchical data, and we'll closely follow their
 example here.
 
@@ -765,7 +766,7 @@ In the process, we merge variables from the school-level and
 student-level data sets, and create two new school-level variables:
 \code{mean.ses}, which is the average SES for students in each school;
 and \code{cses}, which is the individual students' SES centered at their
-school means. For details, see \citet[Sec. 7.2.2]{FoxWeisberg:2019}.
+school means. For details, see \citet[Sec.~7.2.2]{FoxWeisberg:2019}.
 
 Still following Fox and Weisberg, we proceed to use the \code{lmer()}
 function in the \pkg{lme4} package \citep{BatesEtAl:2015} to fit a mixed
@@ -929,7 +930,7 @@ from a population with a between-patient effect of dosage of \(1.0\) and
 a within-patient effect of \(-0.5\). We then applied four different
 multipliers to the between-patient standard deviation from the
 regression line of patient centroids. The resulting data sets, shown in
-Figure \ref{fig:plot1}, differ in the between-patient variation of
+Figure~\ref{fig:plot1}, differ in the between-patient variation of
 patient centroids from a common between-patient regression line,
 exhibiting a progression from low to high variation around the common
 regression line. Each patient has the same relative configuration of
@@ -940,7 +941,7 @@ ellipses are shown for each patient.
 \begin{CodeChunk}
 \begin{figure}
 
-{\centering \includegraphics[width=0.75\linewidth]{Figures/plot1-1}
+{\centering \includegraphics[width=0.75\linewidth]{jss5535_files/figure-latex/plot1-1}
 
 }
 
@@ -960,21 +961,21 @@ nested in their fixed effects: (1) \code{~ 1}, intercept only; (2)
 variable, \code{xm}, consisting of the within-patient mean of \code{x}.
 The final model, (4) \code{~ 1 + I(x - xm)}, uses an intercept and the
 centered-within-group variable \code{x - xm}. We thus fit four models to
-four data sets for a total of 16 models.
+each of the four data sets for a total of 16 models.
 
 We proceed to obtain predictions from each model (1) using only the
 fixed effects, as for cross-validation based on clusters (i.e.,
 patients), and (2) using both fixed and random effects---that is, the
 BLUPs---as for cross-validation based on cases (i.e., occasions within
 patients). The fixed- and random-effects predictions from these models
-are displayed in Figure \ref{fig:plot-fits-combined} along with a
+are displayed in Figure~\ref{fig:plot-fits-combined} along with a
 summary of the data using 50\% concentration ellipses (see the top row
 of the figure).
 
 \begin{CodeChunk}
 \begin{figure}
 
-{\centering \includegraphics[width=1\linewidth]{Figures/plot-fits-combined-1}
+{\centering \includegraphics[width=1\linewidth]{jss5535_files/figure-latex/plot-fits-combined-1}
 
 }
 
@@ -1037,7 +1038,7 @@ cluster-based and case-based cross-validation, are assembled in Figure
 \begin{CodeChunk}
 \begin{figure}
 
-{\centering \includegraphics[width=0.75\linewidth]{Figures/cross-validation-data-plot-1}
+{\centering \includegraphics[width=0.75\linewidth]{jss5535_files/figure-latex/cross-validation-data-plot-1}
 
 }
 
@@ -1053,14 +1054,14 @@ our examples, the model \code{~ 1 + x + xm}, which includes both
 \code{x} and its contextual mean, produces better results using both
 cluster-based and case-based CV. These conclusions are consistent with
 our observations based on graphing predictions from the various models
-(in Figure \ref{fig:plot-fits-combined} on page
+(in Figure~\ref{fig:plot-fits-combined} on page
 \pageref{fig:plot-fits-combined}), and they illustrate the desirability
 of assessing mixed-effect models at different hierarchical levels.
 
 \section{Cross-validating model
 specification}\label{cross-validating-model-specification}
 
-As \citet[Sec. 7.10.2: ``The Wrong and Right Way to Do
+As \citet[Sec.~7.10.2: ``The Wrong and Right Way to Do
 Cross-validation'']{HastieTibshiraniFriedman:2009} explain, if the whole
 data are used to specify or fine-tune a statistical model, then
 subsequent cross-validation of the model is intrinsically misleading,
@@ -1092,8 +1093,9 @@ a process that we term ``meta cross-validation.''\footnote{In a vignette
   on extending the \pkg{cv} package, we explain how to specify
   additional model-selection procedures.}
 
-\subsection{Example: Data transformation and predictor selection for the
-Auto
+\subsection[Example: Data transformation and predictor selection for the Auto
+data]{Example: Data transformation and predictor selection for the
+\code{Auto}
 data}\label{example-data-transformation-and-predictor-selection-for-the-auto-data}
 
 To illustrate cross-validation of model specification, we return to the
@@ -1142,7 +1144,7 @@ inform the selection of the degree of a polynomial regression of
 problem of predicting \code{mpg} from the other variables in the
 \code{Auto} data. We begin with a bit of data management, and then
 examine the pairwise relationships among the numeric variables in the
-data set (Figure \ref{fig:Auto-explore-scatterplot-matrix}, produced by
+data set (Figure~\ref{fig:Auto-explore-scatterplot-matrix}, produced by
 the \code{scatterplotMatrix()} function in the \pkg{car} package); in
 each panel, the solid line shows the linear least-squares fit and the
 broken line is for a nonparametric regression:
@@ -1163,7 +1165,7 @@ R> scatterplotMatrix(~ mpg + displacement + horsepower + weight
 \end{CodeInput}
 \begin{figure}
 
-{\centering \includegraphics[width=0.95\linewidth]{Figures/Auto-explore-scatterplot-matrix-1}
+{\centering \includegraphics[width=0.95\linewidth]{jss5535_files/figure-latex/Auto-explore-scatterplot-matrix-1}
 
 }
 
@@ -1202,7 +1204,7 @@ R> crPlots(m.auto,
 \end{CodeInput}
 \begin{figure}
 
-{\centering \includegraphics[width=0.7\linewidth]{Figures/Auto-explore-cr-plots-1}
+{\centering \includegraphics[width=0.7\linewidth]{jss5535_files/figure-latex/Auto-explore-cr-plots-1}
 
 }
 
@@ -1217,7 +1219,7 @@ model. The broken blue lines in the C+R plots show linear least-squares
 fits, while the solid magenta lines are nonparametric-regression
 smooths.
 
-Some background: As \citet[Sec. 8.2]{Weisberg:2014} explains, there are
+Some background: As \citet[Sec.~8.2]{Weisberg:2014} explains, there are
 technical advantages to having (numeric) predictors in linear regression
 analysis that are themselves linearly related. If the predictors
 \emph{aren't} linearly related, then the relationships between them can
@@ -1238,8 +1240,8 @@ individually. Several ``families'' of power transformations can be used,
 including the original Box-Cox family (which is the default), simple
 powers (and roots), and two adaptations of the Box-Cox family to data
 that may include negative values and zeros: the Box-Cox-with-negatives
-family and the Yeo-Johnson family; see \citet[Chap. 8]{Weisberg:2014}
-and \citet[Chap. 3]{FoxWeisberg:2019} for details. We proceed to
+family and the Yeo-Johnson family; see \citet[Chap.~8]{Weisberg:2014}
+and \citet[Chap.~3]{FoxWeisberg:2019} for details. We proceed to
 transform the numeric predictors in the \code{Auto} regression towards
 multivariate normality:
 
@@ -1474,18 +1476,18 @@ Some noteworthy points:
 
 \subsection[Example: Applying meta CV to polynomial regression for the
 Auto data]{\texorpdfstring{Example: Applying meta CV to polynomial
-regression for the Auto
+regression for the \code{Auto}
 data\footnote{What we call here ``meta CV'' has also been termed
   ``nested CV'' \citep[e.g., in the \pkg{cvms} package
   by][]{OlsenZachariae:2024}. We prefer, however, to reserve the term
   ``nested CV'' for the procedure described by
   \citet{BatesHastieTibshirani:2023}.}}{Example: Applying meta CV to polynomial regression for the Auto data}}\label{example-applying-meta-cv-to-polynomial-regression-for-the-auto-datameta-cv}
 
-In Section \ref{comparing-competing-models}, following \citet[Secs. 5.1,
+In Section~\ref{comparing-competing-models}, following \citet[Secs. 5.1,
 5.3]{JamesEtAl:2021}, we fit polynomial regressions up to degree 10 to
 the relationship of \code{mpg} to \code{horsepower} for the \code{Auto}
 data, saving the 10 models, named \code{m.1} through \code{m.10}, in the
-list \code{mlist}. We then used \code{cv()} to compare the
+object \code{mlist}. We then used \code{cv()} to compare the
 cross-validated MSE for the 10 models, discovering that the 7th degree
 polynomial had the smallest MSE (by a small margin).
 
@@ -1585,8 +1587,8 @@ we illustrate (1) and (2); more diverse and extensive examples
 
 Suppose that we want to cross-validate a multinomial logistic regression
 model fit by the \code{multinom()} function in the \pkg{nnet} package
-\citep{VenablesRipley:2002}. We borrow an example from \citet[Sec.
-14.2.1]{Fox:2016}, with data from the British Election Panel Study on
+\citep{VenablesRipley:2002}. We borrow an example from \citet[Sec.~14.2.1]{Fox:2016},
+with data from the British Election Panel Study on
 vote choice in the 2001 UK election. Data for the example are in the
 \code{BEPS} data set in the \pkg{carData} package:
 
@@ -1636,7 +1638,7 @@ factor with levels \code{"Conservative"}, \code{"Labour"}, and
   of the Labour, Conservative, and Liberal Democratic parties, on 1 to 5
   scales.
 \item
-  \code{Europe}, an 11-point scale on attitude towards European
+  \code{Europe}, an 11-point scale for attitude towards European
   integration, with high scores representing ``Euro-skepticism.''
 \item
   \code{political.knowledge}, knowledge of the parties' positions on
@@ -1661,7 +1663,7 @@ R> m.beps <- multinom(vote ~ age + gender + economic.cond.national
 \end{CodeInput}
 \end{CodeChunk}
 
-Figure \ref{fig:BEPS-plot} shows an ``effect plot,'' using the the
+Figure~\ref{fig:BEPS-plot} shows an ``effect plot,'' using the the
 \pkg{effects} package \citep{FoxWeisberg:2019} to visualize the
 \code{Europe} \(\times\) \code{political.knowledge} interaction in a
 ``stacked-area'' graph:
@@ -1676,7 +1678,7 @@ R> plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
 \end{CodeInput}
 \begin{figure}
 
-{\centering \includegraphics{Figures/BEPS-plot-1}
+{\centering \includegraphics{jss5535_files/figure-latex/BEPS-plot-1}
 
 }
 
@@ -1684,8 +1686,8 @@ R> plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
 \end{figure}
 \end{CodeChunk}
 
-As political knowledge increases, voters tend to align their votes more
-closely with the party positions on European integration: The
+As political knowledge increased, voters tended to align their votes
+more closely with the party positions on European integration: The
 Conservative Party was relatively Euro-skeptic, while Labour and the
 Liberal Democrats were more supportive of the UK's participation in the
 EU.
@@ -1712,7 +1714,7 @@ function (y, yhat)
     attr(result, "casewise loss") <- "y != round(yhat)"
     result
 }
-<bytecode: 0x14fd342e8>
+<bytecode: 0x11188dee8>
 <environment: namespace:cv>
 \end{CodeOutput}
 \end{CodeChunk}
@@ -1904,7 +1906,7 @@ more briefly consider facilities for cross-validation in other commonly
 used statistical software, \proglang{SAS}, \proglang{Stata}, and
 \proglang{Python}.
 
-\subsection{Other R software}\label{other-r-software}
+\subsection[Other R software]{Other \proglang{R} software}\label{other-r-software}
 
 The \pkg{cv} package is far from unique in implementing cross-validation
 of regression models in \proglang{R}. We've already mentioned the
@@ -2138,9 +2140,11 @@ similar to direct computation of LOO CV and to \code{cv()} with
 \code{cv()} with \code{method="Woodbury"}, and more than three orders of
 magnitude slower than \code{cv()} with \code{method="hatvalues"}.
 
-\subsection{Comparing cv to other software for cross-validation: SAS,
-Stata, and
-Python}\label{comparing-cv-to-other-software-for-cross-validation-sas-stata-and-python}
+\subsection[Comparing cv to other software for cross-validation: SAS,
+Stata, and Python]
+{Comparing cv to other software for cross-validation: \proglang{SAS},
+\proglang{Stata}, and \proglang{Python}}
+\label{comparing-cv-to-other-software-for-cross-validation-sas-stata-and-python}
 
 Although we do not have recent experience with statistical software for
 cross-validation other than in \proglang{R},\footnote{It is our
@@ -2153,7 +2157,7 @@ cross-validation other than in \proglang{R},\footnote{It is our
 provisions for CV in \proglang{SAS}, \proglang{Stata}, and
 \proglang{Python}, primarily by locating and reading documentation.
 
-\subsubsection{SAS}\label{sas}
+\subsubsection[SAS]{\proglang{SAS}}\label{sas}
 
 Cross-validation in \proglang{SAS} is associated with particular
 procedures (``\code{PROC}s''), and is distributed across several
@@ -2173,7 +2177,7 @@ models, which repeatedly calls \code{PROC MIXED} in \proglang{SAS/STAT},
 and which performs cluster-based resampling (one of the options that we
 provide for mixed-effects models in the \pkg{cv} package).
 
-\subsubsection{Stata}\label{stata}
+\subsubsection[Stata]{\proglang{Stata}}\label{stata}
 
 As far as we can tell, \proglang{Stata} has no standard implementation
 of cross-validation. Like \proglang{R}, however, \proglang{Stata} is
@@ -2193,7 +2197,7 @@ roughly comparable to the default method of \code{cv()}, although
 cost criteria can be computed, rather than (as \code{cv()})
 cost-criteria directly.
 
-\subsubsection{Python}\label{python}
+\subsubsection[Python]{\proglang{Python}}\label{python}
 
 The programming language \proglang{Python} is often the software of
 choice for ``machine learning,'' in which cross-validation can play a
@@ -2219,7 +2223,7 @@ package. The approach for hierarchical data is similar, but not
 identical, to that in \pkg{cv} (as described in Section
 \ref{cross-validating-mixed-effects-models}). Our \pkg{cv} package
 doesn't currently provide for cross-validating time-series models, but
-we anticipate that the next version of the package will.
+we anticipate that a future version of the package will.
 
 \section*{Appendix: Computational
 notes}\label{appendix-computational-notes}
@@ -2258,7 +2262,7 @@ with constant error variance, the weight matrix is taken to be
 \(\mathbf{W} = \mathbf{I}_n\), the order-\(n\) identity matrix.
 
 The weighted-least-squares (``WLS'') estimator of \(\boldsymbol{\beta}\)
-is \citep[see, e.g.,][Sec. 12.2.2]{Fox:2016} \footnote{This is a
+is \citep[see, e.g.,][Sec.~12.2.2]{Fox:2016} \footnote{This is a
   definitional formula, which assumes that the model matrix
   \(\mathbf{X}\) is of full column rank, and which can be subject to
   numerical instability when \(\mathbf{X}\) is ill-conditioned.
@@ -2320,8 +2324,8 @@ deficiency of \(\mathbf{X}\) doesn't disqualify cross-validation because
 all we need are fitted values under the estimated model.
 
 \code{glm()} computes the maximum-likelihood estimates for a generalized
-linear model by iterated weighted least squares \citep[see, e.g.,][Sec.
-6.12]{FoxWeisberg:2019}. The last iteration is therefore just a WLS fit
+linear model by iterated weighted least squares \citep[see, e.g.,][Sec.~6.12]{FoxWeisberg:2019}.
+The last iteration is therefore just a WLS fit
 of the ``working response'' on the model matrix using ``working
 weights.'' Both the working weights and the working response at
 convergence are available from the information in the object returned by
