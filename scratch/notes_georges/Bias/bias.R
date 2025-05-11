@@ -244,10 +244,22 @@ Err_full <- mean(subset(summ, model == 'full')$Err_XY)
 
 cols <- viridis_pal()(ns)
 Plot3d(Err_XY ~ kfold + loo | n_sampled, subset(summ, model == 'full'), col = cols)
-Fit3d(function(...) Err_full)
+Plot3d(Err_XY ~ loo + n_sampled, subset(summ, model == 'full'), col = cols)
+Plot3d(Err_XY ~ kfold + loo | n_sampled, subset(summ, model == 'full'), col = cols)
+Plot3d(log(Err_XY) ~ kfold + n_sampled , subset(summ, model == 'full'), col = cols)
+
+# Fit3d(function(...) Err_full)
 
 Axes3d()
-Plot3d( Err_XY ~ uniq_num + loo , r, col = heat.colors(6))
+Plot3d( log(Err_XY) ~ n_sampled+ loo , subset(summ, model == 'full'), col = heat.colors(6))
+
+
+fit1 <- lm(log(Err_XY) ~ loo + I(loo^2),  subset(summ, model == 'full'))
+
+fit <- lm( log(Err_XY) ~ loo * n_sampled + I(loo^2) + I(n_sampled^2) , subset(summ, model == 'full'))
+summary(fit)
+Fit3d(fit)
+Fit3d(fit1)
 
 
 
