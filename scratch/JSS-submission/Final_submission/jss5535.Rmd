@@ -13,7 +13,7 @@ author:
     affiliation: 'York University'
     address: |
       | Toronto, Ontario, Canada
-    email: \email
+    email: \email{georges@yorku.ca}
     url: http://blackwell.math.yorku.ca/gmonette
 title:
   formatted: "\\pkg{cv}: An \\proglang{R} Package for Cross-Validating Regression Models"
@@ -247,7 +247,7 @@ plot(cv.auto.loo, main = "Polynomial Regressions, LOO CV",
 
 [^plot-confint]: The objects \code{cv.auto.10} and \code{cv.auto.loo} do not include confidence intervals for the CV MSE estimates because, as we explained, there are fewer than 400 cases in the \code{Auto} data. Consequently, confidence intervals are not shown in the graphs in Figure \ref{fig:polynomial-regression-CV-graph-2}. We can force `cv()` to compute confidence intervals by adding the argument `confint = TRUE`; we invite the reader to do this and to verify that the resulting confidence intervals are very broad, as was the case for the quadratic model fit to the \code{Auto} data in the preceding section.
 
-In this example, 10-fold and LOO CV produce generally similar results, and also results that are similar to those produced by the estimated error variance $\widehat{\sigma}^2$ for each model (cf., Figure \ref{fig:mpg-horsepower-polynomials} (b) on page \pageref{fig:mpg-horsepower-polynomials}), except for the highest-degree polynomials, where the CV results more clearly suggest over-fitting.
+In this example, 10-fold and LOO CV produce generally similar results, and also results that are similar to those produced by the estimated error variance $\widehat{\sigma}^2$ for each model (cf., Figure \ref{fig:mpg-horsepower-polynomials}~(b) on page \pageref{fig:mpg-horsepower-polynomials}), except for the highest-degree polynomials, where the CV results more clearly suggest over-fitting.
 \newpage
 
 # Cross-validating mixed-effects models
@@ -749,7 +749,7 @@ m.beps <- multinom(vote ~ age + gender + economic.cond.national
 
 ```
 
-Figure \ref{fig:BEPS-plot} shows an "effect plot," using the the \pkg{effects} package [@FoxWeisberg:2019] to visualize the \code{Europe} $\times$ \code{political.knowledge} interaction in a "stacked-area" graph:
+Figure \ref{fig:BEPS-plot} shows an "effect plot," using the \pkg{effects} package [@FoxWeisberg:2019] to visualize the \code{Europe} $\times$ \code{political.knowledge} interaction in a "stacked-area" graph:
 ```{r BEPS-plot, fig.width=9, fig.height=5}
 #| fig.cap = "Effect plot for the interaction between attitude towards European integration and political knowledge in the multinomial logit model fit to voting data from the 2001 British Election Panel Study, using party colors."
 plot(effects::Effect(c("Europe", "political.knowledge"), m.beps,
