@@ -13,7 +13,7 @@ vignette("cv-extend", package="cv")).'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -120,10 +120,10 @@ and can also be used for extensions (see the vignette "Extending the cv package,
 <span></span>
 <span><span class="fu">folds</span><span class="op">(</span><span class="va">n</span>, <span class="va">k</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">fold</span><span class="op">(</span><span class="va">folds</span>, <span class="va">i</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">fold</span><span class="op">(</span><span class="va">folds</span>, <span class="va">i_</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'folds'</span></span>
-<span><span class="fu">fold</span><span class="op">(</span><span class="va">folds</span>, <span class="va">i</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">fold</span><span class="op">(</span><span class="va">folds</span>, <span class="va">i_</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'folds'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -143,7 +143,9 @@ and can also be used for extensions (see the vignette "Extending the cv package,
 <span><span class="fu">GetResponse</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'modList'</span></span>
-<span><span class="fu">GetResponse</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">GetResponse</span><span class="op">(</span><span class="va">model</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">checkFormula</span><span class="op">(</span><span class="va">model</span>, <span class="va">data.names</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -321,12 +323,17 @@ is set to the value of <code>save.coef</code>.</p></dd>
 <dd><p>an object of class <code>"folds"</code>.</p></dd>
 
 
-<dt id="arg-i">i<a class="anchor" aria-label="anchor" href="#arg-i"></a></dt>
+<dt id="arg-i-">i_<a class="anchor" aria-label="anchor" href="#arg-i-"></a></dt>
 <dd><p>a fold number for an object of class <code>"folds"</code>.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>a <code>"cv"</code>, <code>"cvList"</code>, or <code>"folds"</code> object to be printed</p></dd>
+
+
+<dt id="arg-data-names">data.names<a class="anchor" aria-label="anchor" href="#arg-data-names"></a></dt>
+<dd><p>names of variables in the data set to which the model was
+fit; if missing, an attempt will be made to extract the data from the model.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -363,6 +370,10 @@ the result is a numeric vector.</p>
 and <code>"glmmTMB"</code> methods that convert factor
 responses to numeric 0/1 responses, as would be appropriate
 for a generalized linear mixed model with a binary response.</p></li>
+<li><p><code>checkFormula()</code> returns <code>TRUE</code> if all variables in the
+model formula are also in the data to which the model is fit; <code>FALSE</code> is this
+is not the case (and q warning is printed); or <code>NA</code> if the function
+couldn't extract a model formula.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
@@ -387,6 +398,9 @@ from a regression model.</p></li>
 <li><p><code>GetResponse(lme)</code>: <code>"lme"</code> method.</p></li>
 <li><p><code>GetResponse(glmmTMB)</code>: <code>"glmmTMB"</code> method.</p></li>
 <li><p><code>GetResponse(modList)</code>: <code>"modList"</code> method.</p></li>
+<li><p><code>checkFormula()</code>: check a model formula to determine whether it include
+variables not in the data to which the model was fit; prints a warning if this
+is not the case.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -437,7 +451,7 @@ from a regression model.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
