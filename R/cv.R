@@ -78,7 +78,9 @@
 #' The default \code{cv()} method uses \code{\link{update}()} to refit the model
 #' to each fold, and should work if there are appropriate \code{update()}
 #' and \code{\link{predict}()} methods, and if the default method for \code{\link{GetResponse}()}
-#' works or if a \code{\link{GetResponse}()} method is supplied.
+#' works or if a \code{\link{GetResponse}()} method is supplied. The model must, however,
+#' work correctly with \code{update()}, and in particular not have variables
+#' in the model formula that aren't in the data to which the model was fit: see the last example.
 #'
 #' The \code{"lm"} and \code{"glm"} methods can use much faster computational
 #' algorithms, as selected by the \code{method} argument. The linear-model
@@ -163,6 +165,20 @@
 #' cat("\n install 'carData' package to run these examples\n")
 #' }
 #'
+#' # the following (due to Joshua Philipp Entrop)
+#' # produces an error:
+#' \dontrun{
+#' data("Auto", package="ISLR2")
+#' Auto$mpg_20 <- as.numeric(Auto$mpg < 20)
+#' mlist <- lapply(
+#'                 1:3,
+#'                 \(p) glm(mpg_20  ~ poly(horsepower, p), data = Auto)
+#' )
+#' cv(
+#'    models(mlist),
+#'    data = Auto,
+#'    seed = 2120)
+#' }
 #' @export
 cv <- function(model, data, criterion, k, reps = 1L, seed, ...) {
   UseMethod("cv")
@@ -198,9 +214,9 @@ cv.default <- function(model,
                        start = FALSE,
                        model.function,
                        ...) {
-  f <- function(i, ...) {
+  f <- function(i_, ...) {
     # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i)
+    indices.i <- fold(folds, i_)
     model.i <- if (start) {
       update(model, data = data[-indices.i,], start = b)
     } else {
@@ -216,13 +232,13 @@ cv.default <- function(model,
   }
 
   fPara <-
-    function(i,
+    function(i_,
              model.function = model.function,
              model.function.name,
              ...) {
       # helper function to compute cv criterion for each fold
       #  with parallel computations
-      indices.i <- fold(folds, i)
+      indices.i <- fold(folds, i_)
       if (!is.null(model.function))
         assign(model.function.name, model.function)
       # the following deals with a scoping issue that can
@@ -269,7 +285,6 @@ cv.default <- function(model,
   }
 
   n <- nrow(data)
-
   cvCompute(
     model = model,
     data = data,
@@ -321,9 +336,9 @@ cv.lm <- function(model,
       XXi.u %*% (Xy - t(X[omit, , drop = FALSE]) %*% (w[omit] * y[omit]))
     as.vector(b.u)
   }
-  f <- function(i, ...) {
+  f <- function(i_, ...) {
     # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i)
+    indices.i <- fold(folds, i_)
     b.i <- UpdateLM(indices.i)
     names(b.i) <- coef.names
     fit.all.i <- X %*% b.i
@@ -466,9 +481,9 @@ cv.glm <- function(model,
     names(b.u) <- coef.names
     b.u
   }
-  f <- function(i, ...) {
+  f <- function(i_, ...) {
     # helper function to compute cv criterion for each fold
-    indices.i <- fold(folds, i)
+    indices.i <- fold(folds, i_)
     b.i <- UpdateIWLS(indices.i)
     fit.all.i <- linkinv(X %*% b.i)
     fit.i <- fit.all.i[indices.i]

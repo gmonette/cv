@@ -137,11 +137,11 @@ cv.modList <-
     result <- vector(n.models, mode = "list")
     names(result) <- names(model)
     class(result) <- "cvModList"
-    for (i in 1L:n.models) {
-      result[[i]] <- if (missing(k)) {
+    for (i_ in 1L:n.models) {
+      result[[i_]] <- if (missing(k)) {
         if (quietly) {
           suppressMessages(cv(
-            model[[i]],
+            model[[i_]],
             data = data,
             criterion = criterion,
             seed = seed,
@@ -150,7 +150,7 @@ cv.modList <-
           ))
         } else {
           cv(
-            model[[i]],
+            model[[i_]],
             data = data,
             criterion = criterion,
             seed = seed,
@@ -161,7 +161,7 @@ cv.modList <-
       } else {
         if (quietly) {
           suppressMessages(cv(
-            model[[i]],
+            model[[i_]],
             data = data,
             criterion = criterion,
             k = k,
@@ -171,7 +171,7 @@ cv.modList <-
           ))
         } else {
           cv(
-            model[[i]],
+            model[[i_]],
             data = data,
             criterion = criterion,
             k = k,
@@ -204,8 +204,8 @@ models <- function(...) {
     stop("models are fit to data sets of differing numbers of cases")
   }
   response <- GetResponse(models[[1L]])
-  for (i in 2L:length(models)) {
-    if (!isTRUE(all.equal(response, GetResponse(models[[i]]),
+  for (i_ in 2L:length(models)) {
+    if (!isTRUE(all.equal(response, GetResponse(models[[i_]]),
                           check.attributes = FALSE))) {
       stop("models are not all fit to the same response variable")
     }
@@ -232,17 +232,17 @@ print.cvModList <- function(x, ...) {
     nms <-
       paste0(nms, " averaged across ", reps, " replications")
   }
-  for (i in seq_along(x)) {
-    cat(paste0("Model ", nms[i], ":\n"))
-    if (inherits(x[[i]], "cvList")) {
-      sumry <- summarizeReps(x[[i]])
-      xi <- x[[i]][[1L]]
+  for (i_ in seq_along(x)) {
+    cat(paste0("Model ", nms[i_], ":\n"))
+    if (inherits(x[[i_]], "cvList")) {
+      sumry <- summarizeReps(x[[i_]])
+      xi <- x[[i_]][[1L]]
       nms.sumry <- names(sumry)
       xi[nms.sumry] <- sumry
       print(xi)
       cat("\n")
     } else {
-      print(x[[i]], ...)
+      print(x[[i_]], ...)
       cat("\n")
     }
   }
@@ -258,16 +258,16 @@ summary.cvModList <- function(object, ...) {
     nms <-
       paste0(nms, " averaged across ", reps, " replications (with SDs)")
   }
-  for (i in seq_along(object)) {
-    cat(paste0("\nModel ", nms[i], ":\n"))
-    if (inherits(object[[i]], "cvList")) {
-      sumry <- summarizeReps(object[[i]])
-      xi <- object[[i]][[1L]]
+  for (i_ in seq_along(object)) {
+    cat(paste0("\nModel ", nms[i_], ":\n"))
+    if (inherits(object[[i_]], "cvList")) {
+      sumry <- summarizeReps(object[[i_]])
+      xi <- object[[i_]][[1L]]
       nms.sumry <- names(sumry)
       xi[nms.sumry] <- sumry
       summary(xi)
     } else {
-      summary(object[[i]], ...)
+      summary(object[[i_]], ...)
     }
   }
   return(invisible(object))
@@ -477,8 +477,8 @@ as.data.frame.cvModList <- function(x, row.names=NULL, optional=TRUE, ...) {
   Ds <- lapply(x, as.data.frame, optional=TRUE, ...)
   model.names <- names(x)
   D <- cbind(model = model.names[1L], Ds[[1L]])
-  for (i in 2L:length((Ds))) {
-    D <- Merge(D, cbind(model = model.names[i], Ds[[i]]))
+  for (i_ in 2L:length((Ds))) {
+    D <- Merge(D, cbind(model = model.names[i_], Ds[[i_]]))
   }
   rownames(D) <- row.names
   if (!optional) names(D) <- make.names(names(D), unique = TRUE)

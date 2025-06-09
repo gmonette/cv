@@ -41,7 +41,7 @@
 #' to \code{update()}, possibly making the CV updates faster, e.g. for a GLM.
 #' @param n number of cases, for constructed folds.
 #' @param folds an object of class \code{"folds"}.
-#' @param i a fold number for an object of class \code{"folds"}.
+#' @param i_ a fold number for an object of class \code{"folds"}.
 #' @param ... to match generic; passed to \code{predict()} for the default method,
 #' and to \code{fPara()} (for parallel computations) in \code{cvCompute()}.
 #' @param f function to be called by \code{cvCompute()} for each fold.
@@ -127,6 +127,11 @@
 #' and \code{"glmmTMB"} methods that convert factor
 #' responses to numeric 0/1 responses, as would be appropriate
 #' for a generalized linear mixed model with a binary response.
+#'
+#' \item \code{checkFormula()} returns \code{TRUE} if all variables in the
+#' model formula are also in the data to which the model is fit; \code{FALSE} is this
+#' is not the case (and q warning is printed); or \code{NA} if the function
+#' couldn't extract a model formula.
 #'}
 #' @examples
 #' fit <- lm(mpg ~ gear, mtcars)
@@ -162,13 +167,16 @@ cvCompute <- function(model,
                       model.function = NULL,
                       model.function.name = NULL,
                       ...) {
+
+  checkFormula(model, colnames(data))
+
   # put function and variable args in the local environment
   env <- environment()
   environment(f) <- env
   environment(fPara) <- env
   localsNames <- names(locals)
-  for (i in seq_along(locals)) {
-    assign(localsNames[i], locals[[i]])
+  for (i_ in seq_along(locals)) {
+    assign(localsNames[i_], locals[[i_]])
   }
 
   se.cv <- NA
@@ -224,30 +232,31 @@ cvCompute <- function(model,
     dots <- list(...)
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    result <- foreach(i = 1L:k) %dopar% {
-      fPara(i,
+    result <- foreach(i_ = 1L:k) %dopar% {
+      fPara(i_,
             model.function = model.function,
             model.function.name = model.function.name,
             ...)
     }
     stopCluster(cl)
-    for (i in 1L:k) {
-      yhat[fold(folds, i)] <- result[[i]]$fit.i
+
+    for (i_ in 1L:k) {
+      yhat[fold(folds, i_)] <- result[[i_]]$fit.i
       if (details) {
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
-        coef.i[[i]] <- result[[i]]$coef.i
+        crit.i[i_] <- criterion(y[fold(folds, i_)],
+                               yhat[fold(folds, i_)])
+        coef.i[[i_]] <- result[[i_]]$coef.i
       }
     }
   } else {
     result <- vector(k, mode = "list")
-    for (i in 1L:k) {
-      result[[i]] <- f(i)
-      yhat[fold(folds, i)] <- result[[i]]$fit.i
+    for (i_ in 1L:k) {
+      result[[i_]] <- f(i_)
+      yhat[fold(folds, i_)] <- result[[i_]]$fit.i
       if (details) {
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
-        coef.i[[i]] <- result[[i]]$coef.i
+        crit.i[i_] <- criterion(y[fold(folds, i_)],
+                               yhat[fold(folds, i_)])
+        coef.i[[i_]] <- result[[i_]]$coef.i
       }
     }
   }
@@ -323,8 +332,8 @@ cvCompute <- function(model,
     } else {
       res <- list(res, result)
     }
-    for (i in 1L:(length(res) - 1L)) {
-      res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
+    for (i_ in 1L:(length(res) - 1L)) {
+      res[[i_]]["criterion"] <- res[[length(res)]]["criterion"]
     }
     class(res) <- "cvList"
     return(res)
@@ -354,6 +363,9 @@ cvMixed <- function(model,
                                                 data),
                     fixed.effects,
                     ...) {
+
+  checkFormula(model, colnames(data))
+
   pkg.env <- getNamespace(package)
 
   se.cv <- NA
@@ -363,11 +375,11 @@ cvMixed <- function(model,
     criterion.name <- deparse(substitute(criterion))
 
   f.clusters <-
-    function(i,
+    function(i_,
              predict.clusters.args,
              predict.cases.args,
              ...) {
-      indices.i <- fold(folds, i)
+      indices.i <- fold(folds, i_)
       index <-
         selectClusters(clusters[-indices.i, , drop = FALSE], data = data)
       update.args <- list(...)
@@ -386,11 +398,11 @@ cvMixed <- function(model,
     }
 
   f.cases <-
-    function(i,
+    function(i_,
              predict.clusters.args,
              predict.cases.args,
              ...) {
-      indices.i <- fold(folds, i)
+      indices.i <- fold(folds, i_)
       update.args <- list(...)
       update.args$object <- model
       update.args$data <- data[-indices.i,]
@@ -474,35 +486,35 @@ cvMixed <- function(model,
   if (ncores > 1L) {
     cl <- makeCluster(ncores)
     registerDoParallel(cl)
-    result <- foreach(i = 1L:k) %dopar% {
-      f(i, predict.clusters.args, predict.cases.args, ...)
+    result <- foreach(i_ = 1L:k) %dopar% {
+      f(i_, predict.clusters.args, predict.cases.args, ...)
     }
     stopCluster(cl)
-    for (i in 1L:k) {
-      indices.i <- result[[i]]$indices.i
+    for (i_ in 1L:k) {
+      indices.i <- result[[i_]]$indices.i
       # yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
-      yhat[indices.i] <- result[[i]]$fit.i
+      yhat[indices.i] <- result[[i_]]$fit.i
       if (details) {
         # crit.i[i] <- criterion(y[fold(folds, i)],
         #                        yhat[fold(folds, i)])
-        crit.i[i] <- criterion(y[indices.i],
+        crit.i[i_] <- criterion(y[indices.i],
                                yhat[indices.i])
-        coef.i[[i]] <- result[[i]]$coef.i
+        coef.i[[i_]] <- result[[i_]]$coef.i
       }
     }
   } else {
     result <- vector(k, mode = "list")
-    for (i in 1L:k) {
-      result[[i]] <- f(i, predict.clusters.args, predict.cases.args, ...)
-      indices.i <- result[[i]]$indices.i
+    for (i_ in 1L:k) {
+      result[[i_]] <- f(i_, predict.clusters.args, predict.cases.args, ...)
+      indices.i <- result[[i_]]$indices.i
       # yhat[result[[i]]$indices.i] <- result[[i]]$fit.i
-      yhat[indices.i] <- result[[i]]$fit.i
+      yhat[indices.i] <- result[[i_]]$fit.i
       if (details) {
         # crit.i[i] <- criterion(y[fold(folds, i)],
         #                        yhat[fold(folds, i)])
-        crit.i[i] <- criterion(y[indices.i],
+        crit.i[i_] <- criterion(y[indices.i],
                                yhat[indices.i])
-        coef.i[[i]] <- result[[i]]$coef.i
+        coef.i[[i_]] <- result[[i_]]$coef.i
       }
     }
   }
@@ -578,8 +590,8 @@ cvMixed <- function(model,
     } else {
       res <- list(res, result)
     }
-    for (i in 1L:(length(res) - 1L)) {
-      res[[i]]["criterion"] <- res[[length(res)]]["criterion"]
+    for (i_ in 1L:(length(res) - 1L)) {
+      res[[i_]]["criterion"] <- res[[length(res)]]["criterion"]
     }
     class(res) <- "cvList"
     return(res)
@@ -690,25 +702,25 @@ cvSelect <- function(procedure,
     )
     if (selectModelListP)
       arglist <- c(arglist, list(k = k.save))
-    selection <- foreach(i = 1L:k) %dopar% {
+    selection <- foreach(i_ = 1L:k) %dopar% {
       # the following deals with a scoping issue that can
       #   occur with args passed via ...
-      arglist$indices <- fold(folds, i)
+      arglist$indices <- fold(folds, i_)
       do.call(procedure, arglist)
     }
     stopCluster(cl)
 
-    for (i in 1L:k) {
-      yhat[fold(folds, i)] <- selection[[i]]$fit.i
-      crit.all.i[i] <- selection[[i]]$crit.all.i
+    for (i_ in 1L:k) {
+      yhat[fold(folds, i_)] <- selection[[i_]]$fit.i
+      crit.all.i[i_] <- selection[[i_]]$crit.all.i
 
       if (details) {
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
-        coef.i[[i]] <- selection[[i]]$coefficients
-        model.name.i[[i]] <-
-          if (!is.null(selection[[i]]$model.name))
-            selection[[i]]$model.name
+        crit.i[i_] <- criterion(y[fold(folds, i_)],
+                               yhat[fold(folds, i_)])
+        coef.i[[i_]] <- selection[[i_]]$coefficients
+        model.name.i[[i_]] <-
+          if (!is.null(selection[[i_]]$model.name))
+            selection[[i_]]$model.name
         else
           ""
       }
@@ -716,8 +728,8 @@ cvSelect <- function(procedure,
     }
 
   } else {
-    for (i in 1L:k) {
-      indices.i <- fold(folds, i)
+    for (i_ in 1L:k) {
+      indices.i <- fold(folds, i_)
       selection <- if (selectModelListP) {
         procedure(
           data,
@@ -738,14 +750,14 @@ cvSelect <- function(procedure,
           ...
         )
       }
-      crit.all.i[i] <- selection$crit.all.i
+      crit.all.i[i_] <- selection$crit.all.i
       yhat[indices.i] <- selection$fit.i
 
       if (details) {
-        crit.i[i] <- criterion(y[fold(folds, i)],
-                               yhat[fold(folds, i)])
-        coef.i[[i]] <- selection$coefficients
-        model.name.i[[i]] <-
+        crit.i[i_] <- criterion(y[fold(folds, i_)],
+                               yhat[fold(folds, i_)])
+        coef.i[[i_]] <- selection$coefficients
+        model.name.i[[i_]] <-
           if (!is.null(selection$model.name))
             selection$model.name
         else
@@ -891,14 +903,14 @@ folds <- function(n, k) {
 
 #' @describeIn cvCompute to extract a fold from a \code{"folds"} object.
 #' @export
-fold <- function(folds, i, ...)
+fold <- function(folds, i_, ...)
   UseMethod("fold")
 
 #' @describeIn cvCompute \code{fold()} method for \code{"folds"} objects.
 #' @export
 fold.folds <-
-  function(folds, i, ...)
-    folds$indices[folds$starts[i]:folds$ends[i]]
+  function(folds, i_, ...)
+    folds$indices[folds$starts[i_]:folds$ends[i_]]
 
 #' @describeIn cvCompute \code{print()} method for \code{"folds"} objects.
 #' @export
@@ -909,9 +921,9 @@ print.folds <- function(x, ...) {
   }
   cat(x$k, "folds of approximately", floor(x$n / x$k),
       "cases each")
-  for (i in 1L:min(x$k, 10L)) {
-    cat("\n fold", paste0(i, ": "))
-    fld <- fold(x, i)
+  for (i_ in 1L:min(x$k, 10L)) {
+    cat("\n fold", paste0(i_, ": "))
+    fld <- fold(x, i_)
     if (length(fld) <= 10L)
       cat(fld)
     else
@@ -993,6 +1005,35 @@ GetResponse.glmmTMB <- function (model, ...){
 GetResponse.modList <- function(model, ...)
   GetResponse(model[[1L]])
 
+#' @describeIn cvCompute check a model formula to determine whether it include
+#' variables not in the data to which the model was fit; prints a warning if this
+#' is not the case.
+#' @param data.names names of variables in the data set to which the model was
+#' fit; if missing, an attempt will be made to extract the data from the model.
+#' @export
+checkFormula <-  function(model, data.names){
+  if (missing(data.names)) {
+    data.names <- colnames(insight::get_data(model))
+  }
+  f <- insight::find_formula(model)
+  if (is.null(f)) return(NA)
+  warn <- FALSE
+  for (i in seq_along(f)){
+    f.names <- all.vars(f[[i]])
+    extra <- setdiff(f.names, data.names)
+    if (length(extra) > 0) {
+      warning(paste0("the following variable",
+                     if (length(extra) > 1) "s are " else " is ",
+                     "\nin the model formula but not in the data set:\n ",
+                     paste(extra, collapse=", "),
+                     "\nexpect errors or incorrect results"))
+      warn <- TRUE
+    }
+  }
+  return(!warn)
+}
+
+
 
 # not exported
 
@@ -1038,11 +1079,12 @@ getLossFn <- function(cv) {
 Merge <- function(...) {
   Ds <- lapply(list(...), as.data.frame, optional=TRUE)
   names <- unique(unlist(lapply(Ds, colnames)))
-  for (i in 1L:length(Ds)) {
-    missing <- setdiff(names, colnames(Ds[[i]]))
-    Ds[[i]][, missing] <- NA
+  for (i_ in 1L:length(Ds)) {
+    missing <- setdiff(names, colnames(Ds[[i_]]))
+    Ds[[i_]][, missing] <- NA
   }
   do.call("rbind", Ds)
 }
+
 
 utils::globalVariables(c("b", "y", "dots"))
