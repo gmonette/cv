@@ -1,6 +1,6 @@
 # cv 2.0.4
 
-- Provide an informative message when cvCompute() can't refit the model, probably via update() (following report by Joshua Philipp Entrop).
+- Provide an informative warning when there are variables in a model formula that aren't in the data to which the model was fit, which can cause update() to fail or report incorrect results  (following report by Joshua Philipp Entrop).
 
 # cv 2.0.3
 
