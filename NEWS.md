@@ -1,6 +1,6 @@
 # cv 2.0.4
 
-- Provide an informative error message when cvCompute() can't refit the model, probably via update() (following report by Joshua Philipp Entrop).
+- Provide an informative message when cvCompute() can't refit the model, probably via update() (following report by Joshua Philipp Entrop).
 
 # cv 2.0.3
 
