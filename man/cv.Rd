@@ -189,7 +189,7 @@ the default is \code{type="response"}, which is appropriate, e.g., for a \code{"
 and may be recognized or ignored by \code{predict()} methods for other model classes.}
 
 \item{start}{if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
-to \code{update()} is set to the vector of regression coefficients for the model fit
+to \code{\link[stats]{update}()} is set to the vector of regression coefficients for the model fit
 to the full data, possibly making the CV updates faster, e.g., for a GLM.}
 
 \item{model.function}{a regression function, typically for a new \code{cv()} method that
@@ -294,7 +294,7 @@ and for \link[=cv.modList]{several models fit to the same data},
 which are documented separately.
 }
 \details{
-The default \code{cv()} method uses \code{\link{update}()} to refit the model
+The default \code{cv()} method uses \code{\link[stats]{update}()} to refit the model
 to each fold, and should work if there are appropriate \code{update()}
 and \code{\link{predict}()} methods, and if the default method for \code{\link{GetResponse}()}
 works or if a \code{\link{GetResponse}()} method is supplied. The model must, however,

@@ -45,7 +45,7 @@
 #' the default is `type="response"`, which is appropriate, e.g., for a \code{"glm"} model
 #' and may be recognized or ignored by \code{predict()} methods for other model classes.
 #' @param start if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
-#' to \code{update()} is set to the vector of regression coefficients for the model fit
+#' to \code{\link[stats]{update}()} is set to the vector of regression coefficients for the model fit
 #' to the full data, possibly making the CV updates faster, e.g., for a GLM.
 #' @param ... to match generic; passed to \code{predict()} for the default \code{cv()} method;
 #' passed to the \code{\link[car]{Tapply}()} function in the \pkg{car} package for
@@ -75,7 +75,7 @@
 #' \code{\link{cv.modList}}.
 #'
 #' @details
-#' The default \code{cv()} method uses \code{\link{update}()} to refit the model
+#' The default \code{cv()} method uses \code{\link[stats]{update}()} to refit the model
 #' to each fold, and should work if there are appropriate \code{update()}
 #' and \code{\link{predict}()} methods, and if the default method for \code{\link{GetResponse}()}
 #' works or if a \code{\link{GetResponse}()} method is supplied. The model must, however,
