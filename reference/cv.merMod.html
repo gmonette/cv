@@ -179,6 +179,10 @@ if <code>reps &gt; 1</code>, of class <code>"cvList"</code> (see <code><a href="
 individual observations. If the former, predictions are based only on fixed
 effects; if the latter, predictions include the random effects (i.e., are the
 best linear unbiased predictors or "BLUPS").</p>
+<p>The model supplied must work properly with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a>()</code>, and in
+particular the formula for the model should not include variables that
+are not in the data set to which the model was fit. See the last
+(faulty) example in the help for <code><a href="cv.html">cv</a>()</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
