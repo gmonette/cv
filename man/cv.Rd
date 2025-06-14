@@ -189,7 +189,7 @@ the default is \code{type="response"}, which is appropriate, e.g., for a \code{"
 and may be recognized or ignored by \code{predict()} methods for other model classes.}
 
 \item{start}{if \code{TRUE} (the default is \code{FALSE}), the \code{start} argument
-to \code{update()} is set to the vector of regression coefficients for the model fit
+to \code{\link[stats]{update}()} is set to the vector of regression coefficients for the model fit
 to the full data, possibly making the CV updates faster, e.g., for a GLM.}
 
 \item{model.function}{a regression function, typically for a new \code{cv()} method that
@@ -294,10 +294,12 @@ and for \link[=cv.modList]{several models fit to the same data},
 which are documented separately.
 }
 \details{
-The default \code{cv()} method uses \code{\link{update}()} to refit the model
+The default \code{cv()} method uses \code{\link[stats]{update}()} to refit the model
 to each fold, and should work if there are appropriate \code{update()}
 and \code{\link{predict}()} methods, and if the default method for \code{\link{GetResponse}()}
-works or if a \code{\link{GetResponse}()} method is supplied.
+works or if a \code{\link{GetResponse}()} method is supplied. The model must, however,
+work correctly with \code{update()}, and in particular not have variables
+in the model formula that aren't in the data to which the model was fit: see the last example.
 
 The \code{"lm"} and \code{"glm"} methods can use much faster computational
 algorithms, as selected by the \code{method} argument. The linear-model
@@ -421,6 +423,20 @@ summary(cv(m.rlm, k="loo"))
 cat("\n install 'carData' package to run these examples\n")
 }
 
+# the following (due to Joshua Philipp Entrop)
+# produces an error:
+\dontrun{
+data("Auto", package="ISLR2")
+Auto$mpg_20 <- as.numeric(Auto$mpg < 20)
+mlist <- lapply(
+                1:3,
+                \(p) glm(mpg_20  ~ poly(horsepower, p), data = Auto)
+)
+cv(
+   models(mlist),
+   data = Auto,
+   seed = 2120)
+}
 }
 \seealso{
 \code{\link{cv.merMod}}, \code{\link{cv.function}},

@@ -14,6 +14,7 @@
 \alias{GetResponse.lme}
 \alias{GetResponse.glmmTMB}
 \alias{GetResponse.modList}
+\alias{checkFormula}
 \title{Utility Functions for the cv Package}
 \usage{
 cvCompute(
@@ -80,9 +81,9 @@ cvSelect(
 
 folds(n, k)
 
-fold(folds, i, ...)
+fold(folds, i_, ...)
 
-\method{fold}{folds}(folds, i, ...)
+\method{fold}{folds}(folds, i_, ...)
 
 \method{print}{folds}(x, ...)
 
@@ -97,6 +98,8 @@ GetResponse(model, ...)
 \method{GetResponse}{glmmTMB}(model, ...)
 
 \method{GetResponse}{modList}(model, ...)
+
+checkFormula(model, data.names)
 }
 \arguments{
 \item{model}{a regression model object.}
@@ -208,9 +211,12 @@ is set to the value of \code{save.coef}.}
 
 \item{folds}{an object of class \code{"folds"}.}
 
-\item{i}{a fold number for an object of class \code{"folds"}.}
+\item{i_}{a fold number for an object of class \code{"folds"}.}
 
 \item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed}
+
+\item{data.names}{names of variables in the data set to which the model was
+fit; if missing, an attempt will be made to extract the data from the model.}
 }
 \value{
 The utility functions return various kinds of objects:
@@ -253,6 +259,11 @@ There are also  \code{"lme"}, \code{"merMod"}
 and \code{"glmmTMB"} methods that convert factor
 responses to numeric 0/1 responses, as would be appropriate
 for a generalized linear mixed model with a binary response.
+
+\item \code{checkFormula()} returns \code{TRUE} if all variables in the
+model formula are also in the data to which the model is fit; \code{FALSE} is this
+is not the case (and q warning is printed); or \code{NA} if the function
+couldn't extract a model formula.
 }
 }
 \description{
@@ -295,6 +306,10 @@ from a regression model.
 \item \code{GetResponse(glmmTMB)}: \code{"glmmTMB"} method.
 
 \item \code{GetResponse(modList)}: \code{"modList"} method.
+
+\item \code{checkFormula()}: check a model formula to determine whether it include
+variables not in the data to which the model was fit; prints a warning if this
+is not the case.
 
 }}
 \examples{
