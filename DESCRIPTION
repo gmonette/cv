@@ -52,6 +52,6 @@ License: GPL (>= 2)
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 URL: https://gmonette.github.io/cv/, https://CRAN.R-project.org/package=cv
 BugReports: https://github.com/gmonette/cv/issues
