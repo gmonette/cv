@@ -20,6 +20,7 @@
 \alias{GetResponse.modList}
 \alias{GetResponse.ARIMA}
 \alias{plot.cvOrdered}
+\alias{checkFormula}
 \title{Utility Functions for the cv Package}
 \usage{
 cvCompute(
@@ -109,6 +110,7 @@ cvOrdered(
 
 folds(n, k)
 
+<<<<<<< HEAD
 orderedFolds(
   times,
   k,
@@ -118,8 +120,11 @@ orderedFolds(
 )
 
 fold(folds, i, ...)
+=======
+fold(folds, i_, ...)
+>>>>>>> main
 
-\method{fold}{folds}(folds, i, ...)
+\method{fold}{folds}(folds, i_, ...)
 
 \method{fold}{orderedFolds}(
   folds,
@@ -150,6 +155,7 @@ GetResponse(model, ...)
 \method{GetResponse}{ARIMA}(model, ...)
 
 \method{plot}{cvOrdered}(x, y, xlab = "lead", ylab = x$criterion, main = "Cross-Validation", ...)
+checkFormula(model, data.names)
 }
 \arguments{
 \item{model}{a regression model object.}
@@ -288,7 +294,7 @@ is a \code{"ts"} object.}
 
 \item{folds}{an object of class \code{"folds"}.}
 
-\item{i}{a fold number for an object of class \code{"folds"}.}
+\item{i_}{a fold number for an object of class \code{"folds"}.}
 
 \item{predicted}{if \code{TRUE} (the default is \code{FALSE}), return
 the index (or indices) of the case(s) to be predicted; otherwise, return the indices
@@ -314,6 +320,10 @@ or a \code{"cvOfdered"} object to be plotted.}
 \item{ylab}{label for vertical axis.}
 
 \item{main}{main title for graph.}
+\item{x}{a \code{"cv"}, \code{"cvList"}, or \code{"folds"} object to be printed}
+
+\item{data.names}{names of variables in the data set to which the model was
+fit; if missing, an attempt will be made to extract the data from the model.}
 }
 \value{
 The utility functions return various kinds of objects:
@@ -359,6 +369,11 @@ There are also  \code{"lme"}, \code{"merMod"}
 and \code{"glmmTMB"} methods that convert factor
 responses to numeric 0/1 responses, as would be appropriate
 for a generalized linear mixed model with a binary response.
+
+\item \code{checkFormula()} returns \code{TRUE} if all variables in the
+model formula are also in the data to which the model is fit; \code{FALSE} is this
+is not the case (and q warning is printed); or \code{NA} if the function
+couldn't extract a model formula.
 }
 }
 \description{
@@ -416,6 +431,9 @@ from a regression model.
 \item \code{GetResponse(ARIMA)}: \code{"ARIMA"} method.
 
 \item \code{plot(cvOrdered)}: \code{plot()} method for \code{"cvOrdered"} objects.
+\item \code{checkFormula()}: check a model formula to determine whether it include
+variables not in the data to which the model was fit; prints a warning if this
+is not the case.
 
 }}
 \examples{

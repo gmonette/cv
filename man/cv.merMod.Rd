@@ -102,6 +102,11 @@ For mixed-effects models, cross-validation can be done by "clusters" or by
 individual observations. If the former, predictions are based only on fixed
 effects; if the latter, predictions include the random effects (i.e., are the
 best linear unbiased predictors or "BLUPS").
+
+The model supplied must work properly with \code{\link[stats]{update}()}, and in
+particular the formula for the model should not include variables that
+are not in the data set to which the model was fit. See the last
+(faulty) example in the help for \code{\link{cv}()}.
 }
 \section{Functions}{
 \itemize{

@@ -39,6 +39,18 @@ summary(cv(m.auto, k = "loo") ) # default method = "hatvalues"
 summary(cv(m.auto, k = "loo", method = "naive"))
 summary(cv(m.auto, k = "loo", method = "Woodbury"))
 
+## ----cv.lm.timings, cache=TRUE------------------------------------------------
+m.auto.glm <- glm(mpg ~ poly(horsepower, 2), data = Auto)
+boot::cv.glm(Auto, m.auto.glm)$delta
+
+microbenchmark::microbenchmark(
+  hatvalues = cv(m.auto, k = "loo"),
+  Woodbury = cv(m.auto, k = "loo", method = "Woodbury"),
+  naive = cv(m.auto, k = "loo", method = "naive"),
+  cv.glm = boot::cv.glm(Auto, m.auto.glm),
+  times = 10
+)
+
 ## ----Mroz-logistic-regression-------------------------------------------------
 data("Mroz", package="carData")
 m.mroz <- glm(lfp ~ ., data = Mroz, family = binomial)
@@ -55,6 +67,26 @@ summary(cv(m.mroz,
    k = "loo",
    criterion = BayesRule,
    method = "hatvalues"))
+
+## ----glm.timings, cache=TRUE--------------------------------------------------
+microbenchmark::microbenchmark(
+  hatvalues = cv(
+    m.mroz,
+    k = "loo",
+    criterion = BayesRule,
+    method = "hatvalues"
+  ),
+  Woodbury = cv(
+    m.mroz,
+    k = "loo",
+    criterion = BayesRule,
+    method = "Woodbury"
+  ),
+  exact = cv(m.mroz, k = "loo", criterion = BayesRule),
+  cv.glm = boot::cv.glm(Mroz, m.mroz,
+                        cost = BayesRule),
+  times = 10
+)
 
 ## -----------------------------------------------------------------------------
 AUC <- function(y, yhat = seq_along(y)) {

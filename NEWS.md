@@ -1,3 +1,4 @@
+
 # cv 2.1.0
 
 - Support for timeseries cross-validation:
@@ -12,9 +13,13 @@
     
     - Many new methods for standard generics to support these features.
 
+# cv 2.0.4
+
+- Provide an informative warning when there are variables in a model formula that aren't in the data to which the model was fit, which can cause update() to fail or report incorrect results  (following report by Joshua Philipp Entrop).
+
 # cv 2.0.3
 
-- New plot.cv() and plot.cvList() methods.
+- New plot.cv() and plot.cvList() methods. 
 
 - New cvInfo() accessor function with "cv", "cvList", "cvModList", and "cvSelect" methods.
 

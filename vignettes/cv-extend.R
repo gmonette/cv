@@ -93,7 +93,9 @@ BayesRuleMulti(BEPS$vote, yhat)
 xtabs(~ vote, data=BEPS)/nrow(BEPS)
 
 ## ----BEPS-test-default, error=TRUE--------------------------------------------
+try({
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
+})
 
 ## ----GetResponse.multinom-----------------------------------------------------
 GetResponse.multinom <- function(model, ...) {
@@ -103,7 +105,9 @@ GetResponse.multinom <- function(model, ...) {
 head(GetResponse(m.beps))
 
 ## ----BEPS-test-default-2, error=TRUE------------------------------------------
+try({
 cv(m.beps, seed=3465, criterion=BayesRuleMulti)
+})
 
 ## ----cv.nultinom--------------------------------------------------------------
 cv.multinom <-
@@ -281,6 +285,16 @@ summary(m.glmer)
 
 # comparison of fixed effects:
 car::compareCoefs(m.pql, m.glmer) 
+
+## ----cv-example-glmmPQL, cache=TRUE-------------------------------------------
+summary(cv(m.pql, clusterVariables="ID", criterion=BayesRule))
+
+summary(cv(m.pql, data=bacteria, criterion=BayesRule, seed=1490))
+
+## ----cv-example-glmer, cache=TRUE---------------------------------------------
+summary(cv(m.glmer, clusterVariables="ID", criterion=BayesRule))
+
+summary(cv(m.glmer, data=bacteria, criterion=BayesRule, seed=1490))
 
 ## ----swiss--------------------------------------------------------------------
 library("leaps")

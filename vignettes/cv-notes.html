@@ -12,7 +12,7 @@
 
 <meta name="author" content="John Fox and Georges Monette" />
 
-<meta name="date" content="2024-09-02" />
+<meta name="date" content="2025-06-15" />
 
 <title>Computational and technical notes on cross-validating regression models</title>
 
@@ -62,7 +62,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -364,7 +364,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Computational and technical notes on
 cross-validating regression models</h1>
 <h4 class="author">John Fox and Georges Monette</h4>
-<h4 class="date">2024-09-02</h4>
+<h4 class="date">2025-06-15</h4>
 
 
 
@@ -532,12 +532,14 @@ for the timings <span class="citation">(Mersmann, 2023)</span>:</p>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">cv.glm =</span> boot<span class="sc">::</span><span class="fu">cv.glm</span>(Auto, m.auto.glm),</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>)</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;  hatvalues   1.3345   1.5178   1.5347   1.5442   1.5801   1.6284    10</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;   Woodbury  14.9877  15.0436  15.2659  15.2147  15.4062  15.7366    10</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;      naive 315.0382 316.9830 320.9941 321.9218 323.7760 330.4423    10</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt;     cv.glm 550.5770 557.5320 579.8248 565.4353 581.3043 666.1158    10</span></span></code></pre></div>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = &quot;loo&quot;), :</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; less accurate nanosecond times to avoid potential integer overflows</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;       expr      min       lq     mean   median       uq      max neval cld</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;  hatvalues   1.8379   2.0744   2.0789   2.1138   2.1473   2.1824    10 a  </span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt;   Woodbury  14.1628  14.2439  16.3909  14.6271  19.1500  20.4607    10 a  </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt;      naive 215.9824 223.4145 224.0820 225.2306 226.3134 229.5120    10  b </span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt;     cv.glm 376.1002 380.2579 393.1865 382.2935 388.2199 485.8424    10   c</span></span></code></pre></div>
 <p>On our computer, using the hatvalues is about an order of magnitude
 faster than employing Woodbury matrix updates, and more than two orders
 of magnitude faster than refitting the model.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
@@ -625,11 +627,16 @@ comparable to <code>cv()</code> with <code>method=&quot;exact&quot;</code>):</p>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="at">times =</span> <span class="dv">10</span></span>
 <span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>)</span>
 <span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; Unit: milliseconds</span></span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq      max neval</span></span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;  hatvalues    1.4388    1.6126    2.0269    1.6524    1.7319    5.273    10</span></span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt;   Woodbury   47.5865   48.6913   49.6252   49.5880   50.1344   52.654    10</span></span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;      exact 2066.3274 2090.2715 2136.2337 2119.0919 2178.5412 2262.585    10</span></span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt;     cv.glm 2452.5692 2477.5964 2527.5282 2540.4879 2543.2671 2644.205    10</span></span></code></pre></div>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;       expr       min        lq      mean    median        uq       max neval</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;  hatvalues    2.0085    2.0507    2.1891    2.2389    2.3146    2.3892    10</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt;   Woodbury   41.8543   42.2084   44.4863   43.0971   47.4801   47.8831    10</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;      exact 1735.4481 1751.7635 1786.9661 1756.7391 1844.2620 1882.9254    10</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt;     cv.glm 1997.6330 2014.3131 2059.2029 2019.0023 2100.2874 2208.7621    10</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;  cld</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;  a  </span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt;   b </span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt;    c</span></span></code></pre></div>
 <p>There is a substantial time penalty associated with exact
 computations.</p>
 </div>

@@ -207,6 +207,19 @@ plot(cv.auto.10, main="Polynomial Regressions, 10-Fold CV",
 plot(cv.auto.loo, main="Polynomial Regressions, LOO CV",
      axis.args=list(labels=1:10), xlab="Degree of Polynomial, p")
 
+## ----bad-loop-----------------------------------------------------------------
+mods <- vector(3, mode="list")
+for (p in 1:3){
+  mods[[p]] <- lm(mpg ~ poly(horsepower, p), data = Auto)
+}
+cv(
+  models(mods),
+  data = Auto,
+  seed = 2120,
+  method = "naive"
+)
+p
+
 ## ----Mroz-data----------------------------------------------------------------
 data("Mroz", package = "carData")
 head(Mroz, 3)

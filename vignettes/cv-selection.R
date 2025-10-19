@@ -60,6 +60,17 @@ library("cv")
 
 summary(cv(m.select, seed = 2529))
 
+## ----cvSelect-artificial-data, cache=TRUE-------------------------------------
+cv.select <- cv(
+  selectStepAIC,
+  data = D,
+  seed = 3791,
+  working.model = m.null,
+  direction = "forward",
+  scope = list(lower =  ~ 1, upper = formula(m.full))
+)
+summary(cv.select)
+
 ## ----compare-selected-models--------------------------------------------------
 compareFolds(cv.select)
 
