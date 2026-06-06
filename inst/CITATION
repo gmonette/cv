@@ -1,0 +1,16 @@
+bibentry(bibtype = "Article",
+  title        = "{cv}: An {R} Package for Cross-Validating Regression Models",
+  author       = c(person(given = "John",
+                          family = "Fox",
+                          email = "jfox@mcmaster.ca"),
+                   person(given = "Georges",
+                          family = "Monette",
+                          email = "georges@yorku.ca")),
+  journal      = "Journal of Statistical Software",
+  year         = "2026",
+  volume       = "116",
+  number       = "8",
+  pages        = "1--41",
+  doi          = "10.18637/jss.v116.i08",
+  header       = "To cite cv in publications use:"
+)

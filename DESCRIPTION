@@ -1,18 +1,20 @@
 Package: cv
 Type: Package
 Title: Cross-Validating Regression Models
-Version: 2.0.4
-Date: 2025-06-16
-Authors@R: c(person("John", "Fox", role = "aut", email = "jfox@mcmaster.ca",
+Version: 2.0.5
+Date: 2026-06-05
+Authors@R: c(person("John", "Fox", role = "aut",
   comment = c(ORCID = "0000-0002-1196-8012")),
-	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca"))
+	person("Georges", "Monette", role = c("aut", "cre"), email = "georges+cv@yorku.ca",
+	comment = c(ORCID ="0000-0003-0076-5532")))
 Description: Cross-validation methods of regression models that exploit features of various
     modeling functions to improve speed. Some of the methods implemented in the package are
-    novel, as described in the package vignettes; for general introductions to cross-validation,
-    see, for example, Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani 
-    (2021, ISBN 978-1-0716-1417-4, Secs. 5.1, 5.3), "An Introduction to Statistical Learning with 
-    Applications in R, Second Edition", and Trevor Hastie, Robert Tibshirani, 
-    and Jerome Friedman (2009, ISBN 978-0-387-84857-0, Sec. 7.10), "The Elements of Statistical 
+    novel, as described in Fox and Monette (2026) <doi:10.18637/jss.v116.i08>,
+    and the package vignettes. For general introductions to cross-validation,
+    see, for example, Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani
+    (2021, ISBN 978-1-0716-1417-4, Secs. 5.1, 5.3), "An Introduction to Statistical Learning with
+    Applications in R, Second Edition", and Trevor Hastie, Robert Tibshirani,
+    and Jerome Friedman (2009, ISBN 978-0-387-84857-0, Sec. 7.10), "The Elements of Statistical
     Learning, Second Edition".
 Depends: R (>= 3.5.0), doParallel 
 Imports: car,
@@ -52,6 +54,6 @@ License: GPL (>= 2)
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+RoxygenNote: 8.0.0
 URL: https://gmonette.github.io/cv/, https://CRAN.R-project.org/package=cv
 BugReports: https://github.com/gmonette/cv/issues

@@ -438,6 +438,10 @@ cv(
    seed = 2120)
 }
 }
+\references{
+Fox, J. and Monette, G. (2026) "cv: An R Package for Cross-Validating Regression Models",
+\emph{Journal of Statistical Software}, \url{doi:10.18637/jss.v116.i08}
+}
 \seealso{
 \code{\link{cv.merMod}}, \code{\link{cv.function}},
 \code{\link{cv.modList}}.

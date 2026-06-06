@@ -117,7 +117,9 @@
 #' \code{cv()} is designed to be extensible to other classes of regression
 #' models; see the "Extending the cv package" vignette
 #' (\code{vignette("cv-extend", package="cv")}).
-#'
+#' @references
+#' Fox, J. and Monette, G. (2026) "cv: An R Package for Cross-Validating Regression Models",
+#' *Journal of Statistical Software*, <doi:10.18637/jss.v116.i08>
 #' @examples
 #' if (requireNamespace("ISLR2", quietly=TRUE)){
 #' withAutoprint({
@@ -185,12 +187,7 @@ cv <- function(model, data, criterion, k, reps = 1L, seed, ...) {
 }
 
 #' @describeIn cv \code{"default"} method.
-#' @importFrom stats coef family fitted getCall
-#' lm.wfit lsfit model.frame
-#' model.matrix model.response predict qnorm
-#' update weighted.mean weights
-#' residuals hatvalues printCoefmat sd
-#' na.pass
+#' @importFrom stats coef family fitted getCall lm.wfit lsfit model.frame model.matrix model.response predict qnorm update weighted.mean weights residuals hatvalues printCoefmat sd na.pass
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
