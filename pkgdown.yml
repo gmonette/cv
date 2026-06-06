@@ -1,5 +1,5 @@
-pandoc: 3.1.11
-pkgdown: 2.1.3
+pandoc: 3.8.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   cv-extend: cv-extend.html
@@ -7,7 +7,7 @@ articles:
   cv-notes: cv-notes.html
   cv-selection: cv-selection.html
   cv: cv.html
-last_built: 2025-09-24T21:54Z
+last_built: 2026-06-06T04:02Z
 urls:
   reference: https://gmonette.github.io/cv/reference
   article: https://gmonette.github.io/cv/articles

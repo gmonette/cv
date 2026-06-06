@@ -1,0 +1,147 @@
+# cv package for R: Cross-Validating Regression Models
+
+![](reference/figures/cv-hex.png)
+
+The **cv** package for R provides a consistent and extensible framework
+for cross-validating standard R statistical models. Some of the
+functions supplied by the package:
+
+- [`cv()`](https://gmonette.github.io/cv/reference/cv.md) is a generic
+  function with a default method, computationally efficient `"lm"` and
+  `"glm"` methods, an `"rlm"` method (for robust linear models), and a
+  method for a list of competing models. There are also `"merMod"`,
+  `"lme"`, and `"glmmTMB"` methods for mixed-effects models.
+  [`cv()`](https://gmonette.github.io/cv/reference/cv.md) supports
+  parallel computations.
+
+- [`mse()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  (mean-squared error),
+  [`rmse()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  (root-mean-squared error),
+  [`medAbsErr()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  (median absolute error), and
+  [`BayesRule()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  are cross-validation criteria (“cost functions”), suitable for use
+  with [`cv()`](https://gmonette.github.io/cv/reference/cv.md).
+
+- [`cv()`](https://gmonette.github.io/cv/reference/cv.md) also can
+  cross-validate a selection procedure (such as the following) for a
+  regression model:
+
+  - `cvModelList()` employs CV to select a model from among a number of
+    candidates, and then cross-validates this model-selection procedure.
+
+  - [`selectStepAIC()`](https://gmonette.github.io/cv/reference/cv.function.md)
+    is a predictor-selection procedure based on the `stepAIC()` function
+    in the **MASS** package.
+
+  - [`selectTrans()`](https://gmonette.github.io/cv/reference/cv.function.md)
+    is a procedure for selecting predictor and response transformations
+    in regression, based on the `powerTransform()` function in the
+    **car** package.
+
+  - [`selectTransStepAIC()`](https://gmonette.github.io/cv/reference/cv.function.md)
+    is a procedure that first selects predictor and response
+    transformations and then selects predictors.
+
+For additional introductory information on using the **cv** package, see
+the “[Cross-validating regression
+models](https://gmonette.github.io/cv/articles/cv.html)” vignette
+([`vignette("cv", package="cv")`](https://gmonette.github.io/cv/articles/cv.md)).
+There are also vignettes on [cross-validating mixed-effects
+models](https://gmonette.github.io/cv/articles/cv-mixed.html)
+([`vignette("cv-mixed", package="cv")`](https://gmonette.github.io/cv/articles/cv-mixed.md)),
+[cross-validating model
+selection](https://gmonette.github.io/cv/articles/cv-selection.html)
+([`vignette("cv-selection", package="cv")`](https://gmonette.github.io/cv/articles/cv-selection.md)),
+and [computational and technical
+notes](https://gmonette.github.io/cv/articles/cv-notes.html)
+([`vignette("cv-notes", package="cv")`](https://gmonette.github.io/cv/articles/cv-notes.md)).
+The **cv** package is designed to be extensible to other classes of
+regression models, other CV criteria, and other model-selection
+procedures; for details, see the “[Extending the cv
+package](https://gmonette.github.io/cv/articles/cv-extend.html)”
+vignette
+([`vignette("cv-extend", package="cv")`](https://gmonette.github.io/cv/articles/cv-extend.md)).
+
+## Installing the cv package
+
+To install the current version of the **cv** package from CRAN:
+
+    install.packages("cv")
+
+To install the development version of the **cv** package from GitHub:
+
+    if (!require(remotes)) install.packages("remotes")
+    remotes::install_github("gmonette/cv", build_vignettes=TRUE,
+      dependencies=TRUE)
+
+# Package index
+
+## All functions
+
+- [`Pigs`](https://gmonette.github.io/cv/reference/Pigs.md) : Body
+  Weights of 48 Pigs in 9 Successive Weeks
+- [`mse()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  [`rmse()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  [`medAbsErr()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  [`BayesRule()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  [`BayesRule2()`](https://gmonette.github.io/cv/reference/cost-functions.md)
+  : Cost Functions for Fitted Regression Models
+- [`cv()`](https://gmonette.github.io/cv/reference/cv.md)
+  [`print(`*`<cv>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`summary(`*`<cv>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`print(`*`<cvList>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`summary(`*`<cvList>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`plot(`*`<cv>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`plot(`*`<cvList>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`cvInfo()`](https://gmonette.github.io/cv/reference/cv.md)
+  [`as.data.frame(`*`<cv>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`as.data.frame(`*`<cvList>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`print(`*`<cvDataFrame>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  [`summary(`*`<cvDataFrame>`*`)`](https://gmonette.github.io/cv/reference/cv.md)
+  : Cross-Validate Regression Models
+- [`cv(`*`<function>`*`)`](https://gmonette.github.io/cv/reference/cv.function.md)
+  [`selectStepAIC()`](https://gmonette.github.io/cv/reference/cv.function.md)
+  [`selectTrans()`](https://gmonette.github.io/cv/reference/cv.function.md)
+  [`selectTransStepAIC()`](https://gmonette.github.io/cv/reference/cv.function.md)
+  [`selectModelList()`](https://gmonette.github.io/cv/reference/cv.function.md)
+  [`compareFolds()`](https://gmonette.github.io/cv/reference/cv.function.md)
+  [`coef(`*`<cvSelect>`*`)`](https://gmonette.github.io/cv/reference/cv.function.md)
+  [`cvInfo(`*`<cvSelect>`*`)`](https://gmonette.github.io/cv/reference/cv.function.md)
+  : Cross-Validate a Model-Selection Procedure
+- [`cv(`*`<merMod>`*`)`](https://gmonette.github.io/cv/reference/cv.merMod.md)
+  [`cv(`*`<lme>`*`)`](https://gmonette.github.io/cv/reference/cv.merMod.md)
+  [`cv(`*`<glmmTMB>`*`)`](https://gmonette.github.io/cv/reference/cv.merMod.md)
+  : Cross-Validate Mixed-Effects Model
+- [`cv(`*`<modList>`*`)`](https://gmonette.github.io/cv/reference/cv.modList.md)
+  [`models()`](https://gmonette.github.io/cv/reference/cv.modList.md)
+  [`print(`*`<cvModList>`*`)`](https://gmonette.github.io/cv/reference/cv.modList.md)
+  [`summary(`*`<cvModList>`*`)`](https://gmonette.github.io/cv/reference/cv.modList.md)
+  [`plot(`*`<cvModList>`*`)`](https://gmonette.github.io/cv/reference/cv.modList.md)
+  [`as.data.frame(`*`<cvModList>`*`)`](https://gmonette.github.io/cv/reference/cv.modList.md)
+  : Cross-Validate Several Models Fit to the Same Data
+- [`cvCompute()`](https://gmonette.github.io/cv/reference/cvCompute.md)
+  [`cvMixed()`](https://gmonette.github.io/cv/reference/cvCompute.md)
+  [`cvSelect()`](https://gmonette.github.io/cv/reference/cvCompute.md)
+  [`folds()`](https://gmonette.github.io/cv/reference/cvCompute.md)
+  [`fold()`](https://gmonette.github.io/cv/reference/cvCompute.md)
+  [`print(`*`<folds>`*`)`](https://gmonette.github.io/cv/reference/cvCompute.md)
+  [`GetResponse()`](https://gmonette.github.io/cv/reference/cvCompute.md)
+  [`checkFormula()`](https://gmonette.github.io/cv/reference/cvCompute.md)
+  : Utility Functions for the cv Package
+
+# Articles
+
+### All vignettes
+
+- [Extending the cv
+  package](https://gmonette.github.io/cv/articles/cv-extend.md):
+- [Cross-validating mixed-effects
+  models](https://gmonette.github.io/cv/articles/cv-mixed.md):
+- [Computational and technical notes on cross-validating regression
+  models](https://gmonette.github.io/cv/articles/cv-notes.md):
+- [Cross-validating model
+  selection](https://gmonette.github.io/cv/articles/cv-selection.md):
+- [Cross-validating regression
+  models](https://gmonette.github.io/cv/articles/cv.md):

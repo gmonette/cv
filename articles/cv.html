@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Cross-validating regression models • cv</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Cross-validating regression models">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cv</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,7 @@ package</h3>
                         <h4 data-toc-skip class="author">John Fox and
 Georges Monette</h4>
             
-            <h4 data-toc-skip class="date">2025-09-24</h4>
+            <h4 data-toc-skip class="date">2026-06-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/gmonette/cv/blob/main/vignettes/cv.Rmd" class="external-link"><code>vignettes/cv.Rmd</code></a></small>
       <div class="d-none name"><code>cv.Rmd</code></div>
@@ -213,7 +213,7 @@ scatterplot:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">horsepower</span>, data<span class="op">=</span><span class="va">Auto</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/mpg-horsepower-scatterplot-1.png" alt="`mpg` vs `horsepower` for the `Auto` data" width="100%"><p class="caption">
+<img src="fig/mpg-horsepower-scatterplot-1.png" class="r-plt" alt="`mpg` vs `horsepower` for the `Auto` data" width="100%"><p class="caption">
 <code>mpg</code> vs <code>horsepower</code> for the <code>Auto</code>
 data
 </p>
@@ -257,7 +257,7 @@ are shown in the following figure:</p>
 <span>  inset <span class="op">=</span> <span class="fl">0.02</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/mpg-horsepower-scatterplot-polynomials-1.png" alt="`mpg` vs `horsepower` for the `Auto` data" width="100%"><p class="caption">
+<img src="fig/mpg-horsepower-scatterplot-polynomials-1.png" class="r-plt" alt="`mpg` vs `horsepower` for the `Auto` data" width="100%"><p class="caption">
 <code>mpg</code> vs <code>horsepower</code> for the <code>Auto</code>
 data
 </p>
@@ -274,9 +274,9 @@ below).</p>
 <p>The following graph shows two measures of estimated (squared) error
 as a function of polynomial-regression degree: The mean-squared error
 (“MSE”), defined as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝖬</mi><mi>𝖲</mi><mi>𝖤</mi></mrow><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝖬</mi><mi>𝖲</mi><mi>𝖤</mi></mrow><mo>=</mo><mfrac><mn>1</mn><mi>n</mi></mfrac><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\mathsf{MSE} = \frac{1}{n}\sum_{i=1}^n (y_i - \widehat{y}_i)^2</annotation></semantics></math>,
 and the usual residual variance, defined as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mover><mi>σ</mi><mo accent="true">̂</mo></mover><mn>2</mn></msup><mo>=</mo><mfrac><mn>1</mn><mrow><mi>n</mi><mo>−</mo><mi>p</mi><mo>−</mo><mn>1</mn></mrow></mfrac><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2</annotation></semantics></math>.
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mover><mi>σ</mi><mo accent="true">̂</mo></mover><mn>2</mn></msup><mo>=</mo><mfrac><mn>1</mn><mrow><mi>n</mi><mo>−</mo><mi>p</mi><mo>−</mo><mn>1</mn></mrow></mfrac><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\widehat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i=1}^n (y_i - \widehat{y}_i)^2</annotation></semantics></math>.
 The former necessarily declines with
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
 (or, more strictly, can’t increase with
@@ -334,7 +334,7 @@ with the “best” value, by a small margin, for
 <span>  pch <span class="op">=</span> <span class="fl">17</span><span class="op">:</span><span class="fl">16</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/mpg-horsepower-MSE-se-1.png" alt="Estimated squared error as a function of polynomial degree, $p$" width="100%"><p class="caption">
+<img src="fig/mpg-horsepower-MSE-se-1.png" class="r-plt" alt="Estimated squared error as a function of polynomial degree, $p$" width="100%"><p class="caption">
 Estimated squared error as a function of polynomial degree,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math></p>
 </div>
@@ -403,14 +403,14 @@ each fold deleted:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.m.auto</span><span class="op">)</span> <span class="co"># CV criterion</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/plot.cv.crit-1.png" alt="CV criterion (MSE) for cases in each fold." width="90%"><p class="caption">
+<img src="fig/plot.cv.crit-1.png" class="r-plt" alt="CV criterion (MSE) for cases in each fold." width="90%"><p class="caption">
 CV criterion (MSE) for cases in each fold.
 </p>
 </div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.m.auto</span>, what<span class="op">=</span><span class="st">"coefficients"</span><span class="op">)</span> <span class="co"># coefficient estimates</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/plot.cv.coefs-1.png" alt="Regression coefficients with each fold omitted." width="90%"><p class="caption">
+<img src="fig/plot.cv.coefs-1.png" class="r-plt" alt="Regression coefficients with each fold omitted." width="90%"><p class="caption">
 Regression coefficients with each fold omitted.
 </p>
 </div>
@@ -704,7 +704,7 @@ CV and the MSEs for LOO CV (see the section below on manipulating
 <span>  pch <span class="op">=</span> <span class="fl">17</span><span class="op">:</span><span class="fl">16</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/polynomial-regression-CV-graph-1.png" alt="Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$" width="100%"><p class="caption">
+<img src="fig/polynomial-regression-CV-graph-1.png" class="r-plt" alt="Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$" width="100%"><p class="caption">
 Cross-validated 10-fold and LOO MSE as a function of polynomial degree,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math></p>
 </div>
@@ -717,7 +717,7 @@ separate graphs for 10-fold and LOO CV:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.auto.loo</span>, main<span class="op">=</span><span class="st">"Polynomial Regressions, LOO CV"</span>,</span>
 <span>     axis.args<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>labels<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>, xlab<span class="op">=</span><span class="st">"Degree of Polynomial, p"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/polynomial-regression-CV-graph-2-1.png" alt="Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$" width="45%"><img src="fig/polynomial-regression-CV-graph-2-2.png" alt="Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$" width="45%"><p class="caption">
+<img src="fig/polynomial-regression-CV-graph-2-1.png" class="r-plt" alt="Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$" width="45%"><img src="fig/polynomial-regression-CV-graph-2-2.png" class="r-plt" alt="Cross-validated 10-fold and LOO MSE as a function of polynomial degree, $p$" width="45%"><p class="caption">
 Cross-validated 10-fold and LOO MSE as a function of polynomial degree,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math></p>
 </div>
@@ -861,7 +861,7 @@ result of applying the <code><a href="../reference/cost-functions.html">BayesRul
 <strong>cv</strong> package to predictions derived from the fitted
 model. Bayes rule, which predicts a “success” in a binary regression
 model when the fitted probability of success [i.e.,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϕ</mi><mo>=</mo><mo>Pr</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>y</mi><mo>=</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\phi = \Pr(y = 1)</annotation></semantics></math>]
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ϕ</mi><mo>=</mo><mrow><mi mathvariant="normal">Pr</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo>=</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\phi = \Pr(y = 1)</annotation></semantics></math>]
 is
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>ϕ</mi><mo accent="true">̂</mo></mover><mo>≥</mo><mn>.5</mn></mrow><annotation encoding="application/x-tex">\widehat{\phi} \ge .5</annotation></semantics></math>
 and a “failure” if
@@ -983,7 +983,7 @@ is a multiple of the number of folds
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>—a
 slightly simplifying assumption—the number of possible partitions of
 cases into folds is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mrow><mi>n</mi><mi>!</mi></mrow><msup><mrow><mo stretchy="true" form="prefix">[</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mi>/</mi><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>!</mi><mo stretchy="true" form="postfix">]</mo></mrow><mi>k</mi></msup></mfrac><annotation encoding="application/x-tex">\frac{n!}{[(n/k)!]^k}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mrow><mi>n</mi><mi>!</mi></mrow><mrow><mo stretchy="false" form="prefix">[</mo><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mi>/</mi><mi>k</mi><mo stretchy="false" form="postfix">)</mo><mi>!</mi><msup><mo stretchy="false" form="postfix">]</mo><mi>k</mi></msup></mrow></mfrac><annotation encoding="application/x-tex">\frac{n!}{[(n/k)!]^k}</annotation></semantics></math>,
 a number that grows very large very quickly. For example, for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">n = 10</annotation></semantics></math>
 and
@@ -1105,7 +1105,7 @@ replication:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.mroz.reps</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/cv.mroz.reps-1.png" alt="Replicated cross-validated 10-fold CV for the logistic regression fit to the `Mroz` data." width="90%"><p class="caption">
+<img src="fig/cv.mroz.reps-1.png" class="r-plt" alt="Replicated cross-validated 10-fold CV for the logistic regression fit to the `Mroz` data." width="90%"><p class="caption">
 Replicated cross-validated 10-fold CV for the logistic regression fit to
 the <code>Mroz</code> data.
 </p>
@@ -1126,7 +1126,7 @@ the results:</p>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv.auto.reps</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="fig/model-comparison-with-reps-1.png" alt=" Replicated cross-validated 10-fold CV as a function of polynomial degree, $p$" width="100%"><p class="caption">
+<img src="fig/model-comparison-with-reps-1.png" class="r-plt" alt=" Replicated cross-validated 10-fold CV as a function of polynomial degree, $p$" width="100%"><p class="caption">
 Replicated cross-validated 10-fold CV as a function of polynomial
 degree,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math></p>
@@ -1194,7 +1194,7 @@ default:</p>
 <span><span class="co">#&gt; [1] "cvModListDataFrame" "cvListDataFrame"    "cvDataFrame"       </span></span>
 <span><span class="co">#&gt; [4] "data.frame"</span></span></code></pre></div>
 <p>The resulting data frame has
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝗋</mi><mi>𝖾</mi><mi>𝗉</mi><mi>𝗅</mi><mi>𝗂</mi><mi>𝖼</mi><mi>𝖺</mi><mi>𝗍</mi><mi>𝗂</mi><mi>𝗈</mi><mi>𝗇</mi><mi>𝗌</mi></mrow><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mrow><mi>𝖿</mi><mi>𝗈</mi><mi>𝗅</mi><mi>𝖽</mi><mi>𝗌</mi></mrow><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mrow><mi>𝗆</mi><mi>𝗈</mi><mi>𝖽</mi><mi>𝖾</mi><mi>𝗅</mi><mi>𝗌</mi></mrow><mo>=</mo><mn>5</mn><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>10</mn><mo>+</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mn>10</mn><mo>=</mo><mn>550</mn></mrow><annotation encoding="application/x-tex">\mathsf{replications} \times (\mathsf{folds} + 1) \times \mathsf{models} = 5 \times (10 + 1) \times 10 = 550</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝗋</mi><mi>𝖾</mi><mi>𝗉</mi><mi>𝗅</mi><mi>𝗂</mi><mi>𝖼</mi><mi>𝖺</mi><mi>𝗍</mi><mi>𝗂</mi><mi>𝗈</mi><mi>𝗇</mi><mi>𝗌</mi></mrow><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mrow><mi>𝖿</mi><mi>𝗈</mi><mi>𝗅</mi><mi>𝖽</mi><mi>𝗌</mi></mrow><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mrow><mi>𝗆</mi><mi>𝗈</mi><mi>𝖽</mi><mi>𝖾</mi><mi>𝗅</mi><mi>𝗌</mi></mrow><mo>=</mo><mn>5</mn><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mn>10</mn><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mn>10</mn><mo>=</mo><mn>550</mn></mrow><annotation encoding="application/x-tex">\mathsf{replications} \times (\mathsf{folds} + 1) \times \mathsf{models} = 5 \times (10 + 1) \times 10 = 550</annotation></semantics></math>
 rows, the first few of which are</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">D</span><span class="op">)</span></span>
@@ -1377,6 +1377,9 @@ related objects has a formula interface, and may be used, for example,
 as follows:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">D</span>, <span class="va">adjusted.criterion</span> <span class="op">~</span> <span class="va">model</span> <span class="op">+</span> <span class="va">rep</span><span class="op">)</span> <span class="co"># fold "0" only</span></span>
+<span><span class="co">#&gt; Registered S3 method overwritten by 'car':</span></span>
+<span><span class="co">#&gt;   method           from</span></span>
+<span><span class="co">#&gt;   na.action.merMod lme4</span></span>
 <span><span class="co">#&gt;           rep</span></span>
 <span><span class="co">#&gt; model           1      2      3      4      5</span></span>
 <span><span class="co">#&gt;   model.1  24.193 24.113 24.226 24.144 24.184</span></span>
@@ -1444,7 +1447,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;  26.406   0.601  27.279</span></span>
+<span><span class="co">#&gt;  30.075   0.744  31.352</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span></span>
 <span>  <span class="va">m.mroz.sel.cv.p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cv.html">cv</a></span><span class="op">(</span></span>
@@ -1458,7 +1461,7 @@ LOO CV to lengthen the calculation) and then doing it in parallel using
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.338   0.045  14.283</span></span>
+<span><span class="co">#&gt;   0.361   0.055  16.204</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">m.mroz.sel.cv</span>, <span class="va">m.mroz.sel.cv.p</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>On our computer, the parallel computation with 2 cores is nearly
@@ -1520,7 +1523,7 @@ introduction to statistical learning with applications in
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
