@@ -128,7 +128,7 @@ mse
 #>     attr(result, "casewise loss") <- "(y - yhat)^2"
 #>     result
 #> }
-#> <bytecode: 0x13341d9a8>
+#> <bytecode: 0x13063e470>
 #> <environment: namespace:cv>
 
 cv:::getLossFn(mse(rnorm(100), rnorm(100)))
@@ -136,7 +136,7 @@ cv:::getLossFn(mse(rnorm(100), rnorm(100)))
 #> {
 #>     (y - yhat)^2
 #> }
-#> <environment: 0x13345bbd8>
+#> <environment: 0x13067c6a0>
 ```
 
 For this scheme to work, the “casewise loss” attribute must be a
@@ -572,7 +572,7 @@ cv:::cv.lme
 #>             newdata = data, level = 1), fixed.effects = nlme::fixef, 
 #>         ...)
 #> }
-#> <bytecode: 0x126414c60>
+#> <bytecode: 0x133e02c68>
 #> <environment: namespace:cv>
 ```
 

@@ -1398,9 +1398,10 @@ number of computer cores to be used) to a number \> `1` (which is the
 default). Parallel computation can be advantageous for large problems,
 reducing the execution time of the program.
 
-To illustrate, let’s time model selection in Mroz’s logistic regression,
-repeating the computation as performed previously (but with LOO CV to
-lengthen the calculation) and then doing it in parallel using 2 cores:
+To illustrate, the reader is invited to time model selection in Mroz’s
+logistic regression, repeating the computation as performed previously
+(but with LOO CV to lengthen the calculation) and then doing it in
+parallel using 2 cores:
 
 ``` r
 
@@ -1414,8 +1415,6 @@ system.time(
     AIC = FALSE
   )
 )
-#>    user  system elapsed 
-#>  30.075   0.744  31.352
 
 system.time(
   m.mroz.sel.cv.p <- cv(
@@ -1428,10 +1427,7 @@ system.time(
     ncores = 2
   )
 )
-#>    user  system elapsed 
-#>   0.361   0.055  16.204
 all.equal(m.mroz.sel.cv, m.mroz.sel.cv.p)
-#> [1] TRUE
 ```
 
 On our computer, the parallel computation with 2 cores is nearly twice

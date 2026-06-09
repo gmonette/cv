@@ -1,5 +1,10 @@
 # Changelog
 
+## cv 2.0.6
+
+- CRAN release in conjunction with the publication of Fox and
+  Monette (2026) <doi:10.18637/jss.v116.i08>
+
 ## cv 2.0.4
 
 CRAN release: 2025-06-16

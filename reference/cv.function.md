@@ -372,47 +372,44 @@ cv package" vignette
 ## Examples
 
 ``` r
-if (requireNamespace("ISLR2", quietly=TRUE)){
-withAutoprint({
-data("Auto", package="ISLR2")
-m.auto <- lm(mpg ~ . - name - origin, data=Auto)
-cv(selectStepAIC, Auto, seed=123, working.model=m.auto)
-cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
-         AIC=FALSE, k=5, reps=3) # via BIC
-})
-} else {
-cat("\n install the 'ISLR2' package to run these examples\n")
-}
+  if (requireNamespace("ISLR2", quietly=TRUE)){
+    withAutoprint({
+      data("Auto", package="ISLR2")
+      m.auto <- lm(mpg ~ . - name - origin - year, data=Auto)
+      cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
+         AIC=FALSE, k=5, reps=2) # via BIC
+      # The user is invited to increase reps and to try using AIC with the
+      # following line:
+      # cv(selectStepAIC, Auto, seed=123, working.model=m.auto) # via AIC
+    })
+  } else {
+    cat("\n install the 'ISLR2' package to run these examples\n")
+  }
 #> > data("Auto", package = "ISLR2")
-#> > m.auto <- lm(mpg ~ . - name - origin, data = Auto)
-#> > cv(selectStepAIC, Auto, seed = 123, working.model = m.auto)
-#> R RNG seed set to 123
-#> cross-validation criterion (mse) = 11.87795 
+#> > m.auto <- lm(mpg ~ . - name - origin - year, data = Auto)
 #> > cv(selectStepAIC, Auto, seed = 123, working.model = m.auto, AIC = FALSE, 
-#> +     k = 5, reps = 3)
+#> +     k = 5, reps = 2)
 #> R RNG seed set to 123
 #> R RNG seed set to 319729
-#> R RNG seed set to 889422
 #> cross-validation criterion (mse)
-#> Replicate 1: 11.91891 
-#> Replicate 2: 11.80601 
-#> Replicate 3: 11.81343 
-#> Average: 11.86432 
+#> Replicate 1: 18.04787 
+#> Replicate 2: 18.40478 
+#> Average: 18.16684 
 if (requireNamespace("carData", quietly=TRUE)){
-withAutoprint({
-data("Prestige", package="carData")
-m.pres <- lm(prestige ~ income + education + women,
-             data=Prestige)
-cvt <- cv(selectTrans, data=Prestige, working.model=m.pres, seed=123,
-          predictors=c("income", "education", "women"),
-          response="prestige", family="yjPower")
-cvt
-compareFolds(cvt)
-coef(cvt, average=median, NAs=1) # NAs not really needed here
-cv(m.pres, seed=123)
-})
-} else {
-cat("install the 'carData' package to run these examples\n")
+  withAutoprint({
+    data("Prestige", package="carData")
+    m.pres <- lm(prestige ~ income + education + women,
+               data=Prestige)
+    cvt <- cv(selectTrans, data=Prestige, working.model=m.pres, seed=123,
+            predictors=c("income", "education", "women"),
+            response="prestige", family="yjPower")
+    cvt
+    compareFolds(cvt)
+    coef(cvt, average=median, NAs=1) # NAs not really needed here
+    cv(m.pres, seed=123)
+  })
+  } else {
+  cat("install the 'carData' package to run these examples\n")
 }
 #> > data("Prestige", package = "carData")
 #> > m.pres <- lm(prestige ~ income + education + women, data = Prestige)
@@ -526,6 +523,7 @@ compareFolds(cvs)
 #> Fold 8   0.30500     -0.17392     -0.01683                                   
 #> Fold 9   0.29284     -0.14623     -0.05409                                   
 #> Fold 10  0.32421                                                             
+# \donttest{
 data("Duncan", package="carData")
 m1 <- lm(prestige ~ income + education, data=Duncan)
 m2 <- lm(prestige ~ income + education + type, data=Duncan)
@@ -548,4 +546,5 @@ cvInfo(cv.sel, "selected model")
 #> (Intercept)       income    education     typeprof       typewc  
 #>     -0.1850       0.5975       0.3453      16.6575     -14.6611  
 #> 
+# }
 ```

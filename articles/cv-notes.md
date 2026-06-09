@@ -193,11 +193,11 @@ microbenchmark::microbenchmark(
 #> Warning in microbenchmark::microbenchmark(hatvalues = cv(m.auto, k = "loo"), :
 #> less accurate nanosecond times to avoid potential integer overflows
 #> Unit: milliseconds
-#>       expr      min       lq     mean   median       uq      max neval
-#>  hatvalues   2.0507   2.2768   2.6806   2.3058   2.7121   5.4399    10
-#>   Woodbury  13.5814  14.8696  19.0034  16.4796  24.1375  27.7238    10
-#>      naive 234.6956 258.4918 278.0291 289.1408 297.0773 301.7305    10
-#>     cv.glm 450.2114 462.6246 537.8314 510.7763 607.9489 745.1678    10
+#>       expr      min       lq     mean  median       uq       max neval
+#>  hatvalues   2.2523   2.5716   3.4297   2.802   3.0273    7.0419    10
+#>   Woodbury  22.3746  24.7914  31.5752  32.998  36.6194   39.6416    10
+#>      naive 397.3227 472.0032 545.7685 515.170 663.6847  694.8077    10
+#>     cv.glm 778.8036 847.8872 920.7226 906.592 936.7376 1288.8372    10
 ```
 
 On our computer, using the hatvalues is about an order of magnitude
@@ -299,11 +299,11 @@ microbenchmark::microbenchmark(
   times = 10
 )
 #> Unit: milliseconds
-#>       expr       min        lq      mean    median        uq       max neval
-#>  hatvalues    2.1878    2.4001    2.6145    2.5735    2.8389    3.1786    10
-#>   Woodbury   48.3798   51.2279   52.9838   52.8029   54.7773   58.1968    10
-#>      exact 2184.4771 2260.2463 2378.7911 2367.4649 2456.2159 2662.5837    10
-#>     cv.glm 2442.4449 2523.9813 2693.9351 2736.7670 2772.3282 2949.3461    10
+#>       expr      min        lq      mean   median       uq       max neval
+#>  hatvalues    2.588    2.7119    2.9594    2.882    3.306    3.4282    10
+#>   Woodbury   48.582   53.0518   56.8492   56.451   57.058   68.9085    10
+#>      exact 2389.216 2476.1870 2618.2364 2576.572 2801.621 2917.9261    10
+#>     cv.glm 2402.914 2650.4961 2894.1319 2805.600 3053.615 3554.0149    10
 ```
 
 There is a substantial time penalty associated with exact computations.

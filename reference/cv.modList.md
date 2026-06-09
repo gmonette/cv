@@ -231,100 +231,30 @@ returns a `"cvModList"` object, or, when `meta=TRUE`, an object of class
 ## Examples
 
 ``` r
-if (requireNamespace("carData", quietly=TRUE)){
-withAutoprint({
-data("Duncan", package="carData")
-m1 <- lm(prestige ~ income + education, data=Duncan)
-m2 <- lm(prestige ~ income + education + type, data=Duncan)
-m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
-(cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
-                 data=Duncan, seed=7949, reps=5))
-D.cv.models <- as.data.frame(cv.models)
-head(D.cv.models)
-summary(D.cv.models, criterion ~ model + rep, include="folds")
-plot(cv.models)
-(cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
-                    data=Duncan, seed=5963, confint=TRUE, level=0.50))
-                 # nb: n too small for accurate CIs
-plot(cv.models.ci)
-(cv.models.meta <- cv(models(m1=m1, m2=m2, m3=m3),
-                      data=Duncan, seed=5963,
-                      meta=TRUE, save.model=TRUE))
-cvInfo(cv.models.meta, "selected model")
-})
-} else {
-cat("install the 'carData' package to run these examples\n")
+if(interactive()){
+  if (requireNamespace("carData", quietly=TRUE)){
+  withAutoprint({
+  data("Duncan", package="carData")
+  m1 <- lm(prestige ~ income + education, data=Duncan)
+  m2 <- lm(prestige ~ income + education + type, data=Duncan)
+  m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
+  (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
+                   data=Duncan, seed=7949, reps=5))
+  D.cv.models <- as.data.frame(cv.models)
+  head(D.cv.models)
+  summary(D.cv.models, criterion ~ model + rep, include="folds")
+  plot(cv.models)
+  (cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
+                      data=Duncan, seed=5963, confint=TRUE, level=0.50))
+                   # nb: n too small for accurate CIs
+  plot(cv.models.ci)
+  (cv.models.meta <- cv(models(m1=m1, m2=m2, m3=m3),
+                        data=Duncan, seed=5963,
+                        meta=TRUE, save.model=TRUE))
+  cvInfo(cv.models.meta, "selected model")
+  })
+  } else {
+  cat("install the 'carData' package to run these examples\n")
+  }
 }
-#> > data("Duncan", package = "carData")
-#> > m1 <- lm(prestige ~ income + education, data = Duncan)
-#> > m2 <- lm(prestige ~ income + education + type, data = Duncan)
-#> > m3 <- lm(prestige ~ (income + education) * type, data = Duncan)
-#> > (cv.models <- cv(models(m1 = m1, m2 = m2, m3 = m3), data = Duncan, seed = 7949, 
-#> +     reps = 5))
-#> Model m1 averaged across 5 replications:
-#> cross-validation criterion = 195.0866 
-#> 
-#> Model m2 averaged across 5 replications:
-#> cross-validation criterion = 111.7281 
-#> 
-#> Model m3 averaged across 5 replications:
-#> cross-validation criterion = 142.3619 
-#> 
-#> > D.cv.models <- as.data.frame(cv.models)
-#> > head(D.cv.models)
-#>   model rep fold criterion adjusted.criterion full.criterion coef.Intercept
-#> 1    m1   1    0   198.534             196.89         166.82        -6.0647
-#> 2    m1   1    1   139.227                 NA             NA        -5.3264
-#> 3    m1   1    2   328.311                 NA             NA        -7.4825
-#> 4    m1   1    3    87.649                 NA             NA        -5.1543
-#> 5    m1   1    4   133.564                 NA             NA        -5.9934
-#> 6    m1   1    5    55.317                 NA             NA        -5.4389
-#>   coef.income coef.education coef.typeprof coef.typewc coef.income:typeprof
-#> 1     0.59873        0.54583            NA          NA                   NA
-#> 2     0.57458        0.55107            NA          NA                   NA
-#> 3     0.53963        0.59419            NA          NA                   NA
-#> 4     0.60090        0.53586            NA          NA                   NA
-#> 5     0.54033        0.59515            NA          NA                   NA
-#> 6     0.57504        0.54903            NA          NA                   NA
-#>   coef.income:typewc coef.education:typeprof coef.education:typewc
-#> 1                 NA                      NA                    NA
-#> 2                 NA                      NA                    NA
-#> 3                 NA                      NA                    NA
-#> 4                 NA                      NA                    NA
-#> 5                 NA                      NA                    NA
-#> 6                 NA                      NA                    NA
-#> > summary(D.cv.models, criterion ~ model + rep, include = "folds")
-#>      rep
-#> model        1        2        3        4        5
-#>    m1 204.7489 197.8415 192.9138 199.5759 200.2259
-#>    m2 110.5324 109.8870 121.7147 111.1913 120.0575
-#>    m3 141.9428 145.7092 143.0177 143.1847 155.0245
-#> > plot(cv.models)
-
-#> > (cv.models.ci <- cv(models(m1 = m1, m2 = m2, m3 = m3), data = Duncan, 
-#> +     seed = 5963, confint = TRUE, level = 0.5))
-#> Model m1:
-#> cross-validation criterion = 196.8033 
-#> 
-#> Model m2:
-#> cross-validation criterion = 112.0172 
-#> 
-#> Model m3:
-#> cross-validation criterion = 145.4901 
-#> 
-#> > plot(cv.models.ci)
-
-#> > (cv.models.meta <- cv(models(m1 = m1, m2 = m2, m3 = m3), data = Duncan, 
-#> +     seed = 5963, meta = TRUE, save.model = TRUE))
-#> R RNG seed set to 5963
-#> cross-validation criterion = 112.0172 
-#> > cvInfo(cv.models.meta, "selected model")
-#> 
-#> Call:
-#> lm(formula = prestige ~ income + education + type, data = Duncan)
-#> 
-#> Coefficients:
-#> (Intercept)       income    education     typeprof       typewc  
-#>     -0.1850       0.5975       0.3453      16.6575     -14.6611  
-#> 
 ```

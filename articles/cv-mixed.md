@@ -179,7 +179,7 @@ or at the case (i.e., student) level,
 
 summary(cv(hsb.lmer, seed = 1575))
 #> R RNG seed set to 1575
-#> Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, : Model failed to converge with max|grad| = 0.00587267 (tol = 0.002, component 1)
+#> Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, : Model failed to converge with max|grad| = 0.00587154 (tol = 0.002, component 1)
 #>   See ?lme4::convergence and ?lme4::troubleshooting.
 #> boundary (singular) fit: see help('isSingular')
 #> 10-Fold Cross Validation
