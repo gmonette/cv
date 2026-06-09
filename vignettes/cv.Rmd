@@ -496,8 +496,8 @@ See `?summary.cvDataFrame` for details.
 
 The CV functions in the **cv** package are all capable of performing parallel computations by setting the `ncores` argument (specifying the number of computer cores to be used) to a number > `1` (which is the default). Parallel computation can be advantageous for large problems, reducing the execution time of the program.
 
-To illustrate, let's time model selection in Mroz's logistic regression, repeating the computation as performed previously (but with LOO CV to lengthen the calculation) and then doing it in parallel using 2 cores:
-```{r parallel-computation, cache=TRUE}
+To illustrate, the reader is invited to time model selection in Mroz's logistic regression, repeating the computation as performed previously (but with LOO CV to lengthen the calculation) and then doing it in parallel using 2 cores:
+```{r parallel-computation, cache=TRUE, eval=FALSE}
 system.time(
   m.mroz.sel.cv <- cv(
     selectStepAIC,

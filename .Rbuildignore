@@ -10,3 +10,5 @@ vignettes/cv-extend_cache/*
 .*\.tar\.gz
 ^doc$
 ^Meta$
+^\.positai$
+^\.claude$

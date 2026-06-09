@@ -24,5 +24,8 @@
 #'             data=Pigs, REML=FALSE,
 #'             control=lmerControl(optimizer="bobyqa"))
 #' summary(m.p)
-#' cv(m.p, clusterVariables=c("id", "week"), k=10, seed=8469)
+#' #
+#' # we illustrate 'cv' with k=5, the reader is invited
+#' # to try k=10
+#' cv(m.p, clusterVariables=c("id", "week"), k=5, seed=8469)
 "Pigs"

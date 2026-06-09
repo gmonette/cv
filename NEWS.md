@@ -1,3 +1,7 @@
+# cv 2.0.6
+
+- CRAN release in conjunction with the publication of Fox and Monette (2026) <doi:10.18637/jss.v116.i08>
+
 # cv 2.0.4
 
 - Provide an informative warning when there are variables in a model formula that aren't in the data to which the model was fit, which can cause update() to fail or report incorrect results  (following report by Joshua Philipp Entrop).

@@ -164,29 +164,31 @@ different response variables.
 
 }}
 \examples{
-if (requireNamespace("carData", quietly=TRUE)){
-withAutoprint({
-data("Duncan", package="carData")
-m1 <- lm(prestige ~ income + education, data=Duncan)
-m2 <- lm(prestige ~ income + education + type, data=Duncan)
-m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
-(cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
-                 data=Duncan, seed=7949, reps=5))
-D.cv.models <- as.data.frame(cv.models)
-head(D.cv.models)
-summary(D.cv.models, criterion ~ model + rep, include="folds")
-plot(cv.models)
-(cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
-                    data=Duncan, seed=5963, confint=TRUE, level=0.50))
-                 # nb: n too small for accurate CIs
-plot(cv.models.ci)
-(cv.models.meta <- cv(models(m1=m1, m2=m2, m3=m3),
-                      data=Duncan, seed=5963,
-                      meta=TRUE, save.model=TRUE))
-cvInfo(cv.models.meta, "selected model")
-})
-} else {
-cat("install the 'carData' package to run these examples\n")
+if(interactive()){
+  if (requireNamespace("carData", quietly=TRUE)){
+  withAutoprint({
+  data("Duncan", package="carData")
+  m1 <- lm(prestige ~ income + education, data=Duncan)
+  m2 <- lm(prestige ~ income + education + type, data=Duncan)
+  m3 <- lm(prestige ~ (income + education)*type, data=Duncan)
+  (cv.models <- cv(models(m1=m1, m2=m2, m3=m3),
+                   data=Duncan, seed=7949, reps=5))
+  D.cv.models <- as.data.frame(cv.models)
+  head(D.cv.models)
+  summary(D.cv.models, criterion ~ model + rep, include="folds")
+  plot(cv.models)
+  (cv.models.ci <- cv(models(m1=m1, m2=m2, m3=m3),
+                      data=Duncan, seed=5963, confint=TRUE, level=0.50))
+                   # nb: n too small for accurate CIs
+  plot(cv.models.ci)
+  (cv.models.meta <- cv(models(m1=m1, m2=m2, m3=m3),
+                        data=Duncan, seed=5963,
+                        meta=TRUE, save.model=TRUE))
+  cvInfo(cv.models.meta, "selected model")
+  })
+  } else {
+  cat("install the 'carData' package to run these examples\n")
+  }
 }
 }
 \seealso{

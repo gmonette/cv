@@ -105,18 +105,19 @@
 #' is set accordingly (note that this is distinct from the number of
 #' folds \code{k}).
 #' @examples
-#' if (requireNamespace("ISLR2", quietly=TRUE)){
-#' withAutoprint({
-#' data("Auto", package="ISLR2")
-#' m.auto <- lm(mpg ~ . - name - origin, data=Auto)
-#' cv(selectStepAIC, Auto, seed=123, working.model=m.auto)
-#' cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
-#'          AIC=FALSE, k=5, reps=3) # via BIC
-#' })
-#' } else {
-#' cat("\n install the 'ISLR2' package to run these examples\n")
-#' }
-
+#'   if (requireNamespace("ISLR2", quietly=TRUE)){
+#'     withAutoprint({
+#'       data("Auto", package="ISLR2")
+#'       m.auto <- lm(mpg ~ . - name - origin - year, data=Auto)
+#'       cv(selectStepAIC, Auto, seed=123, working.model=m.auto,
+#'          AIC=FALSE, k=5, reps=2) # via BIC
+#'       # The user is invited to increase reps and to try using AIC with the
+#'       # following line:
+#'       # cv(selectStepAIC, Auto, seed=123, working.model=m.auto) # via AIC
+#'     })
+#'   } else {
+#'     cat("\n install the 'ISLR2' package to run these examples\n")
+#'   }
 #' @describeIn cv.function \code{cv()} method for applying a model
 #' model-selection (or specification) procedure.
 #' @export
@@ -284,20 +285,20 @@ yjPowerInverse <- function(y, lambda) {
 #' of the estimated transformation parameters (see \code{\link[car]{bcPower}()}).
 #' @examples
 #' if (requireNamespace("carData", quietly=TRUE)){
-#' withAutoprint({
-#' data("Prestige", package="carData")
-#' m.pres <- lm(prestige ~ income + education + women,
-#'              data=Prestige)
-#' cvt <- cv(selectTrans, data=Prestige, working.model=m.pres, seed=123,
-#'           predictors=c("income", "education", "women"),
-#'           response="prestige", family="yjPower")
-#' cvt
-#' compareFolds(cvt)
-#' coef(cvt, average=median, NAs=1) # NAs not really needed here
-#' cv(m.pres, seed=123)
-#' })
-#' } else {
-#' cat("install the 'carData' package to run these examples\n")
+#'   withAutoprint({
+#'     data("Prestige", package="carData")
+#'     m.pres <- lm(prestige ~ income + education + women,
+#'                data=Prestige)
+#'     cvt <- cv(selectTrans, data=Prestige, working.model=m.pres, seed=123,
+#'             predictors=c("income", "education", "women"),
+#'             response="prestige", family="yjPower")
+#'     cvt
+#'     compareFolds(cvt)
+#'     coef(cvt, average=median, NAs=1) # NAs not really needed here
+#'     cv(m.pres, seed=123)
+#'   })
+#'   } else {
+#'   cat("install the 'carData' package to run these examples\n")
 #' }
 #' @describeIn cv.function select transformations of the predictors and response
 #' using \code{\link[car]{powerTransform}()} in the \pkg{car} package.
@@ -726,6 +727,7 @@ selectModelList <-
     )
   }
 #' @examples
+#' \donttest{
 #' data("Duncan", package="carData")
 #' m1 <- lm(prestige ~ income + education, data=Duncan)
 #' m2 <- lm(prestige ~ income + education + type, data=Duncan)
@@ -734,7 +736,7 @@ selectModelList <-
 #'                      working.model=models(m1, m2, m3),
 #'                      save.model=TRUE)) # meta CV
 #' cvInfo(cv.sel, "selected model")
-#'
+#' }
 #' @describeIn cv.function print the coefficients from the selected models
 #' for the several folds.
 #' @param object an object of class \code{"cvSelect"}.
